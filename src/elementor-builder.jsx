@@ -4799,8 +4799,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           </div>
           {briefLoading && (
             <div style={{ marginTop: "14px", padding: "10px 14px", background: "#f5f5f4", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "11px", color: "#52525b", lineHeight: 1.6 }}>
-              <div style={{ marginBottom: "4px", color: "#000000", fontWeight: 500 }}>What's happening:</div>
-              Reading your description, matching it against 19 industry templates, 11 layouts, and 12 color themes. Considering your context (inspiration, audience, goals). Drafting tagline + hero eyebrow.
+              <div style={{ marginBottom: "4px", color: "#000000", fontWeight: 500 }}></div>
+              
             </div>
           )}
           {briefError && (
