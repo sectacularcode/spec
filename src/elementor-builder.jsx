@@ -4503,6 +4503,180 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   );
 
   // If there are no projects at all, force the Projects view (which has + New / Import tiles)
+
+  const exportBrief = () => {
+    const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+    const layout = LAYOUTS ? LAYOUTS.find(l => l.id === brand.layoutId) : null;
+    const theme = THEMES ? THEMES.find(t => t.id === brand.themeId) : null;
+    const sl = brand.socialLinks || [];
+
+    const section = (label, content) => content ? `
+      <div class="section">
+        <div class="section-label">${label}</div>
+        ${content}
+      </div>
+      <hr class="divider">
+    ` : "";
+
+    const field = (label, value) => value ? `
+      <div class="field">
+        <div class="field-key">${label}</div>
+        <div class="field-val">${value}</div>
+      </div>
+    ` : "";
+
+    const copyBlock = (label, value) => value ? `
+      <div class="copy-block">
+        <div class="copy-label">${label}</div>
+        <div class="copy-text">${value}</div>
+      </div>
+    ` : "";
+
+    const pill = (text) => `<span class="pill">${text}</span>`;
+    const chip = (text) => `<span class="chip">${text}</span>`;
+
+    const pagesHTML = project.pages.filter(p => p.heroHeading || p.aboutBody || p.services).map(p => `
+      <div class="page-block">
+        <div class="page-name">${p.name}</div>
+        <div class="chips">${(p.sections || []).map(chip).join("")}</div>
+        ${p.heroHeading ? `<div class="page-copy"><span class="copy-label">Hero</span> ${p.heroHeading}</div>` : ""}
+        ${p.heroSubhead ? `<div class="page-copy"><span class="copy-label">Subhead</span> ${p.heroSubhead}</div>` : ""}
+        ${p.aboutBody ? `<div class="page-copy"><span class="copy-label">About</span> ${p.aboutBody}</div>` : ""}
+      </div>
+    `).join("");
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>${brand.name} — Brand Brief</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:13px;color:#18181b;background:#fff;padding:48px;max-width:800px;margin:0 auto}
+  .doc-header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:24px;border-bottom:1px solid #e4e4e7;margin-bottom:32px}
+  .brand-name{font-size:24px;font-weight:600;color:#09090b}
+  .brand-desc{font-size:13px;color:#71717a;margin-top:4px}
+  .doc-meta{font-size:11px;color:#a1a1aa;text-align:right;line-height:1.8}
+  .spec-mark{font-size:11px;font-weight:600;color:#52525b;letter-spacing:.05em;text-transform:uppercase}
+  .section{margin-bottom:28px}
+  .section-label{font-size:10px;font-weight:600;color:#a1a1aa;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+  .divider{border:none;border-top:1px solid #f4f4f5;margin:0 0 28px}
+  .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .field{margin-bottom:12px}
+  .field-key{font-size:11px;color:#71717a;margin-bottom:2px}
+  .field-val{font-size:13px;color:#18181b;line-height:1.5}
+  .pill-group{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+  .pill{font-size:11px;padding:3px 10px;border-radius:20px;background:#f4f4f5;color:#52525b;border:1px solid #e4e4e7}
+  .copy-block{background:#fafafa;border-radius:6px;padding:12px 14px;margin-bottom:8px;border:1px solid #f4f4f5}
+  .copy-label{font-size:10px;color:#a1a1aa;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px}
+  .copy-text{font-size:13px;color:#18181b;line-height:1.6}
+  .copy-text.large{font-size:15px;font-weight:500}
+  .cta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .color-swatch{display:flex;align-items:center;gap:8px}
+  .swatch{width:18px;height:18px;border-radius:4px;border:1px solid #e4e4e7;flex-shrink:0}
+  .page-block{border:1px solid #f4f4f5;border-radius:6px;padding:12px 14px;margin-bottom:8px}
+  .page-name{font-size:13px;font-weight:500;color:#09090b;margin-bottom:8px}
+  .chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+  .chip{font-size:10px;padding:2px 7px;border-radius:4px;background:#f4f4f5;color:#71717a;border:1px solid #e4e4e7}
+  .page-copy{font-size:12px;color:#52525b;margin-top:6px;line-height:1.5}
+  .page-copy .copy-label{display:inline;font-size:10px;color:#a1a1aa;letter-spacing:.05em;text-transform:uppercase;margin-right:6px;font-weight:600}
+  .kw{font-size:13px;color:#18181b;line-height:1.9}
+  .social-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .social-item{font-size:12px;color:#52525b;background:#fafafa;padding:3px 10px;border-radius:4px;border:1px solid #e4e4e7}
+  .footer{padding-top:24px;border-top:1px solid #e4e4e7;display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+  .footer-text{font-size:10px;color:#a1a1aa}
+  @media print{body{padding:32px}button{display:none}}
+</style>
+</head>
+<body>
+  <div class="doc-header">
+    <div>
+      <div class="brand-name">${brand.name || "Unnamed Brand"}</div>
+      <div class="brand-desc">${brand.description ? brand.description.substring(0, 100) + (brand.description.length > 100 ? "..." : "") : ""}</div>
+    </div>
+    <div class="doc-meta">
+      <div class="spec-mark">Brand Brief</div>
+      <div>${today}</div>
+      <div>Generated by Spec</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Brand Identity</div>
+    <div class="field-grid">
+      ${brand.primaryColor ? `<div class="field"><div class="field-key">Primary Color</div><div class="color-swatch"><div class="swatch" style="background:${brand.primaryColor}"></div><span class="field-val">${brand.primaryColor}</span></div></div>` : ""}
+      ${brand.accentColor ? `<div class="field"><div class="field-key">Accent Color</div><div class="color-swatch"><div class="swatch" style="background:${brand.accentColor}"></div><span class="field-val">${brand.accentColor}</span></div></div>` : ""}
+      ${brand.headingFont ? `<div class="field"><div class="field-key">Heading Font</div><div class="field-val">${brand.headingFont}</div></div>` : ""}
+      ${brand.bodyFont ? `<div class="field"><div class="field-key">Body Font</div><div class="field-val">${brand.bodyFont}</div></div>` : ""}
+      ${layout ? `<div class="field"><div class="field-key">Layout Template</div><div class="field-val">${layout.name || brand.layoutId}</div></div>` : ""}
+      ${theme ? `<div class="field"><div class="field-key">Theme</div><div class="field-val">${theme.name || brand.themeId}</div></div>` : ""}
+      ${brand.logoUrl ? `<div class="field"><div class="field-key">Logo URL</div><div class="field-val" style="word-break:break-all;font-size:11px">${brand.logoUrl}</div></div>` : ""}
+    </div>
+  </div>
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-label">Contact & Site Info</div>
+    <div class="field-grid">
+      ${field("Contact Email", brand.contactEmail)}
+      ${field("Contact Phone", brand.contactPhone)}
+      ${field("Site URL / Domain", brand.siteUrl)}
+    </div>
+    ${sl.length ? `<div class="field"><div class="field-key">Social Links</div><div class="social-row">${sl.map(s => `<span class="social-item">${s.label}: ${s.url}</span>`).join("")}</div></div>` : ""}
+  </div>
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-label">Goals & Strategy</div>
+    ${(brand.goals || []).length ? `<div class="field"><div class="field-key">Primary Goals</div><div class="pill-group">${(brand.goals || []).map(pill).join("")}</div></div>` : ""}
+    ${field("Desired Outcome", brand.desiredOutcome)}
+    ${field("Target Audience", brand.targetAudience)}
+    ${field("Tone", brand.tone)}
+  </div>
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-label">SEO & Messaging</div>
+    ${brand.primaryKeywords ? `<div class="field"><div class="field-key">Primary Keywords</div><div class="kw">${brand.primaryKeywords.split(",").map(k => k.trim()).join(" · ")}</div></div>` : ""}
+    ${brand.keyMessages ? `<div class="field" style="margin-top:12px"><div class="field-key">Key Messages</div><div class="field-val">${brand.keyMessages}</div></div>` : ""}
+  </div>
+  <hr class="divider">
+
+  ${brand.inspoUrls ? `<div class="section"><div class="section-label">Inspiration</div>${field("Inspiration URLs", brand.inspoUrls)}${field("Style Notes", brand.styleNotes)}</div><hr class="divider">` : ""}
+
+  <div class="section">
+    <div class="section-label">Starter Copy</div>
+    ${copyBlock("Tagline", brand.tagline)}
+    ${project.pages[0] ? copyBlock("Hero Heading", project.pages[0].heroHeading) : ""}
+    ${project.pages[0] ? copyBlock("Hero Subhead", project.pages[0].heroSubhead) : ""}
+    ${project.pages[0] ? copyBlock("About", project.pages[0].aboutBody) : ""}
+    <div class="cta-grid">
+      ${copyBlock("Primary CTA", brand.cta1)}
+      ${copyBlock("Secondary CTA", brand.cta2)}
+    </div>
+  </div>
+  <hr class="divider">
+
+  ${brand.clientLogos ? `<div class="section"><div class="section-label">Client / Brand List</div><div class="pill-group">${brand.clientLogos.split("\n").filter(Boolean).map(pill).join("")}</div></div><hr class="divider">` : ""}
+
+  ${brand.primaryMenu ? `<div class="section"><div class="section-label">Navigation</div><div class="pill-group">${brand.primaryMenu.split(",").map(m => pill(m.trim())).join("")}</div></div><hr class="divider">` : ""}
+
+  ${pagesHTML ? `<div class="section"><div class="section-label">Pages</div>${pagesHTML}</div><hr class="divider">` : ""}
+
+  <div class="footer">
+    <div class="footer-text">${brand.name} · Brand Brief · ${today}</div>
+    <div class="footer-text">Generated by Spec · elementor-builder2.vercel.app</div>
+  </div>
+
+  <script>window.print();</script>
+</body>
+</html>`;
+
+    const win = window.open("", "_blank");
+    win.document.write(html);
+    win.document.close();
+  };
+
   const effectiveView = projects.length === 0 ? "projects" : view;
 
   // ── PREVIEW VIEW ───────────────────────────────────────────────────────────
@@ -4857,6 +5031,9 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             </button>
             <button onClick={() => exportProjectFile(project)} style={{ ...I.btnGhost, display: "inline-flex", alignItems: "center", gap: "6px" }} title="Download this project as a JSON backup">
               <Icon name="download" size={14} color="#52525b" /> Save Backup
+            </button>
+            <button onClick={exportBrief} style={{ padding: "9px 14px", background: "transparent", color: "#52525b", border: "1px solid #e4e4e7", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              <Icon name="file-text" size={14} color="#52525b" /> Export Brief
             </button>
             <button onClick={() => setView("preview")} style={{ ...I.btn, background: "#000000", color: "#ffffff", display: "inline-flex", alignItems: "center", gap: "6px" }}>
               <Icon name="eye" size={14} color="#ffffff" /> Preview Page
