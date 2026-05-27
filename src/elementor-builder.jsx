@@ -3927,7 +3927,7 @@ Important guardrails:
           "x-api-key": "",
           "anthropic-dangerous-direct-browser-access": "true" },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
+          model: "claude-sonnet-4-5",
           max_tokens: 1000,
           system: systemPrompt,
           messages: [{ role: "user", content: userPrompt }],
@@ -4001,7 +4001,7 @@ Return ONLY the new ${fieldName} value as plain text.`;
           "x-api-key": "",
           "anthropic-dangerous-direct-browser-access": "true" },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
+          model: "claude-sonnet-4-5",
           max_tokens: 400,
           system: systemPrompt,
           messages: [{ role: "user", content: userPrompt }],
@@ -4152,7 +4152,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           "x-api-key": "",
           "anthropic-dangerous-direct-browser-access": "true" },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
+          model: "claude-sonnet-4-5",
           max_tokens: 800,
           system: systemPrompt,
           messages: [{ role: "user", content: briefText.trim()
