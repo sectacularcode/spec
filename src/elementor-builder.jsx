@@ -4749,7 +4749,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             
           </p>
           <div style={{ marginBottom: "10px" }}>
-            <label style={{ display: "block", fontSize: "10px", color: "#71717a", fontWeight: 600, marginBottom: "6px", letterSpacing: "0.05em", textTransform: "uppercase" }}>Let AI pick your template — describe your industry or site</label>
+            
             <textarea
               value={briefText}
               onChange={e => setBriefText(e.target.value)}
@@ -4914,7 +4914,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         <h2 style={{ fontSize: "14px", margin: "0 0 14px", fontWeight: 600, color: "#09090b", letterSpacing: "-0.01em" }}>Your projects</h2>
         {projects.length === 0 && (
           <div style={{ marginBottom: "20px", padding: "20px 24px", background: "#ffffff", border: "1px solid #ebe9e2", borderRadius: "10px" }}>
-            <div style={{ fontSize: "13px", fontWeight: 600, color: "#09090b", marginBottom: "6px" }}>No projects yet — start with one of the tiles below</div>
+            <div style={{ fontSize: "13px", fontWeight: 600, color: "#09090b", marginBottom: "6px" }}></div>
             <div style={{ fontSize: "12px", color: "#52525b", lineHeight: 1.6 }}>
               
             </div>
@@ -4984,12 +4984,12 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             <Icon name="plus" size={18} color="#52525b" /> New Project
           </button>
           <label style={{ background: "transparent", border: "1.5px dashed #d4d2c8", color: "#52525b", padding: "32px", borderRadius: "10px", cursor: "pointer", fontSize: "13px", fontWeight: 500, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-            <Icon name="upload" size={18} color="#52525b" /> Import Project JSON
+            <Icon name="upload" size={18} color="#52525b" /> Import Project
             <input type="file" accept="application/json,.json" onChange={importProjectFile} style={{ display: "none" }} />
           </label>
         </div>
         <p style={{ fontSize: "11px", color: "#71717a", marginTop: "20px", lineHeight: 1.6 }}>
-          Projects auto-save in your browser. Use the download icon on a project card to save a JSON backup (handy for sharing or as a safety net).
+          Projects auto-save in your browser. Use the download icon on a project card to save a backup.
         </p>
       </div>
     </div>
