@@ -3720,8 +3720,8 @@ const Section = ({ title, icon, id, children }) => (
 );
 
 export default function App() {
-  const [projects, setProjects] = useState([EV_PROJECT]);
-  const [activeId, setActiveId] = useState("ev");
+  const [projects, setProjects] = useState([]);
+  const [activeId, setActiveId] = useState("");
   const [view, setView] = useState("projects"); // projects | editor | preview
   const [tab, setTab] = useState("discovery");
   const [pageIdx, setPageIdx] = useState(0);
