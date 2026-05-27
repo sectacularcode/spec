@@ -4921,7 +4921,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           </div>
         )}
         {importMsg && (
-          <div style={{ marginBottom: "16px", padding: "12px 16px", background: importMsg.startsWith("Import failed") ? "#fef2f2" : "#f7f4ff", border: importMsg.startsWith("Import failed") ? "1px solid #fecaca" : "1px solid #e8def9", borderRadius: "8px", fontSize: "12px", color: importMsg.startsWith("Import failed") ? "#991b1b" : "#5b21b6" }}>
+          <div style={{ marginBottom: "16px", padding: "12px 16px", background: importMsg.startsWith("Import failed") ? "#fef2f2" : "#f5f5f4", border: importMsg.startsWith("Import failed") ? "1px solid #fecaca" : "1px solid #e5e7eb", borderRadius: "8px", fontSize: "12px", color: importMsg.startsWith("Import failed") ? "#991b1b" : "#27272a" }}>
             {importMsg}
           </div>
         )}
