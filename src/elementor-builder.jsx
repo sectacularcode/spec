@@ -3503,7 +3503,7 @@ function previewHTML(page, brand) {
       }).join("");
       return `<section style="background:${pc};padding:clamp(60px,10vw,${layout.sectionPadding}px) clamp(24px,8vw,100px);">
         <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.teamEyebrow">${page.teamEyebrow || "The Team"}</p>
-        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 48px;font-weight:400;">People who make it happen. <span style="font-size:13px;color:${ts};">↔ swipe</span></h2>
+        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 48px;font-weight:400;">People who make it happen.</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;">${cards}</div>
       </section>`;
     }
@@ -3521,7 +3521,7 @@ function previewHTML(page, brand) {
       }).join("");
       return `<section style="background:${card};padding:clamp(60px,10vw,${layout.sectionPadding}px) clamp(24px,8vw,100px);">
         <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.portfolioEyebrow">${page.portfolioEyebrow || "Selected Work"}</p>
-        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 48px;font-weight:400;">Recent projects. <span style="font-size:13px;color:${ts};">↔ swipe</span></h2>
+        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 48px;font-weight:400;">Recent projects.</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;">${cards}</div>
       </section>`;
     }
