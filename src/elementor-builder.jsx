@@ -3239,7 +3239,7 @@ function previewHTML(page, brand) {
           <h2 style="font-family:'${hf}',sans-serif;font-size:clamp(28px,4vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 56px;font-weight:500;">${heading}</h2>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;text-align:left;">
             ${items.map((line, i) => { const [t, d] = line.split("|"); return `<div style="background:${card};padding:40px 32px;border-radius:${radius};">
-              <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:${ac};margin:0 0 20px;font-weight:600;">${String(i + 1).padStart(2, "0")}</p>
+              <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:${ac};margin:0 0 20px;font-weight:600;" data-edit="page.serviceNumber_${i}">${String(i + 1).padStart(2, "0")}</p>
               <h3 style="font-family:'${hf}',sans-serif;font-size:22px;color:${headingColor};margin:0 0 12px;font-weight:500;">${t || ""}</h3>
               <p style="font-family:'${bf}',sans-serif;font-size:14px;color:${ts};line-height:1.6;margin:0;">${d || ""}</p>
             </div>`; }).join("")}
@@ -3264,7 +3264,7 @@ function previewHTML(page, brand) {
 
       // DEFAULT — grid numbered (Editorial Minimal, Studio Portfolio)
       return `<section style="background:${pc};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
-        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">${eyebrow}</p>
+        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;" data-edit="page.servicesEyebrow">${page.servicesEyebrow || eyebrow}</p>
         <h2 style="font-family:'${hf}',serif;font-size:clamp(36px,5vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 80px;font-weight:400;">${heading}</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:${bdr};border:1px solid ${bdr};">
           ${items.map((line, i) => { const [t, d] = line.split("|"); return `<div style="background:${pc};padding:48px 36px;">
@@ -3439,7 +3439,7 @@ function previewHTML(page, brand) {
         const fields = (fStr || "Name,Email,Message").split(",").filter(Boolean);
         return `<section id="contact" style="background:${s === "Form" ? card : pc};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
           <div style="max-width:640px;">
-            <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">Contact</p>
+            <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;" data-edit="page.contactEyebrow">${page.contactEyebrow || "Contact"}</p>
             <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 40px;font-weight:400;">${title || "Let's talk."}</h2>
             <form style="display:flex;flex-direction:column;gap:18px;">
               ${fields.map(fl => /message|details|notes/i.test(fl)
