@@ -1424,6 +1424,21 @@ const newPage = (name = "Homepage", pageType = "Homepage") => {
     videoUrl: "",
     forms: template.forms || "Project Inquiry|Name,Email,Company,Project Type,Budget,Timeline,Project Details|Send Inquiry",
     ctaHeading: template.ctaHeading || "Ready to make something worth seeing?",
+    heroEyebrow: template.heroEyebrow || "",
+    aboutEyebrow: template.aboutEyebrow || "About",
+    servicesEyebrow: template.servicesEyebrow || "Services",
+    clientsEyebrow: template.clientsEyebrow || "Trusted By",
+    portfolioEyebrow: template.portfolioEyebrow || "Selected Work",
+    teamEyebrow: template.teamEyebrow || "The Team",
+    leadershipEyebrow: template.leadershipEyebrow || "Leadership",
+    processEyebrow: template.processEyebrow || "How We Work",
+    testimonialsEyebrow: template.testimonialsEyebrow || "Kind Words",
+    blogEyebrow: template.blogEyebrow || "Journal",
+    faqEyebrow: template.faqEyebrow || "FAQ",
+    pricingEyebrow: template.pricingEyebrow || "Pricing",
+    socialEyebrow: template.socialEyebrow || "Follow Along",
+    contactEyebrow: template.contactEyebrow || "Contact",
+    sectionEyebrow: template.sectionEyebrow || "",
   };
 };
 
