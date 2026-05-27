@@ -4710,9 +4710,9 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         </div>
         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
           <FormatToggle />
-          <button onClick={downloadPage} style={{ padding: "8px 14px", background: "#ffffff", color: "#18181b", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Download Page JSON</button>
-          <button onClick={downloadHeader} style={{ padding: "8px 14px", background: "transparent", color: "#ffffff", border: "1px solid #3f3f46", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Header JSON</button>
-          <button onClick={downloadFooter} style={{ padding: "8px 14px", background: "transparent", color: "#ffffff", border: "1px solid #3f3f46", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Footer JSON</button>
+          <button onClick={downloadPage} style={{ padding: "8px 14px", background: "#ffffff", color: "#18181b", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Download Template</button>
+          <button onClick={downloadHeader} style={{ padding: "8px 14px", background: "transparent", color: "#ffffff", border: "1px solid #3f3f46", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Header Template</button>
+          <button onClick={downloadFooter} style={{ padding: "8px 14px", background: "transparent", color: "#ffffff", border: "1px solid #3f3f46", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Footer Template</button>
           <button onClick={() => setView("editor")} style={{ padding: "8px 14px", background: "transparent", color: "#a3a39e", border: "1px solid #3f3f46", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>← Back to Editor</button>
         </div>
       </div>
@@ -5065,13 +5065,13 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", flexWrap: "wrap", gap: "8px", paddingTop: "10px", borderTop: "1px solid #e5e7eb" }}>
           <FormatToggle />
           <button onClick={downloadPage} style={{ ...I.btn, background: "#000000", color: "#ffffff", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-            <Icon name="download" size={14} color="#ffffff" /> Download Page JSON
+            <Icon name="download" size={14} color="#ffffff" /> Download Template
           </button>
           <button onClick={downloadHeader} style={{ ...I.btnGhost, padding: "8px 14px", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-            <Icon name="download" size={14} color="#52525b" /> Header JSON
+            <Icon name="download" size={14} color="#52525b" /> Header Template
           </button>
           <button onClick={downloadFooter} style={{ ...I.btnGhost, padding: "8px 14px", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-            <Icon name="download" size={14} color="#52525b" /> Footer JSON
+            <Icon name="download" size={14} color="#52525b" /> Footer Template
           </button>
         </div>
       </div>
@@ -6091,10 +6091,10 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               <div style={{ fontSize: "13px", color: "#27272a", lineHeight: 1.7 }}>
                 {exportFormat === "elementor" ? (
                   <><strong style={{ color: "#18181b" }}>Page JSON</strong> — Elementor template using native widgets (Heading, Text, Button, Icon Box, Image, Counter, Testimonial, Accordion, Social Icons, Video, Form).<br /><br />
-                  <strong style={{ color: "#18181b" }}>Footer JSON</strong> — separate Theme Builder template. Import once under Theme Builder → Footer.</>
+                  <strong style={{ color: "#18181b" }}>Footer Template</strong> — separate Theme Builder template. Import once under Theme Builder → Footer.</>
                 ) : (
                   <><strong style={{ color: "#18181b" }}>Page JSON</strong> — Divi layout using native modules (et_pb_text, et_pb_button, et_pb_blurb, et_pb_image, et_pb_number_counter, et_pb_testimonial, et_pb_accordion, et_pb_social_media_follow, et_pb_video, et_pb_contact_form).<br /><br />
-                  <strong style={{ color: "#18181b" }}>Footer JSON</strong> — separate Divi layout. Import via Theme Builder or insert into a Global Footer template.</>
+                  <strong style={{ color: "#18181b" }}>Footer Template</strong> — separate Divi layout. Import via Theme Builder or insert into a Global Footer template.</>
                 )}
               </div>
             </div>
