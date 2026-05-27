@@ -4736,7 +4736,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           <div style={{ fontSize: "10px", color: "#71717a", padding: "3px 9px", background: "#ffffff", border: "1px solid #e8e6dd", borderRadius: "10px", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>Beta</div>
         </div>
         <h1 style={{ fontSize: "28px", margin: "0 0 6px", fontWeight: 600, letterSpacing: "-0.02em", color: "#09090b" }}>Projects</h1>
-        <p style={{ color: "#52525b", fontSize: "13px", margin: "0 0 32px", lineHeight: 1.6 }}>Brand strategy to a designed page concept, ready for Elementor or Divi. Start from a description, pick a template, or open an existing project.</p>
+        <p style={{ color: "#52525b", fontSize: "13px", margin: "0 0 32px", lineHeight: 1.6 }}>Plan, spec, and export Elementor or Divi templates.</p>
 
         {/* AI Describe Your Site — optional guided start */}
         <div style={{ background: "#ffffff", border: "1px solid #ebe9e2", borderRadius: "12px", padding: "24px", marginBottom: "28px" }}>
@@ -4745,7 +4745,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             <h2 style={{ fontSize: "16px", margin: 0, fontWeight: 600, color: "#09090b", letterSpacing: "-0.01em" }}>Describe your site — get a custom recommendation</h2>
           </div>
           <p style={{ fontSize: "12px", color: "#52525b", margin: "0 0 16px", lineHeight: 1.6 }}>
-            Optional. Tell me what you're building — industry, vibe, goal — and I'll suggest the right template, layout, colors, fonts, and starting brief. You can apply, tweak, or ignore.
+            Describe your site and get a template, layout, colors, and starter copy.
           </p>
           <div style={{ marginBottom: "12px" }}>
             <label style={{ display: "block", fontSize: "10px", color: "#000000", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600, marginBottom: "6px" }}>
@@ -4763,20 +4763,20 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             <div style={{ fontSize: "10px", color: "#71717a", marginTop: "6px", lineHeight: 1.5 }}>
               {lockedTemplateId
                 ? "Pinned. AI will keep this template and recommend everything else (layout, colors, fonts, brief)."
-                : "AI will pick from all 19 templates based on your description. Pick one above if you already have a preference."}
+                : ""}
             </div>
           </div>
           <div style={{ marginBottom: "6px", fontSize: "11px", color: "#71717a" }}>
             {lockedTemplateId
               ? "Description below is now optional — your locked template gives me enough to work with. Add details to personalize the brief further."
-              : "Describe what you're building (industry, vibe, audience, goal) and I'll recommend everything."}
+              : ""}
           </div>
           <textarea
             value={briefText}
             onChange={e => setBriefText(e.target.value)}
             placeholder={lockedTemplateId
               ? "Optional: add specifics like audience, vibe, or a target outcome to personalize the recommendation. Leave blank to use smart defaults for this template."
-              : "Example: A modern fitness coaching site for women over 40 focused on strength training. Warm but no-nonsense voice. Earthy color palette. I want visitors to book 1-on-1 coaching consultations."}
+              : "e.g. A modern fitness coaching site for women over 40. Warm but no-nonsense. Earthy palette."}
             style={{ width: "100%", minHeight: "100px", padding: "12px 14px", background: "#f5f5f4", color: "#18181b", border: "1px solid #ebe9e2", borderRadius: "8px", fontSize: "13px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.6, outline: "none" }}
           />
           <div style={{ display: "flex", gap: "10px", marginTop: "14px", alignItems: "center", flexWrap: "wrap" }}>
@@ -4926,7 +4926,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           <div style={{ marginBottom: "20px", padding: "20px 24px", background: "#ffffff", border: "1px solid #ebe9e2", borderRadius: "10px" }}>
             <div style={{ fontSize: "13px", fontWeight: 600, color: "#09090b", marginBottom: "6px" }}>No projects yet — start with one of the tiles below</div>
             <div style={{ fontSize: "12px", color: "#52525b", lineHeight: 1.6 }}>
-              Click <strong style={{ color: "#18181b" }}>New Project</strong> to start from scratch, <strong style={{ color: "#18181b" }}>Import Project JSON</strong> to restore a backup, or use the <strong style={{ color: "#000000" }}>Describe your site</strong> box above to get an AI-recommended project.
+              Start a new project or describe your site above for an AI recommendation.
             </div>
           </div>
         )}
