@@ -3782,6 +3782,7 @@ export default function App() {
 
   // Persistence — load projects from window.storage on mount, save on changes
   const [storageLoaded, setStorageLoaded] = useState(false);
+  const [showAdvancedColors, setShowAdvancedColors] = React.useState(false);
   const [welcomeDismissed, setWelcomeDismissed] = useState(() => { try { return window.localStorage.getItem("specWelcomeDone") === "1"; } catch(e) { return false; } });
   const [importMsg, setImportMsg] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState(null); // project id pending delete confirmation
@@ -5354,6 +5355,13 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 </div>
               </Section>
 
+                            
+              <Section id="founder" title="Founder" icon="👤">
+                <div><label style={I.lbl}>Founder Name</label><input style={I.inp} value={brand.founderName} onChange={e => updBrand("founderName", e.target.value)} placeholder="e.g. Alex Morgan" /></div>
+                <div><label style={I.lbl}>Founder Title</label><input style={I.inp} value={brand.founderTitle} onChange={e => updBrand("founderTitle", e.target.value)} placeholder="e.g. Founder & Creative Director" /></div>
+                <div><label style={I.lbl}>Founder Bio</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.founderBio} onChange={e => updBrand("founderBio", e.target.value)} /></div>
+              </Section>
+
                             <Section id="brand-business" title="Business" icon="🏢">
                 <div>
                   <label style={I.lbl}>Business Name</label>
@@ -5612,7 +5620,13 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
 
 
-              <Section id="brand-colors" title="Brand Colors — Use Your Hex Codes" icon="🎨">
+              <div style={{ border: "1px solid #e5e7eb", borderRadius: "10px", marginBottom: "16px", overflow: "hidden" }}>
+              <button onClick={() => setShowAdvancedColors(v => !v)} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", background: "#fafaf9", border: "none", cursor: "pointer", fontSize: "13px", fontWeight: 600, color: "#09090b" }}>
+                <span>🎨 Advanced — Custom Brand Colors</span>
+                <span style={{ fontSize: "11px", color: "#71717a" }}>{showAdvancedColors ? "▲ Hide" : "▼ Show"}</span>
+              </button>
+              {showAdvancedColors && <div style={{ padding: "16px" }}>
+              <Section id="brand-colors" title="" icon="">
                 <p style={{ fontSize: "12px", color: "#27272a", margin: 0, lineHeight: 1.6 }}>
                   Drop in your actual brand hex codes. Once you have at least 2 colors (Background + Accent), an <strong style={{ color: "#18181b" }}>"Apply Custom Brand Palette"</strong> button appears that swaps the live theme to use them.
                 </p>
@@ -5832,15 +5846,15 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   placeholder="e.g. Lowercase navigation, dramatic numbered sections, generous negative space, all-caps eyebrow labels, dark background with one bold accent color, work-first hierarchy."
                 />
               </Section>
+              </div>}
+            </div>
               <Section id="brand-assets" title="Brand Assets — Clients & Founder" icon="📦">
                 <div>
                   <label style={I.lbl}>Client Logos / Brands Worked With (one per line)</label>
                   <textarea style={{ ...I.inp, resize: "vertical", fontSize: "12px" }} rows={5} value={brand.clientLogos} onChange={e => updBrand("clientLogos", e.target.value)} placeholder="Sephora&#10;Glossier&#10;Kérastase" />
                   <div style={{ fontSize: "10px", color: "#71717a", marginTop: "4px" }}>Used in the Logo Carousel section and as context for the AI when drafting copy.</div>
                 </div>
-                <div><label style={I.lbl}>Founder Name</label><input style={I.inp} value={brand.founderName} onChange={e => updBrand("founderName", e.target.value)} placeholder="e.g. Alex Morgan" /></div>
-                <div><label style={I.lbl}>Founder Title</label><input style={I.inp} value={brand.founderTitle} onChange={e => updBrand("founderTitle", e.target.value)} placeholder="e.g. Founder & Creative Director" /></div>
-                <div><label style={I.lbl}>Founder Bio</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.founderBio} onChange={e => updBrand("founderBio", e.target.value)} /></div>
+                
               </Section>
             </>
           )}
