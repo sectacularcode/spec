@@ -4746,7 +4746,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             <h2 style={{ fontSize: "16px", margin: 0, fontWeight: 600, color: "#09090b", letterSpacing: "-0.01em" }}>Describe your site — get a custom recommendation</h2>
           </div>
           <p style={{ fontSize: "12px", color: "#52525b", margin: "0 0 16px", lineHeight: 1.6 }}>
-            Describe your site and get a template, layout, colors, and starter copy.
+            
           </p>
           <div style={{ marginBottom: "12px" }}>
             <label style={{ display: "block", fontSize: "10px", color: "#000000", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600, marginBottom: "6px" }}>
