@@ -5857,7 +5857,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </Section>
               </div>}
             </div>
-              <Section id="brand-assets" title="Brand Assets — Clients & Founder" icon="">
+              <Section id="brand-assets" title="Brand Assets" icon="">
                 
                 
               </Section>
