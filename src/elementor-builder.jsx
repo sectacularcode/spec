@@ -3782,7 +3782,7 @@ export default function App() {
 
   // Persistence — load projects from window.storage on mount, save on changes
   const [storageLoaded, setStorageLoaded] = useState(false);
-  const [showAdvancedColors, setShowAdvancedColors] = React.useState(false);
+  const [showAdvancedColors, setShowAdvancedColors] = useState(false);
   const [welcomeDismissed, setWelcomeDismissed] = useState(() => { try { return window.localStorage.getItem("specWelcomeDone") === "1"; } catch(e) { return false; } });
   const [importMsg, setImportMsg] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState(null); // project id pending delete confirmation
