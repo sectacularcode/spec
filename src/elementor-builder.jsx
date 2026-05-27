@@ -4685,7 +4685,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   if (!welcomeDismissed && projects.length === 0) return (
     <div style={{ minHeight: "100vh", background: "#fafaf9", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 24px" }}>
       <div style={{ maxWidth: "480px", width: "100%", textAlign: "center" }}>
-        <div style={{ fontSize: "13px", fontWeight: 600, color: "#a1a1aa", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: "24px" }}>spec</div>
+        <div style={{ fontSize: "24px", fontWeight: 800, letterSpacing: "-0.03em", color: "#09090b", marginBottom: "32px" }}>spec</div>
         <h1 style={{ fontFamily: "'Georgia', serif", fontSize: "clamp(32px, 5vw, 48px)", fontWeight: 400, color: "#09090b", lineHeight: 1.1, marginBottom: "20px" }}>Build better websites,<br/>faster.</h1>
         <p style={{ fontSize: "15px", color: "#71717a", lineHeight: 1.7, marginBottom: "40px", maxWidth: "380px", margin: "0 auto 40px" }}>Plan, build, and export Elementor and Divi templates — with AI-drafted copy, brand briefs, and one-click template export.</p>
         <div style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "center" }}>
