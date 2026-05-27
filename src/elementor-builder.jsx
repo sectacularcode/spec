@@ -3495,7 +3495,7 @@ function previewHTML(page, brand) {
       const cards = teamLines.map((line, i) => {
         const [name, role, img] = line.split("|");
         const src = imgOrPlaceholder(img, `${brand.name}-team-${name}-${i}`, 600, 750, "portrait");
-        return `<div style="flex:0 0 calc(33% - 14px);min-width:240px;scroll-snap-align:start;">
+        return `<div style="min-width:0;">
           <img src="${src}" alt="${name || ""}" style="width:100%;aspect-ratio:4/5;object-fit:cover;display:block;"/>
           <p style="font-family:'${bf}',sans-serif;font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:${headingColor};margin:16px 0 4px;">${name || ""}</p>
           <p style="font-family:'${bf}',sans-serif;font-size:12px;color:${ac};margin:0;">${role || ""}</p>
@@ -3513,7 +3513,7 @@ function previewHTML(page, brand) {
       const cards = portLines.map((line, i) => {
         const [title, cat, img] = line.split("|");
         const src = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, 1000, 750, brand.imageCategory);
-        return `<div style="flex:0 0 calc(33% - 14px);min-width:280px;scroll-snap-align:start;">
+        return `<div style="min-width:0;">
           <img src="${src}" alt="${title || ""}" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block;"/>
           <h3 style="font-family:'${hf}',serif;font-size:20px;color:${headingColor};margin:16px 0 4px;font-weight:500;">${title || ""}</h3>
           <p style="font-family:'${bf}',sans-serif;font-size:12px;color:${ac};margin:0;">${cat || ""}</p>
