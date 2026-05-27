@@ -4748,38 +4748,28 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           <p style={{ fontSize: "12px", color: "#52525b", margin: "0 0 16px", lineHeight: 1.6 }}>
             
           </p>
+          <div style={{ marginBottom: "10px" }}>
+            <label style={{ display: "block", fontSize: "10px", color: "#71717a", fontWeight: 600, marginBottom: "6px", letterSpacing: "0.05em", textTransform: "uppercase" }}>Let AI pick your template — describe your industry or site</label>
+            <textarea
+              value={briefText}
+              onChange={e => setBriefText(e.target.value)}
+              placeholder="e.g. A modern fitness coaching site for women over 40. Warm but no-nonsense. Earthy palette."
+              style={{ width: "100%", minHeight: "80px", padding: "12px 14px", background: "#f5f5f4", color: "#18181b", border: "1px solid #ebe9e2", borderRadius: "8px", fontSize: "13px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.6, outline: "none" }}
+            />
+          </div>
           <div style={{ marginBottom: "12px" }}>
-            <label style={{ display: "block", fontSize: "10px", color: "#000000", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600, marginBottom: "6px" }}>
-              Already know which template you want? (optional)
-            </label>
+            <label style={{ display: "block", fontSize: "10px", color: "#71717a", fontWeight: 600, marginBottom: "6px", letterSpacing: "0.05em", textTransform: "uppercase" }}>Already know which template you want? (optional)</label>
             <select
               value={lockedTemplateId}
               onChange={e => setLockedTemplateId(e.target.value)}
               style={{ width: "100%", padding: "10px 12px", background: "#f5f5f4", color: "#18181b", border: lockedTemplateId ? "1px solid #7c3aed" : "1px solid #ebe9e2", borderRadius: "8px", fontSize: "13px", fontFamily: "inherit", cursor: "pointer", outline: "none" }}>
-              <option value="">Let AI pick the best template (recommended)</option>
+              <option value="">Let AI pick (recommended)</option>
               {WEBSITE_TEMPLATES.map(t => (
                 <option key={t.id} value={t.id}>{t.name} — {t.industry.split(/[,—]/)[0].trim().slice(0, 40)}</option>
               ))}
             </select>
-            <div style={{ fontSize: "10px", color: "#71717a", marginTop: "6px", lineHeight: 1.5 }}>
-              {lockedTemplateId
-                ? "Pinned. AI will keep this template and recommend everything else (layout, colors, fonts, brief)."
-                : ""}
-            </div>
+            {lockedTemplateId && <div style={{ fontSize: "10px", color: "#71717a", marginTop: "6px" }}>Pinned. AI will keep this template and recommend everything else.</div>}
           </div>
-          <div style={{ marginBottom: "6px", fontSize: "11px", color: "#71717a" }}>
-            {lockedTemplateId
-              ? "Description below is now optional — your locked template gives me enough to work with. Add details to personalize the brief further."
-              : ""}
-          </div>
-          <textarea
-            value={briefText}
-            onChange={e => setBriefText(e.target.value)}
-            placeholder={lockedTemplateId
-              ? "Optional: add specifics like audience, vibe, or a target outcome to personalize the recommendation. Leave blank to use smart defaults for this template."
-              : "e.g. A modern fitness coaching site for women over 40. Warm but no-nonsense. Earthy palette."}
-            style={{ width: "100%", minHeight: "100px", padding: "12px 14px", background: "#f5f5f4", color: "#18181b", border: "1px solid #ebe9e2", borderRadius: "8px", fontSize: "13px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.6, outline: "none" }}
-          />
           <div style={{ display: "flex", gap: "10px", marginTop: "14px", alignItems: "center", flexWrap: "wrap" }}>
             <button
               onClick={describeMySite}
