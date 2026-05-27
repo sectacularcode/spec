@@ -3201,7 +3201,7 @@ function previewHTML(page, brand) {
       return `<section style="background:${card};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;" class="about-grid">
           <div>
-            <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">About</p>
+            <p data-edit="page.aboutEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">${page.aboutEyebrow || "About"}</p>
             <h2 data-edit="page.aboutHeading" style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 32px;font-weight:400;line-height:1.15;">${page.aboutHeading || "Built for brands that need content that performs."}</h2>
             <p data-edit="page.aboutBody" style="font-family:'${bf}',sans-serif;font-size:17px;color:${ts};line-height:1.8;margin:0;">${page.aboutBody || brand.description}</p>
           </div>
@@ -3279,7 +3279,7 @@ function previewHTML(page, brand) {
     if (s === "Process") {
       const items = (page.process || "").split("\n").filter(Boolean);
       return `<section style="background:${card};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
-        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">How We Work</p>
+        <p data-edit="page.processEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">${page.processEyebrow || "How We Work"}</p>
         <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 80px;font-weight:400;">The process.</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:40px;">
           ${items.map((line, i) => { const [t, d] = line.split("|"); return `<div style="border-top:2px solid ${ac};padding-top:24px;">
@@ -3294,7 +3294,7 @@ function previewHTML(page, brand) {
     if (s === "Team") {
       const items = (page.team || "").split("\n").filter(Boolean);
       return `<section style="background:${pc};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
-        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">The Team</p>
+        <p data-edit="page.teamEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">${page.teamEyebrow || "The Team"}</p>
         <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 80px;font-weight:400;">People who make it happen.</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:40px;">
           ${items.map((line, i) => {
@@ -3323,7 +3323,7 @@ function previewHTML(page, brand) {
     if (s === "Blog") {
       const items = (page.blog || "").split("\n").filter(Boolean);
       return `<section style="background:${pc};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
-        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">Journal</p>
+        <p data-edit="page.blogEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">${page.blogEyebrow || "Journal"}</p>
         <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 80px;font-weight:400;">Recent posts.</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;">
           ${items.map((line, i) => {
@@ -3376,7 +3376,7 @@ function previewHTML(page, brand) {
     if (s === "Pricing") {
       const items = (page.pricing || "").split("\n").filter(Boolean);
       return `<section style="background:${card};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};text-align:center;">
-        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">Pricing</p>
+        <p data-edit="page.pricingEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">${page.pricingEyebrow || "Pricing"}</p>
         <h2 style="font-family:'${hf}',serif;font-size:clamp(36px,5vw,64px);color:${headingColor};margin:0 0 80px;font-weight:400;">Investment.</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;max-width:1100px;margin:0 auto;">
           ${items.map(line => { const [tier, price, desc] = line.split("|"); return `<div style="background:${pc};padding:48px 32px;border:1px solid ${bdr};">
@@ -3392,7 +3392,7 @@ function previewHTML(page, brand) {
     if (s === "Testimonials") {
       const items = (page.testimonials || "").split("\n").filter(Boolean);
       return `<section style="background:${pc};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
-        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 60px;">Kind Words</p>
+        <p data-edit="page.testimonialsEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 60px;">${page.testimonialsEyebrow || "Kind Words"}</p>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:64px;">
           ${items.map(line => { const [q, n, r] = line.split("|"); return `<div>
             <p style="font-family:'${hf}',serif;font-size:clamp(22px,2vw,28px);color:${headingColor};line-height:1.5;font-weight:400;margin:0 0 32px;">${q || ""}</p>
@@ -3405,7 +3405,7 @@ function previewHTML(page, brand) {
     if (s === "FAQ") {
       const items = (page.faq || "").split("\n").filter(Boolean);
       return `<section style="background:${card};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
-        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">FAQ</p>
+        <p data-edit="page.faqEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">${page.faqEyebrow || "FAQ"}</p>
         <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 60px;font-weight:400;">Questions, answered.</h2>
         <div>${items.map(line => { const [q, a] = line.split("|"); return `<details style="border-bottom:1px solid ${bdr};padding:24px 0;"><summary style="font-family:'${hf}',serif;font-size:20px;color:${headingColor};cursor:pointer;font-weight:400;list-style:none;">${q || ""}</summary><p style="font-family:'${bf}',sans-serif;font-size:15px;color:${ts};line-height:1.8;margin:16px 0 0;">${a || ""}</p></details>`; }).join("")}</div>
       </section>`;
