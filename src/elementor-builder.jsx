@@ -4687,7 +4687,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
       <div style={{ maxWidth: "480px", width: "100%", textAlign: "center" }}>
         <div style={{ fontSize: "13px", fontWeight: 600, color: "#a1a1aa", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: "24px" }}>spec</div>
         <h1 style={{ fontFamily: "'Georgia', serif", fontSize: "clamp(32px, 5vw, 48px)", fontWeight: 400, color: "#09090b", lineHeight: 1.1, marginBottom: "20px" }}>Build better websites,<br/>faster.</h1>
-        <p style={{ fontSize: "15px", color: "#71717a", lineHeight: 1.7, marginBottom: "40px", maxWidth: "380px", margin: "0 auto 40px" }}>Spec helps you plan, spec, and export Elementor and Divi templates — with AI-drafted copy, brand briefs, and one-click JSON export.</p>
+        <p style={{ fontSize: "15px", color: "#71717a", lineHeight: 1.7, marginBottom: "40px", maxWidth: "380px", margin: "0 auto 40px" }}>Plan, build, and export Elementor and Divi templates — with AI-drafted copy, brand briefs, and one-click template export.</p>
         <div style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "center" }}>
           <button onClick={() => { setWelcomeDismissed(true); newProject(); }} style={{ padding: "14px 32px", background: "#09090b", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: "pointer", width: "100%", maxWidth: "280px" }}>
             Start a Project
@@ -4696,7 +4696,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             Browse Projects Page
           </button>
         </div>
-        <p style={{ fontSize: "11px", color: "#a1a1aa", marginTop: "32px" }}>No account needed. Your projects save locally in your browser.</p>
+        <p style={{ fontSize: "11px", color: "#a1a1aa", marginTop: "32px" }}>No account needed. Projects save locally in your browser.</p>
       </div>
     </div>
   );
