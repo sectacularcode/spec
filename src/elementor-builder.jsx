@@ -3722,7 +3722,7 @@ const Section = ({ title, icon, id, children }) => (
 export default function App() {
   const [projects, setProjects] = useState([EV_PROJECT]);
   const [activeId, setActiveId] = useState("ev");
-  const [view, setView] = useState("editor"); // projects | editor | preview
+  const [view, setView] = useState("projects"); // projects | editor | preview
   const [tab, setTab] = useState("discovery");
   const [pageIdx, setPageIdx] = useState(0);
   const [showAudit, setShowAudit] = useState(false);
