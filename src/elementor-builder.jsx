@@ -4696,7 +4696,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             Browse Projects Page
           </button>
         </div>
-        <p style={{ fontSize: "11px", color: "#a1a1aa", marginTop: "32px" }}>No account needed. Projects save locally in your browser.</p>
+        
       </div>
     </div>
   );
