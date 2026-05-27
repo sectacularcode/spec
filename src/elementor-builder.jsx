@@ -446,6 +446,7 @@ const WEBSITE_TEMPLATES = [
       heroSubhead: "Whether it's digital, social, display, or print — get the ads you need fast and flexibly with our full-stack creative team.",
       keyMessages: "Scroll-stopping creative at scale. Brand-trained AI workflows. 24/7 dedicated pods. Performance that compounds.",
       cta1: "Book a demo", cta2: "See our work",
+      portfolioHeading: "Recent Work",
       marqueeText: "We put creative at the center of everything we do",
       aboutHeading: "Built for brands that need creative that compounds.",
       aboutBody: "We started this agency because the old model is broken. Quarterly retainers, slow turnarounds, junior handoffs, agency markup. We're built differently — dedicated senior pods, async-first communication, and AI workflows that compress weeks into days. No middlemen. No surprises. Just creative that performs.",
@@ -481,6 +482,7 @@ const WEBSITE_TEMPLATES = [
       heroSubhead: "Premium product-focused photos delivered on time and ready to drive clicks.",
       keyMessages: "Trusted by leading brands. On-time delivery. Studio + on-location. Full creative direction.",
       cta1: "Request shoot", cta2: "View portfolio",
+      portfolioHeading: "Recent Work",
       aboutHeading: "A studio built on craft.",
       aboutBody: "Ten years producing premium content for brands you know. Our team has shot for Sephora, Glossier, Apple, and dozens of D2C brands you'll see on every shelf. We're not a marketplace, not freelance hub — we're an in-house production team you can plug into for one campaign or every campaign.",
       services: "Product Photography|Studio-shot white background images for e-commerce and catalogs\nLifestyle & Editorial|On-figure and contextual imagery with art direction\nVideo Production|Long and short-form video for social and brand campaigns\nPost-Production|Retouching, color, and asset organization built for catalog",
@@ -514,6 +516,7 @@ const WEBSITE_TEMPLATES = [
       heroSubhead: "Discover the latest arrivals — built for everyday.",
       keyMessages: "Free shipping over $75. Easy 30-day returns. Sustainable materials. Made to last.",
       cta1: "Shop now", cta2: "Shop best sellers",
+      portfolioHeading: "Featured Products",
       promoBanner: "FREE SHIPPING ON ORDERS OVER $75  ·  EASY 30-DAY RETURNS",
       aboutHeading: "Built better. Made to last. Worn every day.",
       aboutBody: "We started this brand because we were tired of fast fashion and disposable basics. Every piece in our collection is designed in-house, made from sustainable materials, and tested for years of wear. No bloated retailer markups. No greenwashing. Just essentials, done right and priced fairly.",
@@ -546,6 +549,7 @@ const WEBSITE_TEMPLATES = [
       heroSubhead: "A weekly journal from our founder and the team. Real talk on what works.",
       keyMessages: "Honest reviews. Curated recommendations. Recipes you'll actually make. Real conversations.",
       cta1: "Read the journal", cta2: "Subscribe",
+      portfolioHeading: "Latest Posts",
       aboutHeading: "An honest take on living well.",
       aboutBody: "Started as a Sunday newsletter to twelve friends. Five years and 250,000 readers later, it's still that — just for more people. We write the honest reviews we wanted to read, share the recipes we actually make, and recommend the things we actually use. No sponsored content disguised as editorial. No influencer noise. Just real.",
       blog: "How to build a morning routine that actually sticks|Wellness|6 min read|https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop&q=80\nThe minimalist skincare edit our editor swears by|Beauty|4 min read|https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&h=600&fit=crop&q=80\nA Sunday dinner recipe everyone will text you about|Food|8 min read|https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=600&fit=crop&q=80\nWhat we're packing for a weekend in the country|Travel|5 min read|https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&h=600&fit=crop&q=80",
@@ -577,6 +581,7 @@ const WEBSITE_TEMPLATES = [
       heroSubhead: "Cinematic, on-brand, on-schedule. Story-led direction, cinema-grade craft, multi-channel masters.",
       keyMessages: "Story-led direction. Cinema-grade craft. Multi-channel masters. Built for performance.",
       cta1: "Start a project", cta2: "Watch the reel",
+      portfolioHeading: "Recent Work",
       aboutHeading: "Cinematic, on-brand, on-schedule.",
       aboutBody: "We started this studio because most brand video looks the same — overlit, overcut, and underbuilt. Our work doesn't. Every film starts with a script worth shooting and ends with edits engineered against the metrics that matter — retention, CTR, conversion. Cinema cameras, prime glass, considered lighting, and a team that obsesses over the hook, the tension, and the close.",
       services: "Founder & Expert Interviews|Cinematic interview setups with multi-cam coverage, broadcast-grade audio and lighting that makes your spokesperson look like the category leader\nCustomer Testimonials|Real stories from real clients, filmed and edited to build trust and drive conversion across every stage of your funnel\nSocial Short-Form (Reels, TikTok, Shorts)|Scroll-stopping short-form content built natively for the platforms and formats your audience actually uses\nPerformance & Brand Video Ads|Paid video built around the brief — hook, hold, and convert. Every frame earns its place\nBrand Films & About-Us Stories|Long-form brand stories that capture who you are and why it matters — the film your company has always deserved",
@@ -608,6 +613,7 @@ const WEBSITE_TEMPLATES = [
       heroSubhead: "Ten years freelancing for teams from seed-stage to Fortune 500. One project at a time, fully embedded.",
       keyMessages: "Senior-level work. Direct communication. No agency markup. Available for 1-2 engagements at a time.",
       cta1: "Check availability", cta2: "See my work",
+      portfolioHeading: "Recent Work",
       aboutHeading: "Senior-level work. Direct communication. No middlemen.",
       aboutBody: "I've spent the last decade as a senior independent across companies of every size — from two-person seed startups to publicly traded brands. I freelance because I do my best work when I'm fully embedded with one or two teams at a time. No agency overhead, no project manager between us, no junior handoffs. Just direct collaboration with someone who's done this for a decade.",
       services: "Strategy & Positioning|Sprints to clarify offer, audience, and messaging\nDesign & Identity|Logo, brand system, and the assets to roll it out\nWebsite & Landing Pages|Fast, conversion-focused builds with copy included\nFractional Engagements|Ongoing partnership, retainer or sprint-based",
@@ -641,6 +647,7 @@ const WEBSITE_TEMPLATES = [
       heroSubhead: "Family-owned and locally trusted for over 20 years. Same-day appointments available.",
       keyMessages: "Licensed and insured. 24/7 emergency service. Free estimates. 100% satisfaction guarantee.",
       cta1: "Get a free quote", cta2: "Call now",
+      portfolioHeading: "Recent Projects",
       promoBanner: "24/7 EMERGENCY SERVICE  ·  FREE ESTIMATES  ·  CALL (555) 123-4567",
       aboutHeading: "The neighborhood's trusted team for 20+ years.",
       aboutBody: "Founded in 2003, we've grown from a one-person operation into the area's most trusted service. We've stayed family-owned because we believe in doing the work right, treating people fairly, and standing behind everything we install. Our technicians are licensed, background-checked, and trained on the latest equipment.",
@@ -673,6 +680,7 @@ const WEBSITE_TEMPLATES = [
       heroSubhead: "Family-owned since 1998. Hand-selected inventory. Service that doesn't end at the sale.",
       keyMessages: "25+ years in business. Certified technicians. Hand-picked inventory. Lifetime service warranty.",
       cta1: "Browse inventory", cta2: "Schedule service",
+      portfolioHeading: "Recent Builds",
       aboutHeading: "Three generations. One promise: do right by the customer.",
       aboutBody: "We've been family-owned since 1998, and we've grown by doing one thing: treating customers the way we'd want to be treated. Every vehicle on our lot is hand-inspected before it's listed. Every technician is factory-trained and certified. Every sale comes with our lifetime service guarantee. We don't do hidden fees, last-minute add-ons, or pressure tactics. Never have, never will.",
       services: "New & Pre-Owned|Hand-selected vehicles, every one inspected and certified\nService & Repair|Factory-trained techs, OEM parts, transparent pricing\nDetailing & Restoration|Showroom finish, paint correction, full interior\nFinancing & Trade-In|Top dollar for trades, competitive financing",
@@ -705,6 +713,7 @@ const WEBSITE_TEMPLATES = [
       heroSubhead: "Strategy, systems, and accountability for entrepreneurs ready to scale without burning out.",
       keyMessages: "10+ years coaching founders from idea to seven figures. Group programs and 1:1. No fluff — clarity and execution.",
       cta1: "Book a free call", cta2: "See client results",
+      portfolioHeading: "Client Wins",
       aboutHeading: "Strategy without execution is a wish.",
       aboutBody: "I spent ten years as an operator before becoming a coach. Built and sold two companies. Made every mistake in the book. Now I help founders find the shortcuts I missed and avoid the mistakes I made. My clients are ambitious, coachable, and ready to do the work — not looking for hype, just results.",
       services: "1:1 Coaching|Twelve weeks of focused work on your biggest growth lever\nMastermind|Small cohort of ambitious founders, weekly calls, lifetime network\nIntensive Day|One day, deep dive into your business, plan to leave with\nKeynote & Workshop|Live training for teams, conferences, and corporate retreats",
@@ -739,6 +748,7 @@ const WEBSITE_TEMPLATES = [
       heroSubhead: "15 years selling homes in this neighborhood. 500+ closings. Top 1% in the region.",
       keyMessages: "Hyper-local expertise. Top 1% nationally. White-glove service. Aggressive negotiator.",
       cta1: "Schedule a consult", cta2: "View listings",
+      portfolioHeading: "Recent Listings",
       aboutHeading: "The neighborhood's most trusted agent.",
       aboutBody: "I've been selling homes in this neighborhood for 15 years. I know every block, every school district, every contractor worth calling. My clients work with me because I'm direct, I do my homework, and I negotiate aggressively on their behalf. Whether you're buying your first home or your fifth, you deserve an agent who treats your transaction like the biggest financial decision of your life — because it usually is.",
       services: "Buying|First-time buyers to luxury — full representation, off-market access\nSelling|Strategic pricing, professional staging, aggressive marketing\nInvestment Property|Rental yields, flip analysis, portfolio strategy\nRelocation|Out-of-state moves, virtual tours, neighborhood briefings",
@@ -772,6 +782,7 @@ const WEBSITE_TEMPLATES = [
       heroSubhead: "A neighborhood restaurant where seasonal menus meet warm hospitality. Dinner nightly. Brunch on weekends.",
       keyMessages: "Seasonal menus. Locally sourced. Family-owned. Open since 2018. Reservations recommended.",
       cta1: "Make a reservation", cta2: "View menu",
+      portfolioHeading: "News & Updates",
       aboutHeading: "A restaurant rooted in the neighborhood.",
       aboutBody: "We opened in 2018 with a simple idea: cook the food we want to eat, source it from people we trust, and treat every guest like family. Our menu changes with the seasons. Our wine list features small producers. Our team has been with us for years. There's nothing trendy about what we do — we just care a lot.",
       services: "Dinner|Tuesday through Sunday, 5pm to 10pm — seasonal tasting and a la carte\nBrunch|Saturday & Sunday, 10am to 2pm — local eggs, sourdough, fresh juice\nPrivate Events|Buyouts and semi-private dining for 12-60 guests\nWine Club|Monthly curated wines from small producers, with notes from our somm",
@@ -803,6 +814,7 @@ const WEBSITE_TEMPLATES = [
       heroSubhead: "Same-week appointments. Most insurance accepted. Telehealth available.",
       keyMessages: "Board-certified providers. Same-week appointments. Most insurance accepted. Telehealth available.",
       cta1: "Book appointment", cta2: "Patient portal",
+      portfolioHeading: "Patient Resources",
       promoBanner: "ACCEPTING NEW PATIENTS  ·  MOST INSURANCE ACCEPTED  ·  SAME-WEEK APPOINTMENTS",
       aboutHeading: "Healthcare without the runaround.",
       aboutBody: "We opened this practice because healthcare shouldn't feel like a factory. Long waits, rushed appointments, hidden fees — that's the old model. We do things differently: appointments start on time, your provider actually listens, and pricing is transparent. Board-certified physicians, in-network with most insurance, and same-week availability for new patients.",
@@ -836,6 +848,7 @@ const WEBSITE_TEMPLATES = [
       heroSubhead: "A boutique firm representing individuals and businesses. Decades of trial experience. Selective about clients.",
       keyMessages: "Trial-tested attorneys. Decades of experience. Selective representation. Free consultation.",
       cta1: "Schedule consultation", cta2: "Our practice areas",
+      portfolioHeading: "Recent Cases",
       aboutHeading: "Boutique firm. Big firm experience.",
       aboutBody: "We're a boutique firm by design. Big firms have hundreds of attorneys, layers of bureaucracy, and clients who feel like case numbers. We're different. Every client works directly with a senior attorney. Every matter gets the attention it deserves. We're selective about who we represent because that's the only way to deliver the results our clients expect.",
       services: "Business & Commercial|Contracts, disputes, M&A, employment matters\nPersonal Injury|Auto accidents, premises liability, wrongful death\nEstate Planning|Wills, trusts, probate, asset protection\nLitigation|Complex civil litigation in state and federal court",
@@ -868,6 +881,7 @@ const WEBSITE_TEMPLATES = [
       heroSubhead: "Documentary-style photography for weddings, portraits, and the families behind them. Available for 2026 dates.",
       keyMessages: "Documentary-style approach. Editorial sensibility. Booking 12-18 months out. Available for destination work.",
       cta1: "Check availability", cta2: "View galleries",
+      portfolioHeading: "Recent Work",
       aboutHeading: "Hi, I'm here for the real moments.",
       aboutBody: "I've been photographing weddings and portraits for ten years. My approach is documentary-style — I'd rather catch a real laugh than pose a fake one. My work has been featured in Vogue, Brides, and Magnolia. I work with about twenty couples a year because that's how I keep the experience personal and the work consistent.",
       services: "Weddings|Full-day documentary coverage from getting ready to last dance\nPortraits|Couples, families, maternity — natural and unposed\nBrand & Editorial|Lookbooks, lifestyle content, brand campaigns\nDestination|Travel weddings and elopements worldwide",
@@ -901,6 +915,7 @@ const WEBSITE_TEMPLATES = [
       heroSubhead: "Personal training and online coaching built for results that last. 12-week programs, custom nutrition, real accountability.",
       keyMessages: "Certified trainer. 10+ years coaching. Custom programs. Real accountability. No quick fixes.",
       cta1: "Get started", cta2: "See transformations",
+      portfolioHeading: "Latest Programs",
       aboutHeading: "Coaching that actually works.",
       aboutBody: "I've been coaching for ten years. I've worked with everyone from total beginners to competitive athletes. The thing they all have in common? They got real results — and kept them — because we built the habits along with the workouts. No 30-day quick fixes. No miracle protocols. Just consistent work, custom programming, and real accountability.",
       services: "1:1 Personal Training|In-person sessions, customized to your goals and body\nOnline Coaching|Custom programming, weekly check-ins, app-based delivery\nNutrition Coaching|Sustainable eating that supports your training and life\nGroup Training|Small group classes, semi-private programming",
@@ -934,6 +949,7 @@ const WEBSITE_TEMPLATES = [
       heroSubhead: "We're a nonprofit working to expand opportunity in our communities. Every dollar funds programs — not overhead.",
       keyMessages: "501(c)(3) nonprofit. 90% of funds go to programs. Volunteer-led leadership. Transparent annual reports.",
       cta1: "Donate now", cta2: "Get involved",
+      portfolioHeading: "Recent Impact",
       aboutHeading: "Why this work matters.",
       aboutBody: "We started this organization in 2014 because we saw a gap that wasn't being filled. Ten years later, we've served over 50,000 people, built partnerships with community leaders, and proven that focused, measurable work changes lives. We're proud to be volunteer-led at the board level, lean on operations, and transparent about every dollar that comes in.",
       services: "Programs|Direct services to the people we serve, every day\nAdvocacy|Policy work and community organizing for systemic change\nPartnerships|Collaboration with community orgs amplifies impact\nResearch|Data and reporting that informs our work and the field",
@@ -965,6 +981,7 @@ const WEBSITE_TEMPLATES = [
       heroSubhead: "Project-based programs, real mentorship, and the network to actually get hired. Next cohort starts soon.",
       keyMessages: "Project-based curriculum. 1:1 mentorship. Job placement support. 90%+ completion rate.",
       cta1: "Apply now", cta2: "View curriculum",
+      portfolioHeading: "Student Highlights",
       aboutHeading: "Education built for outcomes.",
       aboutBody: "Most online courses are video libraries you never finish. Most bootcamps are expensive and inflexible. We built this differently — project-based curriculum, weekly 1:1 mentorship, and a community that holds you accountable. Our students don't just learn — they ship work, build portfolios, and get hired.",
       services: "Foundations Cohort|12 weeks from zero to job-ready in your chosen track\nAdvanced Specialization|6 months going deep into a specific discipline\n1:1 Mentorship|Weekly calls with senior practitioners in your field\nCareer Coaching|Resume, portfolio, interview prep, and job placement support",
@@ -999,6 +1016,7 @@ const WEBSITE_TEMPLATES = [
       heroSubhead: "24/7 fleet maintenance and emergency repair from a coast-to-coast network of certified service providers. One call. Anywhere in the country. Anytime.",
       keyMessages: "24/7 dispatch. Nationwide coverage. Certified providers. Real-time tracking. Same-hour response in major markets.",
       cta1: "Get help now", cta2: "Become a provider",
+      portfolioHeading: "Fleet News",
       promoBanner: "24/7 EMERGENCY DISPATCH  ·  CALL 1-800-555-FLEET  ·  COAST TO COAST",
       aboutHeading: "Forget the letdowns.",
       aboutBody: "Fleet downtime costs you thousands an hour. The old model — calling shop after shop, hoping someone has a bay open — doesn't work for modern fleets. We built a nationwide network of vetted, certified service providers backed by 24/7 dispatch, real-time tracking, and the systems your operations team actually needs. From routine PM to emergency roadside, we get you back on the road faster.",
@@ -1032,6 +1050,7 @@ const WEBSITE_TEMPLATES = [
       heroSubhead: "Full-service planning for couples who want their day to feel personal, intentional, and unmistakably theirs.",
       keyMessages: "Full-service planning. Partial planning. Month-of coordination. Destination weddings. 12 weddings a year so every one gets us at our best.",
       cta1: "Inquire about your date", cta2: "View weddings",
+      portfolioHeading: "Recent Celebrations",
       aboutHeading: "Hi, I'm the planner you've been looking for.",
       aboutBody: "I've planned over 200 weddings across the last decade, from intimate backyard ceremonies to multi-day destination celebrations in Tuscany, Mexico, and beyond. My approach isn't about Pinterest boards and trend chasing — it's about listening carefully, asking better questions, and building a day that feels like the two of you. I take twelve couples a year so every one gets the kind of attention this day deserves.",
       services: "Full Planning|14+ months of partnership — design, vendors, logistics, day-of, everything\nPartial Planning|You've started — I take it from here. Vendor coordination, design refinement, day-of\nMonth-Of Coordination|You planned it. I run it. Six weeks out, I take the reins so you can be a guest at your own wedding\nDestination Weddings|Local-anywhere planning, vendor sourcing, multi-day events, travel logistics for guests\nElopements & Micro-Weddings|Intimate ceremonies with the same care as a 200-guest celebration\nCorporate & Private Events|Anniversaries, milestone birthdays, brand activations, fundraisers",
@@ -1439,6 +1458,7 @@ const newPage = (name = "Homepage", pageType = "Homepage") => {
     socialEyebrow: template.socialEyebrow || "Follow Along",
     contactEyebrow: template.contactEyebrow || "Contact",
     sectionEyebrow: template.sectionEyebrow || "",
+    portfolioHeading: template.portfolioHeading || "Recent projects.",
   };
 };
 
@@ -3360,7 +3380,7 @@ function previewHTML(page, brand) {
       return `<section style="background:${card};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
         <div style="display:flex;justify-content:space-between;align-items:baseline;margin:0 0 60px;flex-wrap:wrap;gap:24px;">
           <div><p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.portfolioEyebrow">${page.portfolioEyebrow || "Selected Work"}</p>
-          <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0;font-weight:400;">Recent projects.</h2></div>
+          <h2 data-edit="page.portfolioHeading" style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0;font-weight:400;">${page.portfolioHeading || "Recent projects."}</h2></div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;">
           ${items.map((line, i) => {
@@ -3521,7 +3541,7 @@ function previewHTML(page, brand) {
       }).join("");
       return `<section style="background:${card};padding:clamp(60px,10vw,${layout.sectionPadding}px) clamp(24px,8vw,100px);">
         <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.portfolioEyebrow">${page.portfolioEyebrow || "Selected Work"}</p>
-        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 48px;font-weight:400;">Recent projects.</h2>
+        <h2 data-edit="page.portfolioHeading" style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 48px;font-weight:400;">${page.portfolioHeading || "Recent projects."}</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;">${cards}</div>
       </section>`;
     }
