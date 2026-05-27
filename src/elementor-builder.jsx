@@ -4302,6 +4302,28 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   const updSocial = (i, k, v) => updBrand("socialLinks", brand.socialLinks.map((s, x) => x === i ? { ...s, [k]: v } : s));
   const delSocial = (i) => updBrand("socialLinks", brand.socialLinks.filter((_, x) => x !== i));
 
+  const resetProject = (id) => {
+  setProjects(ps => ps.map(p => p.id === id ? {
+    ...p,
+    name: "New Project",
+    brand: { ...BLANK_BRAND },
+    pages: [newPage()],
+  } : p));
+  setImportMsg("Project reset to blank.");
+  setTimeout(() => setImportMsg(""), 3000);
+};
+
+  const resetProject = (id) => {
+  setProjects(ps => ps.map(p => p.id === id ? {
+    ...p,
+    name: "New Project",
+    brand: { ...BLANK_BRAND },
+    pages: [newPage()],
+  } : p));
+  setImportMsg("Project reset to blank.");
+  setTimeout(() => setImportMsg(""), 3000);
+};
+
   const newProject = () => {
     const id = uid();
     const np = { id, name: "New Project", brand: { ...BLANK_BRAND }, pages: [newPage()] };
@@ -4731,6 +4753,9 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                       </button>
                       <button onClick={(e) => { e.stopPropagation(); exportProjectFile(p); }} title="Download as JSON backup file" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#52525b", border: "1px solid #ebe9e2", borderRadius: "6px", cursor: "pointer" }}>
                         <Icon name="download" size={14} color="#52525b" />
+                      </button>
+                      <button onClick={(e) => { e.stopPropagation(); resetProject(p.id); }} title="Reset to blank" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#52525b", border: "1px solid #ebe9e2", borderRadius: "6px", cursor: "pointer" }}>
+                        <Icon name="refresh" size={14} color="#52525b" />
                       </button>
                       <button onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(p.id); }} title="Delete this project" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#c93939", border: "1px solid #ebe9e2", borderRadius: "6px", cursor: "pointer" }}>
                         <Icon name="trash" size={14} color="#c93939" />
