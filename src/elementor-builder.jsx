@@ -5717,7 +5717,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   );
                 })()}
               </Section>
-
+              </div>}
+            </div>
 
               <Section id="brand-theme" title="Background Theme" icon="">
                 <p style={{ fontSize: "12px", color: "#71717a", margin: 0, lineHeight: 1.6 }}>Pick a palette. All themes are tested for WCAG AA contrast — text stays readable, accents pop, and the elements complement the background automatically.</p>
