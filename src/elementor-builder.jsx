@@ -3921,7 +3921,7 @@ Important guardrails:
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch("/api/anthropic", {
         method: "POST",
         headers: { "Content-Type": "application/json",
           "x-api-key": "",
@@ -3995,7 +3995,7 @@ Return ONLY the new ${fieldName} value as plain text.`;
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 20000);
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch("/api/anthropic", {
         method: "POST",
         headers: { "Content-Type": "application/json",
           "x-api-key": "",
@@ -4146,7 +4146,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000);
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch("/api/anthropic", {
         method: "POST",
         headers: { "Content-Type": "application/json",
           "x-api-key": "",
