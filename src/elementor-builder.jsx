@@ -4767,7 +4767,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <option key={t.id} value={t.id}>{t.name} — {t.industry.split(/[,—]/)[0].trim().slice(0, 40)}</option>
               ))}
             </select>
-            {lockedTemplateId && <div style={{ fontSize: "10px", color: "#71717a", marginTop: "6px" }}>Pinned. AI will keep this template and recommend everything else.</div>}
+            
           </div>
           <div style={{ display: "flex", gap: "10px", marginTop: "14px", alignItems: "center", flexWrap: "wrap" }}>
             <button
