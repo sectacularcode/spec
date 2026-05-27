@@ -5305,7 +5305,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 </button>
               </div>
 
-<Section id="inspo-sites" title="Inspiration Sites" icon="✨">
+<Section id="inspo-sites" title="Inspiration Sites" icon="">
                 <p style={{ fontSize: "12px", color: "#71717a", margin: 0 }}>URLs of sites you love. The AI Draft Starter Copy uses these to infer aesthetic preferences — adding more or different sites here will change the recommendation when you regenerate.</p>
                 <div><label style={I.lbl}>Inspiration URLs (one per line)</label><textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={6} value={brand.inspoUrls} onChange={e => updBrand("inspoUrls", e.target.value)} placeholder="https://faure.octrace.com&#10;https://nevo.themevillain.com&#10;https://breef.com" /></div>
                 <div style={{ marginTop: "12px", padding: "12px 14px", background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "11px", color: "#27272a", lineHeight: 1.6 }}>
@@ -5313,7 +5313,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 </div>
               </Section>
 
-              <Section id="inspo-keywords" title="Keywords for Search & AI Discovery" icon="🔑">
+              <Section id="inspo-keywords" title="Keywords for Search & AI Discovery" icon="">
                 <p style={{ fontSize: "12px", color: "#71717a", margin: 0, lineHeight: 1.6 }}>
                   Terms you want this site to rank for in Google AND get cited in AI search (ChatGPT, Perplexity, Gemini, and similar). These are also fed to the AI Draft Starter Copy so copy gets written around them naturally.
                 </p>
@@ -5356,13 +5356,22 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </Section>
 
                             
-              <Section id="founder" title="Founder" icon="👤">
+              <Section id="founder" title="Founder" icon="">
                 <div><label style={I.lbl}>Founder Name</label><input style={I.inp} value={brand.founderName} onChange={e => updBrand("founderName", e.target.value)} placeholder="e.g. Alex Morgan" /></div>
                 <div><label style={I.lbl}>Founder Title</label><input style={I.inp} value={brand.founderTitle} onChange={e => updBrand("founderTitle", e.target.value)} placeholder="e.g. Founder & Creative Director" /></div>
                 <div><label style={I.lbl}>Founder Bio</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.founderBio} onChange={e => updBrand("founderBio", e.target.value)} /></div>
               </Section>
 
-                            <Section id="brand-business" title="Business" icon="🏢">
+                            
+              <Section id="client-logos" title="Clients & Brands" icon="">
+                <div>
+                  <label style={I.lbl}>Client Logos / Brands Worked With (one per line)</label>
+                  <textarea style={{ ...I.inp, resize: "vertical", fontSize: "12px" }} rows={5} value={brand.clientLogos} onChange={e => updBrand("clientLogos", e.target.value)} placeholder="Sephora&#10;Glossier&#10;Kérastase" />
+                  <div style={{ fontSize: "10px", color: "#71717a", marginTop: "4px" }}>Used in the Logo Carousel section and as context for the AI when drafting copy.</div>
+                </div>
+              </Section>
+
+                            <Section id="brand-business" title="Business" icon="">
                 <div>
                   <label style={I.lbl}>Business Name</label>
                   <input style={I.inp} value={brand.name} onChange={e => updBrand("name", e.target.value)} placeholder="e.g. Ben Papa Films" />
@@ -5378,7 +5387,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div><label style={I.lbl}>Tone</label><select style={I.inp} value={brand.tone} onChange={e => updBrand("tone", e.target.value)}>{TONES.map(t => <option key={t}>{t}</option>)}</select></div>
               </Section>
 
-              <Section id="brand-brief" title="Brand Brief — Goals & SEO" icon="🎯">
+              <Section id="brand-brief" title="Brand Brief — Goals & SEO" icon="">
                 <p style={{ fontSize: "12px", color: "#27272a", margin: 0, lineHeight: 1.6 }}>
                   This drives the audit's SEO and AI-search recommendations, and powers the "Draft Starter Copy" button below. The more specific you are, the better the audit and the AI copy.
                 </p>
@@ -5448,7 +5457,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* BRAND TAB */}
           {tab === "brand" && (
             <>
-              <Section id="brand-templates" title="Industry Template" icon="🎨">
+              <Section id="brand-templates" title="Industry Template" icon="">
                 <p style={{ fontSize: "12px", color: "#27272a", margin: 0, lineHeight: 1.6 }}>
                   {brand.templateId
                     ? <>Your project is using a template already (likely from your AI recommendation). You can switch to a different one below — one click applies the new layout, theme, accent, fonts, and default copy.</>
@@ -5508,7 +5517,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 </div>
               </Section>
 
-              <Section id="brand-layout" title="Layout Style" icon="📐">
+              <Section id="brand-layout" title="Layout Style" icon="">
                 <p style={{ fontSize: "12px", color: "#27272a", margin: 0, lineHeight: 1.6 }}>
                   {brand.templateId
                     ? <>Your template applied a default layout, but you can swap to a different typographic personality without losing the template's sections, colors, or copy. Use this if you want, say, Agency sections with Magazine-style centered serif typography.</>
@@ -5622,7 +5631,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
               <div style={{ border: "1px solid #e5e7eb", borderRadius: "10px", marginBottom: "16px", overflow: "hidden" }}>
               <button onClick={() => setShowAdvancedColors(v => !v)} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", background: "#fafaf9", border: "none", cursor: "pointer", fontSize: "13px", fontWeight: 600, color: "#09090b" }}>
-                <span>🎨 Advanced — Custom Brand Colors</span>
+                <span>Advanced — Custom Brand Colors</span>
                 <span style={{ fontSize: "11px", color: "#71717a" }}>{showAdvancedColors ? "▲ Hide" : "▼ Show"}</span>
               </button>
               {showAdvancedColors && <div style={{ padding: "16px" }}>
@@ -5721,7 +5730,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </Section>
 
 
-              <Section id="brand-theme" title="Background Theme" icon="🎨">
+              <Section id="brand-theme" title="Background Theme" icon="">
                 <p style={{ fontSize: "12px", color: "#71717a", margin: 0, lineHeight: 1.6 }}>Pick a palette. All themes are tested for WCAG AA contrast — text stays readable, accents pop, and the elements complement the background automatically.</p>
                 {(() => {
                   // Show a "Template default" indicator if the current theme matches the active template's theme
@@ -5813,7 +5822,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 </details>
               </Section>
 
-              <Section id="brand-typography" title="Typography" icon="🔤">
+              <Section id="brand-typography" title="Typography" icon="">
                 <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                   <div><label style={I.lbl}>Heading Font</label><select style={I.inp} value={brand.headingFont} onChange={e => updBrand("headingFont", e.target.value)}>{FONT_OPTIONS.map(f => <option key={f}>{f}</option>)}</select></div>
                   <div><label style={I.lbl}>Body Font</label><select style={I.inp} value={brand.bodyFont} onChange={e => updBrand("bodyFont", e.target.value)}>{FONT_OPTIONS.map(f => <option key={f}>{f}</option>)}</select></div>
@@ -5821,7 +5830,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <p style={{ fontSize: "11px", color: "#71717a", margin: 0, lineHeight: 1.6 }}>Pair a distinctive display font (heading) with a clean sans-serif (body). All fonts are Google Fonts and load automatically.</p>
               </Section>
 
-              <Section id="brand-logo" title="Logo, Identity & CTAs" icon="🎯">
+              <Section id="brand-logo" title="Logo, Identity & CTAs" icon="">
                 <div><label style={I.lbl}>Logo URL (WordPress media URL)</label><input style={I.inp} value={brand.logoUrl} onChange={e => updBrand("logoUrl", e.target.value)} placeholder="https://yoursite.com/wp-content/uploads/logo.png" /></div>
                 <div><label style={I.lbl}>Logo Text Fallback</label><input style={I.inp} value={brand.logoText} onChange={e => updBrand("logoText", e.target.value)} placeholder="Your business name" /></div>
                 <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
@@ -5836,7 +5845,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div><label style={I.lbl}>Contact Email</label><input style={I.inp} value={brand.contactEmail} onChange={e => updBrand("contactEmail", e.target.value)} /></div>
                 <div><label style={I.lbl}>Phone</label><input style={I.inp} value={brand.contactPhone} onChange={e => updBrand("contactPhone", e.target.value)} /></div>
               </Section>
-              <Section id="brand-style-notes" title="Style Notes" icon="📝">
+              <Section id="brand-style-notes" title="Style Notes" icon="">
                 <p style={{ fontSize: "12px", color: "#71717a", margin: 0, lineHeight: 1.6 }}>Specific aesthetic principles you want applied — typography quirks, hierarchy preferences, ornamental rules, things you've seen and liked. Fed to the AI Draft Starter Copy as concrete style guidance.</p>
                 <textarea
                   style={{ ...I.inp, resize: "vertical" }}
@@ -5848,12 +5857,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </Section>
               </div>}
             </div>
-              <Section id="brand-assets" title="Brand Assets — Clients & Founder" icon="📦">
-                <div>
-                  <label style={I.lbl}>Client Logos / Brands Worked With (one per line)</label>
-                  <textarea style={{ ...I.inp, resize: "vertical", fontSize: "12px" }} rows={5} value={brand.clientLogos} onChange={e => updBrand("clientLogos", e.target.value)} placeholder="Sephora&#10;Glossier&#10;Kérastase" />
-                  <div style={{ fontSize: "10px", color: "#71717a", marginTop: "4px" }}>Used in the Logo Carousel section and as context for the AI when drafting copy.</div>
-                </div>
+              <Section id="brand-assets" title="Brand Assets — Clients & Founder" icon="">
+                
                 
               </Section>
             </>
@@ -5862,11 +5867,11 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* PAGE TAB */}
           {tab === "page" && (
             <>
-              <Section id="page-setup" title="Page Setup" icon="📄">
+              <Section id="page-setup" title="Page Setup" icon="">
                 <div><label style={I.lbl}>Page Name</label><input style={I.inp} value={page.name} onChange={e => updPage("name", e.target.value)} /></div>
                 <div><label style={I.lbl}>Page Type</label><select style={I.inp} value={page.pageType} onChange={e => updPage("pageType", e.target.value)}>{PAGE_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
               </Section>
-              <Section id="page-nav" title="Navigation Menus" icon="🧭">
+              <Section id="page-nav" title="Navigation Menus" icon="">
                 <p style={{ fontSize: "12px", color: "#71717a", margin: 0, lineHeight: 1.6 }}>Header and footer menu items. Menus output as Elementor Nav Menu widgets linked to WordPress menus by name — create matching menus in WP → Appearance → Menus.</p>
                 <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "12px", color: "#27272a" }}>
                   <input type="checkbox" checked={brand.multiMenu} onChange={e => updBrand("multiMenu", e.target.checked)} style={{ accentColor: "#000000" }} /> Enable multi-menu (primary + utility)
@@ -5874,7 +5879,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div><label style={I.lbl}>Primary Menu (comma-separated)</label><input style={I.inp} value={brand.primaryMenu} onChange={e => updBrand("primaryMenu", e.target.value)} placeholder="Home, About, Services, Work, Contact" /></div>
                 {brand.multiMenu && <div><label style={I.lbl}>Utility Menu (footer/legal)</label><input style={I.inp} value={brand.utilityMenu} onChange={e => updBrand("utilityMenu", e.target.value)} placeholder="Privacy, Terms, Sitemap" /></div>}
               </Section>
-              <Section id="page-sections" title="Sections on this Page" icon="🧩">
+              <Section id="page-sections" title="Sections on this Page" icon="">
                 <p style={{ fontSize: "12px", color: "#52525b", margin: 0, lineHeight: 1.55 }}>Compose the page top to bottom. Tap a section in the library to add it to the outline. Tap the × to remove.</p>
                 <div style={{ background: "#ffffff", border: "1px solid #e7e7e4", borderRadius: "10px", padding: "22px 24px" }}>
                   {/* PAGE OUTLINE — selected sections in order */}
@@ -5938,65 +5943,65 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* CONTENT TAB */}
           {tab === "content" && (
             <>
-              <Section id="page-hero" title="Hero" icon="🚀">
+              <Section id="page-hero" title="Hero" icon="">
                 <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Shows at the very top of the page — the first thing visitors see when they arrive.</p>
                 <div><label style={I.lbl}>Hero Heading</label><input style={I.inp} value={page.heroHeading} onChange={e => updPage("heroHeading", e.target.value)} /></div>
                 <div><label style={I.lbl}>Hero Subhead</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={page.heroSubhead} onChange={e => updPage("heroSubhead", e.target.value)} /></div>
                 <div><label style={I.lbl}>Hero Image URL (WordPress media URL)</label><input style={I.inp} value={page.heroImage} onChange={e => updPage("heroImage", e.target.value)} placeholder="https://yoursite.com/wp-content/uploads/hero.jpg" /></div>
                 <p style={{ fontSize: "11px", color: "#71717a", margin: 0 }}>Leave empty to use a placeholder photo. Paste your WordPress media URL when ready.</p>
               </Section>
-              <Section id="page-about" title="About" icon="📖">
+              <Section id="page-about" title="About" icon="">
                 <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>A story section that typically sits below the hero or after a logo carousel. Usually image-and-text side by side.</p>
                 <div><label style={I.lbl}>About Heading</label><input style={I.inp} value={page.aboutHeading} onChange={e => updPage("aboutHeading", e.target.value)} /></div>
                 <div><label style={I.lbl}>About Body</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={4} value={page.aboutBody} onChange={e => updPage("aboutBody", e.target.value)} placeholder="Leave blank to use brand description" /></div>
                 <div><label style={I.lbl}>About Image URL (WordPress media URL)</label><input style={I.inp} value={page.aboutImage} onChange={e => updPage("aboutImage", e.target.value)} placeholder="https://yoursite.com/wp-content/uploads/about.jpg" /></div>
               </Section>
-              <Section id="content-services" title="Services — Title|Description per line" icon="⚙️">
+              <Section id="content-services" title="Services — Title|Description per line" icon="">
                 <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Mid-page grid or list showing what you offer. Typically follows the hero/about, before portfolio.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={5} value={page.services} onChange={e => updPage("services", e.target.value)} />
               </Section>
-              <Section id="content-portfolio" title="Portfolio — Title|Category|ImageURL per line" icon="🖼️">
+              <Section id="content-portfolio" title="Portfolio — Title|Category|ImageURL per line" icon="">
                 <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Visual showcase of past work — usually a grid or carousel of project cards.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={6} value={page.portfolio} onChange={e => updPage("portfolio", e.target.value)} placeholder={"Sephora Spring Campaign|Beauty Editorial|https://yoursite.com/wp-content/uploads/sephora.jpg\nKérastase Hero|Product Photography|"} />
                 <p style={{ fontSize: "11px", color: "#71717a", margin: 0 }}>Add your WordPress image URL as the 3rd field. Leave the URL blank (keep the trailing pipe) to use a placeholder photo.</p>
               </Section>
-              <Section id="content-process" title="Process — Step Title|Description per line" icon="🔄">
+              <Section id="content-process" title="Process — Step Title|Description per line" icon="">
                 <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Step-by-step breakdown of how you work. Often appears between services and testimonials.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={5} value={page.process} onChange={e => updPage("process", e.target.value)} />
                 <p style={{ fontSize: "11px", color: "#71717a", margin: 0 }}>Numbered automatically. Best on About, Services, Careers pages.</p>
               </Section>
-              <Section id="content-team" title="Team — Name|Role|ImageURL per line" icon="👥">
+              <Section id="content-team" title="Team — Name|Role|ImageURL per line" icon="">
                 <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Grid of team member cards (portrait + name + role). Usually on About pages.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={5} value={page.team} onChange={e => updPage("team", e.target.value)} placeholder={"Kalei|Founder & Creative Director|https://yoursite.com/wp-content/uploads/kalei.jpg\nLena|Producer|"} />
                 <p style={{ fontSize: "11px", color: "#71717a", margin: 0 }}>Used by both "Team" (grid) and "Team Carousel" sections. Best on About, Studio, Careers pages.</p>
               </Section>
-              <Section id="content-leadership" title="Leadership — Name|Title|ImageURL|Quote|Bio per line" icon="⭐">
+              <Section id="content-leadership" title="Leadership — Name|Title|ImageURL|Quote|Bio per line" icon="">
                 <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Large editorial profiles for founders or principals. Typically on About / Leadership pages.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={4} value={page.leaders || ""} onChange={e => updPage("leaders", e.target.value)} placeholder={"Kalei|Founder & Creative Director|https://...|Great content lives at the intersection of strategy and craft.|10+ years producing premium content for L'Oréal Group brands."} />
                 <p style={{ fontSize: "11px", color: "#71717a", margin: 0, lineHeight: 1.6 }}>Renders as a magazine-style 2-column profile per leader — large portrait, name, title, pulled quote, full bio. Image position alternates left/right when you have multiple leaders. Best for founder pages, About, leadership directory.</p>
               </Section>
-              <Section id="content-stats" title="Stats — Number|Suffix|Label per line" icon="📊">
+              <Section id="content-stats" title="Stats — Number|Suffix|Label per line" icon="">
                 <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Strip of big numbers — years in business, projects shipped, clients served. Often above testimonials.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={4} value={page.stats} onChange={e => updPage("stats", e.target.value)} />
               </Section>
-              <Section id="content-testimonials" title="Testimonials — Quote|Name|Role per line" icon="💬">
+              <Section id="content-testimonials" title="Testimonials — Quote|Name|Role per line" icon="">
                 <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Carousel or grid of client quotes. Usually near the bottom of the homepage, before the final CTA.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={4} value={page.testimonials} onChange={e => updPage("testimonials", e.target.value)} />
               </Section>
-              <Section id="content-pricing" title="Pricing — Tier|Price|Description per line" icon="💰">
+              <Section id="content-pricing" title="Pricing — Tier|Price|Description per line" icon="">
                 <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Pricing tiers shown as side-by-side cards. Usually on Services, Landing, or Shop pages.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={4} value={page.pricing} onChange={e => updPage("pricing", e.target.value)} />
                 <p style={{ fontSize: "11px", color: "#71717a", margin: 0 }}>Leave empty to skip — best on Services, Landing, Shop pages.</p>
               </Section>
-              <Section id="content-faq" title="FAQ — Question|Answer per line" icon="❓">
+              <Section id="content-faq" title="FAQ — Question|Answer per line" icon="">
                 <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Accordion of common questions. Usually toward the bottom of the page, after testimonials.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={4} value={page.faq} onChange={e => updPage("faq", e.target.value)} />
               </Section>
-              <Section id="content-video" title="Video URL (YouTube/Vimeo)" icon="🎬">
+              <Section id="content-video" title="Video URL (YouTube/Vimeo)" icon="">
                 <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Embedded video block. Can sit anywhere — often between hero and about, or in a process section.</p>
                 <input style={I.inp} value={page.videoUrl} onChange={e => updPage("videoUrl", e.target.value)} placeholder="https://youtube.com/watch?v=..." />
               </Section>
-              <Section id="content-forms" title="Forms — Title|Fields|Button|Shortcode (optional) per line" icon="📝">
+              <Section id="content-forms" title="Forms — Title|Fields|Button|Shortcode (optional) per line" icon="">
                 <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Contact form section. Usually appears near the bottom of the page, before the footer.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={5} value={page.forms} onChange={e => updPage("forms", e.target.value)} />
                 <p style={{ fontSize: "11px", color: "#71717a", margin: 0, lineHeight: 1.6 }}>
@@ -6005,7 +6010,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   Add a 4th field with your plugin's shortcode (WPForms, Contact Form 7, Gravity Forms, Fluent Forms, Ninja Forms, etc.) and the tool will use that instead. Leave fields/button empty when using a shortcode.
                 </p>
               </Section>
-              <Section id="content-blog" title="Blog Posts Preview" icon="📰">
+              <Section id="content-blog" title="Blog Posts Preview" icon="">
                 <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Preview cards for recent posts. Usually on the homepage near the bottom, or as the main grid on a Blog Index page.</p>
                 <p style={{ fontSize: "12px", color: "#27272a", margin: 0, lineHeight: 1.6 }}>
                   This is for the <strong>preview cards</strong> that show on the homepage or a blog index page — not for writing actual blog posts. Each line becomes a card with title, category, and read-time meta. Write the real posts inside WordPress later.
@@ -6019,7 +6024,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* SOCIAL TAB */}
           {tab === "social" && (
             <>
-              <Section id="social-links" title="Social Media Links" icon="📱">
+              <Section id="social-links" title="Social Media Links" icon="">
                 {brand.socialLinks.map((s, i) => (
                   <div key={i} className="responsive-4col" style={{ display: "grid", gridTemplateColumns: "100px 1fr 1fr 30px", gap: "8px", alignItems: "end" }}>
                     <select style={I.inp} value={s.key} onChange={e => updSocial(i, "key", e.target.value)}>
@@ -6043,7 +6048,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* FOOTER TAB */}
           {tab === "footer" && (
             <>
-              <Section id="footer-header" title="Header Style" icon="⬆">
+              <Section id="footer-header" title="Header Style" icon="">
                 <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "10px" }}>
                   {HEADER_STYLES.map(f => (
                     <button key={f} onClick={() => updBrand("headerStyle", f)} style={{ padding: "16px", background: "#ffffff", border: brand.headerStyle === f ? "2px solid #000000" : "1px solid #e5e7eb", color: "#000000", borderRadius: "8px", cursor: "pointer", textAlign: "left", transition: "border-color .15s" }} onMouseOver={e => { if (brand.headerStyle !== f) e.currentTarget.style.borderColor = "#a3a39e"; }} onMouseOut={e => { if (brand.headerStyle !== f) e.currentTarget.style.borderColor = "#e7e7e4"; }}>
@@ -6059,7 +6064,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 </div>
                 <p style={{ fontSize: "11px", color: "#71717a", margin: 0 }}>Download separately and import once in Elementor → Theme Builder → Header. Set display conditions to "Entire Site".</p>
               </Section>
-              <Section id="footer-footer" title="Footer Style" icon="⬇">
+              <Section id="footer-footer" title="Footer Style" icon="">
                 <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "10px" }}>
                   {FOOTER_STYLES.map(f => (
                     <button key={f} onClick={() => updBrand("footerStyle", f)} style={{ padding: "16px", background: "#ffffff", border: brand.footerStyle === f ? "2px solid #000000" : "1px solid #e5e7eb", color: "#000000", borderRadius: "8px", cursor: "pointer", textAlign: "left", transition: "border-color .15s" }} onMouseOver={e => { if (brand.footerStyle !== f) e.currentTarget.style.borderColor = "#a3a39e"; }} onMouseOut={e => { if (brand.footerStyle !== f) e.currentTarget.style.borderColor = "#e7e7e4"; }}>
