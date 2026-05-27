@@ -3782,6 +3782,7 @@ export default function App() {
 
   // Persistence — load projects from window.storage on mount, save on changes
   const [storageLoaded, setStorageLoaded] = useState(false);
+  const [welcomeDismissed, setWelcomeDismissed] = useState(false);
   const [importMsg, setImportMsg] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState(null); // project id pending delete confirmation
 
@@ -4680,6 +4681,26 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   const effectiveView = projects.length === 0 ? "projects" : view;
 
   // ── PREVIEW VIEW ───────────────────────────────────────────────────────────
+
+  if (!welcomeDismissed && projects.length === 0) return (
+    <div style={{ minHeight: "100vh", background: "#fafaf9", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 24px" }}>
+      <div style={{ maxWidth: "480px", width: "100%", textAlign: "center" }}>
+        <div style={{ fontSize: "13px", fontWeight: 600, color: "#a1a1aa", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: "24px" }}>spec</div>
+        <h1 style={{ fontFamily: "'Georgia', serif", fontSize: "clamp(32px, 5vw, 48px)", fontWeight: 400, color: "#09090b", lineHeight: 1.1, marginBottom: "20px" }}>Build better websites,<br/>faster.</h1>
+        <p style={{ fontSize: "15px", color: "#71717a", lineHeight: 1.7, marginBottom: "40px", maxWidth: "380px", margin: "0 auto 40px" }}>Spec helps you plan, spec, and export Elementor and Divi templates — with AI-drafted copy, brand briefs, and one-click JSON export.</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "center" }}>
+          <button onClick={() => { setWelcomeDismissed(true); newProject(); }} style={{ padding: "14px 32px", background: "#09090b", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: "pointer", width: "100%", maxWidth: "280px" }}>
+            Start a Project
+          </button>
+          <button onClick={() => setWelcomeDismissed(true)} style={{ padding: "12px 32px", background: "transparent", color: "#71717a", border: "1px solid #e4e4e7", borderRadius: "8px", fontSize: "13px", cursor: "pointer", width: "100%", maxWidth: "280px" }}>
+            Browse Projects Page
+          </button>
+        </div>
+        <p style={{ fontSize: "11px", color: "#a1a1aa", marginTop: "32px" }}>No account needed. Your projects save locally in your browser.</p>
+      </div>
+    </div>
+  );
+
   if (effectiveView === "preview" && project) return (
     <div style={{ position: "fixed", inset: 0, background: "#000", display: "flex", flexDirection: "column", zIndex: 1000 }}>
       <div style={{ padding: "10px 16px", background: "#18181b", borderBottom: "1px solid #27272a", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
