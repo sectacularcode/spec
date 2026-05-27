@@ -4313,17 +4313,6 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   setTimeout(() => setImportMsg(""), 3000);
 };
 
-  const resetProject = (id) => {
-  setProjects(ps => ps.map(p => p.id === id ? {
-    ...p,
-    name: "New Project",
-    brand: { ...BLANK_BRAND },
-    pages: [newPage()],
-  } : p));
-  setImportMsg("Project reset to blank.");
-  setTimeout(() => setImportMsg(""), 3000);
-};
-
   const newProject = () => {
     const id = uid();
     const np = { id, name: "New Project", brand: { ...BLANK_BRAND }, pages: [newPage()] };
