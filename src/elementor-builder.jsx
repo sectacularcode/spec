@@ -5061,19 +5061,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             </button>
           </div>
         </div>
-        {/* Row 2: export format + downloads */}
-        <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", flexWrap: "wrap", gap: "8px", paddingTop: "10px", borderTop: "1px solid #e5e7eb" }}>
-          <FormatToggle />
-          <button onClick={downloadPage} style={{ ...I.btn, background: "#000000", color: "#ffffff", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-            <Icon name="download" size={14} color="#ffffff" /> Download Template
-          </button>
-          <button onClick={downloadHeader} style={{ ...I.btnGhost, padding: "8px 14px", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-            <Icon name="download" size={14} color="#52525b" /> Header Template
-          </button>
-          <button onClick={downloadFooter} style={{ ...I.btnGhost, padding: "8px 14px", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-            <Icon name="download" size={14} color="#52525b" /> Footer Template
-          </button>
-        </div>
+
       </div>
 
       {/* Audit drawer — categorized */}
