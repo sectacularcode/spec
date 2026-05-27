@@ -6075,6 +6075,18 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             </div>
 
             <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "20px", marginBottom: "16px" }}>
+              <div style={{ fontSize: "11px", color: "#52525b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>Download</div>
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "16px" }}>
+                <button onClick={downloadPage} style={{ padding: "10px 16px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <Icon name="download" size={14} color="#ffffff" /> Download Template
+                </button>
+                <button onClick={downloadHeader} style={{ padding: "10px 16px", background: "transparent", color: "#18181b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <Icon name="download" size={14} color="#18181b" /> Header Template
+                </button>
+                <button onClick={downloadFooter} style={{ padding: "10px 16px", background: "transparent", color: "#18181b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <Icon name="download" size={14} color="#18181b" /> Footer Template
+                </button>
+              </div>
               <div style={{ fontSize: "11px", color: "#52525b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>What you'll get</div>
               <div style={{ fontSize: "13px", color: "#27272a", lineHeight: 1.7 }}>
                 {exportFormat === "elementor" ? (
