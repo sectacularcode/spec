@@ -4758,12 +4758,11 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             />
           </div>
           <div style={{ marginBottom: "12px" }}>
-            <label style={{ display: "block", fontSize: "10px", color: "#71717a", fontWeight: 600, marginBottom: "6px", letterSpacing: "0.05em", textTransform: "uppercase" }}>Already know which template you want? (optional)</label>
             <select
               value={lockedTemplateId}
               onChange={e => setLockedTemplateId(e.target.value)}
               style={{ width: "100%", padding: "10px 12px", background: "#f5f5f4", color: "#18181b", border: lockedTemplateId ? "1px solid #7c3aed" : "1px solid #ebe9e2", borderRadius: "8px", fontSize: "13px", fontFamily: "inherit", cursor: "pointer", outline: "none" }}>
-              <option value="">Let AI pick (recommended)</option>
+              <option value="">Already know which template? Pick one (optional)</option>
               {WEBSITE_TEMPLATES.map(t => (
                 <option key={t.id} value={t.id}>{t.name} — {t.industry.split(/[,—]/)[0].trim().slice(0, 40)}</option>
               ))}
