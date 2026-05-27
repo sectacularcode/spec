@@ -3219,7 +3219,7 @@ function previewHTML(page, brand) {
       // LIST ROW — full-width rows, divider between (Editorial Bold, Brutalist)
       if (v === "list-row") {
         return `<section style="background:${pc};padding:clamp(60px,10vw,100px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
-          <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;">${eyebrow}</p>
+          <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.sectionEyebrow">${eyebrow}</p>
           <h2 style="font-family:'${hf}',sans-serif;font-size:clamp(36px,5vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 64px;font-weight:700;letter-spacing:-0.02em;">${heading}</h2>
           <div>
             ${items.map((line, i) => { const [t, d] = line.split("|"); return `<div style="display:grid;grid-template-columns:80px 1.5fr 2fr;gap:32px;padding:32px 0;border-bottom:1px solid ${bdr};align-items:start;">
@@ -3235,7 +3235,7 @@ function previewHTML(page, brand) {
       if (v === "cards-padded") {
         const radius = `${layout.cardRadius || 16}px`;
         return `<section style="background:${pc};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};text-align:center;">
-          <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;">${eyebrow}</p>
+          <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.sectionEyebrow">${eyebrow}</p>
           <h2 style="font-family:'${hf}',sans-serif;font-size:clamp(28px,4vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 56px;font-weight:500;">${heading}</h2>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;text-align:left;">
             ${items.map((line, i) => { const [t, d] = line.split("|"); return `<div style="background:${card};padding:40px 32px;border-radius:${radius};">
@@ -3250,7 +3250,7 @@ function previewHTML(page, brand) {
       // SERIF STACK — huge serif numbers stacked above (Magazine, Lifestyle)
       if (v === "serif-stack") {
         return `<section style="background:${pc};padding:clamp(60px,10vw,120px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};text-align:center;">
-          <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;">${eyebrow}</p>
+          <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.sectionEyebrow">${eyebrow}</p>
           <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,5vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 72px;font-weight:400;font-style:italic;">${heading}</h2>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:48px;">
             ${items.map((line, i) => { const [t, d] = line.split("|"); return `<div>
@@ -3313,7 +3313,7 @@ function previewHTML(page, brand) {
     if (s === "Clients") {
       const items = (brand.clientLogos || "").split("\n").filter(Boolean);
       return `<section style="background:${card};padding:clamp(60px,10vw,120px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};text-align:center;">
-        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 40px;">Trusted By</p>
+        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 40px;" data-edit="page.clientsEyebrow">${page.clientsEyebrow || "Trusted By"}</p>
         <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:48px 64px;max-width:1100px;margin:0 auto;">
           ${items.map(c => `<div style="font-family:'${hf}',serif;font-size:24px;color:${headingColor};opacity:.6;letter-spacing:.02em;">${c}</div>`).join("")}
         </div>
@@ -3344,7 +3344,7 @@ function previewHTML(page, brand) {
       const items = (page.portfolio || "").split("\n").filter(Boolean);
       return `<section style="background:${card};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
         <div style="display:flex;justify-content:space-between;align-items:baseline;margin:0 0 60px;flex-wrap:wrap;gap:24px;">
-          <div><p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;">Selected Work</p>
+          <div><p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.portfolioEyebrow">${page.portfolioEyebrow || "Selected Work"}</p>
           <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0;font-weight:400;">Recent projects.</h2></div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;">
@@ -3413,7 +3413,7 @@ function previewHTML(page, brand) {
 
     if (s === "Social" && brand.showSocialInPage) {
       return `<section style="background:${pc};padding:clamp(60px,10vw,100px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};text-align:center;">
-        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 32px;">Follow Along</p>
+        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 32px;" data-edit="page.socialEyebrow">${page.socialEyebrow || "Follow Along"}</p>
         <div style="display:flex;justify-content:center;gap:32px;flex-wrap:wrap;">
           ${sl.map(s => SVG[s.key] ? `<a href="${s.url}" target="_blank" style="color:${ts};text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:10px;">${SVG[s.key](ts, 28)}<span style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;">${s.label}</span></a>` : "").join("")}
         </div>
@@ -3461,7 +3461,7 @@ function previewHTML(page, brand) {
         const imageOnLeft = idx % 2 === 0;
         const imgCol = `<div style="flex:0 0 40%;"><img src="${imgSrc}" alt="${name || ""}" style="width:100%;height:auto;display:block;"/></div>`;
         const txtCol = `<div style="flex:1;">
-          <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;">Leadership</p>
+          <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.leadershipEyebrow">${page.leadershipEyebrow || "Leadership"}</p>
           <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 8px;font-weight:400;line-height:1.15;">${name || "Leader"}</h2>
           <p style="font-family:'${bf}',sans-serif;font-size:14px;color:${ac};margin:0 0 32px;">${title || "Title"}</p>
           ${quote ? `<h4 style="font-family:'${hf}',serif;font-size:clamp(20px,2.5vw,24px);color:${headingColor};margin:0 0 28px;font-weight:400;line-height:1.4;font-style:italic;">"${quote}"</h4>` : ""}
@@ -3487,7 +3487,7 @@ function previewHTML(page, brand) {
         </div>`;
       }).join("");
       return `<section style="background:${pc};padding:clamp(60px,10vw,${layout.sectionPadding}px) clamp(24px,8vw,100px);">
-        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;">The Team</p>
+        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.teamEyebrow">${page.teamEyebrow || "The Team"}</p>
         <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 48px;font-weight:400;">People who make it happen. <span style="font-size:13px;color:${ts};">↔ swipe</span></h2>
         <div style="display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:20px;">${cards}</div>
       </section>`;
@@ -3505,7 +3505,7 @@ function previewHTML(page, brand) {
         </div>`;
       }).join("");
       return `<section style="background:${card};padding:clamp(60px,10vw,${layout.sectionPadding}px) clamp(24px,8vw,100px);">
-        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;">Selected Work</p>
+        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.portfolioEyebrow">${page.portfolioEyebrow || "Selected Work"}</p>
         <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 48px;font-weight:400;">Recent projects. <span style="font-size:13px;color:${ts};">↔ swipe</span></h2>
         <div style="display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:20px;">${cards}</div>
       </section>`;
@@ -3517,7 +3517,7 @@ function previewHTML(page, brand) {
         `<div style="flex:0 0 auto;padding:0 32px;font-family:'${hf}',serif;font-size:22px;color:${headingColor};opacity:0.55;white-space:nowrap;">${name}</div>`
       ).join("");
       return `<section style="background:${card};padding:clamp(40px,6vw,80px) 0;overflow:hidden;">
-        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;text-align:center;">Trusted By</p>
+        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;text-align:center;" data-edit="page.clientsEyebrow">${page.clientsEyebrow || "Trusted By"}</p>
         <div style="display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;">${logos}</div>
       </section>`;
     }
@@ -3558,7 +3558,7 @@ function previewHTML(page, brand) {
       const eyebrow = page.servicesEyebrow || "Services";
       const heading = page.servicesHeading || "Our services.";
       return `<section style="background:${card};padding:clamp(60px,10vw,100px) clamp(24px,8vw,100px);">
-        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;">${eyebrow}</p>
+        <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.sectionEyebrow">${eyebrow}</p>
         <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,48px);color:${headingColor};margin:0 0 48px;font-weight:400;">${heading}</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;">${cards}</div>
       </section>`;
