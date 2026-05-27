@@ -1459,6 +1459,11 @@ const newPage = (name = "Homepage", pageType = "Homepage") => {
     contactEyebrow: template.contactEyebrow || "Contact",
     sectionEyebrow: template.sectionEyebrow || "",
     portfolioHeading: template.portfolioHeading || "Recent projects.",
+    processHeading: template.processHeading || "The process.",
+    teamHeading: template.teamHeading || "People who make it happen.",
+    blogHeading: template.blogHeading || "Recent posts.",
+    pricingHeading: template.pricingHeading || "Investment.",
+    faqHeading: template.faqHeading || "Questions, answered.",
   };
 };
 
@@ -3255,7 +3260,7 @@ function previewHTML(page, brand) {
       if (v === "list-row") {
         return `<section style="background:${pc};padding:clamp(60px,10vw,100px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
           <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.sectionEyebrow">${eyebrow}</p>
-          <h2 style="font-family:'${hf}',sans-serif;font-size:clamp(36px,5vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 64px;font-weight:700;letter-spacing:-0.02em;">${heading}</h2>
+          <h2 style="font-family:'${hf}',sans-serif;font-size:clamp(36px,5vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 64px;font-weight:700;letter-spacing:-0.02em;" data-edit="page.servicesHeading">${heading}</h2>
           <div>
             ${items.map((line, i) => { const [t, d] = line.split("|"); return `<div style="display:grid;grid-template-columns:80px 1.5fr 2fr;gap:32px;padding:32px 0;border-bottom:1px solid ${bdr};align-items:start;">
               <div style="font-family:'${hf}',sans-serif;font-size:32px;color:${ac};font-weight:700;line-height:1;">${String(i + 1).padStart(2, "0")}</div>
@@ -3271,7 +3276,7 @@ function previewHTML(page, brand) {
         const radius = `${layout.cardRadius || 16}px`;
         return `<section style="background:${pc};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};text-align:center;">
           <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.sectionEyebrow">${eyebrow}</p>
-          <h2 style="font-family:'${hf}',sans-serif;font-size:clamp(28px,4vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 56px;font-weight:500;">${heading}</h2>
+          <h2 style="font-family:'${hf}',sans-serif;font-size:clamp(28px,4vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 56px;font-weight:500;" data-edit="page.servicesHeading">${heading}</h2>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;text-align:left;">
             ${items.map((line, i) => { const [t, d] = line.split("|"); return `<div style="background:${card};padding:40px 32px;border-radius:${radius};">
               <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:${ac};margin:0 0 20px;font-weight:600;" data-edit="page.serviceNumber_${i}">${String(i + 1).padStart(2, "0")}</p>
@@ -3286,7 +3291,7 @@ function previewHTML(page, brand) {
       if (v === "serif-stack") {
         return `<section style="background:${pc};padding:clamp(60px,10vw,120px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};text-align:center;">
           <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.sectionEyebrow">${eyebrow}</p>
-          <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,5vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 72px;font-weight:400;font-style:italic;">${heading}</h2>
+          <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,5vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 72px;font-weight:400;font-style:italic;" data-edit="page.servicesHeading">${heading}</h2>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:48px;">
             ${items.map((line, i) => { const [t, d] = line.split("|"); return `<div>
               <p style="font-family:'${hf}',serif;font-size:64px;color:${ac};margin:0 0 24px;font-weight:400;line-height:1;">${String(i + 1).padStart(2, "0")}</p>
@@ -3300,7 +3305,7 @@ function previewHTML(page, brand) {
       // DEFAULT — grid numbered (Editorial Minimal, Studio Portfolio)
       return `<section style="background:${pc};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
         <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;" data-edit="page.servicesEyebrow">${page.servicesEyebrow || eyebrow}</p>
-        <h2 style="font-family:'${hf}',serif;font-size:clamp(36px,5vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 80px;font-weight:400;">${heading}</h2>
+        <h2 style="font-family:'${hf}',serif;font-size:clamp(36px,5vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 80px;font-weight:400;" data-edit="page.servicesHeading">${heading}</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:${bdr};border:1px solid ${bdr};">
           ${items.map((line, i) => { const [t, d] = line.split("|"); return `<div style="background:${pc};padding:48px 36px;">
             <p style="font-family:'${hf}',serif;font-size:14px;color:${ac};margin:0 0 24px;letter-spacing:.05em;">${String(i + 1).padStart(2, "0")}</p>
@@ -3315,7 +3320,7 @@ function previewHTML(page, brand) {
       const items = (page.process || "").split("\n").filter(Boolean);
       return `<section style="background:${card};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
         <p data-edit="page.processEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">${page.processEyebrow || "How We Work"}</p>
-        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 80px;font-weight:400;">The process.</h2>
+        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 80px;font-weight:400;" data-edit="page.processHeading">${page.processHeading || "The process."}</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:40px;">
           ${items.map((line, i) => { const [t, d] = line.split("|"); return `<div style="border-top:2px solid ${ac};padding-top:24px;">
             <p style="font-family:'${hf}',serif;font-size:14px;color:${ac};margin:0 0 16px;letter-spacing:.05em;">Step ${String(i + 1).padStart(2, "0")}</p>
@@ -3330,7 +3335,7 @@ function previewHTML(page, brand) {
       const items = (page.team || "").split("\n").filter(Boolean);
       return `<section style="background:${pc};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
         <p data-edit="page.teamEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">${page.teamEyebrow || "The Team"}</p>
-        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 80px;font-weight:400;">People who make it happen.</h2>
+        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 80px;font-weight:400;" data-edit="page.teamHeading">${page.teamHeading || "People who make it happen."}</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:40px;">
           ${items.map((line, i) => {
             const [n, role, img] = line.split("|");
@@ -3359,7 +3364,7 @@ function previewHTML(page, brand) {
       const items = (page.blog || "").split("\n").filter(Boolean);
       return `<section style="background:${pc};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
         <p data-edit="page.blogEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">${page.blogEyebrow || "Journal"}</p>
-        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 80px;font-weight:400;">Recent posts.</h2>
+        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 80px;font-weight:400;" data-edit="page.blogHeading">${page.blogHeading || "Recent posts."}</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;">
           ${items.map((line, i) => {
             const [title, cat, meta] = line.split("|");
@@ -3412,7 +3417,7 @@ function previewHTML(page, brand) {
       const items = (page.pricing || "").split("\n").filter(Boolean);
       return `<section style="background:${card};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};text-align:center;">
         <p data-edit="page.pricingEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">${page.pricingEyebrow || "Pricing"}</p>
-        <h2 style="font-family:'${hf}',serif;font-size:clamp(36px,5vw,64px);color:${headingColor};margin:0 0 80px;font-weight:400;">Investment.</h2>
+        <h2 style="font-family:'${hf}',serif;font-size:clamp(36px,5vw,64px);color:${headingColor};margin:0 0 80px;font-weight:400;" data-edit="page.pricingHeading">${page.pricingHeading || "Investment."}</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;max-width:1100px;margin:0 auto;">
           ${items.map(line => { const [tier, price, desc] = line.split("|"); return `<div style="background:${pc};padding:48px 32px;border:1px solid ${bdr};">
             <h3 style="font-family:'${hf}',serif;font-size:22px;color:${headingColor};margin:0 0 16px;font-weight:400;">${tier || ""}</h3>
@@ -3441,7 +3446,7 @@ function previewHTML(page, brand) {
       const items = (page.faq || "").split("\n").filter(Boolean);
       return `<section style="background:${card};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
         <p data-edit="page.faqEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">${page.faqEyebrow || "FAQ"}</p>
-        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 60px;font-weight:400;">Questions, answered.</h2>
+        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 60px;font-weight:400;" data-edit="page.faqHeading">${page.faqHeading || "Questions, answered."}</h2>
         <div>${items.map(line => { const [q, a] = line.split("|"); return `<details style="border-bottom:1px solid ${bdr};padding:24px 0;"><summary style="font-family:'${hf}',serif;font-size:20px;color:${headingColor};cursor:pointer;font-weight:400;list-style:none;">${q || ""}</summary><p style="font-family:'${bf}',sans-serif;font-size:15px;color:${ts};line-height:1.8;margin:16px 0 0;">${a || ""}</p></details>`; }).join("")}</div>
       </section>`;
     }
@@ -3523,7 +3528,7 @@ function previewHTML(page, brand) {
       }).join("");
       return `<section style="background:${pc};padding:clamp(60px,10vw,${layout.sectionPadding}px) clamp(24px,8vw,100px);">
         <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.teamEyebrow">${page.teamEyebrow || "The Team"}</p>
-        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 48px;font-weight:400;">People who make it happen.</h2>
+        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 48px;font-weight:400;" data-edit="page.teamHeading">${page.teamHeading || "People who make it happen."}</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;">${cards}</div>
       </section>`;
     }
@@ -3594,7 +3599,7 @@ function previewHTML(page, brand) {
       const heading = page.servicesHeading || "Our services.";
       return `<section style="background:${card};padding:clamp(60px,10vw,100px) clamp(24px,8vw,100px);">
         <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.sectionEyebrow">${eyebrow}</p>
-        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,48px);color:${headingColor};margin:0 0 48px;font-weight:400;">${heading}</h2>
+        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,48px);color:${headingColor};margin:0 0 48px;font-weight:400;" data-edit="page.servicesHeading">${heading}</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;">${cards}</div>
       </section>`;
     }
