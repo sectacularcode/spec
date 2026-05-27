@@ -4916,7 +4916,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           <div style={{ marginBottom: "20px", padding: "20px 24px", background: "#ffffff", border: "1px solid #ebe9e2", borderRadius: "10px" }}>
             <div style={{ fontSize: "13px", fontWeight: 600, color: "#09090b", marginBottom: "6px" }}>No projects yet — start with one of the tiles below</div>
             <div style={{ fontSize: "12px", color: "#52525b", lineHeight: 1.6 }}>
-              Start a new project or describe your site above for an AI recommendation.
+              
             </div>
           </div>
         )}
