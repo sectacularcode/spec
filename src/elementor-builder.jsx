@@ -3785,6 +3785,7 @@ export default function App() {
   // Persistence — load projects from window.storage on mount, save on changes
   const [storageLoaded, setStorageLoaded] = useState(false);
   const [showAdvancedColors, setShowAdvancedColors] = useState(false);
+  const [briefDirty, setBriefDirty] = useState(false);
   const [welcomeDismissed, setWelcomeDismissed] = useState(() => { try { return !!window.localStorage.getItem("sw"); } catch(e) { return false; } });
   const [importMsg, setImportMsg] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState(null); // project id pending delete confirmation
@@ -3858,13 +3859,14 @@ export default function App() {
   const page = project ? (project.pages[pageIdx] || project.pages[0]) : null;
   const audit = useMemo(() => project ? auditBrand(brand, project.pages) : [], [brand, project]);
 
-  const updBrand = (k, v) => setProjects(ps => ps.map(p => p.id === activeId ? {
+  const updBrand = (k, v) => { setBriefDirty(true); return setProjects(ps => ps.map(p => p.id === activeId ? {
     ...p,
     brand: { ...p.brand, [k]: v },
     // When the business name changes, mirror it onto the project name so the
     // Projects page card label stays accurate (e.g. "Ben Papa Films" not "Untitled").
     ...(k === "name" ? { name: v || "Untitled" } : {}),
   } : p));
+  };
   const updPage = (k, v) => setProjects(ps => ps.map(p => p.id === activeId ? { ...p, pages: p.pages.map((pg, i) => i === pageIdx ? { ...pg, [k]: v } : pg) } : p));
 
   // Jump from an audit item to the exact section it refers to.
@@ -3916,6 +3918,7 @@ export default function App() {
   // AI COPY GENERATOR — calls Claude API to draft hero, about, CTAs based on Brand Brief.
   // Returns JSON we can preview in a modal, then accept or regenerate.
   const generateStarterCopy = async () => {
+    setBriefDirty(false);
     setAiLoading(true);
     setAiError("");
     setAiDraft(null);
@@ -5416,6 +5419,12 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 {(!((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) && (
                   <div style={{ fontSize: "12px", color: "#09090b", marginTop: "-4px" }}>
                     Pick at least one Goal and add a Desired Outcome to enable AI copy drafting.
+                  </div>
+                )}
+                {briefDirty && ((brand.goals && brand.goals.length) || brand.goal) && brand.outcome && (
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#b45309", fontWeight: 500, marginTop: "4px" }}>
+                    <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#b45309", display: "inline-block" }} />
+                    Inputs updated — re-run to refresh your copy
                   </div>
                 )}
               </Section>
