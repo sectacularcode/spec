@@ -5845,8 +5845,6 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   placeholder="e.g. Lowercase navigation, dramatic numbered sections, generous negative space, all-caps eyebrow labels, dark background with one bold accent color, work-first hierarchy."
                 />
               </Section>
-              </div>}
-            </div>
 
             </>
           )}
