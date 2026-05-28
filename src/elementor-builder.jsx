@@ -4704,7 +4704,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
   // ── PROJECTS VIEW ──────────────────────────────────────────────────────────
   if (effectiveView === "projects") return (
-    <div style={{ minHeight: "100vh", background: "#f5f5f4", color: "#18181b", padding: "clamp(20px,5vw,40px) clamp(12px,3vw,24px)", fontFamily: "'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#f5f5f4", color: "#18181b", padding: "clamp(20px,5vw,40px) clamp(12px,3vw,24px)", fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Yeseva+One&family=Manrope:wght@400;500;700&family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Oswald:wght@500;700&family=Space+Mono&family=Inter:wght@500;700&display=swap');
         * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; box-sizing: border-box; }
@@ -4717,14 +4717,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           <div style={{ fontSize: "24px", fontWeight: 800, letterSpacing: "-0.03em", color: "#09090b" }}>spec</div>
           <div style={{ fontSize: "10px", color: "#71717a", padding: "3px 9px", background: "#ffffff", border: "1px solid #e8e6dd", borderRadius: "10px", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>Beta</div>
         </div>
-        <h1 style={{ fontSize: "28px", margin: "0 0 6px", fontWeight: 600, letterSpacing: "-0.02em", color: "#09090b" }}>Projects</h1>
-        <p style={{ color: "#52525b", fontSize: "13px", margin: "0 0 32px", lineHeight: 1.6 }}>Plan, spec, and export Elementor or Divi templates.</p>
+        <h1 style={{ fontSize: "36px", margin: "0 0 6px", fontWeight: 200, letterSpacing: "0", color: "#09090b" }}>Projects</h1>
+        <p style={{ color: "#09090b", fontSize: "13px", margin: "0 0 32px", lineHeight: 1.6 }}>Plan, spec, and export Elementor or Divi templates.</p>
 
         {/* AI Describe Your Site — optional guided start */}
         <div style={{ background: "#ffffff", border: "1px solid #ebe9e2", borderRadius: "12px", padding: "24px", marginBottom: "28px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
             <Icon name="sparkles" size={18} color="#000000" />
-            <h2 style={{ fontSize: "16px", margin: 0, fontWeight: 600, color: "#09090b", letterSpacing: "-0.01em" }}>Describe your site — get a custom recommendation</h2>
+            <h2 style={{ fontSize: "18px", margin: 0, fontWeight: 200, color: "#09090b", letterSpacing: "0" }}>Describe your site — get a custom recommendation</h2>
           </div>
           <p style={{ fontSize: "12px", color: "#52525b", margin: "0 0 16px", lineHeight: 1.6 }}>
             
@@ -4892,7 +4892,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
 
 
-        <h2 style={{ fontSize: "14px", margin: "0 0 14px", fontWeight: 600, color: "#09090b", letterSpacing: "-0.01em" }}>Your projects</h2>
+        <h2 style={{ fontSize: "22px", margin: "0 0 14px", fontWeight: 200, color: "#09090b", letterSpacing: "0" }}>Your projects</h2>
         {projects.length === 0 && (
           <div style={{ marginBottom: "20px", padding: "20px 24px", background: "#ffffff", border: "1px solid #ebe9e2", borderRadius: "10px" }}>
             <div style={{ fontSize: "13px", fontWeight: 600, color: "#09090b", marginBottom: "6px" }}></div>
@@ -4915,7 +4915,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             return (
               <div key={p.id} style={{ background: "#ffffff", border: isPendingDelete ? "1px solid #fecaca" : "1px solid #ebe9e2", padding: "18px 20px", borderRadius: "10px", display: "flex", flexDirection: "column", gap: "12px" }}>
                 <div onClick={() => { setActiveId(p.id); setView("editor"); setPageIdx(0); }} style={{ cursor: "pointer", flex: 1 }}>
-                  <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: "4px", color: "#09090b", letterSpacing: "-0.01em" }}>{displayName}</div>
+                  <div style={{ fontSize: "14px", fontWeight: 500, marginBottom: "4px", color: "#09090b", letterSpacing: "0" }}>{displayName}</div>
                   <div style={{ fontSize: "11px", color: "#71717a", marginBottom: "12px" }}>
                     {p.pages.length} page{p.pages.length !== 1 ? "s" : ""}
                     {hasDescription ? <> · {p.brand.industry}</> : <span style={{ color: "#a3a39e" }}> · No description yet</span>}
@@ -4978,7 +4978,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
   // ── EDITOR VIEW ────────────────────────────────────────────────────────────
   return (
-    <div style={{ minHeight: "100vh", background: "#f5f5f4", color: "#18181b", fontFamily: "'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#f5f5f4", color: "#18181b", fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Yeseva+One&family=Manrope:wght@400;500;700&family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Oswald:wght@500;700&family=Space+Mono&family=Inter:wght@500;700&display=swap');
         * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; box-sizing: border-box; }
