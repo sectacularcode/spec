@@ -3816,6 +3816,7 @@ export default function App() {
   // Persistence — load projects from window.storage on mount, save on changes
   const [storageLoaded, setStorageLoaded] = useState(false);
   const [showAdvancedColors, setShowAdvancedColors] = useState(false);
+  const dndSensors = useSensors(useSensor(PointerSensor));
   const [briefDirty, setBriefDirty] = useState(false);
   const [welcomeDismissed, setWelcomeDismissed] = useState(() => { try { return !!window.localStorage.getItem("sw"); } catch(e) { return false; } });
   const [importMsg, setImportMsg] = useState("");
@@ -5897,7 +5898,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     </div>
                   ) : (
                     <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "24px" }}>
-                      <DndContext sensors={useSensors(useSensor(PointerSensor))} collisionDetection={closestCenter} onDragEnd={({ active, over }) => { if (over && active.id !== over.id) { const oi = page.sections.indexOf(active.id); const ni = page.sections.indexOf(over.id); updPage("sections", arrayMove(page.sections, oi, ni)); } }}>
+                      <DndContext sensors={dndSensors} collisionDetection={closestCenter} onDragEnd={({ active, over }) => { if (over && active.id !== over.id) { const oi = page.sections.indexOf(active.id); const ni = page.sections.indexOf(over.id); updPage("sections", arrayMove(page.sections, oi, ni)); } }}>
                         <SortableContext items={page.sections} strategy={verticalListSortingStrategy}>
                           {page.sections.map((s, i) => (
                             <SortableSection key={s + i} id={s} index={i} onRemove={toggleSection} />
