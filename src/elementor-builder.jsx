@@ -3783,7 +3783,6 @@ export default function App() {
   // Persistence — load projects from window.storage on mount, save on changes
   const [storageLoaded, setStorageLoaded] = useState(false);
   const [showAdvancedColors, setShowAdvancedColors] = useState(false);
-  const [welcomeDismissed, setWelcomeDismissed] = useState(false);
   const [importMsg, setImportMsg] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState(null); // project id pending delete confirmation
 
