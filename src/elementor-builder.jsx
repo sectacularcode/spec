@@ -5995,7 +5995,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   This is for the <strong>preview cards</strong> that show on the homepage or a blog index page — not for writing actual blog posts. Each line becomes a card with title, category, and read-time meta. Write the real posts inside WordPress later.
                 </p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={5} value={page.blog} onChange={e => updPage("blog", e.target.value)} placeholder={"How we approach hero shots|Strategy|6 min read\nThe ROI of premium content|Insights|4 min read"} />
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Format: <code style={{ background: "#eeeeec", padding: "1px 4px", borderRadius: "3px" }}>Title|Category|Meta</code> per line. Best on Journal, Blog Index pages. Placeholder images auto-applied.</p>
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Format: <strong>Title|Category|Meta</strong> per line. Best on Journal, Blog Index pages. Placeholder images auto-applied.</p>
               </Section>}
             </>
           )}
