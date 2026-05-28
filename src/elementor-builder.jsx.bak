@@ -1067,16 +1067,6 @@ const WEBSITE_TEMPLATES = [
   },
 ];
 
-
-const layoutHeaderStyle = (layoutId) => {
-  const map = { "editorial-minimal":"Agency","editorial-bold":"Agency","magazine":"Studio","studio-modern":"Agency","brutalist":"Agency","swiss-grid":"Premium","boutique-luxury":"Studio","apple-minimal":"Premium","modern-tech":"Premium","mono-terminal":"Agency","wedding-editorial":"Studio" };
-  return map[layoutId] || "Editorial";
-};
-const layoutFooterStyle = (layoutId) => {
-  const map = { "editorial-minimal":"Agency","editorial-bold":"Agency","magazine":"Studio","studio-modern":"Agency","brutalist":"Agency","swiss-grid":"Premium","boutique-luxury":"Premium","apple-minimal":"Studio","modern-tech":"Premium","mono-terminal":"Agency","wedding-editorial":"Studio" };
-  return map[layoutId] || "Premium";
-};
-
 // Apply a website template — sets layout, theme, fonts, accent, sections, and copy
 const applyWebsiteTemplate = (template, brand, page) => {
   const theme = THEMES.find(t => t.id === template.themeId);
@@ -1111,8 +1101,6 @@ const applyWebsiteTemplate = (template, brand, page) => {
     goals: template.goals && template.goals.length ? template.goals : (brand.goals || []),
     // Also keep singular goal field synced to first goal for backward compatibility
     goal: template.goals && template.goals.length ? template.goals[0] : brand.goal,
-    headerStyle: layoutHeaderStyle(template.layoutId),
-    footerStyle: layoutFooterStyle(template.layoutId),
   };
   // Override every page field that templates define — so applying Coaching
   // doesn't leave Process/Stats/About reading like a production studio.
@@ -5879,10 +5867,13 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   ) : (
                     <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "24px" }}>
                       {page.sections.map((s, i) => (
-                        <div key={`${s}-${i}`} draggable onDragStart={e=>{e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",String(i));e.currentTarget.style.opacity="0.4";}} onDragEnd={e=>{e.currentTarget.style.opacity="1";document.querySelectorAll("[data-dnd]").forEach(el=>{el.style.borderTop="";el.style.borderBottom="";});}} onDragOver={e=>{e.preventDefault();const r=e.currentTarget.getBoundingClientRect();const mid=r.top+r.height/2;e.currentTarget.style.borderTop=e.clientY<mid?"2px solid #09090b":"";e.currentTarget.style.borderBottom=e.clientY>=mid?"2px solid #09090b":"";}} onDragLeave={e=>{e.currentTarget.style.borderTop="";e.currentTarget.style.borderBottom="";}} onDrop={e=>{e.preventDefault();e.currentTarget.style.borderTop="";e.currentTarget.style.borderBottom="";const from=parseInt(e.dataTransfer.getData("text/plain"),10);const r=e.currentTarget.getBoundingClientRect();const mid=r.top+r.height/2;let to=e.clientY<mid?i:i+1;if(from===to||from+1===to)return;const arr=[...page.sections];const[moved]=arr.splice(from,1);arr.splice(to>from?to-1:to,0,moved);updPage("sections",arr);}} data-dnd style={{ display: "flex", alignItems: "center", gap: "14px", padding: "12px 16px", background: "#f9f9f7", border: "1px solid #e7e7e4", borderRadius: "8px", cursor: "grab", userSelect: "none" }}>
+                        <div key={`${s}-${i}`} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "12px 16px", background: "#f9f9f7", border: "1px solid #e7e7e4", borderRadius: "8px" }}>
                           <span style={{ fontSize: "12px", fontWeight: 700, color: "#09090b", fontVariantNumeric: "tabular-nums", minWidth: "20px", letterSpacing: "0.02em" }}>{String(i + 1).padStart(2, "0")}</span>
                           <span style={{ flex: 1, fontSize: "14px", color: "#09090b", fontWeight: 500 }}>{s}</span>
-                          <span title="Drag to reorder" style={{ display: "inline-flex", flexDirection: "column", gap: "3px", cursor: "grab", opacity: 0.4, flexShrink: 0 }}>{[0,1,2].map(r => (<span key={r} style={{ display: "flex", gap: "3px" }}><span style={{ width:"3px",height:"3px",borderRadius:"50%",background:"#09090b",display:"block" }}/><span style={{ width:"3px",height:"3px",borderRadius:"50%",background:"#09090b",display:"block" }}/></span>))}</span>
+                          <div style={{ display: "flex", gap: "2px" }}>
+                            <button onClick={() => { if (i > 0) { const arr = [...page.sections]; [arr[i-1], arr[i]] = [arr[i], arr[i-1]]; updPage("sections", arr); } }} style={{ background: "transparent", border: "none", cursor: i > 0 ? "pointer" : "default", padding: "4px", color: i > 0 ? "#09090b" : "#d4d2c8", display: "inline-flex", alignItems: "center", borderRadius: "4px" }}>▲</button>
+                            <button onClick={() => { if (i < page.sections.length - 1) { const arr = [...page.sections]; [arr[i+1], arr[i]] = [arr[i], arr[i+1]]; updPage("sections", arr); } }} style={{ background: "transparent", border: "none", cursor: i < page.sections.length - 1 ? "pointer" : "default", padding: "4px", color: i < page.sections.length - 1 ? "#09090b" : "#d4d2c8", display: "inline-flex", alignItems: "center", borderRadius: "4px" }}>▼</button>
+                          </div>
                           <button
                             onClick={() => toggleSection(s)}
                             title={`Remove ${s}`}
