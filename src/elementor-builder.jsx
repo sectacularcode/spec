@@ -5043,9 +5043,6 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             <button onClick={() => exportProjectFile(project)} style={{ ...I.btnGhost, display: "inline-flex", alignItems: "center", gap: "6px" }} title="Download this project as a JSON backup">
               <Icon name="download" size={14} color="#52525b" /> Save Backup
             </button>
-            <button onClick={exportBrief} style={{ padding: "9px 14px", background: "transparent", color: "#52525b", border: "1px solid #e4e4e7", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-              <Icon name="file-text" size={14} color="#52525b" /> Export Brief
-            </button>
             <button onClick={() => setView("preview")} style={{ ...I.btn, background: "#000000", color: "#ffffff", display: "inline-flex", alignItems: "center", gap: "6px" }}>
               <Icon name="eye" size={14} color="#ffffff" /> Preview Page
             </button>
@@ -6089,6 +6086,9 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 </button>
                 <button onClick={downloadFooter} style={{ padding: "10px 16px", background: "transparent", color: "#18181b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
                   <Icon name="download" size={14} color="#18181b" /> Footer Template
+                </button>
+                <button onClick={exportBrief} style={{ padding: "10px 16px", background: "transparent", color: "#18181b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <Icon name="file-text" size={14} color="#18181b" /> Export Brief
                 </button>
               </div>
               <div style={{ fontSize: "11px", color: "#52525b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>What you'll get</div>
