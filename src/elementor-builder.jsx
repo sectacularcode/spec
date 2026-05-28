@@ -3792,6 +3792,8 @@ export default function App() {
     (async () => {
       try {
         if (typeof window !== "undefined" && window.storage) {
+          const wd = await window.storage.get("welcomeDone");
+          if (wd && wd.value === "1") setWelcomeDismissed(true);
           const result = await window.storage.get("projects");
           if (result && result.value && !cancelled) {
             const parsed = JSON.parse(result.value);
