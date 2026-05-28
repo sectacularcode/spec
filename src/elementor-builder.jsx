@@ -1,4 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 // ──────────────────────────────────────────────────────────────────────────────
 // CONSTANTS
