@@ -4685,7 +4685,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
   // ── PREVIEW VIEW ───────────────────────────────────────────────────────────
 
-  if (!welcomeDismissed && projects.length === 0 && storageLoaded) return (
+  if (!welcomeDismissed && projects.length === 0 && storageLoaded && !localStorage.getItem("spec_projects")) return (
     <div style={{ minHeight: "100vh", background: "#fafaf9", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 24px" }}>
       <div style={{ maxWidth: "480px", width: "100%", textAlign: "center" }}>
         <div style={{ fontSize: "24px", fontWeight: 800, letterSpacing: "-0.03em", color: "#09090b", marginBottom: "32px" }}>spec</div>
