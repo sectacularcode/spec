@@ -1464,6 +1464,8 @@ const newPage = (name = "Homepage", pageType = "Homepage") => {
     blogHeading: template.blogHeading || "Recent posts.",
     pricingHeading: template.pricingHeading || "Investment.",
     faqHeading: template.faqHeading || "Questions, answered.",
+    metaTitle: "",
+    metaDesc: "",
   };
 };
 
@@ -5906,6 +5908,11 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* CONTENT TAB */}
           {tab === "content" && (
             <>
+              <Section id="content-seo" title="SEO" icon="">
+                <p style={{ fontSize: "12px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.5 }}>These don't get embedded in the template — copy them into your SEO plugin (Yoast, Rank Math) after importing.</p>
+                <div><label style={I.lbl}>Meta Title</label><input style={I.inp} value={page.metaTitle || ""} onChange={e => updPage("metaTitle", e.target.value)} placeholder={`${brand.name} — ${page.name}`} /></div>
+                <div><label style={I.lbl}>Meta Description</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={page.metaDesc || ""} onChange={e => updPage("metaDesc", e.target.value)} placeholder="150-160 character description of this page for search engines." /></div>
+              </Section>
               <Section id="page-hero" title="Hero" icon="">
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Shows at the very top of the page — the first thing visitors see when they arrive.</p>
                 <div><label style={I.lbl}>Hero Heading</label><input style={I.inp} value={page.heroHeading} onChange={e => updPage("heroHeading", e.target.value)} /></div>
@@ -5919,52 +5926,52 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div><label style={I.lbl}>About Body</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={4} value={page.aboutBody} onChange={e => updPage("aboutBody", e.target.value)} placeholder="Leave blank to use brand description" /></div>
                 <div><label style={I.lbl}>About Image URL (WordPress media URL)</label><input style={I.inp} value={page.aboutImage} onChange={e => updPage("aboutImage", e.target.value)} placeholder="https://yoursite.com/wp-content/uploads/about.jpg" /></div>
               </Section>
-              <Section id="content-services" title="Services — Title|Description per line" icon="">
+              {page.sections.some(s => s === "Services" || s === "Service Cards") && <Section id="content-services" title="Services — Title|Description per line" icon="">
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Mid-page grid or list showing what you offer. Typically follows the hero/about, before portfolio.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={5} value={page.services} onChange={e => updPage("services", e.target.value)} />
-              </Section>
-              <Section id="content-portfolio" title="Portfolio — Title|Category|ImageURL per line" icon="">
+              </Section>}
+              {(page.sections.includes("Portfolio") || page.sections.includes("Portfolio Carousel")) && <Section id="content-portfolio" title="Portfolio — Title|Category|ImageURL per line" icon="">
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Visual showcase of past work — usually a grid or carousel of project cards.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={6} value={page.portfolio} onChange={e => updPage("portfolio", e.target.value)} placeholder={"Sephora Spring Campaign|Beauty Editorial|https://yoursite.com/wp-content/uploads/sephora.jpg\nKérastase Hero|Product Photography|"} />
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Add your WordPress image URL as the 3rd field. Leave the URL blank (keep the trailing pipe) to use a placeholder photo.</p>
-              </Section>
-              <Section id="content-process" title="Process — Step Title|Description per line" icon="">
+              </Section>}
+              {page.sections.includes("Process") && <Section id="content-process" title="Process — Step Title|Description per line" icon="">
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Step-by-step breakdown of how you work. Often appears between services and testimonials.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={5} value={page.process} onChange={e => updPage("process", e.target.value)} />
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Numbered automatically. Best on About, Services, Careers pages.</p>
-              </Section>
-              <Section id="content-team" title="Team — Name|Role|ImageURL per line" icon="">
+              </Section>}
+              {(page.sections.includes("Team") || page.sections.includes("Team Carousel")) && <Section id="content-team" title="Team — Name|Role|ImageURL per line" icon="">
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Grid of team member cards (portrait + name + role). Usually on About pages.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={5} value={page.team} onChange={e => updPage("team", e.target.value)} placeholder={"Kalei|Founder & Creative Director|https://yoursite.com/wp-content/uploads/kalei.jpg\nLena|Producer|"} />
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Used by both "Team" (grid) and "Team Carousel" sections. Best on About, Studio, Careers pages.</p>
-              </Section>
-              <Section id="content-leadership" title="Leadership — Name|Title|ImageURL|Quote|Bio per line" icon="">
+              </Section>}
+              {page.sections.includes("Leadership") && <Section id="content-leadership" title="Leadership — Name|Title|ImageURL|Quote|Bio per line" icon="">
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Large editorial profiles for founders or principals. Typically on About / Leadership pages.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={4} value={page.leaders || ""} onChange={e => updPage("leaders", e.target.value)} placeholder={"Kalei|Founder & Creative Director|https://...|Great content lives at the intersection of strategy and craft.|10+ years producing premium content for L'Oréal Group brands."} />
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Renders as a magazine-style 2-column profile per leader — large portrait, name, title, pulled quote, full bio. Image position alternates left/right when you have multiple leaders. Best for founder pages, About, leadership directory.</p>
-              </Section>
-              <Section id="content-stats" title="Stats — Number|Suffix|Label per line" icon="">
+              </Section>}
+              {page.sections.includes("Stats") && <Section id="content-stats" title="Stats — Number|Suffix|Label per line" icon="">
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Strip of big numbers — years in business, projects shipped, clients served. Often above testimonials.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={4} value={page.stats} onChange={e => updPage("stats", e.target.value)} />
-              </Section>
-              <Section id="content-testimonials" title="Testimonials — Quote|Name|Role per line" icon="">
+              </Section>}
+              {page.sections.includes("Testimonials") && <Section id="content-testimonials" title="Testimonials — Quote|Name|Role per line" icon="">
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Carousel or grid of client quotes. Usually near the bottom of the homepage, before the final CTA.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={4} value={page.testimonials} onChange={e => updPage("testimonials", e.target.value)} />
-              </Section>
-              <Section id="content-pricing" title="Pricing — Tier|Price|Description per line" icon="">
+              </Section>}
+              {page.sections.includes("Pricing") && <Section id="content-pricing" title="Pricing — Tier|Price|Description per line" icon="">
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Pricing tiers shown as side-by-side cards. Usually on Services, Landing, or Shop pages.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={4} value={page.pricing} onChange={e => updPage("pricing", e.target.value)} />
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Leave empty to skip — best on Services, Landing, Shop pages.</p>
-              </Section>
-              <Section id="content-faq" title="FAQ — Question|Answer per line" icon="">
+              </Section>}
+              {page.sections.includes("FAQ") && <Section id="content-faq" title="FAQ — Question|Answer per line" icon="">
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Accordion of common questions. Usually toward the bottom of the page, after testimonials.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={4} value={page.faq} onChange={e => updPage("faq", e.target.value)} />
-              </Section>
-              <Section id="content-video" title="Video URL (YouTube/Vimeo)" icon="">
+              </Section>}
+              {page.sections.includes("Video") && <Section id="content-video" title="Video URL (YouTube/Vimeo)" icon="">
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Embedded video block. Can sit anywhere — often between hero and about, or in a process section.</p>
                 <input style={I.inp} value={page.videoUrl} onChange={e => updPage("videoUrl", e.target.value)} placeholder="https://youtube.com/watch?v=..." />
-              </Section>
-              <Section id="content-forms" title="Forms — Title|Fields|Button|Shortcode (optional) per line" icon="">
+              </Section>}
+              {(page.sections.includes("Form") || page.sections.includes("Contact")) && <Section id="content-forms" title="Forms — Title|Fields|Button|Shortcode (optional) per line" icon="">
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Contact form section. Usually appears near the bottom of the page, before the footer.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={5} value={page.forms} onChange={e => updPage("forms", e.target.value)} />
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
@@ -5972,15 +5979,15 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   <strong style={{ color: "#09090b" }}>With form plugin:</strong> Project Inquiry|||[wpforms id="123"]<br />
                   Add a 4th field with your plugin's shortcode (WPForms, Contact Form 7, Gravity Forms, Fluent Forms, Ninja Forms, etc.) and the tool will use that instead. Leave fields/button empty when using a shortcode.
                 </p>
-              </Section>
-              <Section id="content-blog" title="Blog Posts Preview" icon="">
+              </Section>}
+              {page.sections.includes("Blog") && <Section id="content-blog" title="Blog Posts Preview" icon="">
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Preview cards for recent posts. Usually on the homepage near the bottom, or as the main grid on a Blog Index page.</p>
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
                   This is for the <strong>preview cards</strong> that show on the homepage or a blog index page — not for writing actual blog posts. Each line becomes a card with title, category, and read-time meta. Write the real posts inside WordPress later.
                 </p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={5} value={page.blog} onChange={e => updPage("blog", e.target.value)} placeholder={"How we approach hero shots|Strategy|6 min read\nThe ROI of premium content|Insights|4 min read"} />
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Format: <code style={{ background: "#eeeeec", padding: "1px 4px", borderRadius: "3px" }}>Title|Category|Meta</code> per line. Best on Journal, Blog Index pages. Placeholder images auto-applied.</p>
-              </Section>
+              </Section>}
             </>
           )}
 
