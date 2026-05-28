@@ -4485,22 +4485,22 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
   // ── Styles ─────────────────────────────────────────────────────────────────
   const I = {
-    lbl: { display: "block", fontSize: "11px", color: "#000000", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700 },
+    lbl: { display: "block", fontSize: "13px", color: "#000000", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700 },
     inp: { width: "100%", padding: "11px 13px", background: "#ffffff", border: "1px solid #e5e7eb", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5 },
-    btn: { padding: "9px 16px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" },
-    btnGhost: { padding: "9px 16px", background: "#ffffff", color: "#27272a", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" },
+    btn: { padding: "10px 18px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "14px", fontWeight: 500, cursor: "pointer" },
+    btnGhost: { padding: "10px 18px", background: "#ffffff", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "14px", fontWeight: 500, cursor: "pointer" },
   };
 
   const TabBtn = ({ id, label }) => (
-    <button onClick={() => setTab(id)} style={{ padding: "10px 16px", background: tab === id ? "#eeeeec" : "transparent", color: tab === id ? "#18181b" : "#71717a", border: "none", borderBottom: tab === id ? "2px solid #18181b" : "2px solid transparent", fontSize: "12px", fontWeight: 600, cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</button>
+    <button onClick={() => setTab(id)} style={{ padding: "10px 16px", background: tab === id ? "#eeeeec" : "transparent", color: tab === id ? "#09090b" : "#09090b", border: "none", borderBottom: tab === id ? "2px solid #18181b" : "2px solid transparent", fontSize: "14px", fontWeight: 600, cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</button>
   );
 
   // Builder format toggle — applies to both Page and Footer downloads
   const FormatToggle = () => (
     <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "6px", padding: "3px", marginRight: "4px" }}>
       <span style={{ fontSize: "10px", color: "#a3a39e", padding: "0 6px", letterSpacing: "0.05em", textTransform: "uppercase" }}>Export</span>
-      <button onClick={() => setExportFormat("elementor")} style={{ padding: "5px 10px", background: exportFormat === "elementor" ? "#18181b" : "transparent", color: exportFormat === "elementor" ? "#ffffff" : "#71717a", border: "none", borderRadius: "4px", fontSize: "11px", fontWeight: 500, cursor: "pointer" }}>Elementor</button>
-      <button onClick={() => setExportFormat("divi")} style={{ padding: "5px 10px", background: exportFormat === "divi" ? "#18181b" : "transparent", color: exportFormat === "divi" ? "#ffffff" : "#71717a", border: "none", borderRadius: "4px", fontSize: "11px", fontWeight: 500, cursor: "pointer" }}>Divi</button>
+      <button onClick={() => setExportFormat("elementor")} style={{ padding: "5px 10px", background: exportFormat === "elementor" ? "#09090b" : "transparent", color: exportFormat === "elementor" ? "#ffffff" : "#09090b", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Elementor</button>
+      <button onClick={() => setExportFormat("divi")} style={{ padding: "5px 10px", background: exportFormat === "divi" ? "#09090b" : "transparent", color: exportFormat === "divi" ? "#ffffff" : "#09090b", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Divi</button>
     </div>
   );
 
@@ -4685,17 +4685,17 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
   if (effectiveView === "preview" && project) return (
     <div style={{ position: "fixed", inset: 0, background: "#000", display: "flex", flexDirection: "column", zIndex: 1000 }}>
-      <div style={{ padding: "10px 16px", background: "#18181b", borderBottom: "1px solid #27272a", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-        <div style={{ color: "#ffffff", fontSize: "13px", fontWeight: 500 }}>
+      <div style={{ padding: "10px 16px", background: "#09090b", borderBottom: "1px solid #27272a", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+        <div style={{ color: "#ffffff", fontSize: "14px", fontWeight: 500 }}>
           Preview — {brand.name} / {page.name}
-          <span style={{ marginLeft: "12px", fontSize: "11px", color: "#a3a39e", fontWeight: 400 }}>Click any heading or paragraph to edit inline</span>
+          <span style={{ marginLeft: "12px", fontSize: "12px", color: "#a3a39e", fontWeight: 400 }}>Click any heading or paragraph to edit inline</span>
         </div>
         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
           <FormatToggle />
-          <button onClick={downloadPage} style={{ padding: "8px 14px", background: "#ffffff", color: "#18181b", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Download Template</button>
-          <button onClick={downloadHeader} style={{ padding: "8px 14px", background: "transparent", color: "#ffffff", border: "1px solid #3f3f46", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Header Template</button>
-          <button onClick={downloadFooter} style={{ padding: "8px 14px", background: "transparent", color: "#ffffff", border: "1px solid #3f3f46", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Footer Template</button>
-          <button onClick={() => setView("editor")} style={{ padding: "8px 14px", background: "transparent", color: "#a3a39e", border: "1px solid #3f3f46", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>← Back to Editor</button>
+          <button onClick={downloadPage} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>Download Template</button>
+          <button onClick={downloadHeader} style={{ padding: "8px 14px", background: "transparent", color: "#ffffff", border: "1px solid #3f3f46", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>Header Template</button>
+          <button onClick={downloadFooter} style={{ padding: "8px 14px", background: "transparent", color: "#ffffff", border: "1px solid #3f3f46", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>Footer Template</button>
+          <button onClick={() => setView("editor")} style={{ padding: "8px 14px", background: "transparent", color: "#a3a39e", border: "1px solid #3f3f46", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>← Back to Editor</button>
         </div>
       </div>
       <iframe srcDoc={previewHTML(page, brand)} style={{ flex: 1, border: "none", width: "100%", background: "#000" }} title="Preview" sandbox="allow-same-origin allow-scripts" />
@@ -4704,7 +4704,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
   // ── PROJECTS VIEW ──────────────────────────────────────────────────────────
   if (effectiveView === "projects") return (
-    <div style={{ minHeight: "100vh", background: "#f5f5f4", color: "#18181b", padding: "clamp(20px,5vw,40px) clamp(12px,3vw,24px)", fontFamily: "'Be Vietnam Pro', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#f5f5f4", color: "#09090b", padding: "clamp(20px,5vw,40px) clamp(12px,3vw,24px)", fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Yeseva+One&family=Manrope:wght@400;500;700&family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Oswald:wght@500;700&family=Space+Mono&family=Inter:wght@500;700&display=swap');
         * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; box-sizing: border-box; }
@@ -4715,10 +4715,10 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
       <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
           <div style={{ fontSize: "24px", fontWeight: 800, letterSpacing: "-0.03em", color: "#09090b" }}>spec</div>
-          <div style={{ fontSize: "10px", color: "#71717a", padding: "3px 9px", background: "#ffffff", border: "1px solid #e8e6dd", borderRadius: "10px", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>Beta</div>
+          <div style={{ fontSize: "10px", color: "#09090b", padding: "3px 9px", background: "#ffffff", border: "1px solid #e8e6dd", borderRadius: "10px", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>Beta</div>
         </div>
         <h1 style={{ fontSize: "36px", margin: "0 0 6px", fontWeight: 200, letterSpacing: "0", color: "#09090b" }}>Projects</h1>
-        <p style={{ color: "#09090b", fontSize: "13px", margin: "0 0 32px", lineHeight: 1.6 }}>Plan, spec, and export Elementor or Divi templates.</p>
+        <p style={{ color: "#09090b", fontSize: "14px", margin: "0 0 32px", lineHeight: 1.6 }}>Plan, spec, and export Elementor or Divi templates.</p>
 
         {/* AI Describe Your Site — optional guided start */}
         <div style={{ background: "#ffffff", border: "1px solid #ebe9e2", borderRadius: "12px", padding: "24px", marginBottom: "28px" }}>
@@ -4726,7 +4726,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             <Icon name="sparkles" size={18} color="#000000" />
             <h2 style={{ fontSize: "18px", margin: 0, fontWeight: 200, color: "#09090b", letterSpacing: "0" }}>Describe your site — get a custom recommendation</h2>
           </div>
-          <p style={{ fontSize: "12px", color: "#52525b", margin: "0 0 16px", lineHeight: 1.6 }}>
+          <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 16px", lineHeight: 1.6 }}>
             
           </p>
           <div style={{ marginBottom: "10px" }}>
@@ -4735,14 +4735,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               value={briefText}
               onChange={e => setBriefText(e.target.value)}
               placeholder="e.g. A modern fitness coaching site for women over 40. Warm but no-nonsense. Earthy palette."
-              style={{ width: "100%", minHeight: "80px", padding: "12px 14px", background: "#f5f5f4", color: "#18181b", border: "1px solid #ebe9e2", borderRadius: "8px", fontSize: "13px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.6, outline: "none" }}
+              style={{ width: "100%", minHeight: "80px", padding: "12px 14px", background: "#f5f5f4", color: "#09090b", border: "1px solid #ebe9e2", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.6, outline: "none" }}
             />
           </div>
           <div style={{ marginBottom: "12px" }}>
             <select
               value={lockedTemplateId}
               onChange={e => setLockedTemplateId(e.target.value)}
-              style={{ width: "100%", padding: "10px 12px", background: "#f5f5f4", color: "#18181b", border: lockedTemplateId ? "1px solid #7c3aed" : "1px solid #ebe9e2", borderRadius: "8px", fontSize: "13px", fontFamily: "inherit", cursor: "pointer", outline: "none" }}>
+              style={{ width: "100%", padding: "10px 12px", background: "#f5f5f4", color: "#09090b", border: lockedTemplateId ? "1px solid #7c3aed" : "1px solid #ebe9e2", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", cursor: "pointer", outline: "none" }}>
               <option value="">Already know which template? Pick one (optional)</option>
               {WEBSITE_TEMPLATES.map(t => (
                 <option key={t.id} value={t.id}>{t.name} — {t.industry.split(/[,—]/)[0].trim().slice(0, 40)}</option>
@@ -4757,25 +4757,25 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               style={{
                 display: "inline-flex", alignItems: "center", gap: "8px",
                 padding: "10px 18px",
-                background: briefLoading ? "#18181b" : "#09090b",
+                background: briefLoading ? "#09090b" : "#09090b",
                 color: "#fff", border: "none", borderRadius: "8px",
-                fontSize: "13px", fontWeight: 500,
+                fontSize: "14px", fontWeight: 500,
                 cursor: (briefLoading || (!briefText.trim() && !lockedTemplateId)) ? "not-allowed" : "pointer",
                 opacity: (briefLoading || (!briefText.trim() && !lockedTemplateId)) ? 0.4 : 1,
               }}>
               <Icon name="sparkles" size={14} color="#fff" />
               {briefLoading ? "Analyzing…" : "Get my recommendation"}
             </button>
-            {briefLoading && <span style={{ fontSize: "11px", color: "#000000", fontWeight: 500 }}>Picking template, layout, colors, fonts… usually 5–10 seconds.</span>}
+            {briefLoading && <span style={{ fontSize: "12px", color: "#000000", fontWeight: 500 }}>Picking template, layout, colors, fonts… usually 5–10 seconds.</span>}
           </div>
           {briefLoading && (
-            <div style={{ marginTop: "14px", padding: "10px 14px", background: "#f5f5f4", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "11px", color: "#52525b", lineHeight: 1.6 }}>
+            <div style={{ marginTop: "14px", padding: "10px 14px", background: "#f5f5f4", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px", color: "#09090b", lineHeight: 1.6 }}>
               <div style={{ marginBottom: "4px", color: "#000000", fontWeight: 500 }}></div>
               
             </div>
           )}
           {briefError && (
-            <div style={{ marginTop: "14px", padding: "10px 14px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: "6px", fontSize: "12px", color: "#991b1b" }}>
+            <div style={{ marginTop: "14px", padding: "10px 14px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: "6px", fontSize: "13px", color: "#991b1b" }}>
               {briefError}
             </div>
           )}
@@ -4787,18 +4787,18 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             {/* Header row — template name + action buttons */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "28px", gap: "16px", flexWrap: "wrap", paddingBottom: "24px", borderBottom: "1px solid #e7e7e4" }}>
               <div style={{ flex: "1 1 280px" }}>
-                <div style={{ fontSize: "9px", color: "#71717a", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "6px" }}>Recommended Template</div>
+                <div style={{ fontSize: "9px", color: "#09090b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "6px" }}>Recommended Template</div>
                 <div style={{ fontSize: "22px", fontWeight: 700, color: "#09090b", letterSpacing: "-0.02em", lineHeight: 1.2, marginBottom: briefRec.templateReason ? "8px" : 0 }}>{WEBSITE_TEMPLATES.find(t => t.id === briefRec.templateId)?.name || briefRec.templateId}</div>
-                {briefRec.templateReason && <div style={{ fontSize: "12px", color: "#52525b", lineHeight: 1.55 }}>{briefRec.templateReason}</div>}
+                {briefRec.templateReason && <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.55 }}>{briefRec.templateReason}</div>}
               </div>
               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                <button onClick={applyBriefRecommendation} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px", background: "#000000", color: "#fff", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>
+                <button onClick={applyBriefRecommendation} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px", background: "#000000", color: "#fff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
                   <Icon name="check" size={14} color="#fff" /> Create this project
                 </button>
-                <button onClick={describeMySite} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px", background: "#ffffff", color: "#18181b", border: "1px solid #e7e7e4", borderRadius: "8px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>
-                  <Icon name="refresh" size={14} color="#18181b" /> Regenerate
+                <button onClick={describeMySite} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px", background: "#ffffff", color: "#09090b", border: "1px solid #e7e7e4", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
+                  <Icon name="refresh" size={14} color="#09090b" /> Regenerate
                 </button>
-                <button onClick={() => setBriefRec(null)} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 14px", background: "transparent", color: "#52525b", border: "1px solid #e7e7e4", borderRadius: "8px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>
+                <button onClick={() => setBriefRec(null)} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 14px", background: "transparent", color: "#09090b", border: "1px solid #e7e7e4", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
                   Discard
                 </button>
               </div>
@@ -4807,7 +4807,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             {/* Tagline pull-quote (if present) */}
             {briefRec.tagline && (
               <div style={{ marginBottom: "28px", paddingBottom: "24px", borderBottom: "1px solid #e7e7e4" }}>
-                <div style={{ fontSize: "9px", color: "#71717a", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "8px" }}>The Brief</div>
+                <div style={{ fontSize: "9px", color: "#09090b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "8px" }}>The Brief</div>
                 <div style={{ fontSize: "16px", color: "#09090b", fontStyle: "italic", lineHeight: 1.45, letterSpacing: "-0.01em", fontWeight: 500 }}>"{briefRec.tagline.replace(/^["']|["']$/g, "")}"</div>
               </div>
             )}
@@ -4817,16 +4817,16 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               {/* Layout */}
               {briefRec.layoutId && (
                 <div>
-                  <div style={{ fontSize: "9px", color: "#71717a", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "8px" }}>Layout</div>
+                  <div style={{ fontSize: "9px", color: "#09090b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "8px" }}>Layout</div>
                   <div style={{ fontSize: "16px", color: "#09090b", fontWeight: 700, marginBottom: "6px", letterSpacing: "-0.015em" }}>{LAYOUTS.find(l => l.id === briefRec.layoutId)?.name || briefRec.layoutId}</div>
-                  {briefRec.layoutReason && <div style={{ fontSize: "12px", color: "#52525b", lineHeight: 1.55 }}>{briefRec.layoutReason}</div>}
+                  {briefRec.layoutReason && <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.55 }}>{briefRec.layoutReason}</div>}
                 </div>
               )}
 
               {/* Palette with visual swatches */}
               {(briefRec.customColors || briefRec.themeId) && (
                 <div>
-                  <div style={{ fontSize: "9px", color: "#71717a", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "8px" }}>Palette</div>
+                  <div style={{ fontSize: "9px", color: "#09090b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "8px" }}>Palette</div>
                   <div style={{ display: "flex", gap: "6px", alignItems: "center", marginBottom: "6px", flexWrap: "wrap" }}>
                     {(() => {
                       // Build swatch list from custom colors or from the recommended theme
@@ -4845,16 +4845,16 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                       {briefRec.customColors ? "Custom colors" : (THEMES.find(t => t.id === briefRec.themeId)?.name || briefRec.themeId)}
                     </span>
                   </div>
-                  {briefRec.themeReason && <div style={{ fontSize: "12px", color: "#52525b", lineHeight: 1.55 }}>{briefRec.themeReason}</div>}
+                  {briefRec.themeReason && <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.55 }}>{briefRec.themeReason}</div>}
                 </div>
               )}
 
               {/* Typography with rendered sample */}
               {briefRec.headingFont && (
                 <div>
-                  <div style={{ fontSize: "9px", color: "#71717a", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "8px" }}>Typography</div>
+                  <div style={{ fontSize: "9px", color: "#09090b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "8px" }}>Typography</div>
                   <div style={{ fontSize: "22px", color: "#09090b", fontFamily: `'${briefRec.headingFont}', Georgia, serif`, lineHeight: 1.1, marginBottom: "4px", fontWeight: 500 }}>{briefRec.headingFont}</div>
-                  <div style={{ fontSize: "12px", color: "#52525b", lineHeight: 1.55 }}>
+                  <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.55 }}>
                     Display heading{briefRec.bodyFont ? ` — paired with ${briefRec.bodyFont} for body` : ""}.{briefRec.fontReason ? ` ${briefRec.fontReason}` : ""}
                   </div>
                 </div>
@@ -4863,8 +4863,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               {/* Goals */}
               {((Array.isArray(briefRec.goals) && briefRec.goals.length) || briefRec.goal) && (
                 <div>
-                  <div style={{ fontSize: "9px", color: "#71717a", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "8px" }}>Goals</div>
-                  <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.6, fontWeight: 500 }}>
+                  <div style={{ fontSize: "9px", color: "#09090b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "8px" }}>Goals</div>
+                  <div style={{ fontSize: "14px", color: "#09090b", lineHeight: 1.6, fontWeight: 500 }}>
                     {(Array.isArray(briefRec.goals) && briefRec.goals.length ? briefRec.goals : [briefRec.goal]).join(" · ")}
                   </div>
                 </div>
@@ -4873,16 +4873,16 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               {/* Outcome */}
               {briefRec.outcome && (
                 <div>
-                  <div style={{ fontSize: "9px", color: "#71717a", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "8px" }}>Desired Outcome</div>
-                  <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.6 }}>{briefRec.outcome}</div>
+                  <div style={{ fontSize: "9px", color: "#09090b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "8px" }}>Desired Outcome</div>
+                  <div style={{ fontSize: "14px", color: "#09090b", lineHeight: 1.6 }}>{briefRec.outcome}</div>
                 </div>
               )}
 
               {/* Keywords */}
               {briefRec.primaryKeywords && (
                 <div>
-                  <div style={{ fontSize: "9px", color: "#71717a", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "8px" }}>Keywords</div>
-                  <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.6 }}>{briefRec.primaryKeywords}</div>
+                  <div style={{ fontSize: "9px", color: "#09090b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "8px" }}>Keywords</div>
+                  <div style={{ fontSize: "14px", color: "#09090b", lineHeight: 1.6 }}>{briefRec.primaryKeywords}</div>
                 </div>
               )}
             </div>
@@ -4895,14 +4895,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         <h2 style={{ fontSize: "22px", margin: "0 0 14px", fontWeight: 200, color: "#09090b", letterSpacing: "0" }}>Your projects</h2>
         {projects.length === 0 && (
           <div style={{ marginBottom: "20px", padding: "20px 24px", background: "#ffffff", border: "1px solid #ebe9e2", borderRadius: "10px" }}>
-            <div style={{ fontSize: "13px", fontWeight: 600, color: "#09090b", marginBottom: "6px" }}></div>
-            <div style={{ fontSize: "12px", color: "#52525b", lineHeight: 1.6 }}>
+            <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "6px" }}></div>
+            <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.6 }}>
               
             </div>
           </div>
         )}
         {importMsg && (
-          <div style={{ marginBottom: "16px", padding: "12px 16px", background: importMsg.startsWith("Import failed") ? "#fef2f2" : "#f5f5f4", border: importMsg.startsWith("Import failed") ? "1px solid #fecaca" : "1px solid #e5e7eb", borderRadius: "8px", fontSize: "12px", color: importMsg.startsWith("Import failed") ? "#991b1b" : "#27272a" }}>
+          <div style={{ marginBottom: "16px", padding: "12px 16px", background: importMsg.startsWith("Import failed") ? "#fef2f2" : "#f5f5f4", border: importMsg.startsWith("Import failed") ? "1px solid #fecaca" : "1px solid #e5e7eb", borderRadius: "8px", fontSize: "13px", color: importMsg.startsWith("Import failed") ? "#991b1b" : "#09090b" }}>
             {importMsg}
           </div>
         )}
@@ -4916,7 +4916,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               <div key={p.id} style={{ background: "#ffffff", border: isPendingDelete ? "1px solid #fecaca" : "1px solid #ebe9e2", padding: "18px 20px", borderRadius: "10px", display: "flex", flexDirection: "column", gap: "12px" }}>
                 <div onClick={() => { setActiveId(p.id); setView("editor"); setPageIdx(0); }} style={{ cursor: "pointer", flex: 1 }}>
                   <div style={{ fontSize: "14px", fontWeight: 500, marginBottom: "4px", color: "#09090b", letterSpacing: "0" }}>{displayName}</div>
-                  <div style={{ fontSize: "11px", color: "#71717a", marginBottom: "12px" }}>
+                  <div style={{ fontSize: "12px", color: "#09090b", marginBottom: "12px" }}>
                     {p.pages.length} page{p.pages.length !== 1 ? "s" : ""}
                     {hasDescription ? <> · {p.brand.industry}</> : <span style={{ color: "#a3a39e" }}> · No description yet</span>}
                   </div>
@@ -4924,12 +4924,12 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
                       <div style={{ width: "18px", height: "18px", background: p.brand.primaryColor, border: "1px solid #ebe9e2", borderRadius: "3px" }} />
                       <div style={{ width: "18px", height: "18px", background: p.brand.accentColor, border: "1px solid #ebe9e2", borderRadius: "3px" }} />
-                      <span style={{ fontSize: "10px", color: "#71717a", marginLeft: "4px" }}>
+                      <span style={{ fontSize: "10px", color: "#09090b", marginLeft: "4px" }}>
                         {WEBSITE_TEMPLATES.find(t => t.id === p.brand.templateId)?.name || "Template applied"}
                       </span>
                     </div>
                   ) : (
-                    <div style={{ fontSize: "10px", color: "#71717a", fontStyle: "italic", padding: "6px 10px", background: "#f5f5f4", border: "1px dashed #d4d2c8", borderRadius: "4px", display: "inline-block" }}>
+                    <div style={{ fontSize: "10px", color: "#09090b", fontStyle: "italic", padding: "6px 10px", background: "#f5f5f4", border: "1px dashed #d4d2c8", borderRadius: "4px", display: "inline-block" }}>
                       No template applied yet
                     </div>
                   )}
@@ -4937,20 +4937,20 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div style={{ display: "flex", gap: "6px", paddingTop: "12px", borderTop: "1px solid #f0eee6" }}>
                   {isPendingDelete ? (
                     <>
-                      <button onClick={(e) => { e.stopPropagation(); deleteProject(p.id); }} style={{ flex: 1, padding: "8px 10px", background: "#c93939", color: "#fff", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: 600, cursor: "pointer" }}>Yes, delete "{displayName}"</button>
-                      <button onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(null); }} style={{ padding: "8px 12px", background: "transparent", color: "#52525b", border: "1px solid #ebe9e2", borderRadius: "6px", fontSize: "11px", fontWeight: 500, cursor: "pointer" }}>Cancel</button>
+                      <button onClick={(e) => { e.stopPropagation(); deleteProject(p.id); }} style={{ flex: 1, padding: "8px 10px", background: "#c93939", color: "#fff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer" }}>Yes, delete "{displayName}"</button>
+                      <button onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(null); }} style={{ padding: "8px 12px", background: "transparent", color: "#09090b", border: "1px solid #ebe9e2", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Cancel</button>
                     </>
                   ) : (
                     <>
-                      <button onClick={(e) => { e.stopPropagation(); setActiveId(p.id); setView("editor"); setPageIdx(0); }} style={{ flex: 1, padding: "8px 10px", background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: 500, cursor: "pointer" }}>Open</button>
-                      <button onClick={(e) => { e.stopPropagation(); duplicateProject(p.id); }} title="Duplicate this project" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#52525b", border: "1px solid #ebe9e2", borderRadius: "6px", cursor: "pointer" }}>
-                        <Icon name="copy" size={14} color="#52525b" />
+                      <button onClick={(e) => { e.stopPropagation(); setActiveId(p.id); setView("editor"); setPageIdx(0); }} style={{ flex: 1, padding: "8px 10px", background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Open</button>
+                      <button onClick={(e) => { e.stopPropagation(); duplicateProject(p.id); }} title="Duplicate this project" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#09090b", border: "1px solid #ebe9e2", borderRadius: "6px", cursor: "pointer" }}>
+                        <Icon name="copy" size={14} color="#09090b" />
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); exportProjectFile(p); }} title="Download as JSON backup file" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#52525b", border: "1px solid #ebe9e2", borderRadius: "6px", cursor: "pointer" }}>
-                        <Icon name="download" size={14} color="#52525b" />
+                      <button onClick={(e) => { e.stopPropagation(); exportProjectFile(p); }} title="Download as JSON backup file" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#09090b", border: "1px solid #ebe9e2", borderRadius: "6px", cursor: "pointer" }}>
+                        <Icon name="download" size={14} color="#09090b" />
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); resetProject(p.id); }} title="Reset to blank" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#52525b", border: "1px solid #ebe9e2", borderRadius: "6px", cursor: "pointer" }}>
-                        <Icon name="refresh" size={14} color="#52525b" />
+                      <button onClick={(e) => { e.stopPropagation(); resetProject(p.id); }} title="Reset to blank" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#09090b", border: "1px solid #ebe9e2", borderRadius: "6px", cursor: "pointer" }}>
+                        <Icon name="refresh" size={14} color="#09090b" />
                       </button>
                       <button onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(p.id); }} title="Delete this project" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#c93939", border: "1px solid #ebe9e2", borderRadius: "6px", cursor: "pointer" }}>
                         <Icon name="trash" size={14} color="#c93939" />
@@ -4961,15 +4961,15 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </div>
             );
           })}
-          <button onClick={newProject} style={{ background: "transparent", border: "1.5px dashed #d4d2c8", color: "#52525b", padding: "32px", borderRadius: "10px", cursor: "pointer", fontSize: "13px", fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-            <Icon name="plus" size={18} color="#52525b" /> New Project
+          <button onClick={newProject} style={{ background: "transparent", border: "1.5px dashed #d4d2c8", color: "#09090b", padding: "32px", borderRadius: "10px", cursor: "pointer", fontSize: "14px", fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+            <Icon name="plus" size={18} color="#09090b" /> New Project
           </button>
-          <label style={{ background: "transparent", border: "1.5px dashed #d4d2c8", color: "#52525b", padding: "32px", borderRadius: "10px", cursor: "pointer", fontSize: "13px", fontWeight: 500, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-            <Icon name="upload" size={18} color="#52525b" /> Import Project
+          <label style={{ background: "transparent", border: "1.5px dashed #d4d2c8", color: "#09090b", padding: "32px", borderRadius: "10px", cursor: "pointer", fontSize: "14px", fontWeight: 500, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+            <Icon name="upload" size={18} color="#09090b" /> Import Project
             <input type="file" accept="application/json,.json" onChange={importProjectFile} style={{ display: "none" }} />
           </label>
         </div>
-        <p style={{ fontSize: "11px", color: "#71717a", marginTop: "20px", lineHeight: 1.6 }}>
+        <p style={{ fontSize: "12px", color: "#09090b", marginTop: "20px", lineHeight: 1.6 }}>
           Projects auto-save in your browser. Use the download icon on a project card to save a backup.
         </p>
       </div>
@@ -4978,7 +4978,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
   // ── EDITOR VIEW ────────────────────────────────────────────────────────────
   return (
-    <div style={{ minHeight: "100vh", background: "#f5f5f4", color: "#18181b", fontFamily: "'Be Vietnam Pro', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#f5f5f4", color: "#09090b", fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Yeseva+One&family=Manrope:wght@400;500;700&family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Oswald:wght@500;700&family=Space+Mono&family=Inter:wght@500;700&display=swap');
         * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; box-sizing: border-box; }
@@ -5010,19 +5010,19 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", marginBottom: "10px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <button onClick={() => setView("projects")} style={{ ...I.btnGhost, padding: "8px 14px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px" }}>
-              <Icon name="arrowLeft" size={14} color="#52525b" /> All Projects
+              <Icon name="arrowLeft" size={14} color="#09090b" /> All Projects
             </button>
             <div>
               <div style={{ fontSize: "24px", fontWeight: 800, letterSpacing: "-0.03em", color: "#000000", lineHeight: 1 }}>spec</div>
-              <div style={{ fontSize: "11px", color: "#52525b", marginTop: "4px" }}>{brand.name} · {project.pages.length} page{project.pages.length !== 1 ? "s" : ""} · Exporting for {exportFormat === "divi" ? "Divi" : "Elementor"}</div>
+              <div style={{ fontSize: "12px", color: "#09090b", marginTop: "4px" }}>{brand.name} · {project.pages.length} page{project.pages.length !== 1 ? "s" : ""} · Exporting for {exportFormat === "divi" ? "Divi" : "Elementor"}</div>
             </div>
           </div>
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
-            <button onClick={() => setShowAudit(!showAudit)} style={{ ...I.btnGhost, color: audit.length ? "#b45309" : "#52525b", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-              <Icon name="alertTriangle" size={14} color={audit.length ? "#b45309" : "#52525b"} /> Audit ({audit.length})
+            <button onClick={() => setShowAudit(!showAudit)} style={{ ...I.btnGhost, color: audit.length ? "#b45309" : "#09090b", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              <Icon name="alertTriangle" size={14} color={audit.length ? "#b45309" : "#09090b"} /> Audit ({audit.length})
             </button>
             <button onClick={() => exportProjectFile(project)} style={{ ...I.btnGhost, display: "inline-flex", alignItems: "center", gap: "6px" }} title="Download this project as a JSON backup">
-              <Icon name="download" size={14} color="#52525b" /> Save Backup
+              <Icon name="download" size={14} color="#09090b" /> Save Backup
             </button>
             <button onClick={() => setView("preview")} style={{ ...I.btn, background: "#000000", color: "#ffffff", display: "inline-flex", alignItems: "center", gap: "6px" }}>
               <Icon name="eye" size={14} color="#ffffff" /> Preview Page
@@ -5036,10 +5036,10 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
       {showAudit && (
         <div style={{ background: "#ffffff", borderBottom: "1px solid #e5e7eb", padding: "20px 24px", maxHeight: "420px", overflowY: "auto" }}>
           {audit.length === 0 ? (
-            <div style={{ fontSize: "13px", color: "#000000", fontWeight: 600 }}>Everything looks good. Ready to build.</div>
+            <div style={{ fontSize: "14px", color: "#000000", fontWeight: 600 }}>Everything looks good. Ready to build.</div>
           ) : (
             <>
-              <div style={{ fontSize: "12px", fontWeight: 700, color: "#18181b", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "0.08em" }}>Build Audit — {audit.length} item{audit.length !== 1 ? "s" : ""}</div>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "#09090b", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "0.08em" }}>Build Audit — {audit.length} item{audit.length !== 1 ? "s" : ""}</div>
               {["critical", "content", "seo", "aio", "best"].map(cat => {
                 const items = audit.filter(a => a.category === cat);
                 if (!items.length) return null;
@@ -5047,7 +5047,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 const color = { critical: "#ef4444", content: "#b45309", seo: "#3b82f6", aio: "#000000", best: "#000000" }[cat];
                 return (
                   <div key={cat} style={{ marginBottom: "16px" }}>
-                    <div style={{ fontSize: "11px", color, fontWeight: 700, marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.08em" }}>{label} ({items.length})</div>
+                    <div style={{ fontSize: "12px", color, fontWeight: 700, marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.08em" }}>{label} ({items.length})</div>
                     {items.map((a, i) => {
                       const TABLABEL = { brand: "Brand", page: "Page", content: "Content", inspo: "Inspiration", social: "Social & Nav", footer: "Header & Footer", export: "Export" };
                       const target = a.target;
@@ -5059,7 +5059,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           disabled={!clickable}
                           style={{
                             display: "block", width: "100%", textAlign: "left",
-                            fontSize: "12px", color: "#27272a", padding: "8px 12px",
+                            fontSize: "13px", color: "#09090b", padding: "8px 12px",
                             lineHeight: 1.5, borderLeft: `2px solid ${color}`,
                             background: "#f5f5f4", border: `1px solid #f4f4f5`, borderLeftWidth: "3px", borderLeftColor: color,
                             borderRadius: "4px", marginBottom: "6px",
@@ -5070,14 +5070,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           onMouseLeave={e => { if (clickable) e.currentTarget.style.background = "#f5f5f4"; }}
                         >
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px" }}>
-                            <strong style={{ color: "#18181b" }}>{a.msg}</strong>
+                            <strong style={{ color: "#09090b" }}>{a.msg}</strong>
                             {clickable && (
-                              <span style={{ fontSize: "10px", color: "#52525b", whiteSpace: "nowrap", textTransform: "uppercase", letterSpacing: "0.08em", flexShrink: 0 }}>
+                              <span style={{ fontSize: "10px", color: "#09090b", whiteSpace: "nowrap", textTransform: "uppercase", letterSpacing: "0.08em", flexShrink: 0 }}>
                                 {TABLABEL[target.tab] || target.tab} → →
                               </span>
                             )}
                           </div>
-                          {a.fix && <div style={{ color: "#52525b", marginTop: "4px", fontSize: "11px" }}>→ {a.fix}</div>}
+                          {a.fix && <div style={{ color: "#09090b", marginTop: "4px", fontSize: "12px" }}>→ {a.fix}</div>}
                         </button>
                       );
                     })}
@@ -5096,17 +5096,17 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             {aiError ? (
               <>
                 <div style={{ fontSize: "16px", fontWeight: 700, color: "#ef4444", marginBottom: "12px" }}>Couldn't draft copy</div>
-                <div style={{ fontSize: "13px", color: "#27272a", marginBottom: "20px", lineHeight: 1.6 }}>{aiError}</div>
+                <div style={{ fontSize: "14px", color: "#09090b", marginBottom: "20px", lineHeight: 1.6 }}>{aiError}</div>
                 <div style={{ display: "flex", gap: "10px" }}>
-                  <button onClick={() => { setAiError(""); generateStarterCopy(); }} style={{ padding: "10px 18px", background: "#000000", color: "#18181b", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>Try again</button>
-                  <button onClick={() => setAiError("")} style={{ padding: "10px 18px", background: "transparent", color: "#27272a", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>Cancel</button>
+                  <button onClick={() => { setAiError(""); generateStarterCopy(); }} style={{ padding: "10px 18px", background: "#000000", color: "#09090b", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}>Try again</button>
+                  <button onClick={() => setAiError("")} style={{ padding: "10px 18px", background: "transparent", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}>Cancel</button>
                 </div>
               </>
             ) : (aiLoading && !aiDraft) ? (
               <>
-                <div style={{ fontSize: "11px", color: "#27272a", fontWeight: 700, marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.1em" }}>Drafting</div>
-                <div style={{ fontSize: "18px", fontWeight: 700, color: "#18181b", marginBottom: "20px" }}>Writing your starter copy…</div>
-                <div style={{ fontSize: "12px", color: "#27272a", lineHeight: 1.6, marginBottom: "20px" }}>
+                <div style={{ fontSize: "12px", color: "#09090b", fontWeight: 700, marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.1em" }}>Drafting</div>
+                <div style={{ fontSize: "18px", fontWeight: 700, color: "#09090b", marginBottom: "20px" }}>Writing your starter copy…</div>
+                <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.6, marginBottom: "20px" }}>
                   Writing tagline, hero heading, hero subhead, about copy, CTAs, and key messages based on your brand brief. Usually 8–15 seconds.
                 </div>
                 {[1,2,3,4,5,6].map(i => (
@@ -5118,10 +5118,10 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </>
             ) : aiDraft && (
               <>
-                <div style={{ fontSize: "11px", color: "#27272a", fontWeight: 700, marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.1em" }}>AI Draft Preview</div>
-                <div style={{ fontSize: "18px", fontWeight: 700, color: "#18181b", marginBottom: "8px" }}>Review and edit the starter copy</div>
-                <div style={{ fontSize: "12px", color: "#52525b", marginBottom: "20px", lineHeight: 1.5 }}>
-                  Edit any field directly. Click <strong style={{ color: "#27272a" }}>↻</strong> next to a label to regenerate just that field. When you like it, click Apply.
+                <div style={{ fontSize: "12px", color: "#09090b", fontWeight: 700, marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.1em" }}>AI Draft Preview</div>
+                <div style={{ fontSize: "18px", fontWeight: 700, color: "#09090b", marginBottom: "8px" }}>Review and edit the starter copy</div>
+                <div style={{ fontSize: "13px", color: "#09090b", marginBottom: "20px", lineHeight: 1.5 }}>
+                  Edit any field directly. Click <strong style={{ color: "#09090b" }}>↻</strong> next to a label to regenerate just that field. When you like it, click Apply.
                 </div>
 
                 {[
@@ -5139,14 +5139,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   return (
                     <div key={key} style={{ marginBottom: "14px", background: "#ffffff", padding: "12px 14px", borderRadius: "6px", border: isRegenerating ? "1px solid #18181b" : "1px solid #e5e7eb", position: "relative" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                        <div style={{ fontSize: "10px", color: "#52525b", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>{label}</div>
+                        <div style={{ fontSize: "10px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>{label}</div>
                         <button
                           onClick={() => regenerateField(key)}
                           disabled={!!aiFieldRegen}
                           title={`Regenerate just the ${label.toLowerCase()}`}
                           style={{
                             background: isRegenerating ? "#000000" : "transparent",
-                            color: isRegenerating ? "#ffffff" : "#52525b",
+                            color: isRegenerating ? "#ffffff" : "#09090b",
                             border: "1px solid #e5e7eb",
                             borderRadius: "4px",
                             padding: "4px 9px",
@@ -5158,7 +5158,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                             alignItems: "center",
                             gap: "4px",
                           }}>
-                          <Icon name="refresh" size={11} color={isRegenerating ? "#ffffff" : "#52525b"} />
+                          <Icon name="refresh" size={11} color={isRegenerating ? "#ffffff" : "#09090b"} />
                           {isRegenerating ? "Regenerating…" : "Regenerate"}
                         </button>
                       </div>
@@ -5168,7 +5168,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           onChange={e => setAiDraft({ ...aiDraft, [key]: e.target.value })}
                           rows={rows || 3}
                           disabled={isRegenerating}
-                          style={{ width: "100%", padding: "8px 10px", background: "#f5f5f4", color: "#18181b", border: "1px solid #e5e7eb", borderRadius: "4px", fontSize: "13px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.5, opacity: isRegenerating ? 0.5 : 1 }}
+                          style={{ width: "100%", padding: "8px 10px", background: "#f5f5f4", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.5, opacity: isRegenerating ? 0.5 : 1 }}
                         />
                       ) : (
                         <input
@@ -5176,7 +5176,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           value={value}
                           onChange={e => setAiDraft({ ...aiDraft, [key]: e.target.value })}
                           disabled={isRegenerating}
-                          style={{ width: "100%", padding: "8px 10px", background: "#f5f5f4", color: "#18181b", border: "1px solid #e5e7eb", borderRadius: "4px", fontSize: "13px", fontFamily: "inherit", opacity: isRegenerating ? 0.5 : 1 }}
+                          style={{ width: "100%", padding: "8px 10px", background: "#f5f5f4", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", opacity: isRegenerating ? 0.5 : 1 }}
                         />
                       )}
                     </div>
@@ -5184,13 +5184,13 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 })}
 
                 <div style={{ display: "flex", gap: "10px", marginTop: "20px", flexWrap: "wrap" }}>
-                  <button onClick={applyAiDraft} disabled={!!aiFieldRegen || aiLoading} style={{ padding: "12px 20px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 600, cursor: (aiFieldRegen || aiLoading) ? "not-allowed" : "pointer", opacity: (aiFieldRegen || aiLoading) ? 0.5 : 1, display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <button onClick={applyAiDraft} disabled={!!aiFieldRegen || aiLoading} style={{ padding: "12px 20px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: (aiFieldRegen || aiLoading) ? "not-allowed" : "pointer", opacity: (aiFieldRegen || aiLoading) ? 0.5 : 1, display: "inline-flex", alignItems: "center", gap: "6px" }}>
                     <Icon name="check" size={14} color="#ffffff" /> Apply to brand & page
                   </button>
-                  <button onClick={() => { setAiDraft(null); generateStarterCopy(); }} disabled={!!aiFieldRegen || aiLoading} style={{ padding: "12px 20px", background: "#ffffff", color: "#27272a", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: (aiFieldRegen || aiLoading) ? "not-allowed" : "pointer", opacity: (aiFieldRegen || aiLoading) ? 0.5 : 1, display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                    <Icon name="refresh" size={14} color="#27272a" /> Regenerate all
+                  <button onClick={() => { setAiDraft(null); generateStarterCopy(); }} disabled={!!aiFieldRegen || aiLoading} style={{ padding: "12px 20px", background: "#ffffff", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: (aiFieldRegen || aiLoading) ? "not-allowed" : "pointer", opacity: (aiFieldRegen || aiLoading) ? 0.5 : 1, display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <Icon name="refresh" size={14} color="#09090b" /> Regenerate all
                   </button>
-                  <button onClick={() => { setAiDraft(null); setAiFieldRegen(""); }} disabled={!!aiFieldRegen} style={{ padding: "12px 20px", background: "transparent", color: "#52525b", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: aiFieldRegen ? "not-allowed" : "pointer" }}>Cancel</button>
+                  <button onClick={() => { setAiDraft(null); setAiFieldRegen(""); }} disabled={!!aiFieldRegen} style={{ padding: "12px 20px", background: "transparent", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: aiFieldRegen ? "not-allowed" : "pointer" }}>Cancel</button>
                 </div>
               </>
             )}
@@ -5205,20 +5205,20 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           <div style={{ display: "flex", gap: "6px", marginBottom: "16px", flexWrap: "wrap", alignItems: "center", position: "relative" }}>
             {project.pages.map((p, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                <button onClick={() => setPageIdx(i)} style={{ padding: "8px 14px", background: i === pageIdx ? "#000000" : "#ffffff", color: i === pageIdx ? "#ffffff" : "#27272a", border: i === pageIdx ? "1px solid #000000" : "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>{p.name}</button>
-                {project.pages.length > 1 && <button onClick={() => delPage(i)} style={{ background: "transparent", border: "none", color: "#71717a", cursor: "pointer", fontSize: "14px" }}>×</button>}
+                <button onClick={() => setPageIdx(i)} style={{ padding: "8px 14px", background: i === pageIdx ? "#000000" : "#ffffff", color: i === pageIdx ? "#ffffff" : "#09090b", border: i === pageIdx ? "1px solid #000000" : "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>{p.name}</button>
+                {project.pages.length > 1 && <button onClick={() => delPage(i)} style={{ background: "transparent", border: "none", color: "#09090b", cursor: "pointer", fontSize: "14px" }}>×</button>}
               </div>
             ))}
             <button onClick={() => setShowAddPage(!showAddPage)} style={{ ...I.btnGhost, padding: "8px 12px", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-              <Icon name="plus" size={13} color="#52525b" /> Add Page
+              <Icon name="plus" size={13} color="#09090b" /> Add Page
             </button>
             {showAddPage && (
               <div style={{ position: "absolute", top: "44px", right: "0", background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "12px", zIndex: 30, minWidth: "280px", maxHeight: "420px", overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,0.08)" }}>
-                <div style={{ fontSize: "11px", color: "#52525b", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "10px", padding: "0 4px", fontWeight: 600 }}>Start from a template</div>
+                <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "10px", padding: "0 4px", fontWeight: 600 }}>Start from a template</div>
                 {PAGE_TYPES.map(pt => (
-                  <button key={pt} onClick={() => addPage(pt)} style={{ width: "100%", textAlign: "left", padding: "10px 12px", background: "transparent", border: "none", color: "#27272a", fontSize: "13px", cursor: "pointer", borderRadius: "4px", marginBottom: "2px" }} onMouseEnter={e => e.currentTarget.style.background = "#eeeeec"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                  <button key={pt} onClick={() => addPage(pt)} style={{ width: "100%", textAlign: "left", padding: "10px 12px", background: "transparent", border: "none", color: "#09090b", fontSize: "14px", cursor: "pointer", borderRadius: "4px", marginBottom: "2px" }} onMouseEnter={e => e.currentTarget.style.background = "#eeeeec"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                     <div style={{ fontWeight: 600, color: "#000000" }}>{pt}</div>
-                    <div style={{ fontSize: "11px", color: "#71717a", marginTop: "2px" }}>{(PAGE_TEMPLATES[pt]?.sections || []).slice(0, 4).join(" · ")}{PAGE_TEMPLATES[pt]?.sections?.length > 4 ? " ..." : ""}</div>
+                    <div style={{ fontSize: "12px", color: "#09090b", marginTop: "2px" }}>{(PAGE_TEMPLATES[pt]?.sections || []).slice(0, 4).join(" · ")}{PAGE_TEMPLATES[pt]?.sections?.length > 4 ? " ..." : ""}</div>
                   </button>
                 ))}
               </div>
@@ -5242,7 +5242,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               {/* Project switcher — quick "where am I + jump to another project" bar */}
               <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "14px 16px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
                 <div style={{ flex: "1 1 220px", minWidth: "180px" }}>
-                  <label style={{ display: "block", fontSize: "10px", color: "#52525b", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700, marginBottom: "3px" }}>Editing</label>
+                  <label style={{ display: "block", fontSize: "10px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700, marginBottom: "3px" }}>Editing</label>
                   <input
                     type="text"
                     value={brand.name || ""}
@@ -5257,31 +5257,31 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   <select
                     value={activeId}
                     onChange={e => { setActiveId(e.target.value); setPageIdx(0); }}
-                    style={{ padding: "9px 12px", background: "#ffffff", color: "#27272a", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer", minWidth: "180px" }}
+                    style={{ padding: "9px 12px", background: "#ffffff", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", minWidth: "180px" }}
                     title="Switch to another project">
                     {projects.map(p => (
                       <option key={p.id} value={p.id}>{p.name}</option>
                     ))}
                   </select>
                 )}
-                <button onClick={newProject} style={{ padding: "9px 14px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                <button onClick={newProject} style={{ padding: "9px 14px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "6px" }}>
                   <Icon name="plus" size={13} color="#ffffff" /> New Project
                 </button>
-                <button onClick={() => setView("projects")} style={{ padding: "9px 14px", background: "transparent", color: "#27272a", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "6px" }} title="View, duplicate, import, or export projects">
-                  <Icon name="folder" size={13} color="#27272a" /> Manage Projects
+                <button onClick={() => setView("projects")} style={{ padding: "9px 14px", background: "transparent", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "6px" }} title="View, duplicate, import, or export projects">
+                  <Icon name="folder" size={13} color="#09090b" /> Manage Projects
                 </button>
               </div>
 
 <Section id="inspo-sites" title="Inspiration Sites" icon="">
-                <p style={{ fontSize: "12px", color: "#71717a", margin: 0 }}>URLs of sites you love. The AI Draft Starter Copy uses these to infer aesthetic preferences — adding more or different sites here will change the recommendation when you regenerate.</p>
-                <div><label style={I.lbl}>Inspiration URLs (one per line)</label><textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={6} value={brand.inspoUrls} onChange={e => updBrand("inspoUrls", e.target.value)} placeholder="https://faure.octrace.com&#10;https://nevo.themevillain.com&#10;https://breef.com" /></div>
-                <div style={{ marginTop: "12px", padding: "12px 14px", background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "11px", color: "#27272a", lineHeight: 1.6 }}>
-                  <strong style={{ color: "#27272a" }}>How this gets used:</strong> Whenever you go to Discovery → Brand Brief and click <strong>Draft Starter Copy</strong>, these URLs are sent to the AI as aesthetic context. To refresh recommendations after adding new URLs, head to Discovery and re-run Draft Starter Copy.
+                <p style={{ fontSize: "13px", color: "#09090b", margin: 0 }}>URLs of sites you love. The AI Draft Starter Copy uses these to infer aesthetic preferences — adding more or different sites here will change the recommendation when you regenerate.</p>
+                <div><label style={I.lbl}>Inspiration URLs (one per line)</label><textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={6} value={brand.inspoUrls} onChange={e => updBrand("inspoUrls", e.target.value)} placeholder="https://faure.octrace.com&#10;https://nevo.themevillain.com&#10;https://breef.com" /></div>
+                <div style={{ marginTop: "12px", padding: "12px 14px", background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px", color: "#09090b", lineHeight: 1.6 }}>
+                  <strong style={{ color: "#09090b" }}>How this gets used:</strong> Whenever you go to Discovery → Brand Brief and click <strong>Draft Starter Copy</strong>, these URLs are sent to the AI as aesthetic context. To refresh recommendations after adding new URLs, head to Discovery and re-run Draft Starter Copy.
                 </div>
               </Section>
 
               <Section id="inspo-keywords" title="Keywords for Search & AI Discovery" icon="">
-                <p style={{ fontSize: "12px", color: "#71717a", margin: 0, lineHeight: 1.6 }}>
+                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
                   Terms you want this site to rank for in Google AND get cited in AI search (ChatGPT, Perplexity, Gemini, and similar). These are also fed to the AI Draft Starter Copy so copy gets written around them naturally.
                 </p>
                 {(() => {
@@ -5294,18 +5294,18 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   if (!missing.length) return null;
                   return (
                     <div style={{ padding: "12px 14px", background: "#f5f5f4", border: "1px solid #e5e7eb", borderRadius: "6px" }}>
-                      <div style={{ fontSize: "11px", color: "#27272a", fontWeight: 700, marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Suggested from your {activeTpl.name} template</div>
+                      <div style={{ fontSize: "12px", color: "#09090b", fontWeight: 700, marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Suggested from your {activeTpl.name} template</div>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                         {missing.map(k => (
                           <button key={k} onClick={() => {
                             const next = currentList.concat(k).join(", ");
                             updBrand("primaryKeywords", next);
-                          }} style={{ padding: "5px 10px", background: "#eeeeec", color: "#27272a", border: "1px solid #e5e7eb", borderRadius: "4px", fontSize: "11px", fontWeight: 500, cursor: "pointer" }}>
+                          }} style={{ padding: "5px 10px", background: "#eeeeec", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "4px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>
                             + {k}
                           </button>
                         ))}
                       </div>
-                      <div style={{ fontSize: "10px", color: "#52525b", marginTop: "8px" }}>Click a chip to add it to your keywords below.</div>
+                      <div style={{ fontSize: "10px", color: "#09090b", marginTop: "8px" }}>Click a chip to add it to your keywords below.</div>
                     </div>
                   );
                 })()}
@@ -5318,7 +5318,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     onChange={e => updBrand("primaryKeywords", e.target.value)}
                     placeholder="freelance videographer, video production, cinematic video, music video, brand film"
                   />
-                  <div style={{ fontSize: "10px", color: "#71717a", marginTop: "5px" }}>3–5 keywords ideal. Same field as Discovery → Brand Brief — edits sync.</div>
+                  <div style={{ fontSize: "10px", color: "#09090b", marginTop: "5px" }}>3–5 keywords ideal. Same field as Discovery → Brand Brief — edits sync.</div>
                 </div>
               </Section>
 
@@ -5333,8 +5333,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               <Section id="client-logos" title="Clients & Brands" icon="">
                 <div>
                   <label style={I.lbl}>Client Logos / Brands Worked With (one per line)</label>
-                  <textarea style={{ ...I.inp, resize: "vertical", fontSize: "12px" }} rows={5} value={brand.clientLogos} onChange={e => updBrand("clientLogos", e.target.value)} placeholder="Sephora&#10;Glossier&#10;Kérastase" />
-                  <div style={{ fontSize: "10px", color: "#71717a", marginTop: "4px" }}>Used in the Logo Carousel section and as context for the AI when drafting copy.</div>
+                  <textarea style={{ ...I.inp, resize: "vertical", fontSize: "13px" }} rows={5} value={brand.clientLogos} onChange={e => updBrand("clientLogos", e.target.value)} placeholder="Sephora&#10;Glossier&#10;Kérastase" />
+                  <div style={{ fontSize: "10px", color: "#09090b", marginTop: "4px" }}>Used in the Logo Carousel section and as context for the AI when drafting copy.</div>
                 </div>
               </Section>
 
@@ -5342,7 +5342,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div>
                   <label style={I.lbl}>Business Name</label>
                   <input style={I.inp} value={brand.name} onChange={e => updBrand("name", e.target.value)} placeholder="e.g. Ben Papa Films" />
-                  <div style={{ fontSize: "10px", color: "#71717a", marginTop: "4px" }}>This is also the project name shown on the Projects page.</div>
+                  <div style={{ fontSize: "10px", color: "#09090b", marginTop: "4px" }}>This is also the project name shown on the Projects page.</div>
                 </div>
                 <div><label style={I.lbl}>Industry / Tagline Line</label><input style={I.inp} value={brand.industry} onChange={e => updBrand("industry", e.target.value)} placeholder="e.g. Documentary & commercial film production" /></div>
                 <div><label style={I.lbl}>Tagline (used in hero)</label><input style={I.inp} value={brand.tagline} onChange={e => updBrand("tagline", e.target.value)} placeholder="e.g. Stories told in motion." /></div>
@@ -5355,7 +5355,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </Section>
 
               <Section id="brand-brief" title="Brand Brief — Goals & SEO" icon="">
-                <p style={{ fontSize: "12px", color: "#27272a", margin: 0, lineHeight: 1.6 }}>
+                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
                   This drives the audit's SEO and AI-search recommendations, and powers the "Draft Starter Copy" button below. The more specific you are, the better the audit and the AI copy.
                 </p>
                 <div>
@@ -5365,7 +5365,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                       const currentGoals = brand.goals || (brand.goal ? [brand.goal] : []);
                       const isSelected = currentGoals.includes(g);
                       return (
-                        <label key={g} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 12px", background: isSelected ? "#eeeeec" : "#f5f5f4", border: `1px solid ${isSelected ? "#000000" : "#e7e7e4"}`, borderRadius: "6px", cursor: "pointer", fontSize: "12px", color: isSelected ? "#18181b" : "#52525b", userSelect: "none" }}>
+                        <label key={g} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 12px", background: isSelected ? "#eeeeec" : "#f5f5f4", border: `1px solid ${isSelected ? "#000000" : "#e7e7e4"}`, borderRadius: "6px", cursor: "pointer", fontSize: "13px", color: isSelected ? "#09090b" : "#09090b", userSelect: "none" }}>
                           <input
                             type="checkbox"
                             checked={isSelected}
@@ -5382,7 +5382,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                       );
                     })}
                   </div>
-                  <div style={{ fontSize: "10px", color: "#71717a", marginTop: "8px" }}>
+                  <div style={{ fontSize: "10px", color: "#09090b", marginTop: "8px" }}>
                     Pick everything the site should do. An e-commerce site is often Sales + Newsletter Growth. A coaching site is often Bookings + Lead Generation. A SaaS product is often Free Trial + Account Creation. A consultant is often Lead Generation + Resource Downloads.
                   </div>
                 </div>
@@ -5393,7 +5393,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div>
                   <label style={I.lbl}>Primary Keywords (comma-separated)</label>
                   <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.primaryKeywords || ""} onChange={e => updBrand("primaryKeywords", e.target.value)} placeholder="Example: executive coaching, business strategy, founder mentorship, scale without burnout" />
-                  <div style={{ fontSize: "11px", color: "#52525b", marginTop: "6px", lineHeight: 1.5 }}>
+                  <div style={{ fontSize: "12px", color: "#09090b", marginTop: "6px", lineHeight: 1.5 }}>
                     The terms you want this page to rank for in Google AND get cited in AI search (ChatGPT, Perplexity, Gemini, and similar). Most pages should target 3–5 keywords.
                   </div>
                 </div>
@@ -5404,7 +5404,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     marginTop: "8px", padding: "14px 18px",
                     background: "#000000",
                     color: "#ffffff", border: "none", borderRadius: "8px",
-                    fontSize: "13px", fontWeight: 500, cursor: (aiLoading || !((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) ? "not-allowed" : "pointer",
+                    fontSize: "14px", fontWeight: 500, cursor: (aiLoading || !((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) ? "not-allowed" : "pointer",
                     opacity: (aiLoading || !((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) ? 0.4 : 1,
                     display: "inline-flex", alignItems: "center", gap: "8px",
                   }}>
@@ -5412,7 +5412,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   {aiLoading ? "Drafting starter copy…" : "Draft Starter Copy with AI"}
                 </button>
                 {(!((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) && (
-                  <div style={{ fontSize: "11px", color: "#52525b", marginTop: "-4px" }}>
+                  <div style={{ fontSize: "12px", color: "#09090b", marginTop: "-4px" }}>
                     Pick at least one Goal and add a Desired Outcome to enable AI copy drafting.
                   </div>
                 )}
@@ -5425,7 +5425,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {tab === "brand" && (
             <>
               <Section id="brand-templates" title="Industry Template" icon="">
-                <p style={{ fontSize: "12px", color: "#27272a", margin: 0, lineHeight: 1.6 }}>
+                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
                   {brand.templateId
                     ? <>Your project is using a template already (likely from your AI recommendation). You can switch to a different one below — one click applies the new layout, theme, accent, fonts, and default copy.</>
                     : <>No template applied yet. Pick one below — one click applies the layout, theme, accent, fonts, section composition, and default copy. Or go back to the Projects page and describe your site to get an AI recommendation.</>}
@@ -5470,12 +5470,12 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                         <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: "200px" }}>
                           <div style={{ fontSize: "15px", fontWeight: 700, color: "#000000", marginBottom: "10px", letterSpacing: "-0.02em", lineHeight: 1.3, paddingRight: isActive ? "70px" : 0 }}>{t.name}</div>
                           <div style={{ height: "1px", background: "#e7e7e4", marginBottom: "12px" }} />
-                          <div style={{ fontSize: "12px", color: "#52525b", lineHeight: 1.55, marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{t.desc}</div>
+                          <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.55, marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{t.desc}</div>
                           <div style={{ display: "flex", gap: "5px", flexWrap: "wrap", marginTop: "auto" }}>
                             {t.homepageSections.slice(0, 5).map(s => (
                               <span key={s} style={{ fontSize: "9px", padding: "3px 8px", background: "#000000", color: "#ffffff", borderRadius: "10px", whiteSpace: "nowrap", fontWeight: 500, letterSpacing: "0.02em" }}>{s}</span>
                             ))}
-                            {t.homepageSections.length > 5 && <span style={{ fontSize: "9px", color: "#71717a", padding: "3px 4px", alignSelf: "center" }}>+{t.homepageSections.length - 5}</span>}
+                            {t.homepageSections.length > 5 && <span style={{ fontSize: "9px", color: "#09090b", padding: "3px 4px", alignSelf: "center" }}>+{t.homepageSections.length - 5}</span>}
                           </div>
                         </div>
                       </button>
@@ -5485,7 +5485,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </Section>
 
               <Section id="brand-layout" title="Layout Style" icon="">
-                <p style={{ fontSize: "12px", color: "#27272a", margin: 0, lineHeight: 1.6 }}>
+                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
                   {brand.templateId
                     ? <>Your template applied a default layout, but you can swap to a different typographic personality without losing the template's sections, colors, or copy. Use this if you want, say, Agency sections with Magazine-style centered serif typography.</>
                     : <>Optional. Layout controls the typographic personality — hero composition, services rendering, heading sizes, alignments. Independent of color. If you pick a Website Template above, it sets a layout for you; you can override here.</>
@@ -5531,8 +5531,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                         }}>Aa</div>
                         <div style={{ height: "1px", background: "#e7e7e4", marginBottom: "12px" }} />
                         <div style={{ fontSize: "14px", fontWeight: 700, color: "#000000", marginBottom: "4px", letterSpacing: "-0.02em", paddingRight: isOnDefault ? "70px" : 0 }}>None — Template Default</div>
-                        <div style={{ fontSize: "11px", color: "#52525b", lineHeight: 1.55, marginBottom: "12px" }}>Keep {activeTemplate.name}'s built-in layout ({defaultLayout?.name || "default"}).</div>
-                        <div style={{ display: "flex", gap: "6px", marginTop: "auto", fontSize: "10px", color: "#71717a", flexWrap: "wrap" }}>
+                        <div style={{ fontSize: "12px", color: "#09090b", lineHeight: 1.55, marginBottom: "12px" }}>Keep {activeTemplate.name}'s built-in layout ({defaultLayout?.name || "default"}).</div>
+                        <div style={{ display: "flex", gap: "6px", marginTop: "auto", fontSize: "10px", color: "#09090b", flexWrap: "wrap" }}>
                           <span>From template</span>
                           <span>·</span>
                           <span>{activeTemplate.headingFont}</span>
@@ -5579,8 +5579,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                         }}>Aa</div>
                         <div style={{ height: "1px", background: "#e7e7e4", marginBottom: "12px" }} />
                         <div style={{ fontSize: "14px", fontWeight: 700, color: "#000000", marginBottom: "4px", letterSpacing: "-0.02em", paddingRight: active ? "70px" : 0 }}>{l.name}</div>
-                        <div style={{ fontSize: "11px", color: "#52525b", lineHeight: 1.55, marginBottom: "12px" }}>{l.desc}</div>
-                        <div style={{ display: "flex", gap: "6px", marginTop: "auto", fontSize: "10px", color: "#71717a", flexWrap: "wrap", alignItems: "center" }}>
+                        <div style={{ fontSize: "12px", color: "#09090b", lineHeight: 1.55, marginBottom: "12px" }}>{l.desc}</div>
+                        <div style={{ display: "flex", gap: "6px", marginTop: "auto", fontSize: "10px", color: "#09090b", flexWrap: "wrap", alignItems: "center" }}>
                           <span>{l.headingFont || "Default"}</span>
                           <span>·</span>
                           <span>{l.cardRadius > 0 ? "Soft edges" : "Sharp edges"}</span>
@@ -5597,20 +5597,20 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
 
               <div style={{ border: "1px solid #e5e7eb", borderRadius: "10px", marginBottom: "16px", overflow: "hidden" }}>
-              <button onClick={() => setShowAdvancedColors(v => !v)} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", background: "#fafaf9", border: "none", cursor: "pointer", fontSize: "13px", fontWeight: 600, color: "#09090b" }}>
+              <button onClick={() => setShowAdvancedColors(v => !v)} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", background: "#fafaf9", border: "none", cursor: "pointer", fontSize: "14px", fontWeight: 600, color: "#09090b" }}>
                 <span>Advanced — Custom Brand Colors</span>
-                <span style={{ fontSize: "11px", color: "#71717a" }}>{showAdvancedColors ? "▲ Hide" : "▼ Show"}</span>
+                <span style={{ fontSize: "12px", color: "#09090b" }}>{showAdvancedColors ? "▲ Hide" : "▼ Show"}</span>
               </button>
               {showAdvancedColors && <div style={{ padding: "16px" }}>
               <Section id="brand-colors" title="" icon="">
-                <p style={{ fontSize: "12px", color: "#27272a", margin: 0, lineHeight: 1.6 }}>
-                  Drop in your actual brand hex codes. Once you have at least 2 colors (Background + Accent), an <strong style={{ color: "#18181b" }}>"Apply Custom Brand Palette"</strong> button appears that swaps the live theme to use them.
+                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
+                  Drop in your actual brand hex codes. Once you have at least 2 colors (Background + Accent), an <strong style={{ color: "#09090b" }}>"Apply Custom Brand Palette"</strong> button appears that swaps the live theme to use them.
                 </p>
                 <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                   {[
                     { key: "background", label: "Background", placeholder: "#0a0a0a", note: "Main page background" },
                     { key: "accent", label: "Accent", placeholder: "#c8791a", note: "Buttons, links, highlights" },
-                    { key: "text", label: "Text (optional)", placeholder: "#18181b", note: "Body/heading text on background" },
+                    { key: "text", label: "Text (optional)", placeholder: "#09090b", note: "Body/heading text on background" },
                     { key: "card", label: "Card / Panel (optional)", placeholder: "#111111", note: "Card backgrounds, panels" },
                   ].map(({ key, label, placeholder, note }) => {
                     const bc = brand.brandColors || {};
@@ -5632,7 +5632,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                             placeholder={placeholder}
                           />
                         </div>
-                        <div style={{ fontSize: "10px", color: "#71717a", marginTop: "4px" }}>{note}</div>
+                        <div style={{ fontSize: "10px", color: "#09090b", marginTop: "4px" }}>{note}</div>
                       </div>
                     );
                   })}
@@ -5642,7 +5642,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   const filled = ["background", "accent", "text", "card"].filter(k => bc[k] && /^#[0-9a-f]{6}$/i.test(bc[k]));
                   const canApply = filled.includes("background") && filled.includes("accent");
                   if (!canApply) return (
-                    <div style={{ fontSize: "11px", color: "#52525b", padding: "10px 12px", background: "#f5f5f4", border: "1px solid #e5e7eb", borderRadius: "6px", lineHeight: 1.5 }}>
+                    <div style={{ fontSize: "12px", color: "#09090b", padding: "10px 12px", background: "#f5f5f4", border: "1px solid #e5e7eb", borderRadius: "6px", lineHeight: 1.5 }}>
                       Add valid hex codes for at least Background and Accent to enable the custom palette.
                     </div>
                   );
@@ -5652,15 +5652,15 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     const r = parseInt(hex.slice(0, 2), 16), g = parseInt(hex.slice(2, 4), 16), b = parseInt(hex.slice(4, 6), 16);
                     return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.5;
                   })();
-                  const txt = bc.text || (isDark ? "#18181b" : "#0a0a0a");
+                  const txt = bc.text || (isDark ? "#09090b" : "#0a0a0a");
                   const cardBg = bc.card || (isDark ? "#181818" : "#f5f5f5");
                   return (
                     <>
                       <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "12px", alignItems: "center", marginTop: "4px" }}>
                         <div style={{ background: bc.background, padding: "16px", borderRadius: "8px", border: "1px solid #e5e7eb" }}>
                           <div style={{ fontFamily: "Georgia,serif", fontSize: "16px", color: txt, marginBottom: "4px" }}>Aa Preview</div>
-                          <div style={{ fontSize: "11px", color: txt, opacity: 0.7, marginBottom: "10px" }}>Body text on background</div>
-                          <span style={{ display: "inline-block", background: bc.accent, color: isDark ? "#0a0a0a" : "#18181b", padding: "5px 12px", borderRadius: "4px", fontSize: "10px", fontWeight: 600 }}>Accent Button</span>
+                          <div style={{ fontSize: "12px", color: txt, opacity: 0.7, marginBottom: "10px" }}>Body text on background</div>
+                          <span style={{ display: "inline-block", background: bc.accent, color: isDark ? "#0a0a0a" : "#09090b", padding: "5px 12px", borderRadius: "4px", fontSize: "10px", fontWeight: 600 }}>Accent Button</span>
                           <div style={{ background: cardBg, marginTop: "10px", padding: "8px 10px", borderRadius: "4px", fontSize: "10px", color: txt, opacity: 0.85 }}>Card / panel example</div>
                         </div>
                       </div>
@@ -5688,7 +5688,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                             }
                           } : p));
                         }}
-                        style={{ padding: "12px 18px", background: "#18181b", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
+                        style={{ padding: "12px 18px", background: "#09090b", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}>
                         ✓ Apply Custom Brand Palette
                       </button>
                     </>
@@ -5699,14 +5699,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             </div>
 
               <Section id="brand-theme" title="Background Theme" icon="">
-                <p style={{ fontSize: "12px", color: "#71717a", margin: 0, lineHeight: 1.6 }}>Pick a palette. All themes are tested for WCAG AA contrast — text stays readable, accents pop, and the elements complement the background automatically.</p>
+                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Pick a palette. All themes are tested for WCAG AA contrast — text stays readable, accents pop, and the elements complement the background automatically.</p>
                 {(() => {
                   // Show a "Template default" indicator if the current theme matches the active template's theme
                   const activeTpl = brand.templateId ? WEBSITE_TEMPLATES.find(t => t.id === brand.templateId) : null;
                   if (!activeTpl || activeTpl.themeId !== brand.themeId) return null;
                   const tplTheme = THEMES.find(t => t.id === activeTpl.themeId);
                   return (
-                    <div style={{ padding: "10px 14px", background: "#f5f5f4", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "11px", color: "#27272a", fontWeight: 500, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <div style={{ padding: "10px 14px", background: "#f5f5f4", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px", color: "#09090b", fontWeight: 500, display: "flex", alignItems: "center", gap: "8px" }}>
                       <span style={{ background: "#000000", color: "#ffffff", padding: "3px 8px", borderRadius: "4px", fontSize: "9px", fontWeight: 600, letterSpacing: "0.05em" }}>TEMPLATE DEFAULT</span>
                       <span>Using <strong style={{ color: "#000000" }}>{tplTheme?.name}</strong> from the {activeTpl.name} template. Pick a different theme below to override.</span>
                     </div>
@@ -5739,15 +5739,15 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                         <div style={{ padding: "14px 16px", background: "#ffffff", display: "flex", flexDirection: "column", flex: 1 }}>
                           <div style={{ fontSize: "14px", fontWeight: 700, color: "#000000", letterSpacing: "-0.02em", marginBottom: "8px", paddingRight: active ? "70px" : 0 }}>{t.name}</div>
                           <div style={{ height: "1px", background: "#e7e7e4", marginBottom: "10px" }} />
-                          <div style={{ fontSize: "11px", color: "#52525b", lineHeight: 1.55 }}>{t.desc}</div>
+                          <div style={{ fontSize: "12px", color: "#09090b", lineHeight: 1.55 }}>{t.desc}</div>
                         </div>
                       </button>
                     );
                   })}
                 </div>
                 <div style={{ marginTop: "16px", padding: "20px 22px", background: "#ffffff", border: "1px solid #e7e7e4", borderRadius: "10px" }}>
-                  <div style={{ fontSize: "11px", color: "#000000", textTransform: "uppercase", letterSpacing: "0.14em", fontWeight: 700, marginBottom: "6px" }}>Quick Accent Swap</div>
-                  <p style={{ fontSize: "12px", color: "#52525b", margin: "0 0 16px", lineHeight: 1.55 }}>Override just the accent. Works with any theme.</p>
+                  <div style={{ fontSize: "12px", color: "#000000", textTransform: "uppercase", letterSpacing: "0.14em", fontWeight: 700, marginBottom: "6px" }}>Quick Accent Swap</div>
+                  <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 16px", lineHeight: 1.55 }}>Override just the accent. Works with any theme.</p>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
                     {PREMIUM_ACCENTS.map(a => {
                       const active = brand.accentColor.toLowerCase() === a.value.toLowerCase();
@@ -5771,14 +5771,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                             onMouseOver={e => { if (!active) e.currentTarget.style.transform = "scale(1.08)"; }}
                             onMouseOut={e => { e.currentTarget.style.transform = "scale(1)"; }}
                           />
-                          <span style={{ fontSize: "9px", color: active ? "#000000" : "#71717a", fontWeight: active ? 600 : 400, letterSpacing: "0.02em", textAlign: "center", lineHeight: 1.2 }}>{a.name}</span>
+                          <span style={{ fontSize: "9px", color: active ? "#000000" : "#09090b", fontWeight: active ? 600 : 400, letterSpacing: "0.02em", textAlign: "center", lineHeight: 1.2 }}>{a.name}</span>
                         </div>
                       );
                     })}
                   </div>
                 </div>
                 <details style={{ marginTop: "8px" }}>
-                  <summary style={{ fontSize: "11px", color: "#52525b", cursor: "pointer", padding: "8px 0" }}>Advanced — override individual colors</summary>
+                  <summary style={{ fontSize: "12px", color: "#09090b", cursor: "pointer", padding: "8px 0" }}>Advanced — override individual colors</summary>
                   <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginTop: "8px" }}>
                     <div><label style={I.lbl}>Primary BG</label><input type="color" style={{ ...I.inp, padding: "4px", height: "40px" }} value={brand.primaryColor} onChange={e => updBrand("primaryColor", e.target.value)} /></div>
                     <div><label style={I.lbl}>Accent</label><input type="color" style={{ ...I.inp, padding: "4px", height: "40px" }} value={brand.accentColor} onChange={e => updBrand("accentColor", e.target.value)} /></div>
@@ -5786,7 +5786,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     <div><label style={I.lbl}>Body Text</label><input type="color" style={{ ...I.inp, padding: "4px", height: "40px" }} value={brand.bodyTextColor} onChange={e => updBrand("bodyTextColor", e.target.value)} /></div>
                   </div>
                   <div style={{ marginTop: "8px" }}><label style={I.lbl}>Border Color (hex)</label><input style={I.inp} value={brand.borderColor} onChange={e => updBrand("borderColor", e.target.value)} /></div>
-                  <p style={{ fontSize: "11px", color: "#b45309", margin: "8px 0 0" }}>Overriding may break contrast. Stick to themes for guaranteed accessibility.</p>
+                  <p style={{ fontSize: "12px", color: "#b45309", margin: "8px 0 0" }}>Overriding may break contrast. Stick to themes for guaranteed accessibility.</p>
                 </details>
               </Section>
 
@@ -5795,7 +5795,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   <div><label style={I.lbl}>Heading Font</label><select style={I.inp} value={brand.headingFont} onChange={e => updBrand("headingFont", e.target.value)}>{FONT_OPTIONS.map(f => <option key={f}>{f}</option>)}</select></div>
                   <div><label style={I.lbl}>Body Font</label><select style={I.inp} value={brand.bodyFont} onChange={e => updBrand("bodyFont", e.target.value)}>{FONT_OPTIONS.map(f => <option key={f}>{f}</option>)}</select></div>
                 </div>
-                <p style={{ fontSize: "11px", color: "#71717a", margin: 0, lineHeight: 1.6 }}>Pair a distinctive display font (heading) with a clean sans-serif (body). All fonts are Google Fonts and load automatically.</p>
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Pair a distinctive display font (heading) with a clean sans-serif (body). All fonts are Google Fonts and load automatically.</p>
               </Section>
 
               <Section id="brand-logo" title="Logo, Identity & CTAs" icon="">
@@ -5808,13 +5808,13 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div>
                   <label style={I.lbl}>Final CTA Heading (used in the bottom CTA section before footer)</label>
                   <input style={I.inp} value={page.ctaHeading} onChange={e => updPage("ctaHeading", e.target.value)} placeholder="e.g. Ready to ship better creative, faster?" />
-                  <div style={{ fontSize: "10px", color: "#71717a", marginTop: "4px" }}>This is the big conversion heading on the homepage's bottom CTA section. Each page can have a different one.</div>
+                  <div style={{ fontSize: "10px", color: "#09090b", marginTop: "4px" }}>This is the big conversion heading on the homepage's bottom CTA section. Each page can have a different one.</div>
                 </div>
                 <div><label style={I.lbl}>Contact Email</label><input style={I.inp} value={brand.contactEmail} onChange={e => updBrand("contactEmail", e.target.value)} /></div>
                 <div><label style={I.lbl}>Phone</label><input style={I.inp} value={brand.contactPhone} onChange={e => updBrand("contactPhone", e.target.value)} /></div>
               </Section>
               <Section id="brand-style-notes" title="Style Notes" icon="">
-                <p style={{ fontSize: "12px", color: "#71717a", margin: 0, lineHeight: 1.6 }}>Specific aesthetic principles you want applied — typography quirks, hierarchy preferences, ornamental rules, things you've seen and liked. Fed to the AI Draft Starter Copy as concrete style guidance.</p>
+                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Specific aesthetic principles you want applied — typography quirks, hierarchy preferences, ornamental rules, things you've seen and liked. Fed to the AI Draft Starter Copy as concrete style guidance.</p>
                 <textarea
                   style={{ ...I.inp, resize: "vertical" }}
                   rows={5}
@@ -5835,36 +5835,36 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div><label style={I.lbl}>Page Type</label><select style={I.inp} value={page.pageType} onChange={e => updPage("pageType", e.target.value)}>{PAGE_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
               </Section>
               <Section id="page-nav" title="Navigation Menus" icon="">
-                <p style={{ fontSize: "12px", color: "#71717a", margin: 0, lineHeight: 1.6 }}>Header and footer menu items. Menus output as Elementor Nav Menu widgets linked to WordPress menus by name — create matching menus in WP → Appearance → Menus.</p>
-                <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "12px", color: "#27272a" }}>
+                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Header and footer menu items. Menus output as Elementor Nav Menu widgets linked to WordPress menus by name — create matching menus in WP → Appearance → Menus.</p>
+                <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}>
                   <input type="checkbox" checked={brand.multiMenu} onChange={e => updBrand("multiMenu", e.target.checked)} style={{ accentColor: "#000000" }} /> Enable multi-menu (primary + utility)
                 </label>
                 <div><label style={I.lbl}>Primary Menu (comma-separated)</label><input style={I.inp} value={brand.primaryMenu} onChange={e => updBrand("primaryMenu", e.target.value)} placeholder="Home, About, Services, Work, Contact" /></div>
                 {brand.multiMenu && <div><label style={I.lbl}>Utility Menu (footer/legal)</label><input style={I.inp} value={brand.utilityMenu} onChange={e => updBrand("utilityMenu", e.target.value)} placeholder="Privacy, Terms, Sitemap" /></div>}
               </Section>
               <Section id="page-sections" title="Sections on this Page" icon="">
-                <p style={{ fontSize: "12px", color: "#52525b", margin: 0, lineHeight: 1.55 }}>Compose the page top to bottom. Tap a section in the library to add it to the outline. Tap the × to remove.</p>
+                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.55 }}>Compose the page top to bottom. Tap a section in the library to add it to the outline. Tap the × to remove.</p>
                 <div style={{ background: "#ffffff", border: "1px solid #e7e7e4", borderRadius: "10px", padding: "22px 24px" }}>
                   {/* PAGE OUTLINE — selected sections in order */}
-                  <div style={{ fontSize: "9px", color: "#71717a", textTransform: "uppercase", letterSpacing: "0.18em", fontWeight: 600, marginBottom: "12px" }}>
+                  <div style={{ fontSize: "9px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.18em", fontWeight: 600, marginBottom: "12px" }}>
                     Page Outline {page.sections.length > 0 && <span style={{ color: "#a3a39e" }}>· {page.sections.length} {page.sections.length === 1 ? "section" : "sections"}</span>}
                   </div>
                   {page.sections.length === 0 ? (
-                    <div style={{ padding: "20px 16px", background: "#f5f5f4", border: "1px dashed #d6d6d2", borderRadius: "8px", textAlign: "center", fontSize: "12px", color: "#71717a", marginBottom: "24px" }}>
+                    <div style={{ padding: "20px 16px", background: "#f5f5f4", border: "1px dashed #d6d6d2", borderRadius: "8px", textAlign: "center", fontSize: "13px", color: "#09090b", marginBottom: "24px" }}>
                       No sections added yet. Tap a section from the library below to start composing this page.
                     </div>
                   ) : (
                     <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "24px" }}>
                       {page.sections.map((s, i) => (
                         <div key={`${s}-${i}`} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "12px 16px", background: "#f9f9f7", border: "1px solid #e7e7e4", borderRadius: "8px" }}>
-                          <span style={{ fontSize: "11px", fontWeight: 700, color: "#09090b", fontVariantNumeric: "tabular-nums", minWidth: "20px", letterSpacing: "0.02em" }}>{String(i + 1).padStart(2, "0")}</span>
-                          <span style={{ flex: 1, fontSize: "13px", color: "#09090b", fontWeight: 500 }}>{s}</span>
+                          <span style={{ fontSize: "12px", fontWeight: 700, color: "#09090b", fontVariantNumeric: "tabular-nums", minWidth: "20px", letterSpacing: "0.02em" }}>{String(i + 1).padStart(2, "0")}</span>
+                          <span style={{ flex: 1, fontSize: "14px", color: "#09090b", fontWeight: 500 }}>{s}</span>
                           <button
                             onClick={() => toggleSection(s)}
                             title={`Remove ${s}`}
-                            style={{ background: "transparent", border: "none", cursor: "pointer", padding: "4px", color: "#71717a", display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: "4px", transition: "color 0.15s, background 0.15s" }}
+                            style={{ background: "transparent", border: "none", cursor: "pointer", padding: "4px", color: "#09090b", display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: "4px", transition: "color 0.15s, background 0.15s" }}
                             onMouseOver={e => { e.currentTarget.style.color = "#c93939"; e.currentTarget.style.background = "#fef2f2"; }}
-                            onMouseOut={e => { e.currentTarget.style.color = "#71717a"; e.currentTarget.style.background = "transparent"; }}>
+                            onMouseOut={e => { e.currentTarget.style.color = "#09090b"; e.currentTarget.style.background = "transparent"; }}>
                             <Icon name="x" size={14} color="currentColor" />
                           </button>
                         </div>
@@ -5876,12 +5876,12 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   <div style={{ height: "1px", background: "#e7e7e4", marginBottom: "18px" }} />
 
                   {/* AVAILABLE LIBRARY — unselected sections as add pills */}
-                  <div style={{ fontSize: "9px", color: "#71717a", textTransform: "uppercase", letterSpacing: "0.18em", fontWeight: 600, marginBottom: "12px" }}>Available Sections</div>
+                  <div style={{ fontSize: "9px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.18em", fontWeight: 600, marginBottom: "12px" }}>Available Sections</div>
                   {(() => {
                     const allOptions = SECTION_OPTIONS.filter((v, i, a) => a.indexOf(v) === i);
                     const available = allOptions.filter(s => !page.sections.includes(s));
                     if (available.length === 0) {
-                      return <div style={{ fontSize: "12px", color: "#71717a", fontStyle: "italic" }}>All sections added.</div>;
+                      return <div style={{ fontSize: "13px", color: "#09090b", fontStyle: "italic" }}>All sections added.</div>;
                     }
                     return (
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
@@ -5889,10 +5889,10 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           <button
                             key={s}
                             onClick={() => toggleSection(s)}
-                            style={{ fontSize: "12px", padding: "7px 12px", background: "#ffffff", border: "1px solid #e7e7e4", borderRadius: "999px", color: "#27272a", cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: "4px", transition: "border-color 0.15s, background 0.15s" }}
+                            style={{ fontSize: "13px", padding: "7px 12px", background: "#ffffff", border: "1px solid #e7e7e4", borderRadius: "999px", color: "#09090b", cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: "4px", transition: "border-color 0.15s, background 0.15s" }}
                             onMouseOver={e => { e.currentTarget.style.borderColor = "#000000"; e.currentTarget.style.background = "#f9f9f7"; }}
                             onMouseOut={e => { e.currentTarget.style.borderColor = "#e7e7e4"; e.currentTarget.style.background = "#ffffff"; }}>
-                            <Icon name="plus" size={11} color="#52525b" /> {s}
+                            <Icon name="plus" size={11} color="#09090b" /> {s}
                           </button>
                         ))}
                       </div>
@@ -5907,79 +5907,79 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {tab === "content" && (
             <>
               <Section id="page-hero" title="Hero" icon="">
-                <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Shows at the very top of the page — the first thing visitors see when they arrive.</p>
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Shows at the very top of the page — the first thing visitors see when they arrive.</p>
                 <div><label style={I.lbl}>Hero Heading</label><input style={I.inp} value={page.heroHeading} onChange={e => updPage("heroHeading", e.target.value)} /></div>
                 <div><label style={I.lbl}>Hero Subhead</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={page.heroSubhead} onChange={e => updPage("heroSubhead", e.target.value)} /></div>
                 <div><label style={I.lbl}>Hero Image URL (WordPress media URL)</label><input style={I.inp} value={page.heroImage} onChange={e => updPage("heroImage", e.target.value)} placeholder="https://yoursite.com/wp-content/uploads/hero.jpg" /></div>
-                <p style={{ fontSize: "11px", color: "#71717a", margin: 0 }}>Leave empty to use a placeholder photo. Paste your WordPress media URL when ready.</p>
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Leave empty to use a placeholder photo. Paste your WordPress media URL when ready.</p>
               </Section>
               <Section id="page-about" title="About" icon="">
-                <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>A story section that typically sits below the hero or after a logo carousel. Usually image-and-text side by side.</p>
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>A story section that typically sits below the hero or after a logo carousel. Usually image-and-text side by side.</p>
                 <div><label style={I.lbl}>About Heading</label><input style={I.inp} value={page.aboutHeading} onChange={e => updPage("aboutHeading", e.target.value)} /></div>
                 <div><label style={I.lbl}>About Body</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={4} value={page.aboutBody} onChange={e => updPage("aboutBody", e.target.value)} placeholder="Leave blank to use brand description" /></div>
                 <div><label style={I.lbl}>About Image URL (WordPress media URL)</label><input style={I.inp} value={page.aboutImage} onChange={e => updPage("aboutImage", e.target.value)} placeholder="https://yoursite.com/wp-content/uploads/about.jpg" /></div>
               </Section>
               <Section id="content-services" title="Services — Title|Description per line" icon="">
-                <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Mid-page grid or list showing what you offer. Typically follows the hero/about, before portfolio.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={5} value={page.services} onChange={e => updPage("services", e.target.value)} />
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Mid-page grid or list showing what you offer. Typically follows the hero/about, before portfolio.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={5} value={page.services} onChange={e => updPage("services", e.target.value)} />
               </Section>
               <Section id="content-portfolio" title="Portfolio — Title|Category|ImageURL per line" icon="">
-                <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Visual showcase of past work — usually a grid or carousel of project cards.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={6} value={page.portfolio} onChange={e => updPage("portfolio", e.target.value)} placeholder={"Sephora Spring Campaign|Beauty Editorial|https://yoursite.com/wp-content/uploads/sephora.jpg\nKérastase Hero|Product Photography|"} />
-                <p style={{ fontSize: "11px", color: "#71717a", margin: 0 }}>Add your WordPress image URL as the 3rd field. Leave the URL blank (keep the trailing pipe) to use a placeholder photo.</p>
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Visual showcase of past work — usually a grid or carousel of project cards.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={6} value={page.portfolio} onChange={e => updPage("portfolio", e.target.value)} placeholder={"Sephora Spring Campaign|Beauty Editorial|https://yoursite.com/wp-content/uploads/sephora.jpg\nKérastase Hero|Product Photography|"} />
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Add your WordPress image URL as the 3rd field. Leave the URL blank (keep the trailing pipe) to use a placeholder photo.</p>
               </Section>
               <Section id="content-process" title="Process — Step Title|Description per line" icon="">
-                <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Step-by-step breakdown of how you work. Often appears between services and testimonials.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={5} value={page.process} onChange={e => updPage("process", e.target.value)} />
-                <p style={{ fontSize: "11px", color: "#71717a", margin: 0 }}>Numbered automatically. Best on About, Services, Careers pages.</p>
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Step-by-step breakdown of how you work. Often appears between services and testimonials.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={5} value={page.process} onChange={e => updPage("process", e.target.value)} />
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Numbered automatically. Best on About, Services, Careers pages.</p>
               </Section>
               <Section id="content-team" title="Team — Name|Role|ImageURL per line" icon="">
-                <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Grid of team member cards (portrait + name + role). Usually on About pages.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={5} value={page.team} onChange={e => updPage("team", e.target.value)} placeholder={"Kalei|Founder & Creative Director|https://yoursite.com/wp-content/uploads/kalei.jpg\nLena|Producer|"} />
-                <p style={{ fontSize: "11px", color: "#71717a", margin: 0 }}>Used by both "Team" (grid) and "Team Carousel" sections. Best on About, Studio, Careers pages.</p>
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Grid of team member cards (portrait + name + role). Usually on About pages.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={5} value={page.team} onChange={e => updPage("team", e.target.value)} placeholder={"Kalei|Founder & Creative Director|https://yoursite.com/wp-content/uploads/kalei.jpg\nLena|Producer|"} />
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Used by both "Team" (grid) and "Team Carousel" sections. Best on About, Studio, Careers pages.</p>
               </Section>
               <Section id="content-leadership" title="Leadership — Name|Title|ImageURL|Quote|Bio per line" icon="">
-                <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Large editorial profiles for founders or principals. Typically on About / Leadership pages.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={4} value={page.leaders || ""} onChange={e => updPage("leaders", e.target.value)} placeholder={"Kalei|Founder & Creative Director|https://...|Great content lives at the intersection of strategy and craft.|10+ years producing premium content for L'Oréal Group brands."} />
-                <p style={{ fontSize: "11px", color: "#71717a", margin: 0, lineHeight: 1.6 }}>Renders as a magazine-style 2-column profile per leader — large portrait, name, title, pulled quote, full bio. Image position alternates left/right when you have multiple leaders. Best for founder pages, About, leadership directory.</p>
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Large editorial profiles for founders or principals. Typically on About / Leadership pages.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={4} value={page.leaders || ""} onChange={e => updPage("leaders", e.target.value)} placeholder={"Kalei|Founder & Creative Director|https://...|Great content lives at the intersection of strategy and craft.|10+ years producing premium content for L'Oréal Group brands."} />
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Renders as a magazine-style 2-column profile per leader — large portrait, name, title, pulled quote, full bio. Image position alternates left/right when you have multiple leaders. Best for founder pages, About, leadership directory.</p>
               </Section>
               <Section id="content-stats" title="Stats — Number|Suffix|Label per line" icon="">
-                <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Strip of big numbers — years in business, projects shipped, clients served. Often above testimonials.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={4} value={page.stats} onChange={e => updPage("stats", e.target.value)} />
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Strip of big numbers — years in business, projects shipped, clients served. Often above testimonials.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={4} value={page.stats} onChange={e => updPage("stats", e.target.value)} />
               </Section>
               <Section id="content-testimonials" title="Testimonials — Quote|Name|Role per line" icon="">
-                <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Carousel or grid of client quotes. Usually near the bottom of the homepage, before the final CTA.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={4} value={page.testimonials} onChange={e => updPage("testimonials", e.target.value)} />
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Carousel or grid of client quotes. Usually near the bottom of the homepage, before the final CTA.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={4} value={page.testimonials} onChange={e => updPage("testimonials", e.target.value)} />
               </Section>
               <Section id="content-pricing" title="Pricing — Tier|Price|Description per line" icon="">
-                <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Pricing tiers shown as side-by-side cards. Usually on Services, Landing, or Shop pages.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={4} value={page.pricing} onChange={e => updPage("pricing", e.target.value)} />
-                <p style={{ fontSize: "11px", color: "#71717a", margin: 0 }}>Leave empty to skip — best on Services, Landing, Shop pages.</p>
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Pricing tiers shown as side-by-side cards. Usually on Services, Landing, or Shop pages.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={4} value={page.pricing} onChange={e => updPage("pricing", e.target.value)} />
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Leave empty to skip — best on Services, Landing, Shop pages.</p>
               </Section>
               <Section id="content-faq" title="FAQ — Question|Answer per line" icon="">
-                <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Accordion of common questions. Usually toward the bottom of the page, after testimonials.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={4} value={page.faq} onChange={e => updPage("faq", e.target.value)} />
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Accordion of common questions. Usually toward the bottom of the page, after testimonials.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={4} value={page.faq} onChange={e => updPage("faq", e.target.value)} />
               </Section>
               <Section id="content-video" title="Video URL (YouTube/Vimeo)" icon="">
-                <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Embedded video block. Can sit anywhere — often between hero and about, or in a process section.</p>
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Embedded video block. Can sit anywhere — often between hero and about, or in a process section.</p>
                 <input style={I.inp} value={page.videoUrl} onChange={e => updPage("videoUrl", e.target.value)} placeholder="https://youtube.com/watch?v=..." />
               </Section>
               <Section id="content-forms" title="Forms — Title|Fields|Button|Shortcode (optional) per line" icon="">
-                <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Contact form section. Usually appears near the bottom of the page, before the footer.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={5} value={page.forms} onChange={e => updPage("forms", e.target.value)} />
-                <p style={{ fontSize: "11px", color: "#71717a", margin: 0, lineHeight: 1.6 }}>
-                  <strong style={{ color: "#27272a" }}>Built-in form:</strong> Project Inquiry|Name,Email,Message|Send<br />
-                  <strong style={{ color: "#27272a" }}>With form plugin:</strong> Project Inquiry|||[wpforms id="123"]<br />
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Contact form section. Usually appears near the bottom of the page, before the footer.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={5} value={page.forms} onChange={e => updPage("forms", e.target.value)} />
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
+                  <strong style={{ color: "#09090b" }}>Built-in form:</strong> Project Inquiry|Name,Email,Message|Send<br />
+                  <strong style={{ color: "#09090b" }}>With form plugin:</strong> Project Inquiry|||[wpforms id="123"]<br />
                   Add a 4th field with your plugin's shortcode (WPForms, Contact Form 7, Gravity Forms, Fluent Forms, Ninja Forms, etc.) and the tool will use that instead. Leave fields/button empty when using a shortcode.
                 </p>
               </Section>
               <Section id="content-blog" title="Blog Posts Preview" icon="">
-                <p style={{ fontSize: "11px", color: "#52525b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Preview cards for recent posts. Usually on the homepage near the bottom, or as the main grid on a Blog Index page.</p>
-                <p style={{ fontSize: "12px", color: "#27272a", margin: 0, lineHeight: 1.6 }}>
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Preview cards for recent posts. Usually on the homepage near the bottom, or as the main grid on a Blog Index page.</p>
+                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
                   This is for the <strong>preview cards</strong> that show on the homepage or a blog index page — not for writing actual blog posts. Each line becomes a card with title, category, and read-time meta. Write the real posts inside WordPress later.
                 </p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "12px" }} rows={5} value={page.blog} onChange={e => updPage("blog", e.target.value)} placeholder={"How we approach hero shots|Strategy|6 min read\nThe ROI of premium content|Insights|4 min read"} />
-                <p style={{ fontSize: "11px", color: "#71717a", margin: 0 }}>Format: <code style={{ background: "#eeeeec", padding: "1px 4px", borderRadius: "3px" }}>Title|Category|Meta</code> per line. Best on Journal, Blog Index pages. Placeholder images auto-applied.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={5} value={page.blog} onChange={e => updPage("blog", e.target.value)} placeholder={"How we approach hero shots|Strategy|6 min read\nThe ROI of premium content|Insights|4 min read"} />
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Format: <code style={{ background: "#eeeeec", padding: "1px 4px", borderRadius: "3px" }}>Title|Category|Meta</code> per line. Best on Journal, Blog Index pages. Placeholder images auto-applied.</p>
               </Section>
             </>
           )}
@@ -6000,9 +6000,9 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 ))}
                 <button onClick={addSocial} style={{ ...I.btnGhost, alignSelf: "start" }}>+ Add Social</button>
                 <div style={{ display: "grid", gap: "8px", marginTop: "10px" }}>
-                  <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "12px", color: "#27272a" }}><input type="checkbox" checked={brand.showSocialInNav} onChange={e => updBrand("showSocialInNav", e.target.checked)} style={{ accentColor: "#000000" }} /> Show icons in top navigation</label>
-                  <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "12px", color: "#27272a" }}><input type="checkbox" checked={brand.showSocialInPage} onChange={e => updBrand("showSocialInPage", e.target.checked)} style={{ accentColor: "#000000" }} /> Show as a section while scrolling (requires "Social" section enabled)</label>
-                  <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "12px", color: "#27272a" }}><input type="checkbox" checked={brand.showSocialInFooter} onChange={e => updBrand("showSocialInFooter", e.target.checked)} style={{ accentColor: "#000000" }} /> Show in footer</label>
+                  <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInNav} onChange={e => updBrand("showSocialInNav", e.target.checked)} style={{ accentColor: "#000000" }} /> Show icons in top navigation</label>
+                  <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInPage} onChange={e => updBrand("showSocialInPage", e.target.checked)} style={{ accentColor: "#000000" }} /> Show as a section while scrolling (requires "Social" section enabled)</label>
+                  <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInFooter} onChange={e => updBrand("showSocialInFooter", e.target.checked)} style={{ accentColor: "#000000" }} /> Show in footer</label>
                 </div>
               </Section>
             </>
@@ -6015,8 +6015,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "10px" }}>
                   {HEADER_STYLES.map(f => (
                     <button key={f} onClick={() => updBrand("headerStyle", f)} style={{ padding: "16px", background: "#ffffff", border: brand.headerStyle === f ? "2px solid #000000" : "1px solid #e5e7eb", color: "#000000", borderRadius: "8px", cursor: "pointer", textAlign: "left", transition: "border-color .15s" }} onMouseOver={e => { if (brand.headerStyle !== f) e.currentTarget.style.borderColor = "#a3a39e"; }} onMouseOut={e => { if (brand.headerStyle !== f) e.currentTarget.style.borderColor = "#e7e7e4"; }}>
-                      <div style={{ fontSize: "13px", fontWeight: 600, marginBottom: "4px" }}>{f}</div>
-                      <div style={{ fontSize: "11px", color: "#52525b" }}>
+                      <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: "4px" }}>{f}</div>
+                      <div style={{ fontSize: "12px", color: "#09090b" }}>
                         {f === "Editorial" && "Logo left, nav center, social right"}
                         {f === "Studio" && "Centered logo with nav below — masthead"}
                         {f === "Agency" && "Logo left, nav + social right"}
@@ -6025,14 +6025,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     </button>
                   ))}
                 </div>
-                <p style={{ fontSize: "11px", color: "#71717a", margin: 0 }}>Download separately and import once in Elementor → Theme Builder → Header. Set display conditions to "Entire Site".</p>
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Download separately and import once in Elementor → Theme Builder → Header. Set display conditions to "Entire Site".</p>
               </Section>
               <Section id="footer-footer" title="Footer Style" icon="">
                 <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "10px" }}>
                   {FOOTER_STYLES.map(f => (
                     <button key={f} onClick={() => updBrand("footerStyle", f)} style={{ padding: "16px", background: "#ffffff", border: brand.footerStyle === f ? "2px solid #000000" : "1px solid #e5e7eb", color: "#000000", borderRadius: "8px", cursor: "pointer", textAlign: "left", transition: "border-color .15s" }} onMouseOver={e => { if (brand.footerStyle !== f) e.currentTarget.style.borderColor = "#a3a39e"; }} onMouseOut={e => { if (brand.footerStyle !== f) e.currentTarget.style.borderColor = "#e7e7e4"; }}>
-                      <div style={{ fontSize: "13px", fontWeight: 600, marginBottom: "4px" }}>{f}</div>
-                      <div style={{ fontSize: "11px", color: "#52525b" }}>
+                      <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: "4px" }}>{f}</div>
+                      <div style={{ fontSize: "12px", color: "#09090b" }}>
                         {f === "Editorial" && "Minimal centered — logo, social, copyright"}
                         {f === "Studio" && "Centered with nav links"}
                         {f === "Agency" && "3-column with menu and contact"}
@@ -6041,7 +6041,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     </button>
                   ))}
                 </div>
-                <p style={{ fontSize: "11px", color: "#71717a", margin: 0 }}>Download separately and import once in Elementor → Theme Builder → Footer. Set to display on all pages.</p>
+                <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Download separately and import once in Elementor → Theme Builder → Footer. Set to display on all pages.</p>
               </Section>
             </>
           )}
@@ -6051,43 +6051,43 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         {tab === "export" && (
           <div className="editor-padding" style={{ padding: "0 20px 40px", maxWidth: "900px" }}>
             <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "20px", marginBottom: "16px" }}>
-              <div style={{ fontSize: "11px", color: "#52525b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Active Page</div>
-              <div style={{ fontSize: "18px", fontWeight: 600, color: "#18181b", marginBottom: "4px" }}>{page.name}</div>
-              <div style={{ fontSize: "13px", color: "#52525b" }}>{page.sections.length} section{page.sections.length !== 1 ? "s" : ""}</div>
+              <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Active Page</div>
+              <div style={{ fontSize: "18px", fontWeight: 600, color: "#09090b", marginBottom: "4px" }}>{page.name}</div>
+              <div style={{ fontSize: "14px", color: "#09090b" }}>{page.sections.length} section{page.sections.length !== 1 ? "s" : ""}</div>
             </div>
 
             <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "20px", marginBottom: "16px" }}>
-              <div style={{ fontSize: "11px", color: "#52525b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>Download</div>
+              <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>Download</div>
               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "16px" }}>
-                <button onClick={downloadPage} style={{ padding: "10px 16px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                <button onClick={downloadPage} style={{ padding: "10px 16px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "14px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
                   <Icon name="download" size={14} color="#ffffff" /> Download Template
                 </button>
-                <button onClick={downloadHeader} style={{ padding: "10px 16px", background: "transparent", color: "#18181b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                  <Icon name="download" size={14} color="#18181b" /> Header Template
+                <button onClick={downloadHeader} style={{ padding: "10px 16px", background: "transparent", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "14px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <Icon name="download" size={14} color="#09090b" /> Header Template
                 </button>
-                <button onClick={downloadFooter} style={{ padding: "10px 16px", background: "transparent", color: "#18181b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                  <Icon name="download" size={14} color="#18181b" /> Footer Template
+                <button onClick={downloadFooter} style={{ padding: "10px 16px", background: "transparent", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "14px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <Icon name="download" size={14} color="#09090b" /> Footer Template
                 </button>
-                <button onClick={exportBrief} style={{ padding: "10px 16px", background: "transparent", color: "#18181b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                  <Icon name="file-text" size={14} color="#18181b" /> Export Brief
+                <button onClick={exportBrief} style={{ padding: "10px 16px", background: "transparent", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "14px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <Icon name="file-text" size={14} color="#09090b" /> Export Brief
                 </button>
               </div>
-              <div style={{ fontSize: "11px", color: "#52525b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>What you'll get</div>
-              <div style={{ fontSize: "13px", color: "#27272a", lineHeight: 1.7 }}>
+              <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>What you'll get</div>
+              <div style={{ fontSize: "14px", color: "#09090b", lineHeight: 1.7 }}>
                 {exportFormat === "elementor" ? (
-                  <><strong style={{ color: "#18181b" }}>Page JSON</strong> — Elementor template using native widgets (Heading, Text, Button, Icon Box, Image, Counter, Testimonial, Accordion, Social Icons, Video, Form).<br /><br />
-                  <strong style={{ color: "#18181b" }}>Footer Template</strong> — separate Theme Builder template. Import once under Theme Builder → Footer.</>
+                  <><strong style={{ color: "#09090b" }}>Page JSON</strong> — Elementor template using native widgets (Heading, Text, Button, Icon Box, Image, Counter, Testimonial, Accordion, Social Icons, Video, Form).<br /><br />
+                  <strong style={{ color: "#09090b" }}>Footer Template</strong> — separate Theme Builder template. Import once under Theme Builder → Footer.</>
                 ) : (
-                  <><strong style={{ color: "#18181b" }}>Page JSON</strong> — Divi layout using native modules (et_pb_text, et_pb_button, et_pb_blurb, et_pb_image, et_pb_number_counter, et_pb_testimonial, et_pb_accordion, et_pb_social_media_follow, et_pb_video, et_pb_contact_form).<br /><br />
-                  <strong style={{ color: "#18181b" }}>Footer Template</strong> — separate Divi layout. Import via Theme Builder or insert into a Global Footer template.</>
+                  <><strong style={{ color: "#09090b" }}>Page JSON</strong> — Divi layout using native modules (et_pb_text, et_pb_button, et_pb_blurb, et_pb_image, et_pb_number_counter, et_pb_testimonial, et_pb_accordion, et_pb_social_media_follow, et_pb_video, et_pb_contact_form).<br /><br />
+                  <strong style={{ color: "#09090b" }}>Footer Template</strong> — separate Divi layout. Import via Theme Builder or insert into a Global Footer template.</>
                 )}
               </div>
             </div>
 
             <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "20px" }}>
-              <div style={{ fontSize: "11px", color: "#52525b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>How to import — {exportFormat === "divi" ? "Divi" : "Elementor"}</div>
+              <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>How to import — {exportFormat === "divi" ? "Divi" : "Elementor"}</div>
               {exportFormat === "elementor" ? (
-                <ol style={{ fontSize: "13px", color: "#27272a", lineHeight: 1.8, paddingLeft: "20px", margin: 0 }}>
+                <ol style={{ fontSize: "14px", color: "#09090b", lineHeight: 1.8, paddingLeft: "20px", margin: 0 }}>
                   <li>WordPress → Templates → Saved Templates</li>
                   <li>Click <em>Import Templates</em>, upload the .json</li>
                   <li>Edit your existing page with Elementor</li>
@@ -6095,7 +6095,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   <li>For footer: Templates → Theme Builder → Footer → Add New → Import</li>
                 </ol>
               ) : (
-                <ol style={{ fontSize: "13px", color: "#27272a", lineHeight: 1.8, paddingLeft: "20px", margin: 0 }}>
+                <ol style={{ fontSize: "14px", color: "#09090b", lineHeight: 1.8, paddingLeft: "20px", margin: 0 }}>
                   <li>WordPress → Divi → Divi Library</li>
                   <li>Click <em>Import & Export</em> → Import tab → upload the .json</li>
                   <li>Edit your existing page with the Divi Builder</li>
@@ -6118,21 +6118,21 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               {prev ? (
                 <button
                   onClick={() => setTab(prev.id)}
-                  style={{ padding: "12px 18px", background: "#ffffff", color: "#000000", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
+                  style={{ padding: "12px 18px", background: "#ffffff", color: "#000000", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
                   <Icon name="arrowLeft" size={14} color="#000000" /> Back to {prev.label}
                 </button>
               ) : <div />}
-              <div style={{ fontSize: "11px", color: "#71717a", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 500 }}>
+              <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 500 }}>
                 Step {idx + 1} of {TAB_ORDER.length}
               </div>
               {next ? (
                 <button
                   onClick={() => setTab(next.id)}
-                  style={{ padding: "12px 20px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
+                  style={{ padding: "12px 20px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
                   Next: {next.label} <Icon name="arrowRight" size={14} color="#ffffff" />
                 </button>
               ) : (
-                <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#000000", fontWeight: 500 }}>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#000000", fontWeight: 500 }}>
                   <Icon name="check" size={14} color="#000000" /> End of workflow
                 </div>
               )}
