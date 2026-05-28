@@ -3783,7 +3783,7 @@ export default function App() {
   // Persistence — load projects from window.storage on mount, save on changes
   const [storageLoaded, setStorageLoaded] = useState(false);
   const [showAdvancedColors, setShowAdvancedColors] = useState(false);
-  const [welcomeDismissed, setWelcomeDismissed] = useState(() => { try { return !!window.localStorage.getItem("sw"); } catch(e) { return false; } });
+  const [welcomeDismissed, setWelcomeDismissed] = useState(false);
   const [importMsg, setImportMsg] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState(null); // project id pending delete confirmation
 
@@ -4683,7 +4683,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
   // ── PREVIEW VIEW ───────────────────────────────────────────────────────────
 
-  if (!welcomeDismissed && projects.length === 0 && storageLoaded && !localStorage.getItem("sw")) return (
+  if (!welcomeDismissed && projects.length === 0 && storageLoaded) return (
     <div style={{ minHeight: "100vh", background: "#fafaf9", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 24px" }}>
       <div style={{ maxWidth: "480px", width: "100%", textAlign: "center" }}>
         <div style={{ fontSize: "24px", fontWeight: 800, letterSpacing: "-0.03em", color: "#09090b", marginBottom: "32px" }}>spec</div>
