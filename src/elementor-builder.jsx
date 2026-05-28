@@ -5870,6 +5870,10 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                         <div key={`${s}-${i}`} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "12px 16px", background: "#f9f9f7", border: "1px solid #e7e7e4", borderRadius: "8px" }}>
                           <span style={{ fontSize: "12px", fontWeight: 700, color: "#09090b", fontVariantNumeric: "tabular-nums", minWidth: "20px", letterSpacing: "0.02em" }}>{String(i + 1).padStart(2, "0")}</span>
                           <span style={{ flex: 1, fontSize: "14px", color: "#09090b", fontWeight: 500 }}>{s}</span>
+                          <div style={{ display: "flex", gap: "2px" }}>
+                            <button onClick={() => { if (i > 0) { const arr = [...page.sections]; [arr[i-1], arr[i]] = [arr[i], arr[i-1]]; updPage("sections", arr); } }} style={{ background: "transparent", border: "none", cursor: i > 0 ? "pointer" : "default", padding: "4px", color: i > 0 ? "#09090b" : "#d4d2c8", display: "inline-flex", alignItems: "center", borderRadius: "4px" }}>▲</button>
+                            <button onClick={() => { if (i < page.sections.length - 1) { const arr = [...page.sections]; [arr[i+1], arr[i]] = [arr[i], arr[i+1]]; updPage("sections", arr); } }} style={{ background: "transparent", border: "none", cursor: i < page.sections.length - 1 ? "pointer" : "default", padding: "4px", color: i < page.sections.length - 1 ? "#09090b" : "#d4d2c8", display: "inline-flex", alignItems: "center", borderRadius: "4px" }}>▼</button>
+                          </div>
                           <button
                             onClick={() => toggleSection(s)}
                             title={`Remove ${s}`}
