@@ -3761,6 +3761,34 @@ const Section = ({ title, icon, id, children }) => (
   </div>
 );
 
+
+function SortableSection({ id, index, onRemove }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    display: "flex", alignItems: "center", gap: "14px",
+    padding: "12px 16px", background: isDragging ? "#f0f0ee" : "#f9f9f7",
+    border: "1px solid #e7e7e4", borderRadius: "8px", cursor: "default",
+  };
+  return (
+    <div ref={setNodeRef} style={style}>
+      <div {...attributes} {...listeners} style={{ cursor: "grab", color: "#a1a1aa", display: "flex", alignItems: "center", padding: "2px" }}>
+        <svg width="12" height="16" viewBox="0 0 12 16" fill="none"><circle cx="4" cy="3" r="1.5" fill="currentColor"/><circle cx="4" cy="8" r="1.5" fill="currentColor"/><circle cx="4" cy="13" r="1.5" fill="currentColor"/><circle cx="8" cy="3" r="1.5" fill="currentColor"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="8" cy="13" r="1.5" fill="currentColor"/></svg>
+      </div>
+      <span style={{ fontSize: "12px", fontWeight: 700, color: "#09090b", minWidth: "20px", letterSpacing: "0.02em" }}>{String(index + 1).padStart(2, "0")}</span>
+      <span style={{ flex: 1, fontSize: "14px", color: "#09090b", fontWeight: 500 }}>{id}</span>
+      <button onClick={() => onRemove(id)} style={{ background: "transparent", border: "none", cursor: "pointer", padding: "4px", color: "#09090b", display: "inline-flex", alignItems: "center", borderRadius: "4px" }}
+        onMouseOver={e => { e.currentTarget.style.color = "#c93939"; e.currentTarget.style.background = "#fef2f2"; }}
+        onMouseOut={e => { e.currentTarget.style.color = "#09090b"; e.currentTarget.style.background = "transparent"; }}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  );
+}
+
+
 export default function App() {
   const [projects, setProjects] = useState([]);
   const [activeId, setActiveId] = useState("");
@@ -5866,20 +5894,13 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     </div>
                   ) : (
                     <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "24px" }}>
-                      {page.sections.map((s, i) => (
-                        <div key={`${s}-${i}`} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "12px 16px", background: "#f9f9f7", border: "1px solid #e7e7e4", borderRadius: "8px" }}>
-                          <span style={{ fontSize: "12px", fontWeight: 700, color: "#09090b", fontVariantNumeric: "tabular-nums", minWidth: "20px", letterSpacing: "0.02em" }}>{String(i + 1).padStart(2, "0")}</span>
-                          <span style={{ flex: 1, fontSize: "14px", color: "#09090b", fontWeight: 500 }}>{s}</span>
-                          <button
-                            onClick={() => toggleSection(s)}
-                            title={`Remove ${s}`}
-                            style={{ background: "transparent", border: "none", cursor: "pointer", padding: "4px", color: "#09090b", display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: "4px", transition: "color 0.15s, background 0.15s" }}
-                            onMouseOver={e => { e.currentTarget.style.color = "#c93939"; e.currentTarget.style.background = "#fef2f2"; }}
-                            onMouseOut={e => { e.currentTarget.style.color = "#09090b"; e.currentTarget.style.background = "transparent"; }}>
-                            <Icon name="x" size={14} color="currentColor" />
-                          </button>
-                        </div>
-                      ))}
+                      <DndContext sensors={useSensors(useSensor(PointerSensor))} collisionDetection={closestCenter} onDragEnd={({ active, over }) => { if (over && active.id !== over.id) { const oi = page.sections.indexOf(active.id); const ni = page.sections.indexOf(over.id); updPage("sections", arrayMove(page.sections, oi, ni)); } }}>
+                        <SortableContext items={page.sections} strategy={verticalListSortingStrategy}>
+                          {page.sections.map((s, i) => (
+                            <SortableSection key={s + i} id={s} index={i} onRemove={toggleSection} />
+                          ))}
+                        </SortableContext>
+                      </DndContext>
                     </div>
                   )}
 
