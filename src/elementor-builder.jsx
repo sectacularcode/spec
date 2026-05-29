@@ -3806,6 +3806,7 @@ export default function App() {
     let cancelled = false;
     (async () => {
       try {
+        const lsRaw = (() => { try { return localStorage.getItem("projects"); } catch(e2) { return null; } })();
         if (typeof window !== "undefined" && window.storage) {
           const result = await window.storage.get("projects");
           if (result && result.value && !cancelled) {
@@ -3841,6 +3842,15 @@ export default function App() {
               setActiveId(sid&&parsed.find(function(x){return x.id===sid;})?sid:parsed[0].id);
             }
           }
+        } else if (lsRaw) {
+          try {
+            const lsParsed = JSON.parse(lsRaw);
+            if (Array.isArray(lsParsed) && lsParsed.length > 0 && !cancelled) {
+              setProjects(lsParsed);
+              var sid2=null;try{sid2=localStorage.getItem("spec_activeId");}catch(e){}
+              setActiveId(sid2&&lsParsed.find(function(x){return x.id===sid2;})?sid2:lsParsed[0].id);
+            }
+          } catch(e3) {}
         }
       } catch (e) {
         // No saved data, key doesn't exist, or parse error — keep default EV_PROJECT
@@ -3859,6 +3869,7 @@ export default function App() {
     let cancelled = false;
     const timer = setTimeout(async () => {
       try {
+        try { localStorage.setItem("projects", JSON.stringify(projects)); } catch(e) {}
         if (typeof window !== "undefined" && window.storage && !cancelled) {
           await window.storage.set("projects", JSON.stringify(projects));
         }
