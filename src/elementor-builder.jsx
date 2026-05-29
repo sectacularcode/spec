@@ -4514,6 +4514,54 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
     download(slug, data);
   };
 
+  const downloadAll = async () => {
+    try {
+      // Dynamically load JSZip from CDN
+      if (!window.JSZip) {
+        await new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      }
+      const zip = new window.JSZip();
+      const brandSlug = brand.name.replace(/\s+/g, "-").toLowerCase();
+      const fmt = exportFormat;
+
+      // Add all pages
+      project.pages.forEach(pg => {
+        const pageData = fmt === "divi" ? buildDiviPage(pg, brand) : buildPageJSON(pg, brand);
+        const pageSlug = pg.name.replace(/\s+/g, "-").toLowerCase();
+        zip.file(`${brandSlug}-${pageSlug}-${fmt}.json`, JSON.stringify(pageData, null, 2));
+      });
+
+      // Add header
+      const headerData = fmt === "divi" ? buildDiviPage({ name: "Header", sections: [] }, brand) : buildHeaderJSON(brand);
+      zip.file(`${brandSlug}-header-${fmt}.json`, JSON.stringify(headerData, null, 2));
+
+      // Add footer
+      const footerData = fmt === "divi" ? buildDiviFooter(brand) : buildFooterJSON(brand);
+      zip.file(`${brandSlug}-footer-${fmt}.json`, JSON.stringify(footerData, null, 2));
+
+      // Add a README
+      const pageList = project.pages.map((pg, i) => `  ${i + 1}. ${pg.name} — ${brandSlug}-${pg.name.replace(/\s+/g, "-").toLowerCase()}-${fmt}.json`).join("\n");
+      zip.file("README.txt", `${brand.name} — Spec Export\n${"=".repeat(40)}\nFormat: ${fmt === "divi" ? "Divi" : "Elementor"}\n\nPages:\n${pageList}\n\nHeader: ${brandSlug}-header-${fmt}.json\nFooter: ${brandSlug}-footer-${fmt}.json\n\nImport instructions:\n- Pages: WordPress → Templates → Saved Templates → Import\n- Header/Footer: WordPress → Templates → Theme Builder → Import`);
+
+      const blob = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${brandSlug}-${fmt}-templates.zip`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+    } catch (err) {
+      alert("ZIP download failed: " + err.message);
+    }
+  };
+
   // ── Styles ─────────────────────────────────────────────────────────────────
   const I = {
     lbl: { display: "block", fontSize: "13px", color: "#000000", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700 },
@@ -4726,6 +4774,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           <button onClick={downloadPage} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>Download Template</button>
           <button onClick={downloadHeader} style={{ padding: "8px 14px", background: "transparent", color: "#ffffff", border: "1px solid #3f3f46", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>Header Template</button>
           <button onClick={downloadFooter} style={{ padding: "8px 14px", background: "transparent", color: "#ffffff", border: "1px solid #3f3f46", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>Footer Template</button>
+          {project.pages.length > 1 && <button onClick={downloadAll} style={{ padding: "8px 14px", background: "transparent", color: "#ffffff", border: "1px solid #3f3f46", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>Download All (.zip)</button>}
           <button onClick={() => setView("editor")} style={{ padding: "8px 14px", background: "transparent", color: "#a3a39e", border: "1px solid #3f3f46", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>← Back to Editor</button>
         </div>
       </div>
@@ -6114,6 +6163,11 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <button onClick={exportBrief} style={{ padding: "10px 16px", background: "transparent", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "14px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
                   <Icon name="file-text" size={14} color="#09090b" /> Export Brief
                 </button>
+                {project.pages.length > 1 && (
+                  <button onClick={downloadAll} style={{ padding: "10px 16px", background: "#18181b", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "14px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <Icon name="download" size={14} color="#ffffff" /> Download All Pages (.zip)
+                  </button>
+                )}
               </div>
               <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>What you'll get</div>
               <div style={{ fontSize: "14px", color: "#09090b", lineHeight: 1.7 }}>
