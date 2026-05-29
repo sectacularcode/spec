@@ -3851,7 +3851,7 @@ export default function App() {
     return () => { cancelled = true; };
   }, []);
 
-  useEffect(function(){try{if(activeId)localStorage.setItem("spec_activeId",activeId);localStorage.setItem("spec_view",view);localStorage.setItem("spec_tab",tab);localStorage.setItem("spec_pageIdx",String(pageIdx));}catch(e){}}, [activeId,view,tab,pageIdx]);
+  useEffect(function(){if(!storageLoaded)return;try{if(activeId)localStorage.setItem("spec_activeId",activeId);localStorage.setItem("spec_view",view);localStorage.setItem("spec_tab",tab);localStorage.setItem("spec_pageIdx",String(pageIdx));}catch(e){}}, [activeId,view,tab,pageIdx,storageLoaded]);
 
   // Save projects to storage whenever they change (after initial load)
   useEffect(() => {
