@@ -4760,14 +4760,32 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
   const shareBrief = () => {
     try {
-      const payload = JSON.stringify({ brand, pages: project.pages, name: project.name });
-      const encoded = btoa(unescape(encodeURIComponent(payload)));
+      // Slim payload — only what the brief view needs, truncate long text
+      const slim = {
+        n: project.name,
+        b: {
+          nm: brand.name, tg: brand.tagline,
+          ds: (brand.description || "").substring(0, 400),
+          km: (brand.keyMessages || "").substring(0, 300),
+          pc: brand.primaryColor, ac: brand.accentColor,
+          hf: brand.headingFont, bf: brand.bodyFont,
+          li: brand.layoutId, ti: brand.themeId,
+          gl: brand.goals, ta: brand.targetAudience, tn: brand.tone,
+          ce: brand.contactEmail, cp: brand.contactPhone,
+          lu: brand.logoUrl, sl: brand.socialLinks,
+        },
+        pg: (project.pages || []).map(pg => ({
+          nm: pg.name, sc: pg.sections,
+          hh: pg.heroHeading, hs: pg.heroSubhead,
+          ab: (pg.aboutBody || "").substring(0, 200),
+        })),
+      };
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(slim))));
       const url = `${window.location.origin}${window.location.pathname}#brief=${encoded}`;
       navigator.clipboard.writeText(url).then(() => {
-        alert("Shareable brief link copied to clipboard!\n\nAnyone with this link can view the read-only brief for " + brand.name + ".");
+        alert("Link copied! Send it to your client — no login needed.");
       }).catch(() => {
-        // Fallback: show URL in prompt so user can copy manually
-        window.prompt("Copy this shareable brief link:", url);
+        window.prompt("Copy this link:", url);
       });
     } catch(e) {
       alert("Could not generate share link: " + e.message);
@@ -4781,9 +4799,25 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
     try {
       const hash = window.location.hash;
       if (hash && hash.startsWith("#brief=")) {
-        const encoded = hash.slice(7);
-        const decoded = decodeURIComponent(escape(atob(encoded)));
-        return JSON.parse(decoded);
+        const raw = JSON.parse(decodeURIComponent(escape(atob(hash.slice(7)))));
+        // Handle slim key format (new) and full format (old)
+        if (raw.b) {
+          const b = raw.b;
+          return {
+            name: raw.n,
+            brand: {
+              name: b.nm, tagline: b.tg, description: b.ds, keyMessages: b.km,
+              primaryColor: b.pc, accentColor: b.ac, headingFont: b.hf, bodyFont: b.bf,
+              layoutId: b.li, themeId: b.ti, goals: b.gl, targetAudience: b.ta, tone: b.tn,
+              contactEmail: b.ce, contactPhone: b.cp, logoUrl: b.lu, socialLinks: b.sl,
+            },
+            pages: (raw.pg || []).map(pg => ({
+              name: pg.nm, sections: pg.sc,
+              heroHeading: pg.hh, heroSubhead: pg.hs, aboutBody: pg.ab,
+            })),
+          };
+        }
+        return raw; // old full format
       }
     } catch(e) {}
     return null;
