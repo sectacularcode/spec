@@ -3775,10 +3775,10 @@ const Section = ({ title, icon, id, children }) => (
 
 export default function App() {
   const [projects, setProjects] = useState([]);
-  const [activeId, setActiveId] = useState("");
-  const [view, setView] = useState("projects"); // projects | editor | preview
-  const [tab, setTab] = useState("discovery");
-  const [pageIdx, setPageIdx] = useState(0);
+  const [activeId, setActiveId] = useState(function(){try{return localStorage.getItem("spec_activeId")||"";}catch(e){return "";}});
+  const [view, setView] = useState(function(){try{return localStorage.getItem("spec_view")||"projects";}catch(e){return "projects";}});
+  const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_tab")||"discovery";}catch(e){return "discovery";}});
+  const [pageIdx, setPageIdx] = useState(function(){try{return parseInt(localStorage.getItem("spec_pageIdx")||"0",10);}catch(e){return 0;}});
   const [showAudit, setShowAudit] = useState(false);
   const [showAddPage, setShowAddPage] = useState(false);
   const [exportFormat, setExportFormat] = useState("elementor"); // "elementor" or "divi"
@@ -3837,7 +3837,8 @@ export default function App() {
                 }
               });
               setProjects(parsed);
-              setActiveId(parsed[0].id);
+              var sid=null;try{sid=localStorage.getItem("spec_activeId");}catch(e){}
+              setActiveId(sid&&parsed.find(function(x){return x.id===sid;})?sid:parsed[0].id);
             }
           }
         }
@@ -3849,6 +3850,8 @@ export default function App() {
     })();
     return () => { cancelled = true; };
   }, []);
+
+  useEffect(function(){try{if(activeId)localStorage.setItem("spec_activeId",activeId);localStorage.setItem("spec_view",view);localStorage.setItem("spec_tab",tab);localStorage.setItem("spec_pageIdx",String(pageIdx));}catch(e){}}, [activeId,view,tab,pageIdx]);
 
   // Save projects to storage whenever they change (after initial load)
   useEffect(() => {
