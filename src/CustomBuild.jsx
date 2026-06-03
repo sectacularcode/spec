@@ -644,7 +644,7 @@ export default function CustomBuild() {
       {/* Header */}
       <div style={{ borderBottom: "1px solid #e5e7eb", background: "#fff", padding: "16px 24px", display: "flex", alignItems: "center", gap: "16px" }}>
         <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b" }}>Custom Build</div>
-        <div style={{ fontSize: "13px", color: "#6b7280" }}>Enterprise-grade site generation from a brand brief</div>
+        
         <div style={{ marginLeft: "auto", display: "flex", gap: "8px" }}>
           {steps.map(s => (
             <div key={s.n} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
@@ -740,7 +740,7 @@ export default function CustomBuild() {
           <div style={{ marginBottom: "20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
               <div style={T.stepNum(true, !!selectedTemplate)}>3</div>
-              <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Past Client Templates</div>
+              <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Template Library</div>
               <span style={{ fontSize: "12px", color: "#6b7280", marginLeft: "auto" }}>Optional</span>
             </div>
             <div style={T.surface}>
