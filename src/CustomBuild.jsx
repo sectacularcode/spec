@@ -406,27 +406,83 @@ export default function CustomBuild() {
   const [previewPage, setPreviewPage]   = useState("home");
   const fileRef = useRef();
 
+  const [parsing, setParsing]           = useState(false);
   const canGenerate = !!brief && selectedPages.length > 0;
 
-  // ── Brief upload ────────────────────────────────────────────────────────────
+  // ── Brief upload — handles JSON, PDF, TXT ────────────────────────────────────
   function handleFile(file) {
     if (!file) return;
     setBriefError("");
-    const reader = new FileReader();
-    reader.onload = e => {
-      try {
-        const raw = JSON.parse(e.target.result);
-        // Accept either the full contract JSON or a simplified brief object
-        const parsed = extractBrief(raw);
-        setBrief(parsed);
-        setBriefName(file.name);
-        // Pre-select pages from sitemap if present
-        if (raw.sitemap) setPages(raw.sitemap.map(s => s.pageId));
-      } catch {
-        setBriefError("Could not read this file. Upload the project JSON from Spec or a brief JSON.");
+    const ext = file.name.split(".").pop().toLowerCase();
+
+    if (ext === "json") {
+      // Parse directly client-side
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const raw = JSON.parse(e.target.result);
+          const parsed = extractBrief(raw);
+          setBrief(parsed);
+          setBriefName(file.name);
+          if (raw.sitemap) setPages(raw.sitemap.map(s => s.pageId));
+        } catch {
+          setBriefError("Could not parse this JSON file. Make sure it is a Spec project JSON.");
+        }
+      };
+      reader.readAsText(file);
+
+    } else if (ext === "pdf") {
+      // Send to API as base64 for Claude to extract
+      setParsing(true);
+      const reader = new FileReader();
+      reader.onload = async e => {
+        try {
+          const base64 = e.target.result.split(",")[1];
+          const res = await fetch("/api/parse-brief", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content: base64, type: "pdf", fileName: file.name }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Parsing failed");
+          setBrief(data);
+          setBriefName(file.name);
+        } catch (err) {
+          setBriefError("Could not parse the PDF: " + err.message);
+        } finally { setParsing(false); }
+      };
+      reader.readAsDataURL(file);
+
+    } else if (ext === "txt" || ext === "docx" || ext === "doc") {
+      if (ext === "docx" || ext === "doc") {
+        // Read as text — basic extraction, works for saved-as-text Word docs
+        // For full DOCX support, save as PDF first
+        setBriefError("For best results, save the intake form as PDF before uploading. Trying text extraction...");
       }
-    };
-    reader.readAsText(file);
+      setParsing(true);
+      const reader = new FileReader();
+      reader.onload = async e => {
+        try {
+          const text = e.target.result;
+          const res = await fetch("/api/parse-brief", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content: text, type: "text", fileName: file.name }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Parsing failed");
+          setBrief(data);
+          setBriefName(file.name);
+          setBriefError("");
+        } catch (err) {
+          setBriefError("Could not parse the file: " + err.message);
+        } finally { setParsing(false); }
+      };
+      reader.readAsText(file);
+
+    } else {
+      setBriefError("Unsupported file type. Upload a PDF, JSON, or TXT file.");
+    }
   }
 
   function extractBrief(raw) {
@@ -564,12 +620,17 @@ export default function CustomBuild() {
                     <div style={{ fontSize: "24px", marginBottom: "8px" }}>📄</div>
                     <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "4px" }}>Upload Brand Brief</div>
                     <div style={{ fontSize: "12px", color: "#6b7280" }}>Drop the project JSON from Spec here, or click to browse</div>
-                    <input ref={fileRef} type="file" accept=".json" style={{ display: "none" }}
+                    <input ref={fileRef} type="file" accept=".json,.pdf,.txt,.docx" style={{ display: "none" }}
                       onChange={e => handleFile(e.target.files[0])} />
                   </div>
+                  {parsing && (
+                    <div style={{ marginTop: "12px", padding: "12px", background: "#f0fdf4", borderRadius: "6px", fontSize: "13px", color: "#15803d", display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span>⏳</span> Reading brief with Claude — this takes a few seconds...
+                    </div>
+                  )}
                   {briefError && <div style={{ fontSize: "12px", color: "#dc2626", marginTop: "8px" }}>{briefError}</div>}
                   <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "12px" }}>
-                    Upload the project JSON generated from the brand brief. PDF parsing via AI is coming soon.
+                    Accepts PDF (recommended), JSON project file, or TXT. For Word docs, save as PDF first.
                   </div>
                 </>
               ) : (
