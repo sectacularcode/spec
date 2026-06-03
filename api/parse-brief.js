@@ -109,7 +109,7 @@ export default async function handler(req, res) {
       method: "POST",
       headers: anthropicHeaders,
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
+        model: "claude-3-5-sonnet-20241022",
         max_tokens: 4000,
         system: "You are a data extraction assistant. Extract structured information from brand briefs and return ONLY valid JSON with no other text, no markdown, no code fences.",
         messages,
