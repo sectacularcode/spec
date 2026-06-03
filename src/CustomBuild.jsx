@@ -633,9 +633,8 @@ export default function CustomBuild() {
   const steps = [
     { n: 1, label: "Brand Brief",       done: !!brief },
     { n: 2, label: "Inspo URLs",        done: inspoUrls.some(u => u.trim()) },
-    { n: 3, label: "Template Library",  done: true }, // optional
-    { n: 4, label: "Pages",             done: selectedPages.length > 0 },
-    { n: 5, label: "Copy Settings",     done: true },
+        { n: 3, label: "Pages",             done: selectedPages.length > 0 },
+    { n: 4, label: "Copy Settings",     done: true },
   ];
 
   return (
@@ -736,44 +735,10 @@ export default function CustomBuild() {
             </div>
           </div>
 
-          {/* STEP 3: Template Library */}
+          {/* STEP 3: Pages */}
           <div style={{ marginBottom: "20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-              <div style={T.stepNum(true, !!selectedTemplate)}>3</div>
-              <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Template Library</div>
-              <span style={{ fontSize: "12px", color: "#6b7280", marginLeft: "auto" }}>Optional</span>
-            </div>
-            <div style={T.surface}>
-              <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>
-                Use a past client build as the structural base. The layout shells are reused; all copy is replaced with the new brief.
-              </div>
-              {TEMPLATE_LIBRARY.map(t => (
-                <div key={t.id}
-                  onClick={() => setTemplate(selectedTemplate?.id === t.id ? null : t)}
-                  style={{ padding: "14px", border: selectedTemplate?.id === t.id ? "2px solid #000" : "1px solid #e5e7eb", borderRadius: "6px", cursor: "pointer", marginBottom: "8px", transition: "border-color .15s" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                    <div>
-                      <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>{t.client}</div>
-                      <div style={{ fontSize: "12px", color: "#6b7280" }}>{t.industry} · {t.style}</div>
-                    </div>
-                    <div style={{ fontSize: "11px", color: "#9ca3af" }}>{t.date}</div>
-                  </div>
-                  <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "8px", lineHeight: 1.5 }}>{t.description}</div>
-                  <div style={{ display: "flex", gap: "6px", marginTop: "10px", flexWrap: "wrap" }}>
-                    {t.tags.map(tag => <span key={tag} style={{ fontSize: "11px", padding: "3px 8px", background: "#f3f4f6", borderRadius: "20px", color: "#374151" }}>{tag}</span>)}
-                  </div>
-                </div>
-              ))}
-              {selectedTemplate && (
-                <div style={{ fontSize: "12px", color: "#16a34a", marginTop: "4px" }}>✓ Using {selectedTemplate.client} as the structural base</div>
-              )}
-            </div>
-          </div>
-
-          {/* STEP 4: Pages */}
-          <div style={{ marginBottom: "20px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-              <div style={T.stepNum(true, selectedPages.length > 0)}>4</div>
+              <div style={T.stepNum(true, selectedPages.length > 0)}>3</div>
               <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Pages to Build</div>
             </div>
             <div style={T.surface}>
@@ -796,10 +761,10 @@ export default function CustomBuild() {
             </div>
           </div>
 
-          {/* STEP 5: Copy Settings */}
+          {/* STEP 4: Copy Settings */}
           <div style={{ marginBottom: "28px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-              <div style={T.stepNum(true, true)}>5</div>
+              <div style={T.stepNum(true, true)}>4</div>
               <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Copy Settings</div>
             </div>
             <div style={T.surface}>
