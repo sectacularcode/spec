@@ -1,6 +1,4 @@
-// api/parse-brief.js
-// Vercel serverless function — receives a brand brief (PDF or text),
-// sends it to Claude, and returns structured JSON the generator can read.
+import mammoth from "mammoth";
 
 const EXTRACTION_PROMPT = `Extract every field from this brand brief and return ONLY a single valid JSON object.
 No markdown, no code fences, no explanation — just the raw JSON.
@@ -16,7 +14,7 @@ Return this exact structure (use empty string "" for any field not found):
   "heroCta1": "",
   "heroCta2": "",
   "hookStatement": "",
-  "serviceCards": [["Title", "Body copy"], ["Title", "Body copy"]],
+  "serviceCards": [["Title", "Body copy"]],
   "differenceEyebrow": "",
   "differenceH2": "",
   "differenceBody": "",
@@ -32,7 +30,7 @@ Return this exact structure (use empty string "" for any field not found):
   "aboutH1": "",
   "aboutStory": "",
   "whyOneMaker": "",
-  "founderValues": ["Value1", "Value2", "Value3"],
+  "founderValues": ["Value1", "Value2"],
   "processH1": "",
   "processSteps": [["01", "Step title", "Step body"]],
   "contactH1": "",
@@ -40,22 +38,12 @@ Return this exact structure (use empty string "" for any field not found):
   "contactCta": "",
   "contactReassurance": "",
   "pricingTiers": [["Tier name", "From $X", "Description"]],
-  "colors": {
-    "ink": "",
-    "brass": "",
-    "brass-deep": "",
-    "bone": "",
-    "asphalt": "",
-    "stone": "",
-    "warm-white": "",
-    "text": ""
-  },
+  "colors": { "ink": "", "brass": "", "brass-deep": "", "bone": "", "asphalt": "", "stone": "", "warm-white": "", "text": "" },
   "fonts": ["Primary font", "Accent font"],
   "voiceRules": ["Rule 1", "Rule 2"],
   "headerNav": ["Link1", "Link2"],
   "headerCta": "",
   "footerTagline": "",
-  "footerSignatureLine": "",
   "seoHome": {"title": "", "description": ""},
   "seoWork": {"title": "", "description": ""},
   "seoServices": {"title": "", "description": ""},
@@ -65,19 +53,17 @@ Return this exact structure (use empty string "" for any field not found):
 }
 
 Rules:
-- Use the EXACT copy from the brief, word for word. Never paraphrase or improve.
+- Use EXACT copy from the brief, word for word. Never paraphrase or improve.
 - If a field appears in brackets like [last name], keep the brackets.
-- For colors, use hex codes exactly as written (#XXXXXX format).
-- For serviceCards, each entry is ["Short title", "One line description"].
-- For pricingTiers, each entry is ["Tier name", "Price range", "Description"].
-- For processSteps, each entry is ["01", "Step title", "Step body"].`;
+- For colors, use hex codes exactly as written.
+- serviceCards: each entry is ["Short title", "One line description"].
+- pricingTiers: each entry is ["Name", "Price range", "Description"].
+- processSteps: each entry is ["01", "Step title", "Step body"].`;
 
-module.exports = async function handler(req, res) {
-  // CORS headers
+export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
@@ -87,37 +73,41 @@ module.exports = async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "ANTHROPIC_API_KEY not set in Vercel environment variables." });
 
-  // Build the message — PDF gets sent as a document block, text goes inline
   let messages;
-  const headers = {
+  const anthropicHeaders = {
     "x-api-key": apiKey,
     "anthropic-version": "2023-06-01",
     "content-type": "application/json",
   };
 
-  if (type === "pdf") {
-    headers["anthropic-beta"] = "pdfs-2024-09-25";
-    messages = [{
-      role: "user",
-      content: [
-        {
-          type: "document",
-          source: { type: "base64", media_type: "application/pdf", data: content }
-        },
-        { type: "text", text: EXTRACTION_PROMPT }
-      ]
-    }];
-  } else {
-    messages = [{
-      role: "user",
-      content: `${EXTRACTION_PROMPT}\n\nBRIEF CONTENT:\n\n${content}`
-    }];
-  }
-
   try {
+    if (type === "pdf") {
+      // Send PDF directly to Claude as a document block
+      anthropicHeaders["anthropic-beta"] = "pdfs-2024-09-25";
+      messages = [{
+        role: "user",
+        content: [
+          { type: "document", source: { type: "base64", media_type: "application/pdf", data: content } },
+          { type: "text", text: EXTRACTION_PROMPT }
+        ]
+      }];
+
+    } else if (type === "docx") {
+      // Convert DOCX to text using mammoth, then send as text
+      const buffer = Buffer.from(content, "base64");
+      const result = await mammoth.extractRawText({ buffer });
+      const text = result.value;
+      if (!text.trim()) throw new Error("Could not extract text from DOCX file.");
+      messages = [{ role: "user", content: `${EXTRACTION_PROMPT}\n\nBRIEF CONTENT:\n\n${text}` }];
+
+    } else {
+      // Plain text
+      messages = [{ role: "user", content: `${EXTRACTION_PROMPT}\n\nBRIEF CONTENT:\n\n${content}` }];
+    }
+
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
-      headers,
+      headers: anthropicHeaders,
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
         max_tokens: 4000,
@@ -128,28 +118,19 @@ module.exports = async function handler(req, res) {
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error("Anthropic API error:", errText);
       return res.status(500).json({ error: `Anthropic API error: ${response.status}`, detail: errText });
     }
 
     const data = await response.json();
     const rawText = data.content?.[0]?.text || "";
-
-    // Strip any accidental markdown fences
     const cleaned = rawText.replace(/```json\n?/gi, "").replace(/```\n?/gi, "").trim();
-
-    // Extract the JSON object
     const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      console.error("No JSON found in response:", rawText);
-      return res.status(500).json({ error: "Claude did not return valid JSON", raw: rawText.slice(0, 500) });
-    }
+    if (!jsonMatch) return res.status(500).json({ error: "Could not parse Claude response", raw: rawText.slice(0, 500) });
 
-    const parsed = JSON.parse(jsonMatch[0]);
-    return res.status(200).json(parsed);
+    return res.status(200).json(JSON.parse(jsonMatch[0]));
 
   } catch (err) {
     console.error("parse-brief error:", err);
     return res.status(500).json({ error: err.message });
   }
-};
+}
