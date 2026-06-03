@@ -453,21 +453,38 @@ export default function CustomBuild() {
       };
       reader.readAsDataURL(file);
 
-    } else if (ext === "txt" || ext === "docx" || ext === "doc") {
-      if (ext === "docx" || ext === "doc") {
-        // Read as text — basic extraction, works for saved-as-text Word docs
-        // For full DOCX support, save as PDF first
-        setBriefError("For best results, save the intake form as PDF before uploading. Trying text extraction...");
-      }
+    } else if (ext === "docx" || ext === "doc") {
+      // Send DOCX as base64 — mammoth on the server converts it to text for Claude
       setParsing(true);
       const reader = new FileReader();
       reader.onload = async e => {
         try {
-          const text = e.target.result;
+          const base64 = e.target.result.split(",")[1];
           const res = await fetch("/api/parse-brief", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ content: text, type: "text", fileName: file.name }),
+            body: JSON.stringify({ content: base64, type: "docx", fileName: file.name }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Parsing failed");
+          setBrief(data);
+          setBriefName(file.name);
+          setBriefError("");
+        } catch (err) {
+          setBriefError("Could not parse the Word doc: " + err.message);
+        } finally { setParsing(false); }
+      };
+      reader.readAsDataURL(file);
+
+    } else if (ext === "txt") {
+      setParsing(true);
+      const reader = new FileReader();
+      reader.onload = async e => {
+        try {
+          const res = await fetch("/api/parse-brief", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content: e.target.result, type: "text", fileName: file.name }),
           });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || "Parsing failed");
@@ -630,7 +647,7 @@ export default function CustomBuild() {
                   )}
                   {briefError && <div style={{ fontSize: "12px", color: "#dc2626", marginTop: "8px" }}>{briefError}</div>}
                   <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "12px" }}>
-                    Accepts PDF (recommended), JSON project file, or TXT. For Word docs, save as PDF first.
+                    Accepts Word doc (.docx), PDF, JSON project file, or TXT.
                   </div>
                 </>
               ) : (
