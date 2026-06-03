@@ -25,52 +25,92 @@ const ALL_PAGES = [
   { id: "contact",  label: "Contact",             slug: "/contact" },
 ];
 
-// ─── Elementor JSON generator (JS port) ───────────────────────────────────────
-let _nidCounter = 0;
-function nid() {
-  _nidCounter++;
-  return Math.random().toString(16).slice(2, 9);
+// ─── Elementor JSON generator — with full mobile/tablet responsiveness ─────────
+function nid() { return Math.random().toString(16).slice(2, 9); }
+
+// Responsive padding helper: scales down padY by 70% tablet, 55% mobile
+function rPad(padY, padX = "40") {
+  const y = parseInt(padY); const x = parseInt(padX);
+  const yt = Math.round(y * 0.7); const ym = Math.round(y * 0.55);
+  return {
+    padding:        { unit:"px", top:String(y),  right:String(x),  bottom:String(y),  left:String(x),  isLinked:false },
+    padding_tablet: { unit:"px", top:String(yt), right:"24",       bottom:String(yt), left:"24",        isLinked:false },
+    padding_mobile: { unit:"px", top:String(ym), right:"20",       bottom:String(ym), left:"20",        isLinked:false },
+  };
+}
+
+// Responsive font size: scales down by breakpoint
+function rFont(px) {
+  if (!px) return {};
+  const t = Math.max(16, Math.round(px * 0.68));
+  const m = Math.max(16, Math.round(px * 0.50));
+  return {
+    typography_font_size:        { unit:"px", size: px },
+    typography_font_size_tablet: { unit:"px", size: t  },
+    typography_font_size_mobile: { unit:"px", size: m  },
+  };
 }
 
 function mkContainer(children, bg, opts = {}) {
+  const direction = opts.direction || "column";
   const s = {
     content_width: "boxed",
-    flex_direction: opts.direction || "column",
-    flex_gap: { unit: "px", size: opts.gap || "20", column: opts.gap || "20", row: opts.gap || "20" },
-    padding: { unit: "px", top: opts.padY || "80", right: "40", bottom: opts.padY || "80", left: "40", isLinked: false },
+    flex_direction: direction,
+    flex_gap: { unit:"px", size: opts.gap||"20", column: opts.gap||"20", row: opts.gap||"20" },
+    ...rPad(opts.padY || "80", opts.padX || "40"),
   };
   if (bg) { s.background_background = "classic"; s.background_color = bg; }
-  if (opts.minH) { s.min_height = { unit: "vh", size: opts.minH }; s.justify_content = "center"; }
+  if (opts.minH) {
+    s.min_height = { unit:"vh", size: opts.minH };
+    s.min_height_tablet = { unit:"vh", size: Math.round(opts.minH * 0.8) };
+    s.min_height_mobile = { unit:"px", size: 520 };
+    s.justify_content = "center";
+  }
   if (opts.center) { s.align_items = "center"; s.text_align = "center"; }
   if (opts.grow) s._flex_grow = opts.grow;
-  if (opts.isInner === undefined) opts.isInner = false;
+  // Row containers: stack columns on tablet and mobile
+  if (direction === "row" && !opts.keepRow) {
+    s.flex_direction_tablet = "column";
+    s.flex_direction_mobile = "column";
+  }
+  // Button rows: keep row on tablet, stack only on mobile
+  if (direction === "row" && opts.buttonRow) {
+    s.flex_direction_tablet = "row";
+    s.flex_direction_mobile = "column";
+    s.align_items_mobile = "center";
+  }
   return { id: nid(), elType: "container", isInner: !!opts.isInner, settings: s, elements: children };
 }
 
 function mkHeading(text, color, size, opts = {}) {
   const s = { title: text, header_size: size, title_color: color, align: opts.align || "left" };
-  if (opts.font || opts.weight || opts.px || opts.italic) {
-    s.typography_typography = "custom";
-    if (opts.font)   s.typography_font_family = opts.font;
-    if (opts.weight) s.typography_font_weight = String(opts.weight);
-    if (opts.px)     s.typography_font_size = { unit: "px", size: opts.px };
-    if (opts.italic) s.typography_font_style = "italic";
-  }
+  // Mobile alignment: center if already center, else left
+  s.align_tablet = opts.align || "left";
+  s.align_mobile = opts.align === "center" ? "center" : "left";
   if (opts.eyebrow) {
     s.typography_typography = "custom";
     s.typography_font_family = "Inter";
     s.typography_font_weight = "600";
     s.typography_text_transform = "uppercase";
-    s.typography_letter_spacing = { unit: "px", size: 2.5 };
-    s.typography_font_size = { unit: "px", size: 12 };
+    s.typography_letter_spacing = { unit:"px", size: 2.5 };
+    s.typography_font_size = { unit:"px", size: 12 };
+    // eyebrow stays same size on all devices
+  } else {
+    if (opts.font || opts.weight || opts.px || opts.italic) {
+      s.typography_typography = "custom";
+      if (opts.font)   s.typography_font_family = opts.font;
+      if (opts.weight) s.typography_font_weight = String(opts.weight);
+      if (opts.italic) s.typography_font_style = "italic";
+      Object.assign(s, rFont(opts.px));
+    }
   }
   return { id: nid(), elType: "widget", widgetType: "heading", settings: s, elements: [] };
 }
 
 function mkText(html, color, align = "left") {
-  return { id: nid(), elType: "widget", widgetType: "text-editor",
-    settings: { editor: `<p>${html}</p>`, text_color: color, ...(align === "center" ? { text_align: "center" } : {}) },
-    elements: [] };
+  const s = { editor: `<p>${html}</p>`, text_color: color };
+  if (align === "center") { s.text_align = "center"; s.text_align_tablet = "center"; s.text_align_mobile = "center"; }
+  return { id: nid(), elType: "widget", widgetType: "text-editor", settings: s, elements: [] };
 }
 
 function mkButton(label, bgColor, textColor) {
@@ -78,23 +118,28 @@ function mkButton(label, bgColor, textColor) {
     settings: {
       text: label, link: { url: "#" },
       background_color: bgColor, button_text_color: textColor,
-      border_radius: { unit: "px", top: "2", right: "2", bottom: "2", left: "2", isLinked: true },
+      border_radius: { unit:"px", top:"2", right:"2", bottom:"2", left:"2", isLinked:true },
       typography_typography: "custom", typography_font_family: "Inter",
       typography_font_weight: "600", typography_text_transform: "uppercase",
-      typography_letter_spacing: { unit: "px", size: 1.5 },
-      padding: { unit: "px", top: "16", right: "32", bottom: "16", left: "32", isLinked: false },
+      typography_letter_spacing: { unit:"px", size: 1.5 },
+      padding:        { unit:"px", top:"16", right:"32", bottom:"16", left:"32", isLinked:false },
+      padding_mobile: { unit:"px", top:"14", right:"24", bottom:"14", left:"24", isLinked:false },
     }, elements: [] };
 }
 
 function mkImagePh(caption) {
   return { id: nid(), elType: "widget", widgetType: "image",
-    settings: { image: { url: "", id: "" }, caption_source: "custom", caption: caption || "" },
+    settings: { image: { url:"", id:"" }, caption_source:"custom", caption: caption||"" },
     elements: [] };
 }
 
 function mkSpacer(px) {
   return { id: nid(), elType: "widget", widgetType: "spacer",
-    settings: { space: { unit: "px", size: px } }, elements: [] };
+    settings: {
+      space:        { unit:"px", size: px },
+      space_tablet: { unit:"px", size: Math.round(px * 0.7) },
+      space_mobile: { unit:"px", size: Math.round(px * 0.5) },
+    }, elements: [] };
 }
 
 function buildHomePage(C, brief) {
@@ -114,7 +159,7 @@ function buildHomePage(C, brief) {
     mkContainer([
       mkButton(brief.heroCta1 || "See the work", brass, ink),
       mkButton(brief.heroCta2 || "See pricing", "rgba(0,0,0,0)", warmWhite),
-    ], null, { direction: "row", gap: "16", padY: "0", center: true, isInner: true }),
+    ], null, { direction: "row", gap: "16", padY: "0", center: true, isInner: true, buttonRow: true }),
   ], ink, { padY: "120", minH: 90, center: true });
 
   const hook = mkContainer([
@@ -155,7 +200,7 @@ function buildHomePage(C, brief) {
     const right = mkContainer([
       mkText(brief.differenceBody || "The supporting body copy for this section.", text),
     ], null, { padY: "0", grow: 1, isInner: true });
-    const row = mkContainer([left, right], null, { direction: "row", gap: "80", padY: "0", isInner: true });
+    const row = mkContainer([left, right], null, { direction: "row", gap: "80", padY: "0", isInner: true, keepRow: false });
     return mkContainer([row], bone, { padY: "96" });
   })();
 
