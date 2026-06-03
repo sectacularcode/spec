@@ -22,7 +22,7 @@ Return this exact structure (use empty string "" for any field not found):
   "whoH2": "",
   "whoBody": "",
   "workH2": "",
-  "workItems": ["Film 1", "Film 2", "Film 3"],
+  "workItems": ["Item 1", "Item 2"],
   "pricingH2": "",
   "pricingSubhead": "",
   "pricingCta": "",
@@ -43,22 +43,55 @@ Return this exact structure (use empty string "" for any field not found):
   "voiceRules": ["Rule 1", "Rule 2"],
   "headerNav": ["Link1", "Link2"],
   "headerCta": "",
-  "footerTagline": "",
-  "seoHome": {"title": "", "description": ""},
-  "seoWork": {"title": "", "description": ""},
-  "seoServices": {"title": "", "description": ""},
-  "seoAbout": {"title": "", "description": ""},
-  "seoProcess": {"title": "", "description": ""},
-  "seoContact": {"title": "", "description": ""}
+  "footerTagline": ""
 }
 
 Rules:
-- Use EXACT copy from the brief, word for word. Never paraphrase or improve.
-- If a field appears in brackets like [last name], keep the brackets.
-- For colors, use hex codes exactly as written.
-- serviceCards: each entry is ["Short title", "One line description"].
-- pricingTiers: each entry is ["Name", "Price range", "Description"].
-- processSteps: each entry is ["01", "Step title", "Step body"].`;
+- Use EXACT copy from the brief word for word. Never paraphrase.
+- Keep anything in [brackets] exactly as written.
+- For colors use hex codes exactly as written.`;
+
+// Try models in order until one works
+const MODELS = [
+  "claude-opus-4-6",
+  "claude-sonnet-4-6",
+  "claude-3-5-sonnet-20241022",
+  "claude-3-5-haiku-20241022",
+  "claude-3-haiku-20240307",
+];
+
+async function callClaude(apiKey, messages, extraHeaders = {}) {
+  for (const model of MODELS) {
+    const headers = {
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+      "content-type": "application/json",
+      ...extraHeaders,
+    };
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        model,
+        max_tokens: 4000,
+        system: "You are a data extraction assistant. Return ONLY valid JSON with no markdown, no code fences, no explanation.",
+        messages,
+      }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      return { ok: true, data, model };
+    }
+    const errBody = await response.text();
+    console.log(`Model ${model} failed: ${response.status} — ${errBody.slice(0, 200)}`);
+    if (response.status !== 404 && response.status !== 400) {
+      // Non-404 error (e.g. 401 auth, 500 server) — no point trying other models
+      return { ok: false, status: response.status, error: errBody };
+    }
+    // 404 or 400 means this model not available, try next
+  }
+  return { ok: false, status: 404, error: "No available model found" };
+}
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -73,17 +106,12 @@ export default async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "ANTHROPIC_API_KEY not set in Vercel environment variables." });
 
-  let messages;
-  const anthropicHeaders = {
-    "x-api-key": apiKey,
-    "anthropic-version": "2023-06-01",
-    "content-type": "application/json",
-  };
-
   try {
+    let messages;
+    let extraHeaders = {};
+
     if (type === "pdf") {
-      // Send PDF directly to Claude as a document block
-      anthropicHeaders["anthropic-beta"] = "pdfs-2024-09-25";
+      extraHeaders["anthropic-beta"] = "pdfs-2024-09-25";
       messages = [{
         role: "user",
         content: [
@@ -91,43 +119,30 @@ export default async function handler(req, res) {
           { type: "text", text: EXTRACTION_PROMPT }
         ]
       }];
-
     } else if (type === "docx") {
-      // Convert DOCX to text using mammoth, then send as text
       const buffer = Buffer.from(content, "base64");
       const result = await mammoth.extractRawText({ buffer });
       const text = result.value;
       if (!text.trim()) throw new Error("Could not extract text from DOCX file.");
       messages = [{ role: "user", content: `${EXTRACTION_PROMPT}\n\nBRIEF CONTENT:\n\n${text}` }];
-
     } else {
-      // Plain text
       messages = [{ role: "user", content: `${EXTRACTION_PROMPT}\n\nBRIEF CONTENT:\n\n${content}` }];
     }
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: anthropicHeaders,
-      body: JSON.stringify({
-        model: "claude-3-5-sonnet-20241022",
-        max_tokens: 4000,
-        system: "You are a data extraction assistant. Extract structured information from brand briefs and return ONLY valid JSON with no other text, no markdown, no code fences.",
-        messages,
-      }),
-    });
+    const result = await callClaude(apiKey, messages, extraHeaders);
 
-    if (!response.ok) {
-      const errText = await response.text();
-      return res.status(500).json({ error: `Anthropic API error: ${response.status}`, detail: errText });
+    if (!result.ok) {
+      return res.status(500).json({
+        error: `API error (${result.status}): ${result.error?.slice(0, 300)}`,
+      });
     }
 
-    const data = await response.json();
-    const rawText = data.content?.[0]?.text || "";
+    const rawText = result.data.content?.[0]?.text || "";
     const cleaned = rawText.replace(/```json\n?/gi, "").replace(/```\n?/gi, "").trim();
     const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return res.status(500).json({ error: "Could not parse Claude response", raw: rawText.slice(0, 500) });
 
-    return res.status(200).json(JSON.parse(jsonMatch[0]));
+    return res.status(200).json({ ...JSON.parse(jsonMatch[0]), _model: result.model });
 
   } catch (err) {
     console.error("parse-brief error:", err);
