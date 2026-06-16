@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 // ─── Template Library ─────────────────────────────────────────────────────────
 const TEMPLATE_LIBRARY = [
@@ -148,7 +148,9 @@ function mkDivider(color) {
 
 // ─── Page builders ────────────────────────────────────────────────────────────
 
-function buildHomePage(C, brief) {
+function buildHomePage(C, brief, inspoHint) {
+  // inspoHint: structural notes from crawled reference sites for this page type
+  var hasInspo = !!inspoHint;
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       asphalt = C.asphalt, brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
@@ -256,7 +258,8 @@ function buildHomePage(C, brief) {
     content: [hero, hook, cards, split, whoSection, work, pricingTeaser, closing] };
 }
 
-function buildWorkPage(C, brief) {
+function buildWorkPage(C, brief, inspoHint) {
+  var hasInspo = !!inspoHint;
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", asphalt = C.asphalt, text = C.text;
@@ -315,7 +318,8 @@ function buildWorkPage(C, brief) {
     content: [header, filterRow, gridSection, closing] };
 }
 
-function buildServicesPage(C, brief) {
+function buildServicesPage(C, brief, inspoHint) {
+  var hasInspo = !!inspoHint;
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", asphalt = C.asphalt || "#2B2823", text = C.text;
@@ -462,7 +466,8 @@ function buildServicesPage(C, brief) {
     content: [header, tiersSection, menuSection, pricingNoteSection, closing] };
 }
 
-function buildAboutPage(C, brief) {
+function buildAboutPage(C, brief, inspoHint) {
+  var hasInspo = !!inspoHint;
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", asphalt = C.asphalt, text = C.text;
@@ -526,7 +531,8 @@ function buildAboutPage(C, brief) {
     content: [header, storySection, whySection, valuesSection, closing] };
 }
 
-function buildProcessPage(C, brief) {
+function buildProcessPage(C, brief, inspoHint) {
+  var hasInspo = !!inspoHint;
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
@@ -591,7 +597,8 @@ function buildProcessPage(C, brief) {
     content: [header, stepsContent, callout, closing] };
 }
 
-function buildContactPage(C, brief) {
+function buildContactPage(C, brief, inspoHint) {
+  var hasInspo = !!inspoHint;
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
@@ -651,21 +658,58 @@ function buildContactPage(C, brief) {
     content: [header, formSection, infoSection, closingDark] };
 }
 
-function generatePages(brief, selectedPages) {
+// ─── Inspo pattern merger ─────────────────────────────────────────────────────
+// Distills all crawl results into a per-page-type hint object.
+// Each key is a page type; value is a merged string of structural notes from
+// every URL that had that page type. Gets passed into page builders so they
+// can make layout decisions informed by real reference sites.
+function buildInspoContext(crawlResults, storedPatterns) {
+  var context = {};
+  // Merge stored patterns first (older accumulated knowledge)
+  if (storedPatterns) {
+    Object.keys(storedPatterns).forEach(function(pageType) {
+      context[pageType] = storedPatterns[pageType];
+    });
+  }
+  // Overlay current session crawl results (most recent wins)
+  Object.keys(crawlResults).forEach(function(url) {
+    var result = crawlResults[url];
+    if (!result || result.error || !result.patterns) return;
+    var pages = result.patterns.pages || {};
+    Object.keys(pages).forEach(function(pageType) {
+      var note = pages[pageType];
+      if (!note) return;
+      if (context[pageType]) {
+        // Append — accumulate notes from multiple sources
+        context[pageType] = context[pageType] + " | " + note;
+      } else {
+        context[pageType] = note;
+      }
+    });
+    // Also store site-level notes under "site"
+    if (result.patterns.siteNotes) {
+      context["site"] = (context["site"] ? context["site"] + " | " : "") + result.patterns.siteNotes;
+    }
+  });
+  return context;
+}
+
+function generatePages(brief, selectedPages, inspoContext) {
   var colors = brief.colors || {
     ink: "#1C1A17", brass: "#C2A35B", "brass-deep": "#9C7E3A",
     bone: "#EDE7DB", asphalt: "#2B2823", stone: "#8A8170",
     "warm-white": "#FBFAF7", text: "#2A2722"
   };
+  var ctx = inspoContext || {};
   return selectedPages.map(function(pid) {
     var label = (ALL_PAGES.find(function(p) { return p.id === pid; }) || {}).label || pid;
     var data = null;
-    if (pid === "home")     data = buildHomePage(colors, brief);
-    if (pid === "work")     data = buildWorkPage(colors, brief);
-    if (pid === "services") data = buildServicesPage(colors, brief);
-    if (pid === "about")    data = buildAboutPage(colors, brief);
-    if (pid === "process")  data = buildProcessPage(colors, brief);
-    if (pid === "contact")  data = buildContactPage(colors, brief);
+    if (pid === "home")     data = buildHomePage(colors, brief, ctx.home || ctx.site);
+    if (pid === "work")     data = buildWorkPage(colors, brief, ctx.work || ctx.site);
+    if (pid === "services") data = buildServicesPage(colors, brief, ctx.services || ctx.site);
+    if (pid === "about")    data = buildAboutPage(colors, brief, ctx.about || ctx.site);
+    if (pid === "process")  data = buildProcessPage(colors, brief, ctx.process || ctx.site);
+    if (pid === "contact")  data = buildContactPage(colors, brief, ctx.contact || ctx.site);
     return data ? { id: pid, label: label, data: data } : null;
   }).filter(function(p) { return p !== null; });
 }
@@ -928,6 +972,7 @@ export default function CustomBuild() {
   const [inspoUrls, setInspoUrls]       = useState([""]);
   const [crawlResults, setCrawlResults] = useState({});  // keyed by URL
   const [crawling, setCrawling]         = useState({});  // keyed by URL
+  const [storedPatterns, setStoredPatterns] = useState({}); // persisted across sessions
   const [selectedPages, setPages]       = useState(["home"]);
   const [copyBriefOnly, setCopy]        = useState(true);
   const [generating, setGenerating]     = useState(false);
@@ -936,6 +981,21 @@ export default function CustomBuild() {
   const fileRef = useRef();
   const [parsing, setParsing]           = useState(false);
   const canGenerate = !!brief && selectedPages.length > 0;
+
+  // Load persisted inspo patterns on mount
+  useEffect(() => {
+    async function loadPatterns() {
+      try {
+        const result = await window.storage.get("spec-inspo-patterns");
+        if (result && result.value) {
+          setStoredPatterns(JSON.parse(result.value));
+        }
+      } catch (e) {
+        // No stored patterns yet — that's fine
+      }
+    }
+    if (window.storage) loadPatterns();
+  }, []);
 
   function handleFile(file) {
     if (!file) return;
@@ -1072,7 +1132,16 @@ export default function CustomBuild() {
       });
       const data = await res.json();
       if (res.ok) {
-        setCrawlResults(r => ({ ...r, [trimmed]: data }));
+        setCrawlResults(r => {
+          const updated = { ...r, [trimmed]: data };
+          // Persist the merged pattern context to storage
+          if (window.storage && data.patterns) {
+            const merged = buildInspoContext(updated, storedPatterns);
+            window.storage.set("spec-inspo-patterns", JSON.stringify(merged)).catch(() => {});
+            setStoredPatterns(merged);
+          }
+          return updated;
+        });
       } else {
         setCrawlResults(r => ({ ...r, [trimmed]: { error: data.error || "Could not crawl this URL" } }));
       }
@@ -1088,8 +1157,9 @@ export default function CustomBuild() {
     if (!canGenerate) return;
     setGenerating(true);
     setTimeout(() => {
-      const pages = generatePages(brief, selectedPages);
-      setGenerated({ pages });
+      const inspoContext = buildInspoContext(crawlResults, storedPatterns);
+      const pages = generatePages(brief, selectedPages, inspoContext);
+      setGenerated({ pages, inspoContext });
       setPreviewPage(selectedPages[0] || "home");
       setGenerating(false);
     }, 800);
@@ -1182,6 +1252,21 @@ export default function CustomBuild() {
               <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Inspo URLs</div>
               <span style={{ fontSize: "12px", color: "#6b7280", marginLeft: "auto" }}>Optional</span>
             </div>
+            {Object.keys(storedPatterns).length > 0 && (
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", background: "#f4f4f5", borderRadius: "6px", marginBottom: "10px" }}>
+                <span style={{ fontSize: "12px", color: "#09090b" }}>
+                  {Object.keys(storedPatterns).filter(k => k !== "site").length} page pattern{Object.keys(storedPatterns).filter(k => k !== "site").length !== 1 ? "s" : ""} learned from previous sessions
+                </span>
+                <button
+                  onClick={async () => {
+                    setStoredPatterns({});
+                    if (window.storage) { try { await window.storage.delete("spec-inspo-patterns"); } catch(e) {} }
+                  }}
+                  style={{ fontSize: "11px", color: "#6b7280", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
+                  Clear
+                </button>
+              </div>
+            )}
             <div style={T.surface}>
               <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>
                 Paste a site URL and Spec will discover all pages in the nav, not just the home page. Each interior page informs the matching page type in your build.
@@ -1329,3 +1414,4 @@ export default function CustomBuild() {
     </div>
   );
 }
+
