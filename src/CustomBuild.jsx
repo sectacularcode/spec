@@ -1109,9 +1109,9 @@ export default function CustomBuild() {
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
               <div style={T.stepNum(true, !!brief)}>1</div>
               <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Brand Brief</div>
-              {brief && <span style={{ fontSize: "12px", color: "#16a34a", marginLeft: "auto" }}>✓ {briefName}</span>}
+              {brief && <span style={{ fontSize: "12px", color: "#09090b", marginLeft: "auto" }}>✓ {briefName}</span>}
             </div>
-            <div style={{ ...T.surface, border: brief ? "1px solid #bbf7d0" : "1px solid #e5e7eb" }}>
+            <div style={{ ...T.surface, border: brief ? "1px solid #e5e7eb" : "1px solid #e5e7eb" }}>
               {!brief ? (
                 <>
                   <div
@@ -1127,7 +1127,7 @@ export default function CustomBuild() {
                     <div style={{ fontSize: "12px", color: "#6b7280" }}>PDF, DOCX, JSON, or TXT</div>
                     <input ref={fileRef} type="file" accept=".json,.pdf,.txt,.docx" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
                   </div>
-                  {parsing && <div style={{ marginTop: "12px", padding: "12px", background: "#f0fdf4", borderRadius: "6px", fontSize: "13px", color: "#15803d" }}>Reading brief — this takes a few seconds...</div>}
+                  {parsing && <div style={{ marginTop: "12px", padding: "12px", background: "#f4f4f5", borderRadius: "6px", fontSize: "13px", color: "#09090b" }}>Reading brief — this takes a few seconds...</div>}
                   {briefError && <div style={{ fontSize: "12px", color: "#dc2626", marginTop: "8px" }}>{briefError}</div>}
                 </>
               ) : (
