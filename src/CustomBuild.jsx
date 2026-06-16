@@ -926,6 +926,8 @@ export default function CustomBuild() {
   const [briefName, setBriefName]       = useState("");
   const [briefError, setBriefError]     = useState("");
   const [inspoUrls, setInspoUrls]       = useState([""]);
+  const [crawlResults, setCrawlResults] = useState({});  // keyed by URL
+  const [crawling, setCrawling]         = useState({});  // keyed by URL
   const [selectedPages, setPages]       = useState(["home"]);
   const [copyBriefOnly, setCopy]        = useState(true);
   const [generating, setGenerating]     = useState(false);
@@ -1052,7 +1054,34 @@ export default function CustomBuild() {
 
   function addUrl() { setInspoUrls(u => [...u, ""]); }
   function updateUrl(i, v) { setInspoUrls(u => u.map((x, j) => j === i ? v : x)); }
-  function removeUrl(i) { setInspoUrls(u => u.filter((_, j) => j !== i)); }
+  function removeUrl(i) {
+    const url = inspoUrls[i];
+    setInspoUrls(u => u.filter((_, j) => j !== i));
+    setCrawlResults(r => { const n = {...r}; delete n[url]; return n; });
+  }
+
+  async function crawlUrl(url) {
+    const trimmed = url.trim();
+    if (!trimmed || crawlResults[trimmed] || crawling[trimmed]) return;
+    setCrawling(c => ({ ...c, [trimmed]: true }));
+    try {
+      const res = await fetch("/api/crawl-inspo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: trimmed }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setCrawlResults(r => ({ ...r, [trimmed]: data }));
+      } else {
+        setCrawlResults(r => ({ ...r, [trimmed]: { error: data.error || "Could not crawl this URL" } }));
+      }
+    } catch (err) {
+      setCrawlResults(r => ({ ...r, [trimmed]: { error: err.message } }));
+    } finally {
+      setCrawling(c => { const n = {...c}; delete n[trimmed]; return n; });
+    }
+  }
   function togglePage(id) { setPages(prev => prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]); }
 
   function generate() {
@@ -1155,12 +1184,51 @@ export default function CustomBuild() {
             </div>
             <div style={T.surface}>
               <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>
-                Paste a site URL and Spec will discover all pages in the nav — not just the home page. Each interior page informs the matching page type in your build.
+                Paste a site URL and Spec will discover all pages in the nav, not just the home page. Each interior page informs the matching page type in your build.
               </div>
               {inspoUrls.map((url, i) => (
-                <div key={i} style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
-                  <input style={{ ...T.input, flex: 1 }} value={url} onChange={e => updateUrl(i, e.target.value)} placeholder="https://example.com" />
-                  {inspoUrls.length > 1 && <button onClick={() => removeUrl(i)} style={{ ...T.btnGhost, padding: "10px 12px" }}>×</button>}
+                <div key={i} style={{ marginBottom: "12px" }}>
+                  <div style={{ display: "flex", gap: "8px", marginBottom: "6px" }}>
+                    <input
+                      style={{ ...T.input, flex: 1 }}
+                      value={url}
+                      onChange={e => updateUrl(i, e.target.value)}
+                      onBlur={e => crawlUrl(e.target.value)}
+                      onKeyDown={e => { if (e.key === "Enter") crawlUrl(url); }}
+                      placeholder="https://example.com"
+                    />
+                    {inspoUrls.length > 1 && <button onClick={() => removeUrl(i)} style={{ ...T.btnGhost, padding: "10px 12px" }}>×</button>}
+                  </div>
+                  {/* Crawl status */}
+                  {crawling[url.trim()] && (
+                    <div style={{ fontSize: "12px", color: "#6b7280", padding: "8px 12px", background: "#f4f4f5", borderRadius: "4px" }}>
+                      Scanning site pages...
+                    </div>
+                  )}
+                  {crawlResults[url.trim()] && !crawlResults[url.trim()].error && (
+                    <div style={{ fontSize: "12px", background: "#f4f4f5", borderRadius: "4px", padding: "10px 12px" }}>
+                      <div style={{ fontWeight: 600, color: "#09090b", marginBottom: "6px" }}>
+                        {crawlResults[url.trim()].pageCount} page{crawlResults[url.trim()].pageCount !== 1 ? "s" : ""} found
+                      </div>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                        {(crawlResults[url.trim()].pages || []).map((p, pi) => (
+                          <span key={pi} style={{ fontSize: "11px", padding: "3px 8px", background: "#e4e4e7", borderRadius: "3px", color: "#09090b" }}>
+                            {p.pageType !== "other" ? p.pageType : p.path}
+                          </span>
+                        ))}
+                      </div>
+                      {crawlResults[url.trim()].patterns?.siteNotes && (
+                        <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "8px", lineHeight: 1.5 }}>
+                          {crawlResults[url.trim()].patterns.siteNotes}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {crawlResults[url.trim()]?.error && (
+                    <div style={{ fontSize: "12px", color: "#dc2626", padding: "6px 10px", background: "#fef2f2", borderRadius: "4px" }}>
+                      {crawlResults[url.trim()].error}
+                    </div>
+                  )}
                 </div>
               ))}
               <button onClick={addUrl} style={{ ...T.btnGhost, marginTop: "4px", fontSize: "13px" }}>+ Add URL</button>
