@@ -1122,12 +1122,12 @@ export default function CustomBuild() {
                     onMouseOver={e => e.currentTarget.style.borderColor = "#000"}
                     onMouseOut={e => e.currentTarget.style.borderColor = "#e5e7eb"}
                   >
-                    <div style={{ fontSize: "24px", marginBottom: "8px" }}>📄</div>
+                    <div style={{ fontSize: "24px", marginBottom: "8px" }}>↑</div>
                     <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "4px" }}>Upload Brand Brief</div>
                     <div style={{ fontSize: "12px", color: "#6b7280" }}>PDF, DOCX, JSON, or TXT</div>
                     <input ref={fileRef} type="file" accept=".json,.pdf,.txt,.docx" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
                   </div>
-                  {parsing && <div style={{ marginTop: "12px", padding: "12px", background: "#f0fdf4", borderRadius: "6px", fontSize: "13px", color: "#15803d" }}>⏳ Reading brief — this takes a few seconds...</div>}
+                  {parsing && <div style={{ marginTop: "12px", padding: "12px", background: "#f0fdf4", borderRadius: "6px", fontSize: "13px", color: "#15803d" }}>Reading brief — this takes a few seconds...</div>}
                   {briefError && <div style={{ fontSize: "12px", color: "#dc2626", marginTop: "8px" }}>{briefError}</div>}
                 </>
               ) : (
