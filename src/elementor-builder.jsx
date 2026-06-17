@@ -3801,6 +3801,8 @@ export default function App() {
   const [welcomeDismissed, setWelcomeDismissed] = useState(() => { try { return !!window.localStorage.getItem("sw"); } catch(e) { return false; } });
   const [importMsg, setImportMsg] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState(null); // project id pending delete confirmation
+  const [savedBuilds, setSavedBuilds] = useState([]); // Blueprint builds saved to library
+  const [libraryFilter, setLibraryFilter] = useState({ visual: "", industry: "" }); // browser filters
 
   useEffect(() => {
     let cancelled = false;
@@ -3880,7 +3882,23 @@ export default function App() {
     return () => { cancelled = true; clearTimeout(timer); };
   }, [projects, storageLoaded]);
 
-  const project = projects.find(p => p.id === activeId) || projects[0];
+  // Load Blueprint saved builds from storage
+  useEffect(() => {
+    async function loadSavedBuilds() {
+      if (typeof window === "undefined" || !window.storage) return;
+      try {
+        const result = await window.storage.get("spec-template-library");
+        if (result && result.value) {
+          const parsed = JSON.parse(result.value);
+          if (Array.isArray(parsed)) setSavedBuilds(parsed);
+        }
+      } catch(e) {}
+    }
+    loadSavedBuilds();
+    // Poll every 10s so new Blueprint saves appear without a page refresh
+    const interval = setInterval(loadSavedBuilds, 10000);
+    return () => clearInterval(interval);
+  }, []);
   const brand = project ? project.brand : null;
   const page = project ? (project.pages[pageIdx] || project.pages[0]) : null;
   const audit = useMemo(() => project ? auditBrand(brand, project.pages) : [], [brand, project]);
@@ -4970,8 +4988,135 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           )}
         </div>
 
-        {/* Recommendation card */}
-        {briefRec && (
+        {/* Blueprint Library — builds saved from Brief to Blueprint */}
+        {savedBuilds.length > 0 && (
+          <div style={{ marginTop: "40px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+              <div>
+                <div style={{ fontSize: "20px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>Blueprint Library</div>
+                <div style={{ fontSize: "13px", color: "#6b7280" }}>{savedBuilds.length} build{savedBuilds.length !== 1 ? "s" : ""} saved from Brief to Blueprint</div>
+              </div>
+              {/* Filter controls */}
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                <select
+                  value={libraryFilter.visual}
+                  onChange={e => setLibraryFilter(f => ({ ...f, visual: e.target.value }))}
+                  style={{ padding: "8px 12px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px", background: "#fff", color: "#09090b", cursor: "pointer", outline: "none" }}>
+                  <option value="">All visual styles</option>
+                  {[...new Set(savedBuilds.flatMap(b => b.visualTags || []))].map(tag => (
+                    <option key={tag} value={tag}>{tag.replace(/-/g, " ")}</option>
+                  ))}
+                </select>
+                <select
+                  value={libraryFilter.industry}
+                  onChange={e => setLibraryFilter(f => ({ ...f, industry: e.target.value }))}
+                  style={{ padding: "8px 12px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px", background: "#fff", color: "#09090b", cursor: "pointer", outline: "none" }}>
+                  <option value="">All industries</option>
+                  {[...new Set(savedBuilds.flatMap(b => b.industryFit || []))].sort().map(ind => (
+                    <option key={ind} value={ind}>{ind.replace(/-/g, " ")}</option>
+                  ))}
+                </select>
+                {(libraryFilter.visual || libraryFilter.industry) && (
+                  <button onClick={() => setLibraryFilter({ visual: "", industry: "" })} style={{ padding: "8px 12px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px", background: "#fff", color: "#6b7280", cursor: "pointer" }}>Clear</button>
+                )}
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "16px" }}>
+              {savedBuilds
+                .filter(b => {
+                  if (libraryFilter.visual && !(b.visualTags || []).includes(libraryFilter.visual)) return false;
+                  if (libraryFilter.industry && !(b.industryFit || []).includes(libraryFilter.industry)) return false;
+                  return true;
+                })
+                .map(build => {
+                  var colors = build.colors || {};
+                  var ink = colors.ink || "#1C1A17";
+                  var bone = colors.bone || "#EDE7DB";
+                  var brass = colors.brass || "#C2A35B";
+                  var stone = colors.stone || "#8A8170";
+                  return (
+                    <div key={build.id} style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: "10px", overflow: "hidden" }}>
+                      {/* Color swatch preview */}
+                      <div style={{ height: "80px", background: ink, display: "flex", alignItems: "flex-end", padding: "12px 16px", gap: "6px" }}>
+                        {Object.values(colors).slice(0, 6).map((hex, i) => (
+                          <div key={i} title={hex} style={{ width: "20px", height: "20px", borderRadius: "50%", background: hex, border: "1px solid rgba(255,255,255,0.2)", flexShrink: 0 }} />
+                        ))}
+                        {brass && <div style={{ width: "28px", height: "4px", background: brass, borderRadius: "2px", alignSelf: "center", marginLeft: "4px" }} />}
+                      </div>
+                      <div style={{ padding: "16px" }}>
+                        <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b", marginBottom: "2px" }}>{build.client}</div>
+                        <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "10px" }}>{build.style} · {build.date}</div>
+                        <div style={{ fontSize: "12px", color: "#09090b", lineHeight: 1.5, marginBottom: "12px" }}>{build.description}</div>
+                        {/* Tags */}
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginBottom: "12px" }}>
+                          {(build.tags || []).slice(0, 4).map(tag => (
+                            <span key={tag} style={{ fontSize: "11px", padding: "3px 8px", background: "#f4f4f5", borderRadius: "3px", color: "#09090b" }}>{tag.replace(/-/g, " ")}</span>
+                          ))}
+                        </div>
+                        {/* Industry fit */}
+                        <div style={{ fontSize: "11px", color: "#6b7280", marginBottom: "12px" }}>
+                          Fits: {(build.industryFit || []).slice(0, 4).map(i => i.replace(/-/g, " ")).join(", ")}
+                          {(build.industryFit || []).length > 4 ? " +" + ((build.industryFit || []).length - 4) + " more" : ""}
+                        </div>
+                        {/* Pages */}
+                        <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", marginBottom: "14px" }}>
+                          {(build.pages || []).map(p => (
+                            <span key={p.id} style={{ fontSize: "11px", padding: "2px 8px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "3px", color: "#15803d" }}>{p.label || p.id}</span>
+                          ))}
+                        </div>
+                        {/* Actions */}
+                        <div style={{ display: "flex", gap: "8px" }}>
+                          <button
+                            onClick={() => {
+                              // Download all pages from this saved build
+                              (build.pages || []).forEach((p, i) => {
+                                setTimeout(() => {
+                                  const blob = new Blob([JSON.stringify(p.data, null, 2)], { type: "application/json" });
+                                  const a = document.createElement("a");
+                                  a.href = URL.createObjectURL(blob);
+                                  a.download = (build.client || "build").replace(/\s+/g, "-").toLowerCase() + "-" + p.id + ".json";
+                                  a.click();
+                                  URL.revokeObjectURL(a.href);
+                                }, i * 300);
+                              });
+                            }}
+                            style={{ flex: 1, padding: "9px 0", fontSize: "12px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
+                            Download Pages
+                          </button>
+                          <button
+                            onClick={async () => {
+                              if (!window.storage) return;
+                              try {
+                                const result = await window.storage.get("spec-template-library");
+                                if (!result || !result.value) return;
+                                const existing = JSON.parse(result.value);
+                                const updated = existing.filter(b => b.id !== build.id);
+                                await window.storage.set("spec-template-library", JSON.stringify(updated));
+                                setSavedBuilds(updated);
+                              } catch(e) {}
+                            }}
+                            style={{ padding: "9px 12px", fontSize: "12px", fontWeight: 500, background: "#fff", color: "#6b7280", border: "1px solid #e5e7eb", borderRadius: "6px", cursor: "pointer" }}>
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+            {savedBuilds.filter(b => {
+              if (libraryFilter.visual && !(b.visualTags || []).includes(libraryFilter.visual)) return false;
+              if (libraryFilter.industry && !(b.industryFit || []).includes(libraryFilter.industry)) return false;
+              return true;
+            }).length === 0 && (
+              <div style={{ padding: "32px", textAlign: "center", color: "#6b7280", fontSize: "13px", border: "1px dashed #e5e7eb", borderRadius: "8px" }}>
+                No builds match these filters.
+              </div>
+            )}
+          </div>
+        )}
+        
           <div style={{ background: "#ffffff", border: "1px solid #e7e7e4", borderRadius: "12px", padding: "32px 36px", marginBottom: "28px" }}>
             {/* Header row — template name + action buttons */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "28px", gap: "16px", flexWrap: "wrap", paddingBottom: "24px", borderBottom: "1px solid #e7e7e4" }}>
@@ -6352,3 +6497,4 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
     </div>
   );
 }
+
