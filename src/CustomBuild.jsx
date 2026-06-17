@@ -148,6 +148,15 @@ function mkDivider(color) {
 
 // ─── Page builders ────────────────────────────────────────────────────────────
 
+// ─── Inspo variant matcher ────────────────────────────────────────────────────
+// Returns true if any keyword appears in the inspo hint string.
+// Used by page builders to pick which layout variant to recommend.
+function inspoMatchesVariant(hint, keywords) {
+  if (!hint) return false;
+  var lower = hint.toLowerCase();
+  return keywords.some(function(k) { return lower.indexOf(k) !== -1; });
+}
+
 function buildHomePage(C, brief, inspoHint) {
   // inspoHint: structural notes from crawled reference sites for this page type
   var hasInspo = !!inspoHint;
@@ -259,20 +268,21 @@ function buildHomePage(C, brief, inspoHint) {
 }
 
 function buildWorkPage(C, brief, inspoHint) {
-  var hasInspo = !!inspoHint;
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", asphalt = C.asphalt, text = C.text;
 
   var header = mkContainer([
-    mkHeading("Work", brassDp, "h6", { eyebrow: true }),
+    mkHeading(brief.workEyebrow || "Work", brassDp, "h6", { eyebrow: true }),
     mkSpacer(16),
-    mkHeading("Selected films.", ink, "h1", { weight: 800, px: 64 }),
+    mkHeading(brief.workH1 || "Selected work.", ink, "h1", { weight: 800, px: 64 }),
     mkSpacer(16),
-    mkText("A look at the stories so far. Customer and team films, brand work, and the films that help a company show what it has become.", text),
+    mkText(brief.workIntro || "A look at the stories so far. Customer and team films, brand work, and the films that help a company show what it has become.", text),
   ], bone, { padY: "88" });
 
-  // Filter row
+  var closing = mkContainer([mkButton("Start a project", brass, ink)], bone, { padY: "80", center: true });
+
+  // ── Variant A: Standard grid with filter row ──────────────────────────────
   var filterRow = mkContainer([
     mkContainer(
       ["All", "Stories & testimonials", "People & culture", "Brand & leadership", "Exit"].map(function(label, i) {
@@ -282,22 +292,17 @@ function buildWorkPage(C, brief, inspoHint) {
         btn.settings.border_color = i === 0 ? brass : brassDp;
         btn.settings.padding = { unit:"px", top:"10", right:"20", bottom:"10", left:"20", isLinked:false };
         return btn;
-      }),
-      null, { direction: "row", gap: "10", padY: "0", isInner: true }
+      }), null, { direction: "row", gap: "10", padY: "0", isInner: true }
     ),
   ], bone, { padY: "24", padX: "40" });
-  filterRow.settings.flex_wrap = "wrap";
 
-  // Portfolio grid — 3 tiles per row
-  var tiles = (brief.workItems || ["Film 1", "Film 2", "Film 3", "Film 4", "Film 5", "Film 6"]).map(function(title) {
+  var gridTiles = (brief.workItems || ["Project 1", "Project 2", "Project 3", "Project 4", "Project 5", "Project 6"]).map(function(title) {
     var tile = mkContainer([
-      mkImagePh(title + " — film still"),
+      mkImagePh(title + " — thumbnail"),
       mkSpacer(16),
       mkHeading(title, ink, "h4", { weight: 700 }),
       mkSpacer(4),
-      mkText("Industrial services", stone),
-      mkSpacer(4),
-      mkText("One line of context about this film.", stone),
+      mkText("One line of context about this project.", stone),
     ], "#ffffff", { padY: "0", isInner: true });
     tile.settings.border_border = "solid";
     tile.settings.border_width = { unit:"px", top:"1", right:"1", bottom:"1", left:"1", isLinked:true };
@@ -305,17 +310,60 @@ function buildWorkPage(C, brief, inspoHint) {
     tile.settings._flex_grow = 1;
     return tile;
   });
-
-  var grid = mkContainer(tiles, null, { direction: "row", gap: "24", padY: "0", isInner: true });
+  var grid = mkContainer(gridTiles, null, { direction: "row", gap: "24", padY: "0", isInner: true });
   grid.settings.flex_wrap = "wrap";
   var gridSection = mkContainer([grid], bone, { padY: "64" });
 
-  var closing = mkContainer([
-    mkButton("Start a project", brass, ink),
-  ], bone, { padY: "80", center: true });
-
-  return { version: "0.4", title: "Work", type: "page", page_settings: {},
+  var variantA = { version: "0.4", title: "Work", type: "page", page_settings: {},
     content: [header, filterRow, gridSection, closing] };
+
+  // ── Variant B: Editorial — featured hero tile + supporting grid ───────────
+  var items = brief.workItems || ["Featured Project", "Project 2", "Project 3", "Project 4", "Project 5"];
+  var featuredTile = mkContainer([
+    mkContainer([
+      mkImagePh(items[0] + " — hero image"),
+    ], null, { padY: "0", grow: 1, isInner: true }),
+    mkContainer([
+      mkHeading("Featured", brass, "h6", { eyebrow: true }),
+      mkSpacer(16),
+      mkHeading(items[0], ink, "h2", { weight: 800, px: 44 }),
+      mkSpacer(12),
+      mkText("The standout piece. Drop this description in when publishing.", text),
+      mkSpacer(24),
+      mkButton("View project", brass, ink),
+    ], null, { padY: "48", grow: 1, isInner: true }),
+  ], "#ffffff", { direction: "row", gap: "0", padY: "0" });
+  featuredTile.settings.border_border = "solid";
+  featuredTile.settings.border_width = { unit:"px", top:"1", right:"1", bottom:"1", left:"1", isLinked:true };
+  featuredTile.settings.border_color = "#E2DBCC";
+
+  var supportingTiles = items.slice(1).map(function(title) {
+    var t = mkContainer([
+      mkImagePh(title),
+      mkSpacer(12),
+      mkHeading(title, ink, "h4", { weight: 700 }),
+      mkSpacer(4),
+      mkText("Project context.", stone),
+    ], "#ffffff", { padY: "24", isInner: true });
+    t.settings.border_border = "solid";
+    t.settings.border_width = { unit:"px", top:"1", right:"1", bottom:"1", left:"1", isLinked:true };
+    t.settings.border_color = "#E2DBCC";
+    t.settings._flex_grow = 1;
+    return t;
+  });
+  var supportingRow = mkContainer(supportingTiles, null, { direction: "row", gap: "20", padY: "0", isInner: true });
+  supportingRow.settings.flex_wrap = "wrap";
+
+  var editorialSection = mkContainer([featuredTile, mkSpacer(20), supportingRow], bone, { padY: "64" });
+
+  var variantB = { version: "0.4", title: "Work", type: "page", page_settings: {},
+    content: [header, editorialSection, closing] };
+
+  // Recommend B if inspo hints suggest editorial/featured/case-study style
+  var recommended = inspoMatchesVariant(inspoHint, ["editorial", "featured", "case study", "full bleed", "hero image", "spotlight"])
+    ? "B" : "A";
+
+  return { variantA: variantA, variantB: variantB, recommended: recommended };
 }
 
 function buildServicesPage(C, brief, inspoHint) {
@@ -467,93 +515,143 @@ function buildServicesPage(C, brief, inspoHint) {
 }
 
 function buildAboutPage(C, brief, inspoHint) {
-  var hasInspo = !!inspoHint;
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", asphalt = C.asphalt, text = C.text;
 
   var header = mkContainer([
-    mkHeading("The maker", brassDp, "h6", { eyebrow: true }),
+    mkHeading(brief.aboutEyebrow || "About", brassDp, "h6", { eyebrow: true }),
     mkSpacer(16),
     mkHeading(brief.aboutH1 || "One person. Every frame.", ink, "h1", { weight: 800, px: 64 }),
   ], bone, { padY: "88" });
 
-  // Story + portrait split
+  var closing = mkContainer([mkButton("Start a project", brass, ink)], bone, { padY: "80", center: true });
+
+  // ── Variant A: Story + portrait split ─────────────────────────────────────
   var storyLeft = mkContainer([
-    mkText(brief.aboutStory || "Mile Marker Films is Ben [last name]. He writes the films, shoots them, records the sound, and cuts them. That is unusual, and it is the point.", text),
+    mkText(brief.aboutStory || "The founder story goes here.", text),
     mkSpacer(24),
-    mkText("He came up making video for [transportation and industrial brands], and somewhere along the way he noticed the same thing on every shoot. The best story in a company is almost never the product. It is the people, the work, and how far the place has come.", text),
-    mkSpacer(24),
-    mkText("So he built Mile Marker for the businesses the big studios skip. The industrial ones. The founder-led ones. The companies with real substance and no one telling it well.", text),
+    mkText(brief.aboutStory2 || "What drove the decision to build this. The gap they saw, the clients they chose.", text),
   ], null, { padY: "0", grow: 1, isInner: true });
 
   var storyRight = mkContainer([
-    mkImagePh("Portrait — Ben, shot on location. Not in a studio."),
+    mkImagePh("Founder portrait — on location, not in a studio."),
   ], null, { padY: "0", grow: 1, isInner: true });
 
   var storyRow = mkContainer([storyLeft, storyRight], null, { direction: "row", gap: "64", padY: "0", isInner: true });
   var storySection = mkContainer([storyRow], bone, { padY: "80" });
 
-  // Why one maker
   var whySection = mkContainer([
-    mkHeading("Why one maker", brassDp, "h6", { eyebrow: true }),
+    mkHeading(brief.whyEyebrow || "Why this approach", brassDp, "h6", { eyebrow: true }),
     mkSpacer(16),
-    mkHeading("One mind on the whole film.", ink, "h2", { weight: 800, px: 44 }),
+    mkHeading(brief.whyH2 || "One mind on the whole project.", ink, "h2", { weight: 800, px: 44 }),
     mkSpacer(24),
-    mkText(brief.whyOneMaker || "One mind on the whole film keeps the voice honest and the cost lean. No crew to manage, no production circus, no game of telephone between a strategist, a director, and an editor who never met your team.", text),
+    mkText(brief.whyOneMaker || "Supporting copy about the approach and what makes it different.", text),
   ], "#ffffff", { padY: "80" });
 
-  // Values row
   var values = (brief.founderValues || ["Grounded", "Forward", "Exact", "Singular", "Human"]).map(function(v) {
     var card = mkContainer([
-      mkContainer([
-        mkContainer([], brass, { padY: "0", isInner: true }), // marker tick
-      ], null, { padY: "0", isInner: true }),
-      mkSpacer(16),
-      mkHeading(v, ink, "h3", { weight: 700, px: 24 }),
+      mkSpacer(8),
+      mkHeading(v, ink, "h3", { weight: 700, px: 22 }),
     ], null, { padY: "32", isInner: true });
+    card.settings.border_border = "solid";
+    card.settings.border_width = { unit:"px", top:"0", right:"0", bottom:"0", left:"3", isLinked:false };
+    card.settings.border_color = brass;
+    card.settings.padding = { unit:"px", top:"16", right:"20", bottom:"16", left:"20", isLinked:false };
     card.settings._flex_grow = 1;
     return card;
   });
-  var valuesRow = mkContainer(values, null, { direction: "row", gap: "0", padY: "0", isInner: true });
+  var valuesRow = mkContainer(values, null, { direction: "row", gap: "16", padY: "0", isInner: true });
   valuesRow.settings.flex_wrap = "wrap";
   var valuesSection = mkContainer([
-    mkHeading("What he is about", brassDp, "h6", { eyebrow: true }),
+    mkHeading(brief.valuesEyebrow || "What we stand for", brassDp, "h6", { eyebrow: true }),
     mkSpacer(32),
     valuesRow,
   ], bone, { padY: "72" });
 
-  var closing = mkContainer([
-    mkButton("Start a project", brass, ink),
-  ], bone, { padY: "80", center: true });
-
-  return { version: "0.4", title: "About", type: "page", page_settings: {},
+  var variantA = { version: "0.4", title: "About", type: "page", page_settings: {},
     content: [header, storySection, whySection, valuesSection, closing] };
+
+  // ── Variant B: Vertical milestone timeline ─────────────────────────────────
+  var milestones = (brief.milestones || [
+    ["The beginning", "How it started and what drove the decision to build this."],
+    ["Finding the niche", "The moment the right clients and right work became clear."],
+    ["The work that mattered", "The projects that defined the approach and proved the model."],
+    ["Where it stands now", "What the studio is today and where it is headed."],
+  ]);
+
+  var timelineItems = milestones.map(function(m, i) {
+    var isEven = i % 2 === 0;
+    var dot = mkContainer([], brass, { padY: "0", isInner: true });
+    dot.settings.width = { unit:"px", size: 12 };
+    dot.settings.height = { unit:"px", size: 12 };
+    dot.settings.border_radius = { unit:"%", top:"50", right:"50", bottom:"50", left:"50", isLinked:true };
+
+    return mkContainer([
+      mkContainer([dot], null, { padY: "0", isInner: true }),
+      mkSpacer(20),
+      mkHeading(m[0], ink, "h3", { weight: 700, px: 22 }),
+      mkSpacer(8),
+      mkText(m[1], text),
+    ], isEven ? bone : "#ffffff", { padY: "48", padX: "40", isInner: false });
+  });
+
+  var timeline = mkContainer(timelineItems, null, { gap: "0", padY: "0" });
+
+  var portraitSection = mkContainer([
+    mkContainer([
+      mkImagePh("Founder portrait — on location."),
+    ], null, { padY: "0", grow: 1, isInner: true }),
+    mkContainer([
+      mkHeading(brief.whyEyebrow || "Why this approach", brassDp, "h6", { eyebrow: true }),
+      mkSpacer(16),
+      mkText(brief.whyOneMaker || "Supporting copy about the approach.", text),
+      mkSpacer(32),
+      mkButton("Start a project", brass, ink),
+    ], null, { padY: "0", grow: 1, isInner: true }),
+  ], bone, { direction: "row", gap: "64", padY: "80" });
+
+  var variantB = { version: "0.4", title: "About", type: "page", page_settings: {},
+    content: [header, timeline, portraitSection, valuesSection, closing] };
+
+  var recommended = inspoMatchesVariant(inspoHint, ["timeline", "journey", "history", "milestones", "story arc", "chapters"])
+    ? "B" : "A";
+
+  return { variantA: variantA, variantB: variantB, recommended: recommended };
 }
 
 function buildProcessPage(C, brief, inspoHint) {
-  var hasInspo = !!inspoHint;
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
 
   var header = mkContainer([
-    mkHeading("Process", brassDp, "h6", { eyebrow: true }),
+    mkHeading(brief.processEyebrow || "Process", brassDp, "h6", { eyebrow: true }),
     mkSpacer(16),
-    mkHeading(brief.processH1 || "How a film gets made.", ink, "h1", { weight: 800, px: 64 }),
+    mkHeading(brief.processH1 || "How it gets made.", ink, "h1", { weight: 800, px: 64 }),
     mkSpacer(16),
-    mkText("Simple and calm, from first call to final files. No maze, no surprises.", text),
+    mkText(brief.processIntro || "Simple and calm, from first call to final files. No maze, no surprises.", text),
   ], bone, { padY: "88" });
 
   var defaultSteps = [
     ["01", "The intro", "A short call to understand the company and the goal. No charge, no maze."],
     ["02", "The plan", "A clear scope and a fixed quote up front. You know the price before anything starts."],
-    ["03", "The shoot", "One day, lean and calm. No crew to host, no production circus on your floor."],
-    ["04", "The edit", "A first cut, then a set number of revision rounds. No open-ended feedback loops."],
-    ["05", "Delivery", "Final files in every format you need, plus short social cutdowns ready to post."],
+    ["03", "The work", "One focused engagement, lean and calm. No chaos, no surprises on your end."],
+    ["04", "The review", "A first draft, then a set number of revision rounds. No open-ended feedback loops."],
+    ["05", "Delivery", "Final files in every format you need, ready to use immediately."],
   ];
+  var steps = brief.processSteps || defaultSteps;
 
-  var steps = (brief.processSteps || defaultSteps).map(function(step, i) {
+  var callout = mkContainer([
+    mkHeading(brief.calloutEyebrow || "What to expect", brass, "h6", { eyebrow: true }),
+    mkSpacer(16),
+    mkText(brief.calloutBody || "Most projects take four to six weeks from the intro call to final delivery. You will always know where the project stands.", warmWhite),
+  ], ink, { padY: "80" });
+
+  var closing = mkContainer([mkButton("Start a project", brass, ink)], bone, { padY: "80", center: true });
+
+  // ── Variant A: Two-column numbered grid ───────────────────────────────────
+  var gridSteps = steps.map(function(step, i) {
     var num = step[0]; var title = step[1]; var body = step[2];
     return mkContainer([
       mkHeading(num, brass, "h1", { font: "Fraunces", weight: 300, px: 80 }),
@@ -563,99 +661,133 @@ function buildProcessPage(C, brief, inspoHint) {
       mkHeading(title, ink, "h3", { weight: 700, px: 22 }),
       mkSpacer(12),
       mkText(body, text),
-    ], i % 2 === 0 ? bone : "#ffffff", { padY: "56", padX: "40", isInner: false });
+    ], i % 2 === 0 ? bone : "#ffffff", { padY: "56", padX: "40" });
   });
 
-  // Stack steps in a grid-like layout: 2 columns then full width for last
-  var stepsRow1 = mkContainer(steps.slice(0, 2), null, { direction: "row", gap: "0", padY: "0", isInner: true });
-  var stepsRow2 = mkContainer(steps.slice(2, 4), null, { direction: "row", gap: "0", padY: "0", isInner: true });
-  var stepsRow3 = steps.length > 4
-    ? mkContainer([steps[4]], null, { direction: "row", gap: "0", padY: "0", isInner: true })
+  var stepsRow1 = mkContainer(gridSteps.slice(0, 2), null, { direction: "row", gap: "0", padY: "0", isInner: true });
+  var stepsRow2 = mkContainer(gridSteps.slice(2, 4), null, { direction: "row", gap: "0", padY: "0", isInner: true });
+  var stepsRow3 = gridSteps.length > 4
+    ? mkContainer([gridSteps[4]], null, { direction: "row", gap: "0", padY: "0", isInner: true })
     : null;
-
-  var stepsContent = stepsRow3
+  var gridContent = stepsRow3
     ? mkContainer([stepsRow1, stepsRow2, stepsRow3], bone, { padY: "0", padX: "0", gap: "0" })
     : mkContainer([stepsRow1, stepsRow2], bone, { padY: "0", padX: "0", gap: "0" });
 
-  // What to expect callout
-  var callout = mkContainer([
-    mkHeading("What to expect", brassDp, "h6", { eyebrow: true }),
-    mkSpacer(16),
-    mkText("Most projects take four to six weeks from the intro call to final delivery. The shoot is one day. The edit takes about two weeks including revision rounds. You will always know where the project stands.", text),
-  ], ink, { padY: "80" });
-  callout.settings.background_color = ink;
-  var calloutHeading = callout.elements[0];
-  if (calloutHeading) calloutHeading.settings.title_color = brass;
-  var calloutText = callout.elements[2];
-  if (calloutText) calloutText.settings.text_color = warmWhite;
+  var variantA = { version: "0.4", title: "Process", type: "page", page_settings: {},
+    content: [header, gridContent, callout, closing] };
 
-  var closing = mkContainer([
-    mkButton("Start a project", brass, ink),
-  ], bone, { padY: "80", center: true });
+  // ── Variant B: Horizontal flowing timeline ────────────────────────────────
+  var timelineSteps = steps.map(function(step) {
+    var num = step[0]; var title = step[1]; var body = step[2];
+    var card = mkContainer([
+      mkHeading(num, brass, "h2", { font: "Fraunces", weight: 300, px: 56 }),
+      mkSpacer(16),
+      mkHeading(title, ink, "h4", { weight: 700, px: 18 }),
+      mkSpacer(8),
+      mkText(body, text),
+    ], "#ffffff", { padY: "40", padX: "32", isInner: true });
+    card.settings.border_border = "solid";
+    card.settings.border_width = { unit:"px", top:"3", right:"0", bottom:"0", left:"0", isLinked:false };
+    card.settings.border_color = brass;
+    card.settings._flex_grow = 1;
+    return card;
+  });
+  var timelineRow = mkContainer(timelineSteps, null, { direction: "row", gap: "20", padY: "0", isInner: true });
+  timelineRow.settings.flex_wrap = "wrap";
+  var timelineSection = mkContainer([timelineRow], bone, { padY: "80" });
 
-  return { version: "0.4", title: "Process", type: "page", page_settings: {},
-    content: [header, stepsContent, callout, closing] };
+  var variantB = { version: "0.4", title: "Process", type: "page", page_settings: {},
+    content: [header, timelineSection, callout, closing] };
+
+  var recommended = inspoMatchesVariant(inspoHint, ["timeline", "horizontal", "flowing", "steps across", "linear", "connector"])
+    ? "B" : "A";
+
+  return { variantA: variantA, variantB: variantB, recommended: recommended };
 }
 
 function buildContactPage(C, brief, inspoHint) {
-  var hasInspo = !!inspoHint;
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
 
-  var header = mkContainer([
-    mkHeading("Contact", brassDp, "h6", { eyebrow: true }),
+  var formPlaceholder = mkContainer([
+    mkText("Form fields: Name · Company · Email · What do you need? · Budget range (optional) · Message", stone),
+    mkSpacer(8),
+    mkText("<em>Connect a forms plugin (Fluent Forms or WPForms) and replace this with the live shortcode.</em>", stone),
+  ], "#ffffff", { padY: "32", padX: "36" });
+  formPlaceholder.settings.border_border = "solid";
+  formPlaceholder.settings.border_width = { unit:"px", top:"1", right:"1", bottom:"1", left:"1", isLinked:true };
+  formPlaceholder.settings.border_color = "#E2DBCC";
+
+  var closingDark = mkContainer([
+    mkHeading(brief.tagline || "Ready to get started?", warmWhite, "h2",
+      { font: "Fraunces", weight: 300, px: 52, italic: true, align: "center" }),
+    mkSpacer(40),
+    mkHeading(brief.signatureLine || "", stone, "h4", { align: "center" }),
+  ], ink, { padY: "96", center: true });
+
+  // ── Variant A: Stacked — header, form, reassurance, info split ────────────
+  var headerA = mkContainer([
+    mkHeading(brief.contactEyebrow || "Contact", brassDp, "h6", { eyebrow: true }),
     mkSpacer(16),
-    mkHeading(brief.contactH1 || "Tell me about the company.", ink, "h1", { weight: 800, px: 56 }),
+    mkHeading(brief.contactH1 || "Tell us about your project.", ink, "h1", { weight: 800, px: 56 }),
     mkSpacer(16),
-    mkText(brief.contactIntro || "A sentence or two about the business and what you are trying to show. You will get a real reply from the person who makes the films, usually within one business day.", text),
+    mkText(brief.contactIntro || "A quick note about what you need. You will get a real reply from a real person, usually within one business day.", text),
   ], bone, { padY: "88" });
 
-  // Form fields as text-editor widget (actual form plugin needed in WP)
-  var formNote = mkContainer([
-    mkText("Form fields: Name · Company · Email · What do you need? (Testimonial / Recruiting film / Brand film / Exit film / Not sure) · Budget range (optional) · Message", stone),
-    mkSpacer(8),
-    mkText("<em>Connect a WordPress forms plugin (Fluent Forms or WPForms) and replace this placeholder with the live form shortcode.</em>", stone),
-  ], "#ffffff", { padY: "32", padX: "36", isInner: false });
-  formNote.settings.border_border = "solid";
-  formNote.settings.border_width = { unit:"px", top:"1", right:"1", bottom:"1", left:"1", isLinked:true };
-  formNote.settings.border_color = "#E2DBCC";
-
-  var formSection = mkContainer([
-    formNote,
+  var formSectionA = mkContainer([
+    formPlaceholder,
     mkSpacer(32),
-    mkContainer([mkButton(brief.contactCta || "Send it over", brass, ink)],
-      null, { padY: "0", isInner: true }),
+    mkContainer([mkButton(brief.contactCta || "Send it over", brass, ink)], null, { padY: "0", isInner: true }),
     mkSpacer(24),
-    mkText(brief.contactReassurance || "No sales team. No automated funnel. Just one maker who will read it and write back.", stone),
+    mkText(brief.contactReassurance || "No sales team. No automated funnel. A real reply from a real person.", stone),
   ], bone, { padY: "64" });
 
-  // Side info
   var infoLeft = mkContainer([
     mkHeading("What happens next", brassDp, "h6", { eyebrow: true }),
     mkSpacer(16),
-    mkText("You send a note. Within one business day, you hear back from the person who actually makes the films. No account manager, no intro call just to learn what you need. A real reply, from a real maker.", text),
+    mkText("You send a note. Within one business day, you hear back from the person who actually does the work. No account manager, no intro call just to learn what you need.", text),
   ], null, { padY: "0", grow: 1, isInner: true });
 
   var infoRight = mkContainer([
     mkHeading("Not sure what you need?", brassDp, "h6", { eyebrow: true }),
     mkSpacer(16),
-    mkText("Tell me what the company does and what you are trying to show. That is enough to start. The right film type will become clear in the first conversation.", text),
+    mkText("Tell us what the company does and what you are trying to show. That is enough to start. The right approach will become clear in the first conversation.", text),
   ], null, { padY: "0", grow: 1, isInner: true });
 
   var infoRow = mkContainer([infoLeft, infoRight], null, { direction: "row", gap: "64", padY: "0", isInner: true });
   var infoSection = mkContainer([infoRow], bone, { padY: "72" });
 
-  // Closing CTA — dark
-  var closingDark = mkContainer([
-    mkHeading(brief.tagline || "The stories that move a company forward.", warmWhite, "h2",
-      { font: "Fraunces", weight: 300, px: 52, italic: true, align: "center" }),
-    mkSpacer(40),
-    mkHeading(brief.signatureLine || "Mark what matters.", stone, "h4", { align: "center" }),
-  ], ink, { padY: "96", center: true });
+  var variantA = { version: "0.4", title: "Contact", type: "page", page_settings: {},
+    content: [headerA, formSectionA, infoSection, closingDark] };
 
-  return { version: "0.4", title: "Contact", type: "page", page_settings: {},
-    content: [header, formSection, infoSection, closingDark] };
+  // ── Variant B: Split — big statement left, lean form right ────────────────
+  var statementLeft = mkContainer([
+    mkHeading(brief.contactEyebrow || "Contact", brassDp, "h6", { eyebrow: true }),
+    mkSpacer(24),
+    mkHeading(brief.contactH1 || "Tell us about your project.", ink, "h2", { font: "Fraunces", weight: 300, px: 56 }),
+    mkSpacer(32),
+    mkText(brief.contactIntro || "A quick note about what you need. You will get a real reply from a real person, usually within one business day.", text),
+    mkSpacer(32),
+    mkText(brief.contactReassurance || "No sales team. No automated funnel. A real reply from a real person.", stone),
+  ], null, { padY: "0", grow: 1, isInner: true });
+
+  var formRight = mkContainer([
+    formPlaceholder,
+    mkSpacer(24),
+    mkButton(brief.contactCta || "Send it over", brass, ink),
+  ], null, { padY: "0", grow: 1, isInner: true });
+
+  var splitRow = mkContainer([statementLeft, formRight], null, { direction: "row", gap: "80", padY: "0", isInner: true });
+  var splitSection = mkContainer([splitRow], bone, { padY: "96" });
+
+  var variantB = { version: "0.4", title: "Contact", type: "page", page_settings: {},
+    content: [splitSection, closingDark] };
+
+  var recommended = inspoMatchesVariant(inspoHint, ["split", "two column", "side by side", "statement", "minimal", "direct", "lean"])
+    ? "B" : "A";
+
+  return { variantA: variantA, variantB: variantB, recommended: recommended };
 }
 
 // ─── Inspo pattern merger ─────────────────────────────────────────────────────
@@ -703,14 +835,29 @@ function generatePages(brief, selectedPages, inspoContext) {
   var ctx = inspoContext || {};
   return selectedPages.map(function(pid) {
     var label = (ALL_PAGES.find(function(p) { return p.id === pid; }) || {}).label || pid;
-    var data = null;
-    if (pid === "home")     data = buildHomePage(colors, brief, ctx.home || ctx.site);
-    if (pid === "work")     data = buildWorkPage(colors, brief, ctx.work || ctx.site);
-    if (pid === "services") data = buildServicesPage(colors, brief, ctx.services || ctx.site);
-    if (pid === "about")    data = buildAboutPage(colors, brief, ctx.about || ctx.site);
-    if (pid === "process")  data = buildProcessPage(colors, brief, ctx.process || ctx.site);
-    if (pid === "contact")  data = buildContactPage(colors, brief, ctx.contact || ctx.site);
-    return data ? { id: pid, label: label, data: data } : null;
+    var result = null;
+    if (pid === "home") {
+      var data = buildHomePage(colors, brief, ctx.home || ctx.site);
+      return { id: pid, label: label, data: data, variantA: data, variantB: null, recommended: "A", hasVariants: false };
+    }
+    if (pid === "work")     result = buildWorkPage(colors, brief, ctx.work || ctx.site);
+    if (pid === "services") {
+      var data = buildServicesPage(colors, brief, ctx.services || ctx.site);
+      return { id: pid, label: label, data: data, variantA: data, variantB: null, recommended: "A", hasVariants: false };
+    }
+    if (pid === "about")   result = buildAboutPage(colors, brief, ctx.about || ctx.site);
+    if (pid === "process") result = buildProcessPage(colors, brief, ctx.process || ctx.site);
+    if (pid === "contact") result = buildContactPage(colors, brief, ctx.contact || ctx.site);
+    if (!result) return null;
+    return {
+      id: pid,
+      label: label,
+      data: result.variantA, // default to recommended
+      variantA: result.variantA,
+      variantB: result.variantB,
+      recommended: result.recommended,
+      hasVariants: true,
+    };
   }).filter(function(p) { return p !== null; });
 }
 
@@ -978,6 +1125,7 @@ export default function CustomBuild() {
   const [generating, setGenerating]     = useState(false);
   const [generated, setGenerated]       = useState(null);
   const [previewPage, setPreviewPage]   = useState("home");
+  const [layoutVariants, setLayoutVariants] = useState({}); // {pageId: "A"|"B"}
   const fileRef = useRef();
   const [parsing, setParsing]           = useState(false);
   const canGenerate = !!brief && selectedPages.length > 0;
@@ -1159,14 +1307,23 @@ export default function CustomBuild() {
     setTimeout(() => {
       const inspoContext = buildInspoContext(crawlResults, storedPatterns);
       const pages = generatePages(brief, selectedPages, inspoContext);
+      // Init layout variants from recommended
+      const variants = {};
+      pages.forEach(p => { variants[p.id] = p.recommended || "A"; });
+      setLayoutVariants(variants);
       setGenerated({ pages, inspoContext });
       setPreviewPage(selectedPages[0] || "home");
       setGenerating(false);
     }, 800);
   }
 
+  function getPageData(p) {
+    var variant = layoutVariants[p.id] || "A";
+    return variant === "B" && p.variantB ? p.variantB : p.variantA || p.data;
+  }
+
   function downloadPage(p) {
-    const blob = new Blob([JSON.stringify(p.data, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify(getPageData(p), null, 2)], { type: "application/json" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
     a.download = p.id + ".json"; a.click(); URL.revokeObjectURL(a.href);
   }
@@ -1402,6 +1559,29 @@ export default function CustomBuild() {
                   {p.label}
                 </button>
               ))}
+              {/* Layout variant switcher — only for pages with two variants */}
+              {generated.pages.filter(p => p.id === previewPage && p.hasVariants).map(p => (
+                <div key="switcher" style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span style={{ fontSize: "11px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>Layout</span>
+                  {["A", "B"].map(v => (
+                    <button key={v}
+                      onClick={() => setLayoutVariants(prev => ({ ...prev, [p.id]: v }))}
+                      style={{
+                        padding: "5px 14px", fontSize: "12px", fontWeight: 600, cursor: "pointer",
+                        border: (layoutVariants[p.id] || p.recommended) === v ? "1px solid #000" : "1px solid #e5e7eb",
+                        borderRadius: "4px",
+                        background: (layoutVariants[p.id] || p.recommended) === v ? "#000" : "#fff",
+                        color: (layoutVariants[p.id] || p.recommended) === v ? "#fff" : "#6b7280",
+                        position: "relative",
+                      }}>
+                      {v}
+                      {v === p.recommended && (
+                        <span style={{ position: "absolute", top: "-6px", right: "-6px", fontSize: "9px", background: "#C2A35B", color: "#1C1A17", borderRadius: "3px", padding: "1px 4px", fontWeight: 700, letterSpacing: "0.05em" }}>REC</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              ))}
             </div>
             <iframe
               srcDoc={buildPreviewHTML(brief, previewPage)}
@@ -1414,4 +1594,5 @@ export default function CustomBuild() {
     </div>
   );
 }
+
 
