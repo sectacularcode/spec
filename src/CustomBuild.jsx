@@ -1372,6 +1372,63 @@ export default function CustomBuild() {
   const [parsing, setParsing]           = useState(false);
   const canGenerate = !!brief && selectedPages.length > 0;
 
+  // ── Draft persistence ──────────────────────────────────────────────────────
+  // Load saved draft on mount
+  useEffect(() => {
+    async function loadDraft() {
+      if (!window.storage) return;
+      try {
+        const result = await window.storage.get("spec-blueprint-draft");
+        if (!result || !result.value) return;
+        const draft = JSON.parse(result.value);
+        if (draft.brief)          setBrief(draft.brief);
+        if (draft.briefName)      setBriefName(draft.briefName);
+        if (draft.inspoUrls)      setInspoUrls(draft.inspoUrls);
+        if (draft.selectedPages)  setPages(draft.selectedPages);
+        if (draft.copyBriefOnly !== undefined) setCopy(draft.copyBriefOnly);
+        if (draft.layoutVariants) setLayoutVariants(draft.layoutVariants);
+        if (draft.generated)      setGenerated(draft.generated);
+        if (draft.previewPage)    setPreviewPage(draft.previewPage);
+        if (draft.crawlResults)   setCrawlResults(draft.crawlResults);
+      } catch(e) {}
+    }
+    loadDraft();
+  }, []);
+
+  // Save draft whenever key state changes (debounced)
+  useEffect(() => {
+    if (!window.storage) return;
+    const timer = setTimeout(() => {
+      const draft = {
+        brief,
+        briefName,
+        inspoUrls,
+        selectedPages,
+        copyBriefOnly,
+        layoutVariants,
+        previewPage,
+        crawlResults,
+        // generated pages can be large — only save metadata, not full JSON
+        generated: generated ? {
+          ...generated,
+          pages: generated.pages.map(p => ({
+            id: p.id,
+            label: p.label,
+            recommended: p.recommended,
+            hasVariants: p.hasVariants,
+            reason: p.reason,
+            // store full data so preview and download work on return
+            data: p.data,
+            variantA: p.variantA,
+            variantB: p.variantB,
+          }))
+        } : null,
+      };
+      window.storage.set("spec-blueprint-draft", JSON.stringify(draft)).catch(() => {});
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [brief, briefName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants, previewPage, crawlResults, generated]);
+
   // Load persisted inspo patterns on mount
   useEffect(() => {
     async function loadPatterns() {
@@ -1636,7 +1693,19 @@ export default function CustomBuild() {
 
       <div style={{ borderBottom: "1px solid #e5e7eb", background: "#fff", padding: "16px 24px", display: "flex", alignItems: "center", gap: "16px" }}>
         <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b" }}>Brief to Blueprint</div>
-        <div style={{ marginLeft: "auto", display: "flex", gap: "8px" }}>
+        <div style={{ marginLeft: "auto", display: "flex", gap: "8px", alignItems: "center" }}>
+          {(brief || generated) && (
+            <button
+              onClick={async () => {
+                setBrief(null); setBriefName(""); setInspoUrls([""]); setPages(["home"]);
+                setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({});
+                setPreviewPage("home");
+                if (window.storage) { try { await window.storage.delete("spec-blueprint-draft"); } catch(e) {} }
+              }}
+              style={{ fontSize: "12px", color: "#6b7280", background: "none", border: "1px solid #e5e7eb", borderRadius: "6px", padding: "6px 12px", cursor: "pointer" }}>
+              Clear draft
+            </button>
+          )}
           {steps.map(s => (
             <div key={s.n} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <div style={T.stepNum(false, s.done)}>{s.done ? "✓" : s.n}</div>
@@ -1892,6 +1961,7 @@ export default function CustomBuild() {
     </div>
   );
 }
+
 
 
 
