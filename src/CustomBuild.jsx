@@ -12,8 +12,119 @@ const TEMPLATE_LIBRARY = [
     pages: ["home","work","services","about","process","contact"],
     date: "2026-06-02",
     description: "Full-bleed dark hero, editorial splits, brass accent system, Fraunces display type. Built for a one-person filmmaker targeting industrial and founder-led companies.",
+    source: "built-in",
   }
 ];
+
+// ─── Library helpers ───────────────────────────────────────────────────────────
+
+function inferTags(brief, pages, layoutVariants) {
+  var colors = brief.colors || {};
+  var ink = (colors.ink || "#000000").toLowerCase();
+  var bone = (colors.bone || colors["warm-white"] || "#ffffff").toLowerCase();
+  var brass = (colors.brass || colors.accent || "").toLowerCase();
+
+  // Visual style tags — inferred from color palette
+  var visualTags = [];
+  var isDark = ink === "#1c1a17" || ink === "#000000" || ink === "#09090b" || ink === "#111111";
+  var isWarm = bone.indexOf("e") !== -1 || bone.indexOf("f3f1") !== -1 || bone.indexOf("ede") !== -1;
+  var hasBrass = brass.indexOf("c2a") !== -1 || brass.indexOf("9c7") !== -1 || brass.indexOf("c49") !== -1;
+  var hasGold = brass.indexOf("c49") !== -1 || brass.indexOf("d4a") !== -1;
+
+  if (isDark) visualTags.push("dark-hero");
+  if (isWarm) visualTags.push("warm-palette");
+  if (hasBrass || hasGold) visualTags.push("brass-accent");
+
+  // Layout style from variant choices
+  var usedB = Object.values(layoutVariants || {}).some(function(v) { return v === "B"; });
+  if (usedB) visualTags.push("editorial");
+  if (!usedB) visualTags.push("structured");
+
+  // Tone tags from voice rules
+  var toneTags = [];
+  var rules = (brief.voiceRules || []).join(" ").toLowerCase();
+  if (rules.indexOf("confident") !== -1 || rules.indexOf("quiet") !== -1) toneTags.push("confident");
+  if (rules.indexOf("plain") !== -1 || rules.indexOf("no buzzword") !== -1) toneTags.push("direct");
+  if (rules.indexOf("warm") !== -1) toneTags.push("warm");
+  if (rules.indexOf("premium") !== -1 || rules.indexOf("luxury") !== -1) toneTags.push("premium");
+  if (rules.indexOf("minimal") !== -1 || rules.indexOf("simple") !== -1) toneTags.push("minimal");
+  if (rules.indexOf("bold") !== -1 || rules.indexOf("strong") !== -1) toneTags.push("bold");
+
+  // Industry fit — infer from brand name + brief context
+  var context = [brief.brandName, brief.tagline, brief.whoBody, brief.hookStatement].join(" ").toLowerCase();
+  var industryFit = [];
+  if (context.match(/film|video|studio|production|shoot|edit/)) industryFit.push("video-production", "creative-agency", "photography");
+  if (context.match(/industrial|manufacturing|plant|equipment|engineering/)) industryFit.push("industrial", "b2b-services");
+  if (context.match(/founder|startup|venture|equity|investor|portfolio|pe\b/)) industryFit.push("founder-led", "private-equity", "consulting");
+  if (context.match(/beauty|wellness|health|spa|skincare|lifestyle/)) industryFit.push("beauty", "wellness", "lifestyle");
+  if (context.match(/agency|creative|design|brand|marketing/)) industryFit.push("creative-agency", "branding", "marketing");
+  if (context.match(/law|legal|attorney|firm/)) industryFit.push("legal", "professional-services");
+  if (context.match(/architect|interior|real estate|property/)) industryFit.push("architecture", "real-estate");
+  if (context.match(/restaurant|food|hospitality|hotel/)) industryFit.push("hospitality", "food-beverage");
+  if (context.match(/tech|software|saas|app|digital/)) industryFit.push("technology", "saas");
+  if (industryFit.length === 0) industryFit.push("professional-services", "consulting");
+
+  // Visual style summary label
+  var styleLabel = [
+    isDark ? "Dark" : "Light",
+    isWarm ? "Warm" : "Cool",
+    hasBrass ? "Brass Accent" : "",
+    usedB ? "Editorial" : "Structured",
+  ].filter(Boolean).join(" · ");
+
+  return { visualTags: visualTags, toneTags: toneTags, industryFit: [...new Set(industryFit)], styleLabel: styleLabel };
+}
+
+async function saveToLibrary(brief, pages, layoutVariants, selectedVariants) {
+  if (!window.storage) return;
+  try {
+    // Load existing saved builds
+    var existing = [];
+    try {
+      var stored = await window.storage.get("spec-template-library");
+      if (stored && stored.value) existing = JSON.parse(stored.value);
+    } catch(e) {}
+
+    var tags = inferTags(brief, pages, selectedVariants || layoutVariants);
+    var id = "build-" + Date.now();
+    var entry = {
+      id: id,
+      client: brief.brandName || "Unnamed Client",
+      date: new Date().toISOString().slice(0, 10),
+      source: "blueprint",
+      style: tags.styleLabel,
+      tags: tags.visualTags.concat(tags.toneTags),
+      visualTags: tags.visualTags,
+      toneTags: tags.toneTags,
+      industryFit: tags.industryFit,
+      industryUsed: brief.brandName || "",
+      description: [brief.tagline, brief.hookStatement].filter(Boolean).join(" — ") || "Custom build",
+      colors: brief.colors || {},
+      fonts: brief.fonts || [],
+      voiceRules: brief.voiceRules || [],
+      selectedVariants: selectedVariants || {},
+      pages: pages.map(function(p) {
+        return {
+          id: p.id,
+          label: p.label,
+          variant: (selectedVariants || {})[p.id] || "A",
+          data: (selectedVariants || {})[p.id] === "B" && p.variantB ? p.variantB : p.variantA || p.data,
+        };
+      }),
+    };
+
+    // Deduplicate by client + date — replace if same client was saved today
+    var deduped = existing.filter(function(e) {
+      return !(e.client === entry.client && e.date === entry.date && e.source === "blueprint");
+    });
+    deduped.unshift(entry); // newest first
+    if (deduped.length > 50) deduped = deduped.slice(0, 50); // cap at 50 entries
+
+    await window.storage.set("spec-template-library", JSON.stringify(deduped));
+  } catch(e) {
+    console.warn("saveToLibrary failed:", e);
+  }
+}
 
 const ALL_PAGES = [
   { id: "home",     label: "Home",               slug: "/" },
@@ -1494,11 +1605,23 @@ export default function CustomBuild() {
     const blob = new Blob([JSON.stringify(getPageData(p), null, 2)], { type: "application/json" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
     a.download = p.id + ".json"; a.click(); URL.revokeObjectURL(a.href);
+    // Auto-save this single page to the library
+    if (brief && generated) {
+      saveToLibrary(brief, [p], layoutVariants, layoutVariants);
+    }
   }
 
   function downloadAll() {
     if (!generated) return;
-    generated.pages.forEach((p, i) => setTimeout(() => downloadPage(p), i * 300));
+    generated.pages.forEach((p, i) => setTimeout(() => {
+      const blob = new Blob([JSON.stringify(getPageData(p), null, 2)], { type: "application/json" });
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+      a.download = p.id + ".json"; a.click(); URL.revokeObjectURL(a.href);
+    }, i * 300));
+    // Auto-save full build to library
+    if (brief && generated) {
+      saveToLibrary(brief, generated.pages, layoutVariants, layoutVariants);
+    }
   }
 
   const steps = [
@@ -1769,6 +1892,7 @@ export default function CustomBuild() {
     </div>
   );
 }
+
 
 
 
