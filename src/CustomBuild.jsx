@@ -796,66 +796,70 @@ function buildContactPage(C, brief, inspoHint) {
 // every URL that had that page type. Gets passed into page builders so they
 // can make layout decisions informed by real reference sites.
 function buildInspoContext(crawlResults, storedPatterns) {
-  var context = {};
-  // Merge stored patterns first (older accumulated knowledge)
+  // Single shared pool — all patterns from all pages merged together.
+  // Nothing is routed by page type. Every builder draws from the full pool.
+  var allNotes = [];
+
+  // Stored patterns from previous sessions
   if (storedPatterns) {
-    Object.keys(storedPatterns).forEach(function(pageType) {
-      context[pageType] = storedPatterns[pageType];
+    Object.keys(storedPatterns).forEach(function(key) {
+      if (storedPatterns[key]) allNotes.push(storedPatterns[key]);
     });
   }
-  // Overlay current session crawl results (most recent wins)
+
+  // Current session crawl results — all pages, all sites
   Object.keys(crawlResults).forEach(function(url) {
     var result = crawlResults[url];
     if (!result || result.error || !result.patterns) return;
+    if (result.patterns.siteNotes) allNotes.push(result.patterns.siteNotes);
     var pages = result.patterns.pages || {};
     Object.keys(pages).forEach(function(pageType) {
-      var note = pages[pageType];
-      if (!note) return;
-      if (context[pageType]) {
-        // Append — accumulate notes from multiple sources
-        context[pageType] = context[pageType] + " | " + note;
-      } else {
-        context[pageType] = note;
-      }
+      if (pages[pageType]) allNotes.push("[" + pageType + "] " + pages[pageType]);
     });
-    // Also store site-level notes under "site"
-    if (result.patterns.siteNotes) {
-      context["site"] = (context["site"] ? context["site"] + " | " : "") + result.patterns.siteNotes;
-    }
   });
-  return context;
+
+  return allNotes.join(" | ");
 }
 
-function generatePages(brief, selectedPages, inspoContext) {
+function generatePages(brief, selectedPages, inspoContext, aiRecs) {
   var colors = brief.colors || {
     ink: "#1C1A17", brass: "#C2A35B", "brass-deep": "#9C7E3A",
     bone: "#EDE7DB", asphalt: "#2B2823", stone: "#8A8170",
     "warm-white": "#FBFAF7", text: "#2A2722"
   };
-  var ctx = inspoContext || {};
+  // aiRecs: { work: {variant:"B", reason:"..."}, about: {variant:"A",...}, ... }
+  var recs = aiRecs || {};
+
   return selectedPages.map(function(pid) {
     var label = (ALL_PAGES.find(function(p) { return p.id === pid; }) || {}).label || pid;
     var result = null;
+
     if (pid === "home") {
-      var data = buildHomePage(colors, brief, ctx.home || ctx.site);
+      var data = buildHomePage(colors, brief, inspoContext);
       return { id: pid, label: label, data: data, variantA: data, variantB: null, recommended: "A", hasVariants: false };
     }
-    if (pid === "work")     result = buildWorkPage(colors, brief, ctx.work || ctx.site);
     if (pid === "services") {
-      var data = buildServicesPage(colors, brief, ctx.services || ctx.site);
+      var data = buildServicesPage(colors, brief, inspoContext);
       return { id: pid, label: label, data: data, variantA: data, variantB: null, recommended: "A", hasVariants: false };
     }
-    if (pid === "about")   result = buildAboutPage(colors, brief, ctx.about || ctx.site);
-    if (pid === "process") result = buildProcessPage(colors, brief, ctx.process || ctx.site);
-    if (pid === "contact") result = buildContactPage(colors, brief, ctx.contact || ctx.site);
+    if (pid === "work")    result = buildWorkPage(colors, brief, inspoContext);
+    if (pid === "about")   result = buildAboutPage(colors, brief, inspoContext);
+    if (pid === "process") result = buildProcessPage(colors, brief, inspoContext);
+    if (pid === "contact") result = buildContactPage(colors, brief, inspoContext);
     if (!result) return null;
+
+    // Use AI recommendation if available, otherwise fall back to keyword match
+    var recommended = (recs[pid] && recs[pid].variant) ? recs[pid].variant : result.recommended;
+    var reason = (recs[pid] && recs[pid].reason) ? recs[pid].reason : null;
+
     return {
       id: pid,
       label: label,
-      data: result.variantA, // default to recommended
+      data: recommended === "B" ? result.variantB : result.variantA,
       variantA: result.variantA,
       variantB: result.variantB,
-      recommended: result.recommended,
+      recommended: recommended,
+      reason: reason,
       hasVariants: true,
     };
   }).filter(function(p) { return p !== null; });
@@ -1226,6 +1230,7 @@ export default function CustomBuild() {
   const [selectedPages, setPages]       = useState(["home"]);
   const [copyBriefOnly, setCopy]        = useState(true);
   const [generating, setGenerating]     = useState(false);
+  const [generatingStatus, setGeneratingStatus] = useState("");
   const [generated, setGenerated]       = useState(null);
   const [previewPage, setPreviewPage]   = useState("home");
   const [layoutVariants, setLayoutVariants] = useState({}); // {pageId: "A"|"B"}
@@ -1239,10 +1244,12 @@ export default function CustomBuild() {
       try {
         const result = await window.storage.get("spec-inspo-patterns");
         if (result && result.value) {
-          setStoredPatterns(JSON.parse(result.value));
+          const parsed = JSON.parse(result.value);
+          // Handle both old per-page format and new flat pool format
+          setStoredPatterns(parsed.pool ? { pool: parsed.pool } : parsed);
         }
       } catch (e) {
-        // No stored patterns yet — that's fine
+        // No stored patterns yet
       }
     }
     if (window.storage) loadPatterns();
@@ -1385,11 +1392,11 @@ export default function CustomBuild() {
       if (res.ok) {
         setCrawlResults(r => {
           const updated = { ...r, [trimmed]: data };
-          // Persist the merged pattern context to storage
+          // Persist the merged pattern pool to storage
           if (window.storage && data.patterns) {
             const merged = buildInspoContext(updated, storedPatterns);
-            window.storage.set("spec-inspo-patterns", JSON.stringify(merged)).catch(() => {});
-            setStoredPatterns(merged);
+            window.storage.set("spec-inspo-patterns", JSON.stringify({ pool: merged })).catch(() => {});
+            setStoredPatterns({ pool: merged });
           }
           return updated;
         });
@@ -1404,20 +1411,55 @@ export default function CustomBuild() {
   }
   function togglePage(id) { setPages(prev => prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]); }
 
-  function generate() {
+  async function generate() {
     if (!canGenerate) return;
     setGenerating(true);
-    setTimeout(() => {
-      const inspoContext = buildInspoContext(crawlResults, storedPatterns);
-      const pages = generatePages(brief, selectedPages, inspoContext);
-      // Init layout variants from recommended
-      const variants = {};
-      pages.forEach(p => { variants[p.id] = p.recommended || "A"; });
-      setLayoutVariants(variants);
-      setGenerated({ pages, inspoContext });
-      setPreviewPage(selectedPages[0] || "home");
-      setGenerating(false);
-    }, 800);
+
+    // Step 1: build shared inspo pool
+    const inspoContext = buildInspoContext(crawlResults, storedPatterns);
+
+    // Step 2: if we have patterns and inspo URLs, ask AI for recommendations
+    let aiRecs = {};
+    const hasInspo = inspoContext && inspoContext.length > 20;
+    const variantPages = selectedPages.filter(p => p !== "home" && p !== "services");
+
+    if (hasInspo && variantPages.length > 0) {
+      setGeneratingStatus("Analyzing inspo patterns...");
+      try {
+        const res = await fetch("/api/analyze-inspo", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            patterns: inspoContext,
+            pages: variantPages,
+            brandVoice: [
+              brief.brandName,
+              (brief.voiceRules || []).join(". "),
+              brief.tagline,
+            ].filter(Boolean).join(" — "),
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          aiRecs = data.recommendations || {};
+        }
+      } catch (e) {
+        // Silent fallback — keyword matching handles it
+      }
+    }
+
+    // Step 3: build pages
+    setGeneratingStatus("Building pages...");
+    await new Promise(r => setTimeout(r, 300)); // small pause so status is visible
+
+    const pages = generatePages(brief, selectedPages, inspoContext, aiRecs);
+    const variants = {};
+    pages.forEach(p => { variants[p.id] = p.recommended || "A"; });
+    setLayoutVariants(variants);
+    setGenerated({ pages, inspoContext, aiRecs });
+    setPreviewPage(selectedPages[0] || "home");
+    setGenerating(false);
+    setGeneratingStatus("");
   }
 
   function getPageData(p) {
@@ -1627,7 +1669,7 @@ export default function CustomBuild() {
             onClick={generate}
             disabled={!canGenerate || generating}
             style={{ ...T.btnPrimary, width: "100%", justifyContent: "center", padding: "16px 24px", fontSize: "15px", opacity: canGenerate ? 1 : 0.4, cursor: canGenerate ? "pointer" : "not-allowed" }}>
-            {generating ? "Generating…" : "Generate " + selectedPages.length + " Page" + (selectedPages.length !== 1 ? "s" : "")}
+            {generating ? (generatingStatus || "Generating…") : "Generate " + selectedPages.length + " Page" + (selectedPages.length !== 1 ? "s" : "")}
           </button>
           {!brief && <div style={{ fontSize: "12px", color: "#9ca3af", textAlign: "center", marginTop: "8px" }}>Upload a brand brief to enable generation</div>}
 
@@ -1664,25 +1706,32 @@ export default function CustomBuild() {
               ))}
               {/* Layout variant switcher — only for pages with two variants */}
               {generated.pages.filter(p => p.id === previewPage && p.hasVariants).map(p => (
-                <div key="switcher" style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "6px" }}>
-                  <span style={{ fontSize: "11px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>Layout</span>
-                  {["A", "B"].map(v => (
-                    <button key={v}
-                      onClick={() => setLayoutVariants(prev => ({ ...prev, [p.id]: v }))}
-                      style={{
-                        padding: "5px 14px", fontSize: "12px", fontWeight: 600, cursor: "pointer",
-                        border: (layoutVariants[p.id] || p.recommended) === v ? "1px solid #000" : "1px solid #e5e7eb",
-                        borderRadius: "4px",
-                        background: (layoutVariants[p.id] || p.recommended) === v ? "#000" : "#fff",
-                        color: (layoutVariants[p.id] || p.recommended) === v ? "#fff" : "#6b7280",
-                        position: "relative",
-                      }}>
-                      {v}
-                      {v === p.recommended && (
-                        <span style={{ position: "absolute", top: "-6px", right: "-6px", fontSize: "9px", background: "#C2A35B", color: "#1C1A17", borderRadius: "3px", padding: "1px 4px", fontWeight: 700, letterSpacing: "0.05em" }}>REC</span>
-                      )}
-                    </button>
-                  ))}
+                <div key="switcher" style={{ marginLeft: "auto", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "4px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span style={{ fontSize: "11px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>Layout</span>
+                    {["A", "B"].map(v => (
+                      <button key={v}
+                        onClick={() => setLayoutVariants(prev => ({ ...prev, [p.id]: v }))}
+                        style={{
+                          padding: "5px 14px", fontSize: "12px", fontWeight: 600, cursor: "pointer",
+                          border: (layoutVariants[p.id] || p.recommended) === v ? "1px solid #000" : "1px solid #e5e7eb",
+                          borderRadius: "4px",
+                          background: (layoutVariants[p.id] || p.recommended) === v ? "#000" : "#fff",
+                          color: (layoutVariants[p.id] || p.recommended) === v ? "#fff" : "#6b7280",
+                          position: "relative",
+                        }}>
+                        {v}
+                        {v === p.recommended && (
+                          <span style={{ position: "absolute", top: "-6px", right: "-6px", fontSize: "9px", background: "#C2A35B", color: "#1C1A17", borderRadius: "3px", padding: "1px 4px", fontWeight: 700, letterSpacing: "0.05em" }}>REC</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  {p.reason && (
+                    <div style={{ fontSize: "11px", color: "#6b7280", maxWidth: "280px", textAlign: "right", lineHeight: 1.4 }}>
+                      {p.reason}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -1697,6 +1746,7 @@ export default function CustomBuild() {
     </div>
   );
 }
+
 
 
 
