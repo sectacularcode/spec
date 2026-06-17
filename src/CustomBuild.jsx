@@ -215,7 +215,7 @@ function buildHomePage(C, brief, inspoHint) {
       mkHeading(brief.differenceH2 || "One person. The whole film.", ink, "h2", { px: 48, weight: 800 }),
     ], null, { padY: "0", grow: 1, isInner: true });
     var right = mkContainer([
-      mkText(brief.differenceBody || "Supporting body copy.", text),
+      mkText(brief.differenceBody || "[The difference — explain what sets this apart. Pulled from brand brief.]", text),
     ], null, { padY: "0", grow: 1, isInner: true });
     var row = mkContainer([left, right], null, { direction: "row", gap: "80", padY: "0", isInner: true });
     return mkContainer([row], bone, { padY: "96" });
@@ -228,7 +228,7 @@ function buildHomePage(C, brief, inspoHint) {
       mkHeading(brief.whoH2 || "For the underfilmed.", ink, "h2", { px: 48, weight: 800 }),
     ], null, { padY: "0", grow: 1, isInner: true });
     var right = mkContainer([
-      mkText(brief.whoBody || "The audience this is built for.", text),
+      mkText(brief.whoBody || "[Who this is for — pulled from brand brief. Describe the ideal client specifically.]", text),
     ], null, { padY: "0", grow: 1, isInner: true });
     var row = mkContainer([left, right], null, { direction: "row", gap: "80", padY: "0", isInner: true });
     return mkContainer([row], bone, { padY: "96" });
@@ -283,9 +283,10 @@ function buildWorkPage(C, brief, inspoHint) {
   var closing = mkContainer([mkButton("Start a project", brass, ink)], bone, { padY: "80", center: true });
 
   // ── Variant A: Standard grid with filter row ──────────────────────────────
+  var filterCategories = brief.workCategories || ["All", "Stories & testimonials", "People & culture", "Brand & leadership", "Exit"];
   var filterRow = mkContainer([
     mkContainer(
-      ["All", "Stories & testimonials", "People & culture", "Brand & leadership", "Exit"].map(function(label, i) {
+      filterCategories.map(function(label, i) {
         var btn = mkButton(label, i === 0 ? brass : "transparent", i === 0 ? ink : brassDp);
         btn.settings.border_border = "solid";
         btn.settings.border_width = { unit:"px", top:"1", right:"1", bottom:"1", left:"1", isLinked:true };
@@ -296,13 +297,15 @@ function buildWorkPage(C, brief, inspoHint) {
     ),
   ], bone, { padY: "24", padX: "40" });
 
-  var gridTiles = (brief.workItems || ["Project 1", "Project 2", "Project 3", "Project 4", "Project 5", "Project 6"]).map(function(title) {
+  var gridTiles = (brief.workItems || []).map(function(title) {
     var tile = mkContainer([
-      mkImagePh(title + " — thumbnail"),
+      mkImagePh(title),
       mkSpacer(16),
       mkHeading(title, ink, "h4", { weight: 700 }),
       mkSpacer(4),
-      mkText("One line of context about this project.", stone),
+      mkText("[Project type — fill in]", stone),
+      mkSpacer(4),
+      mkText("[One line of context about this project]", stone),
     ], "#ffffff", { padY: "0", isInner: true });
     tile.settings.border_border = "solid";
     tile.settings.border_width = { unit:"px", top:"1", right:"1", bottom:"1", left:"1", isLinked:true };
@@ -310,6 +313,24 @@ function buildWorkPage(C, brief, inspoHint) {
     tile.settings._flex_grow = 1;
     return tile;
   });
+
+  // If no work items in brief, show flagged placeholder tiles
+  if (gridTiles.length === 0) {
+    for (var wi = 0; wi < 6; wi++) {
+      var pt = mkContainer([
+        mkImagePh("[Upload project image " + (wi+1) + "]"),
+        mkSpacer(16),
+        mkHeading("[Project title " + (wi+1) + "]", ink, "h4", { weight: 700 }),
+        mkSpacer(4),
+        mkText("[Project type]", stone),
+      ], "#ffffff", { padY: "0", isInner: true });
+      pt.settings.border_border = "solid";
+      pt.settings.border_width = { unit:"px", top:"1", right:"1", bottom:"1", left:"1", isLinked:true };
+      pt.settings.border_color = "#E2DBCC";
+      pt.settings._flex_grow = 1;
+      gridTiles.push(pt);
+    }
+  }
   var grid = mkContainer(gridTiles, null, { direction: "row", gap: "24", padY: "0", isInner: true });
   grid.settings.flex_wrap = "wrap";
   var gridSection = mkContainer([grid], bone, { padY: "64" });
@@ -318,17 +339,18 @@ function buildWorkPage(C, brief, inspoHint) {
     content: [header, filterRow, gridSection, closing] };
 
   // ── Variant B: Editorial — featured hero tile + supporting grid ───────────
-  var items = brief.workItems || ["Featured Project", "Project 2", "Project 3", "Project 4", "Project 5"];
+  var items = brief.workItems || [];
+  var featured = items[0] || "[Featured project title]";
   var featuredTile = mkContainer([
     mkContainer([
-      mkImagePh(items[0] + " — hero image"),
+      mkImagePh(featured),
     ], null, { padY: "0", grow: 1, isInner: true }),
     mkContainer([
       mkHeading("Featured", brass, "h6", { eyebrow: true }),
       mkSpacer(16),
-      mkHeading(items[0], ink, "h2", { weight: 800, px: 44 }),
+      mkHeading(featured, ink, "h2", { weight: 800, px: 44 }),
       mkSpacer(12),
-      mkText("The standout piece. Drop this description in when publishing.", text),
+      mkText("[Add a one paragraph description of this project when publishing.]", text),
       mkSpacer(24),
       mkButton("View project", brass, ink),
     ], null, { padY: "48", grow: 1, isInner: true }),
@@ -337,13 +359,14 @@ function buildWorkPage(C, brief, inspoHint) {
   featuredTile.settings.border_width = { unit:"px", top:"1", right:"1", bottom:"1", left:"1", isLinked:true };
   featuredTile.settings.border_color = "#E2DBCC";
 
-  var supportingTiles = items.slice(1).map(function(title) {
+  var supportingItems = items.length > 1 ? items.slice(1) : ["[Project 2]", "[Project 3]", "[Project 4]", "[Project 5]"];
+  var supportingTiles = supportingItems.map(function(title) {
     var t = mkContainer([
       mkImagePh(title),
       mkSpacer(12),
       mkHeading(title, ink, "h4", { weight: 700 }),
       mkSpacer(4),
-      mkText("Project context.", stone),
+      mkText("[Project type]", stone),
     ], "#ffffff", { padY: "24", isInner: true });
     t.settings.border_border = "solid";
     t.settings.border_width = { unit:"px", top:"1", right:"1", bottom:"1", left:"1", isLinked:true };
@@ -529,9 +552,9 @@ function buildAboutPage(C, brief, inspoHint) {
 
   // ── Variant A: Story + portrait split ─────────────────────────────────────
   var storyLeft = mkContainer([
-    mkText(brief.aboutStory || "The founder story goes here.", text),
+    mkText(brief.aboutStory || "[Founder story — pulled from brief. Fill in if missing.]", text),
     mkSpacer(24),
-    mkText(brief.aboutStory2 || "What drove the decision to build this. The gap they saw, the clients they chose.", text),
+    mkText(brief.aboutStory2 || "[Second paragraph — additional context about the founder's background and what led to this work.]", text),
   ], null, { padY: "0", grow: 1, isInner: true });
 
   var storyRight = mkContainer([
@@ -546,7 +569,7 @@ function buildAboutPage(C, brief, inspoHint) {
     mkSpacer(16),
     mkHeading(brief.whyH2 || "One mind on the whole project.", ink, "h2", { weight: 800, px: 44 }),
     mkSpacer(24),
-    mkText(brief.whyOneMaker || "Supporting copy about the approach and what makes it different.", text),
+    mkText(brief.whyOneMaker || "[Why this approach — pulled from brief. Explain what makes the method different and why it matters to clients.]", text),
   ], "#ffffff", { padY: "80" });
 
   var values = (brief.founderValues || ["Grounded", "Forward", "Exact", "Singular", "Human"]).map(function(v) {
@@ -605,7 +628,7 @@ function buildAboutPage(C, brief, inspoHint) {
     mkContainer([
       mkHeading(brief.whyEyebrow || "Why this approach", brassDp, "h6", { eyebrow: true }),
       mkSpacer(16),
-      mkText(brief.whyOneMaker || "Supporting copy about the approach.", text),
+      mkText(brief.whyOneMaker || "[Why this approach — pulled from brief.]", text),
       mkSpacer(32),
       mkButton("Start a project", brass, ink),
     ], null, { padY: "0", grow: 1, isInner: true }),
@@ -645,7 +668,7 @@ function buildProcessPage(C, brief, inspoHint) {
   var callout = mkContainer([
     mkHeading(brief.calloutEyebrow || "What to expect", brass, "h6", { eyebrow: true }),
     mkSpacer(16),
-    mkText(brief.calloutBody || "Most projects take four to six weeks from the intro call to final delivery. You will always know where the project stands.", warmWhite),
+    mkText(brief.calloutBody || "[What to expect — timeline and delivery details. Fill in from client brief.]", warmWhite),
   ], ink, { padY: "80" });
 
   var closing = mkContainer([mkButton("Start a project", brass, ink)], bone, { padY: "80", center: true });
@@ -1070,7 +1093,7 @@ function buildPreviewHTML(brief, activePage, variant) {
             "<div style='display:grid;grid-template-columns:1fr 1fr;gap:64px;max-width:1160px;margin:0 auto;align-items:center;'>" +
               "<div style='background:#e0ddd7;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Founder portrait</div>" +
               "<div><div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>" + (brief.whyEyebrow||"The approach") + "</div>" +
-              "<p style='font-size:17px;color:" + text + ";line-height:1.65;'>" + (brief.whyOneMaker||"Supporting copy about the approach.") + "</p></div>" +
+              "<p style='font-size:17px;color:" + text + ";line-height:1.65;'>" + (brief.whyOneMaker||"[Why this approach — fill in from brief]") + "</p></div>" +
             "</div>" +
           "</section>" +
           valuesHtml + aboutClose;
@@ -1088,7 +1111,7 @@ function buildPreviewHTML(brief, activePage, variant) {
           "<div style='max-width:720px;margin:0 auto;'>" +
             "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>" + (brief.whyEyebrow||"The approach") + "</div>" +
             "<h2 style='font-size:clamp(28px,3.5vw,44px);font-weight:800;color:" + ink + ";margin:0 0 24px;'>" + (brief.whyH2||"One mind on the whole project.") + "</h2>" +
-            "<p style='font-size:17px;color:" + text + ";line-height:1.65;'>" + (brief.whyOneMaker||"Supporting copy about the approach.") + "</p>" +
+            "<p style='font-size:17px;color:" + text + ";line-height:1.65;'>" + (brief.whyOneMaker||"[Why this approach — fill in from brief]") + "</p>" +
           "</div>" +
         "</section>" +
         valuesHtml + aboutClose;
@@ -1746,6 +1769,7 @@ export default function CustomBuild() {
     </div>
   );
 }
+
 
 
 
