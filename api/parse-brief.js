@@ -21,23 +21,37 @@ Return this exact structure (use empty string "" for any field not found):
   "whoEyebrow": "",
   "whoH2": "",
   "whoBody": "",
+  "workEyebrow": "",
+  "workH1": "",
   "workH2": "",
+  "workIntro": "",
   "workItems": ["Item 1", "Item 2"],
   "pricingH2": "",
   "pricingSubhead": "",
   "pricingCta": "",
   "closingCta": "",
+  "aboutEyebrow": "",
   "aboutH1": "",
   "aboutStory": "",
+  "aboutStory2": "",
+  "whyEyebrow": "",
+  "whyH2": "",
   "whyOneMaker": "",
+  "valuesEyebrow": "",
   "founderValues": ["Value1", "Value2"],
+  "milestones": [["Milestone title", "Milestone description"]],
+  "processEyebrow": "",
   "processH1": "",
+  "processIntro": "",
   "processSteps": [["01", "Step title", "Step body"]],
+  "calloutEyebrow": "",
+  "calloutBody": "",
+  "contactEyebrow": "",
   "contactH1": "",
   "contactIntro": "",
   "contactCta": "",
   "contactReassurance": "",
-  "pricingTiers": [["Tier name", "From $X", "Description"]],
+  "pricingTiers": [["Tier name", "Tier subtitle", "Description", "From $X"]],
   "colors": { "ink": "", "brass": "", "brass-deep": "", "bone": "", "asphalt": "", "stone": "", "warm-white": "", "text": "" },
   "fonts": ["Primary font", "Accent font"],
   "voiceRules": ["Rule 1", "Rule 2"],
@@ -48,8 +62,13 @@ Return this exact structure (use empty string "" for any field not found):
 
 Rules:
 - Use EXACT copy from the brief word for word. Never paraphrase.
-- Keep anything in [brackets] exactly as written.
-- For colors use hex codes exactly as written.`;
+- Keep anything in [brackets] exactly as written — these are human placeholders, never fill them in.
+- For colors use hex codes exactly as written.
+- For workItems: extract real project/film/work titles if listed, otherwise leave as empty array [].
+- For milestones: extract any founder journey, company history, or timeline events from the About section.
+- For pricingTiers: the subtitle is the short descriptor line like "CASH FLOW & TRUST" or "MARGIN & CRAFT".
+- For differenceH2, whoH2, workH1, aboutH1: extract the actual headline copy, not the eyebrow label.
+- If a field is genuinely absent from the brief, use empty string "" — never invent copy.`;
 
 // Try models in order until one works
 const MODELS = [
@@ -85,10 +104,8 @@ async function callClaude(apiKey, messages, extraHeaders = {}) {
     const errBody = await response.text();
     console.log(`Model ${model} failed: ${response.status} — ${errBody.slice(0, 200)}`);
     if (response.status !== 404 && response.status !== 400) {
-      // Non-404 error (e.g. 401 auth, 500 server) — no point trying other models
       return { ok: false, status: response.status, error: errBody };
     }
-    // 404 or 400 means this model not available, try next
   }
   return { ok: false, status: 404, error: "No available model found" };
 }
