@@ -862,7 +862,8 @@ function generatePages(brief, selectedPages, inspoContext) {
 }
 
 // ─── HTML Preview ─────────────────────────────────────────────────────────────
-function buildPreviewHTML(brief, activePage) {
+function buildPreviewHTML(brief, activePage, variant) {
+  variant = variant || "A";
   var C = brief.colors || {
     ink: "#1C1A17", brass: "#C2A35B", "brass-deep": "#9C7E3A",
     bone: "#EDE7DB", asphalt: "#2B2823", stone: "#8A8170",
@@ -916,32 +917,63 @@ function buildPreviewHTML(brief, activePage) {
         "<a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>" + (brief.closingCta || "Start a project") + "</a>" +
       "</section>",
 
-    work:
-      "<section style='background:" + bone + ";padding:88px 40px;'>" +
-        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Work</div>" +
-        "<h1 style='font-size:clamp(40px,6vw,64px);font-weight:800;color:" + ink + ";margin:0 0 20px;'>Selected films.</h1>" +
-        "<p style='font-size:17px;color:" + text + ";max-width:640px;'>A look at the stories so far. Customer and team films, brand work, and the films that help a company show what it has become.</p>" +
-      "</section>" +
-      "<section style='background:" + bone + ";padding:16px 40px;border-top:1px solid #E2DBCC;border-bottom:1px solid #E2DBCC;'>" +
-        "<div style='display:flex;gap:10px;flex-wrap:wrap;'>" +
-          ["All","Stories & testimonials","People & culture","Brand & leadership","Exit"].map(function(label, i) {
-            return "<a style='padding:10px 20px;font-size:13px;font-weight:600;text-decoration:none;border-radius:2px;letter-spacing:.05em;text-transform:uppercase;background:" + (i===0?brass:"transparent") + ";color:" + (i===0?ink:brassDp) + ";border:1px solid " + (i===0?brass:brassDp) + ";'>" + label + "</a>";
-          }).join("") +
-        "</div>" +
-      "</section>" +
-      "<section style='background:" + bone + ";padding:64px 40px;'>" +
-        "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;max-width:1160px;margin:0 auto;'>" +
-          (brief.workItems || ["Film 1","Film 2","Film 3","Film 4","Film 5","Film 6"]).map(function(title) {
-            return "<div style='background:#fff;border:1px solid #E2DBCC;'>" +
-              "<div style='background:#e0ddd7;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>" + title + "</div>" +
-              "<div style='padding:20px;'><div style='font-size:16px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + title + "</div><div style='font-size:12px;color:" + stone + ";'>Industrial services</div></div>" +
-            "</div>";
-          }).join("") +
-        "</div>" +
-      "</section>" +
-      "<section style='background:" + bone + ";padding:80px 40px;text-align:center;'>" +
-        "<a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>Start a project</a>" +
-      "</section>",
+
+    work: (function() {
+      var items = brief.workItems || ["Project 1","Project 2","Project 3","Project 4","Project 5","Project 6"];
+      var workHeader = "<section style='background:" + bone + ";padding:88px 40px;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>" + (brief.workEyebrow||"Work") + "</div>" +
+        "<h1 style='font-size:clamp(40px,6vw,64px);font-weight:800;color:" + ink + ";margin:0 0 20px;'>" + (brief.workH1||"Selected work.") + "</h1>" +
+        "<p style='font-size:17px;color:" + text + ";max-width:640px;'>" + (brief.workIntro||"A look at the work so far.") + "</p>" +
+        "</section>";
+      var workClose = "<section style='background:" + bone + ";padding:80px 40px;text-align:center;'><a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>Start a project</a></section>";
+
+      if (variant === "B") {
+        // Editorial: featured hero + supporting grid
+        var featured = items[0] || "Featured Project";
+        var rest = items.slice(1);
+        return workHeader +
+          "<section style='background:" + bone + ";padding:64px 40px;'>" +
+            "<div style='display:grid;grid-template-columns:1fr 1fr;gap:0;max-width:1160px;margin:0 auto 32px;border:1px solid #E2DBCC;'>" +
+              "<div style='background:#e0ddd7;min-height:360px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>" + featured + " — hero image</div>" +
+              "<div style='padding:56px 48px;background:#fff;'>" +
+                "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:16px;'>Featured</div>" +
+                "<h2 style='font-size:clamp(28px,3.5vw,40px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>" + featured + "</h2>" +
+                "<p style='font-size:16px;color:" + text + ";line-height:1.65;margin-bottom:32px;'>The standout piece. Add the description when publishing.</p>" +
+                "<a style='padding:14px 32px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>View project</a>" +
+              "</div>" +
+            "</div>" +
+            "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;max-width:1160px;margin:0 auto;'>" +
+              rest.map(function(title) {
+                return "<div style='background:#fff;border:1px solid #E2DBCC;'>" +
+                  "<div style='background:#e0ddd7;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>" + title + "</div>" +
+                  "<div style='padding:20px;'><div style='font-size:15px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + title + "</div><div style='font-size:12px;color:" + stone + ";'>Project context.</div></div>" +
+                "</div>";
+              }).join("") +
+            "</div>" +
+          "</section>" +
+          workClose;
+      }
+      // Variant A: filter row + standard grid
+      return workHeader +
+        "<section style='background:" + bone + ";padding:16px 40px;border-top:1px solid #E2DBCC;border-bottom:1px solid #E2DBCC;'>" +
+          "<div style='display:flex;gap:10px;flex-wrap:wrap;'>" +
+            ["All","Stories & testimonials","People & culture","Brand & leadership","Exit"].map(function(label, i) {
+              return "<a style='padding:10px 20px;font-size:13px;font-weight:600;text-decoration:none;border-radius:2px;letter-spacing:.05em;text-transform:uppercase;background:" + (i===0?brass:"transparent") + ";color:" + (i===0?ink:brassDp) + ";border:1px solid " + (i===0?brass:brassDp) + ";'>" + label + "</a>";
+            }).join("") +
+          "</div>" +
+        "</section>" +
+        "<section style='background:" + bone + ";padding:64px 40px;'>" +
+          "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;max-width:1160px;margin:0 auto;'>" +
+            items.map(function(title) {
+              return "<div style='background:#fff;border:1px solid #E2DBCC;'>" +
+                "<div style='background:#e0ddd7;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>" + title + "</div>" +
+                "<div style='padding:20px;'><div style='font-size:16px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + title + "</div><div style='font-size:12px;color:" + stone + ";'>Project context.</div></div>" +
+              "</div>";
+            }).join("") +
+          "</div>" +
+        "</section>" +
+        workClose;
+    })(),
 
     services:
       "<section style='background:" + bone + ";padding:88px 40px;'>" +
@@ -995,101 +1027,172 @@ function buildPreviewHTML(brief, activePage) {
         "<a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>Start a project</a>" +
       "</section>",
 
-    about:
-      "<section style='background:" + bone + ";padding:88px 40px;'>" +
-        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>The maker</div>" +
-        "<h1 style='font-size:clamp(40px,6vw,64px);font-weight:800;color:" + ink + ";margin:0;'>" + (brief.aboutH1 || "One person. Every frame.") + "</h1>" +
-      "</section>" +
-      "<section style='background:" + bone + ";padding:80px 40px;'>" +
-        "<div style='display:grid;grid-template-columns:1fr 1fr;gap:64px;max-width:1160px;margin:0 auto;align-items:start;'>" +
-          "<div>" +
-            "<p style='font-size:17px;color:" + text + ";line-height:1.65;margin-bottom:24px;'>" + (brief.aboutStory || "Mile Marker Films is Ben [last name]. He writes the films, shoots them, records the sound, and cuts them. That is unusual, and it is the point.") + "</p>" +
-          "</div>" +
-          "<div style='background:#e0ddd7;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Portrait — shot on location</div>" +
-        "</div>" +
-      "</section>" +
-      "<section style='background:#fff;padding:80px 40px;'>" +
-        "<div style='max-width:720px;margin:0 auto;'>" +
-          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Why one maker</div>" +
-          "<h2 style='font-size:clamp(28px,3.5vw,44px);font-weight:800;color:" + ink + ";margin:0 0 24px;'>One mind on the whole film.</h2>" +
-          "<p style='font-size:17px;color:" + text + ";line-height:1.65;'>" + (brief.whyOneMaker || "One mind on the whole film keeps the voice honest and the cost lean. No crew to manage, no production circus, no game of telephone between a strategist, a director, and an editor who never met your team.") + "</p>" +
-        "</div>" +
-      "</section>" +
-      "<section style='background:" + bone + ";padding:72px 40px;'>" +
-        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:32px;'>What he is about</div>" +
+    about: (function() {
+      var vals = (brief.founderValues || ["Grounded","Forward","Exact","Singular","Human"]);
+      var valuesHtml = "<section style='background:" + bone + ";padding:72px 40px;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:32px;'>" + (brief.valuesEyebrow||"What we stand for") + "</div>" +
         "<div style='display:flex;gap:0;max-width:1160px;flex-wrap:wrap;'>" +
-          (brief.founderValues || ["Grounded","Forward","Exact","Singular","Human"]).map(function(v) {
-            return "<div style='flex:1;min-width:160px;padding:32px;border-right:1px solid #E2DBCC;'>" +
-              "<div style='width:28px;height:3px;background:" + brass + ";margin-bottom:16px;'></div>" +
-              "<div style='font-size:22px;font-weight:700;color:" + ink + ";'>" + v + "</div>" +
+          vals.map(function(v) {
+            return "<div style='flex:1;min-width:160px;padding:24px 28px;border-left:3px solid " + brass + ";margin:0 12px 12px 0;'>" +
+              "<div style='font-size:20px;font-weight:700;color:" + ink + ";'>" + v + "</div>" +
             "</div>";
           }).join("") +
-        "</div>" +
-      "</section>" +
-      "<section style='background:" + bone + ";padding:80px 40px;text-align:center;'>" +
-        "<a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>Start a project</a>" +
-      "</section>",
+        "</div></section>";
+      var aboutClose = "<section style='background:" + bone + ";padding:80px 40px;text-align:center;'><a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>Start a project</a></section>";
+      var aboutHeader = "<section style='background:" + bone + ";padding:88px 40px;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>" + (brief.aboutEyebrow||"About") + "</div>" +
+        "<h1 style='font-size:clamp(40px,6vw,64px);font-weight:800;color:" + ink + ";margin:0;'>" + (brief.aboutH1||"One person. Every frame.") + "</h1>" +
+        "</section>";
 
-    process:
-      "<section style='background:" + bone + ";padding:88px 40px;'>" +
-        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Process</div>" +
-        "<h1 style='font-size:clamp(40px,6vw,64px);font-weight:800;color:" + ink + ";margin:0 0 20px;'>" + (brief.processH1 || "How a film gets made.") + "</h1>" +
-        "<p style='font-size:17px;color:" + text + ";max-width:560px;'>Simple and calm, from first call to final files. No maze, no surprises.</p>" +
-      "</section>" +
-      "<section style='background:" + bone + ";padding:0;'>" +
-        "<div style='display:grid;grid-template-columns:1fr 1fr;max-width:1160px;margin:0 auto;'>" +
-          (brief.processSteps || [
-            ["01","The intro","A short call to understand the company and the goal. No charge, no maze."],
-            ["02","The plan","A clear scope and a fixed quote up front. You know the price before anything starts."],
-            ["03","The shoot","One day, lean and calm. No crew to host, no production circus on your floor."],
-            ["04","The edit","A first cut, then a set number of revision rounds. No open-ended feedback loops."],
-            ["05","Delivery","Final files in every format you need, plus short social cutdowns ready to post."],
-          ]).map(function(step, i) {
-            return "<div style='padding:56px 40px;background:" + (i%2===0?bone:"#fff") + ";border:1px solid #E2DBCC;'>" +
-              "<div style='font-family:Fraunces,serif;font-size:72px;font-weight:300;color:" + brass + ";line-height:1;margin-bottom:24px;'>" + step[0] + "</div>" +
-              "<div style='height:1px;background:" + brass + ";width:34px;margin-bottom:24px;'></div>" +
-              "<div style='font-size:20px;font-weight:700;color:" + ink + ";margin-bottom:12px;'>" + step[1] + "</div>" +
-              "<p style='font-size:16px;color:" + text + ";line-height:1.65;'>" + step[2] + "</p>" +
-            "</div>";
-          }).join("") +
-        "</div>" +
-      "</section>" +
-      "<section style='background:" + ink + ";padding:80px 40px;'>" +
-        "<div style='max-width:720px;margin:0 auto;'>" +
-          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:16px;'>What to expect</div>" +
-          "<p style='font-size:18px;color:" + warmWhite + ";line-height:1.65;'>Most projects take four to six weeks from the intro call to final delivery. The shoot is one day. You will always know where the project stands.</p>" +
-        "</div>" +
-      "</section>" +
-      "<section style='background:" + bone + ";padding:80px 40px;text-align:center;'>" +
-        "<a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>Start a project</a>" +
-      "</section>",
+      if (variant === "B") {
+        // Timeline variant
+        var milestones = brief.milestones || [
+          ["The beginning","How it started and what drove the decision to build this."],
+          ["Finding the niche","The moment the right clients and right work became clear."],
+          ["The work that mattered","The projects that defined the approach and proved the model."],
+          ["Where it stands now","What the studio is today and where it is headed."],
+        ];
+        return aboutHeader +
+          "<section style='background:" + bone + ";padding:0;'>" +
+            milestones.map(function(m, i) {
+              return "<div style='padding:56px 40px;background:" + (i%2===0?bone:"#fff") + ";border-bottom:1px solid #E2DBCC;display:flex;gap:32px;align-items:flex-start;max-width:1160px;margin:0 auto;'>" +
+                "<div style='width:12px;height:12px;border-radius:50%;background:" + brass + ";flex-shrink:0;margin-top:8px;'></div>" +
+                "<div><div style='font-size:20px;font-weight:700;color:" + ink + ";margin-bottom:10px;'>" + m[0] + "</div>" +
+                "<p style='font-size:16px;color:" + text + ";line-height:1.65;'>" + m[1] + "</p></div>" +
+              "</div>";
+            }).join("") +
+          "</section>" +
+          "<section style='background:#fff;padding:80px 40px;'>" +
+            "<div style='display:grid;grid-template-columns:1fr 1fr;gap:64px;max-width:1160px;margin:0 auto;align-items:center;'>" +
+              "<div style='background:#e0ddd7;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Founder portrait</div>" +
+              "<div><div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>" + (brief.whyEyebrow||"The approach") + "</div>" +
+              "<p style='font-size:17px;color:" + text + ";line-height:1.65;'>" + (brief.whyOneMaker||"Supporting copy about the approach.") + "</p></div>" +
+            "</div>" +
+          "</section>" +
+          valuesHtml + aboutClose;
+      }
 
-    contact:
-      "<section style='background:" + bone + ";padding:88px 40px;'>" +
-        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Contact</div>" +
-        "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 20px;'>" + (brief.contactH1 || "Tell me about the company.") + "</h1>" +
-        "<p style='font-size:17px;color:" + text + ";max-width:560px;'>" + (brief.contactIntro || "A sentence or two about the business and what you are trying to show. You will get a real reply from the person who makes the films, usually within one business day.") + "</p>" +
-      "</section>" +
-      "<section style='background:" + bone + ";padding:64px 40px;'>" +
-        "<div style='max-width:680px;'>" +
-          "<div style='background:#fff;border:1px solid #E2DBCC;padding:32px;margin-bottom:24px;'>" +
-            "<p style='font-size:14px;color:" + stone + ";line-height:1.8;'>Form fields: Name · Company · Email · What do you need? (Testimonial / Recruiting film / Brand film / Exit film / Not sure) · Budget range (optional) · Message</p>" +
-            "<p style='font-size:12px;color:" + stone + ";margin-top:12px;font-style:italic;'>Connect a WordPress forms plugin (Fluent Forms or WPForms) and replace this with the live form shortcode.</p>" +
+      // Variant A: story/portrait split
+      return aboutHeader +
+        "<section style='background:" + bone + ";padding:80px 40px;'>" +
+          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:64px;max-width:1160px;margin:0 auto;align-items:start;'>" +
+            "<div><p style='font-size:17px;color:" + text + ";line-height:1.65;margin-bottom:24px;'>" + (brief.aboutStory||"The founder story goes here.") + "</p></div>" +
+            "<div style='background:#e0ddd7;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Portrait — on location</div>" +
           "</div>" +
-          "<a style='display:inline-block;padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;margin-bottom:20px;'>" + (brief.contactCta || "Send it over") + "</a>" +
-          "<p style='font-size:14px;color:" + stone + ";'>" + (brief.contactReassurance || "No sales team. No automated funnel. Just one maker who will read it and write back.") + "</p>" +
-        "</div>" +
-      "</section>" +
-      "<section style='background:" + bone + ";padding:72px 40px;border-top:1px solid #E2DBCC;'>" +
-        "<div style='display:grid;grid-template-columns:1fr 1fr;gap:64px;max-width:1160px;margin:0 auto;'>" +
-          "<div><div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>What happens next</div><p style='font-size:16px;color:" + text + ";line-height:1.65;'>You send a note. Within one business day, you hear back from the person who actually makes the films. No account manager, no intro call just to learn what you need.</p></div>" +
-          "<div><div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Not sure what you need?</div><p style='font-size:16px;color:" + text + ";line-height:1.65;'>Tell me what the company does and what you are trying to show. That is enough to start. The right film type will become clear in the first conversation.</p></div>" +
-        "</div>" +
-      "</section>" +
-      "<section style='background:" + ink + ";padding:96px 40px;text-align:center;'>" +
-        "<h2 style='font-family:Fraunces,serif;font-weight:300;font-style:italic;font-size:clamp(32px,4.5vw,52px);color:" + warmWhite + ";max-width:720px;margin:0 auto 32px;line-height:1.1;'>" + (brief.tagline || "The stories that move a company forward.") + "</h2>" +
-        "<div style='font-size:14px;color:" + stone + ";letter-spacing:2px;text-transform:uppercase;'>" + (brief.signatureLine || "Mark what matters.") + "</div>" +
-      "</section>",
+        "</section>" +
+        "<section style='background:#fff;padding:80px 40px;'>" +
+          "<div style='max-width:720px;margin:0 auto;'>" +
+            "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>" + (brief.whyEyebrow||"The approach") + "</div>" +
+            "<h2 style='font-size:clamp(28px,3.5vw,44px);font-weight:800;color:" + ink + ";margin:0 0 24px;'>" + (brief.whyH2||"One mind on the whole project.") + "</h2>" +
+            "<p style='font-size:17px;color:" + text + ";line-height:1.65;'>" + (brief.whyOneMaker||"Supporting copy about the approach.") + "</p>" +
+          "</div>" +
+        "</section>" +
+        valuesHtml + aboutClose;
+    })(),
+
+    process: (function() {
+      var steps = brief.processSteps || [
+        ["01","The intro","A short call to understand the company and the goal. No charge, no maze."],
+        ["02","The plan","A clear scope and a fixed quote up front. You know the price before anything starts."],
+        ["03","The work","One focused engagement, lean and calm."],
+        ["04","The review","A first draft, then a set number of revision rounds."],
+        ["05","Delivery","Final files in every format you need, ready to use immediately."],
+      ];
+      var processHeader = "<section style='background:" + bone + ";padding:88px 40px;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>" + (brief.processEyebrow||"Process") + "</div>" +
+        "<h1 style='font-size:clamp(40px,6vw,64px);font-weight:800;color:" + ink + ";margin:0 0 20px;'>" + (brief.processH1||"How it gets made.") + "</h1>" +
+        "<p style='font-size:17px;color:" + text + ";max-width:560px;'>" + (brief.processIntro||"Simple and calm, from first call to final files. No maze, no surprises.") + "</p>" +
+        "</section>";
+      var processCallout = "<section style='background:" + ink + ";padding:80px 40px;'>" +
+        "<div style='max-width:720px;margin:0 auto;'>" +
+          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:16px;'>" + (brief.calloutEyebrow||"What to expect") + "</div>" +
+          "<p style='font-size:18px;color:" + warmWhite + ";line-height:1.65;'>" + (brief.calloutBody||"Most projects take four to six weeks from the intro call to final delivery. You will always know where the project stands.") + "</p>" +
+        "</div></section>";
+      var processClose = "<section style='background:" + bone + ";padding:80px 40px;text-align:center;'><a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>Start a project</a></section>";
+
+      if (variant === "B") {
+        // Horizontal timeline cards
+        return processHeader +
+          "<section style='background:" + bone + ";padding:80px 40px;'>" +
+            "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;max-width:1160px;margin:0 auto;'>" +
+              steps.map(function(step) {
+                return "<div style='background:#fff;padding:40px 32px;border-top:3px solid " + brass + ";'>" +
+                  "<div style='font-family:Fraunces,serif;font-size:52px;font-weight:300;color:" + brass + ";line-height:1;margin-bottom:20px;'>" + step[0] + "</div>" +
+                  "<div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:10px;'>" + step[1] + "</div>" +
+                  "<p style='font-size:14px;color:" + text + ";line-height:1.65;'>" + step[2] + "</p>" +
+                "</div>";
+              }).join("") +
+            "</div>" +
+          "</section>" +
+          processCallout + processClose;
+      }
+
+      // Variant A: two-column grid
+      return processHeader +
+        "<section style='background:" + bone + ";padding:0;'>" +
+          "<div style='display:grid;grid-template-columns:1fr 1fr;max-width:1160px;margin:0 auto;'>" +
+            steps.map(function(step, i) {
+              return "<div style='padding:56px 40px;background:" + (i%2===0?bone:"#fff") + ";border:1px solid #E2DBCC;'>" +
+                "<div style='font-family:Fraunces,serif;font-size:72px;font-weight:300;color:" + brass + ";line-height:1;margin-bottom:24px;'>" + step[0] + "</div>" +
+                "<div style='height:1px;background:" + brass + ";width:34px;margin-bottom:24px;'></div>" +
+                "<div style='font-size:20px;font-weight:700;color:" + ink + ";margin-bottom:12px;'>" + step[1] + "</div>" +
+                "<p style='font-size:16px;color:" + text + ";line-height:1.65;'>" + step[2] + "</p>" +
+              "</div>";
+            }).join("") +
+          "</div>" +
+        "</section>" +
+        processCallout + processClose;
+    })(),
+
+    contact: (function() {
+      var formBox = "<div style='background:#fff;border:1px solid #E2DBCC;padding:32px;margin-bottom:24px;'>" +
+        "<p style='font-size:14px;color:" + stone + ";line-height:1.8;'>Form fields: Name · Company · Email · What do you need? · Budget range (optional) · Message</p>" +
+        "<p style='font-size:12px;color:" + stone + ";margin-top:12px;font-style:italic;'>Connect a forms plugin and replace this with the live shortcode.</p>" +
+      "</div>";
+      var contactClose = "<section style='background:" + ink + ";padding:96px 40px;text-align:center;'>" +
+        "<h2 style='font-family:Fraunces,serif;font-weight:300;font-style:italic;font-size:clamp(32px,4.5vw,52px);color:" + warmWhite + ";max-width:720px;margin:0 auto 32px;line-height:1.1;'>" + (brief.tagline||"Ready to get started?") + "</h2>" +
+        "<div style='font-size:14px;color:" + stone + ";letter-spacing:2px;text-transform:uppercase;'>" + (brief.signatureLine||"") + "</div>" +
+      "</section>";
+
+      if (variant === "B") {
+        // Split: statement left, form right
+        return "<section style='background:" + bone + ";padding:96px 40px;'>" +
+          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:80px;max-width:1160px;margin:0 auto;align-items:start;'>" +
+            "<div>" +
+              "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:24px;'>" + (brief.contactEyebrow||"Contact") + "</div>" +
+              "<h2 style='font-family:Fraunces,serif;font-weight:300;font-size:clamp(36px,4.5vw,56px);color:" + ink + ";margin:0 0 32px;line-height:1.06;'>" + (brief.contactH1||"Tell us about your project.") + "</h2>" +
+              "<p style='font-size:17px;color:" + text + ";line-height:1.65;margin-bottom:24px;'>" + (brief.contactIntro||"A quick note about what you need.") + "</p>" +
+              "<p style='font-size:14px;color:" + stone + ";'>" + (brief.contactReassurance||"No sales team. A real reply from a real person.") + "</p>" +
+            "</div>" +
+            "<div>" +
+              formBox +
+              "<a style='display:inline-block;padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>" + (brief.contactCta||"Send it over") + "</a>" +
+            "</div>" +
+          "</div>" +
+        "</section>" + contactClose;
+      }
+
+      // Variant A: stacked
+      return "<section style='background:" + bone + ";padding:88px 40px;'>" +
+          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>" + (brief.contactEyebrow||"Contact") + "</div>" +
+          "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 20px;'>" + (brief.contactH1||"Tell us about your project.") + "</h1>" +
+          "<p style='font-size:17px;color:" + text + ";max-width:560px;'>" + (brief.contactIntro||"A quick note about what you need. You will get a real reply from a real person, usually within one business day.") + "</p>" +
+        "</section>" +
+        "<section style='background:" + bone + ";padding:64px 40px;'>" +
+          "<div style='max-width:680px;'>" +
+            formBox +
+            "<a style='display:inline-block;padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;margin-bottom:20px;'>" + (brief.contactCta||"Send it over") + "</a>" +
+            "<p style='font-size:14px;color:" + stone + ";margin-top:16px;'>" + (brief.contactReassurance||"No sales team. A real reply from a real person.") + "</p>" +
+          "</div>" +
+        "</section>" +
+        "<section style='background:" + bone + ";padding:72px 40px;border-top:1px solid #E2DBCC;'>" +
+          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:64px;max-width:1160px;margin:0 auto;'>" +
+            "<div><div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>What happens next</div><p style='font-size:16px;color:" + text + ";line-height:1.65;'>You send a note. Within one business day, you hear back from the person who actually does the work. No account manager, no intro call just to learn what you need.</p></div>" +
+            "<div><div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Not sure what you need?</div><p style='font-size:16px;color:" + text + ";line-height:1.65;'>Tell us what the company does and what you are trying to show. That is enough to start.</p></div>" +
+          "</div>" +
+        "</section>" +
+        contactClose;
+    })(),
   };
 
   var body = sections[activePage] || sections.home;
@@ -1584,7 +1687,7 @@ export default function CustomBuild() {
               ))}
             </div>
             <iframe
-              srcDoc={buildPreviewHTML(brief, previewPage)}
+              srcDoc={buildPreviewHTML(brief, previewPage, layoutVariants[previewPage] || "A")}
               style={{ flex: 1, border: "none", width: "100%", minHeight: "calc(100vh - 100px)" }}
               title="Site preview"
             />
@@ -1594,5 +1697,6 @@ export default function CustomBuild() {
     </div>
   );
 }
+
 
 
