@@ -1357,6 +1357,7 @@ export default function CustomBuild() {
   const [brief, setBrief]               = useState(null);
   const [briefName, setBriefName]       = useState("");
   const [briefError, setBriefError]     = useState("");
+  const [clientName, setClientName]     = useState(""); // editable export name
   const [inspoUrls, setInspoUrls]       = useState([""]);
   const [crawlResults, setCrawlResults] = useState({});  // keyed by URL
   const [crawling, setCrawling]         = useState({});  // keyed by URL
@@ -1383,6 +1384,7 @@ export default function CustomBuild() {
         const draft = JSON.parse(result.value);
         if (draft.brief)          setBrief(draft.brief);
         if (draft.briefName)      setBriefName(draft.briefName);
+        if (draft.clientName)     setClientName(draft.clientName);
         if (draft.inspoUrls)      setInspoUrls(draft.inspoUrls);
         if (draft.selectedPages)  setPages(draft.selectedPages);
         if (draft.copyBriefOnly !== undefined) setCopy(draft.copyBriefOnly);
@@ -1402,6 +1404,7 @@ export default function CustomBuild() {
       const draft = {
         brief,
         briefName,
+        clientName,
         inspoUrls,
         selectedPages,
         copyBriefOnly,
@@ -1427,7 +1430,7 @@ export default function CustomBuild() {
       window.storage.set("spec-blueprint-draft", JSON.stringify(draft)).catch(() => {});
     }, 800);
     return () => clearTimeout(timer);
-  }, [brief, briefName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants, previewPage, crawlResults, generated]);
+  }, [brief, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants, previewPage, crawlResults, generated]);
 
   // Load persisted inspo patterns on mount
   useEffect(() => {
@@ -1459,6 +1462,7 @@ export default function CustomBuild() {
           const parsed = extractBrief(raw);
           setBrief(parsed);
           setBriefName(file.name);
+          if (parsed.brandName) setClientName(parsed.brandName);
           if (raw.sitemap) setPages(raw.sitemap.map(s => s.pageId));
         } catch { setBriefError("Could not parse this JSON file."); }
       };
@@ -1473,6 +1477,7 @@ export default function CustomBuild() {
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || "Parsing failed");
           setBrief(data); setBriefName(file.name);
+          if (data.brandName) setClientName(data.brandName);
         } catch (err) { setBriefError("Could not parse the PDF: " + err.message); }
         finally { setParsing(false); }
       };
@@ -1487,6 +1492,7 @@ export default function CustomBuild() {
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || "Parsing failed");
           setBrief(data); setBriefName(file.name); setBriefError("");
+          if (data.brandName) setClientName(data.brandName);
         } catch (err) { setBriefError("Could not parse the Word doc: " + err.message); }
         finally { setParsing(false); }
       };
@@ -1500,6 +1506,7 @@ export default function CustomBuild() {
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || "Parsing failed");
           setBrief(data); setBriefName(file.name); setBriefError("");
+          if (data.brandName) setClientName(data.brandName);
         } catch (err) { setBriefError("Could not parse the file: " + err.message); }
         finally { setParsing(false); }
       };
@@ -1653,6 +1660,10 @@ export default function CustomBuild() {
     setGeneratingStatus("");
   }
 
+  function slugify(name) {
+    return (name || "client").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  }
+
   function getPageData(p) {
     var variant = layoutVariants[p.id] || "A";
     return variant === "B" && p.variantB ? p.variantB : p.variantA || p.data;
@@ -1661,7 +1672,8 @@ export default function CustomBuild() {
   function downloadPage(p) {
     const blob = new Blob([JSON.stringify(getPageData(p), null, 2)], { type: "application/json" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-    a.download = p.id + ".json"; a.click(); URL.revokeObjectURL(a.href);
+    a.download = slugify(clientName || brief?.brandName) + "-" + p.id + ".json";
+    a.click(); URL.revokeObjectURL(a.href);
     // Auto-save this single page to the library
     if (brief && generated) {
       saveToLibrary(brief, [p], layoutVariants, layoutVariants);
@@ -1673,7 +1685,8 @@ export default function CustomBuild() {
     generated.pages.forEach((p, i) => setTimeout(() => {
       const blob = new Blob([JSON.stringify(getPageData(p), null, 2)], { type: "application/json" });
       const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-      a.download = p.id + ".json"; a.click(); URL.revokeObjectURL(a.href);
+      a.download = slugify(clientName || brief?.brandName) + "-" + p.id + ".json";
+      a.click(); URL.revokeObjectURL(a.href);
     }, i * 300));
     // Auto-save full build to library
     if (brief && generated) {
@@ -1697,7 +1710,7 @@ export default function CustomBuild() {
           {(brief || generated) && (
             <button
               onClick={async () => {
-                setBrief(null); setBriefName(""); setInspoUrls([""]); setPages(["home"]);
+                setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]);
                 setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({});
                 setPreviewPage("home");
                 if (window.storage) { try { await window.storage.delete("spec-blueprint-draft"); } catch(e) {} }
@@ -1756,7 +1769,17 @@ export default function CustomBuild() {
                       ))}
                     </div>
                   )}
-                  <button style={T.btnGhost} onClick={() => { setBrief(null); setBriefName(""); }}>Replace brief</button>
+                  <label style={{ ...T.label, marginBottom: "6px", display: "block" }}>Export name</label>
+                  <input
+                    style={{ ...T.input, marginBottom: "12px" }}
+                    value={clientName}
+                    onChange={e => setClientName(e.target.value)}
+                    placeholder="e.g. Mile Marker Films"
+                  />
+                  <div style={{ fontSize: "11px", color: "#9ca3af", marginBottom: "12px" }}>
+                    Files will download as: <span style={{ color: "#09090b", fontWeight: 600 }}>{slugify(clientName || brief?.brandName)}-home.json</span>
+                  </div>
+                  <button style={T.btnGhost} onClick={() => { setBrief(null); setBriefName(""); setClientName(""); }}>Replace brief</button>
                 </div>
               )}
             </div>
@@ -1961,6 +1984,7 @@ export default function CustomBuild() {
     </div>
   );
 }
+
 
 
 
