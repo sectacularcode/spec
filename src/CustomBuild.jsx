@@ -78,7 +78,7 @@ function inferTags(brief, pages, layoutVariants) {
 async function saveToLibrary(brief, pages, layoutVariants, selectedVariants) {
   if (!window.storage) return;
   try {
-    // Load existing saved builds
+    // ── Save full build ────────────────────────────────────────────────────
     var existing = [];
     try {
       var stored = await window.storage.get("spec-template-library");
@@ -113,14 +113,45 @@ async function saveToLibrary(brief, pages, layoutVariants, selectedVariants) {
       }),
     };
 
-    // Deduplicate by client + date — replace if same client was saved today
     var deduped = existing.filter(function(e) {
       return !(e.client === entry.client && e.date === entry.date && e.source === "blueprint");
     });
-    deduped.unshift(entry); // newest first
-    if (deduped.length > 50) deduped = deduped.slice(0, 50); // cap at 50 entries
-
+    deduped.unshift(entry);
+    if (deduped.length > 50) deduped = deduped.slice(0, 50);
     await window.storage.set("spec-template-library", JSON.stringify(deduped));
+
+    // ── Save individual sections ───────────────────────────────────────────
+    var existingSections = [];
+    try {
+      var storedSections = await window.storage.get("spec-section-library");
+      if (storedSections && storedSections.value) existingSections = JSON.parse(storedSections.value);
+    } catch(e) {}
+
+    var newSections = [];
+    pages.forEach(function(p) {
+      var pageData = (selectedVariants || {})[p.id] === "B" && p.variantB ? p.variantB : p.variantA || p.data;
+      if (!pageData || !pageData.content) return;
+      pageData.content.forEach(function(section, si) {
+        newSections.push({
+          id: "section-" + Date.now() + "-" + si,
+          buildId: id,
+          client: brief.brandName || "Unnamed Client",
+          date: new Date().toISOString().slice(0, 10),
+          pageId: p.id,
+          pageLabel: p.label,
+          sectionIndex: si,
+          colors: brief.colors || {},
+          tags: tags.visualTags.concat(tags.toneTags),
+          industryFit: tags.industryFit,
+          data: section,
+        });
+      });
+    });
+
+    var combinedSections = newSections.concat(existingSections);
+    if (combinedSections.length > 300) combinedSections = combinedSections.slice(0, 300);
+    await window.storage.set("spec-section-library", JSON.stringify(combinedSections));
+
   } catch(e) {
     console.warn("saveToLibrary failed:", e);
   }
@@ -1420,6 +1451,10 @@ export default function CustomBuild() {
   const [generated, setGenerated]       = useState(null);
   const [previewPage, setPreviewPage]   = useState("home");
   const [layoutVariants, setLayoutVariants] = useState({}); // {pageId: "A"|"B"}
+  const [swapDrawer, setSwapDrawer]         = useState(null); // pageId of page being swapped, or null
+  const [sectionLibrary, setSectionLibrary] = useState([]); // saved sections from past builds
+  const [swapFilter, setSwapFilter]         = useState(""); // filter by page type
+  const [pageOverrides, setPageOverrides]   = useState({}); // {pageId: {sectionIndex: sectionData}}
   const fileRef = useRef();
   const [parsing, setParsing]           = useState(false);
   const canGenerate = !!brief && selectedPages.length > 0;
@@ -1498,6 +1533,18 @@ export default function CustomBuild() {
       }
     }
     if (window.storage) loadPatterns();
+  }, []);
+
+  // Load section library for swap drawer
+  useEffect(() => {
+    async function loadSectionLibrary() {
+      if (!window.storage) return;
+      try {
+        const result = await window.storage.get("spec-section-library");
+        if (result && result.value) setSectionLibrary(JSON.parse(result.value));
+      } catch(e) {}
+    }
+    loadSectionLibrary();
   }, []);
 
   function handleFile(file) {
@@ -1717,7 +1764,15 @@ export default function CustomBuild() {
 
   function getPageData(p) {
     var variant = layoutVariants[p.id] || "A";
-    return variant === "B" && p.variantB ? p.variantB : p.variantA || p.data;
+    var baseData = variant === "B" && p.variantB ? p.variantB : p.variantA || p.data;
+    // Apply any section overrides for this page
+    var overrides = pageOverrides[p.id];
+    if (!overrides || Object.keys(overrides).length === 0) return baseData;
+    var content = (baseData.content || []).slice();
+    Object.keys(overrides).forEach(function(idx) {
+      content.push(overrides[idx]); // append swapped sections
+    });
+    return { ...baseData, content: content };
   }
 
   function downloadPage(p) {
@@ -1763,7 +1818,7 @@ export default function CustomBuild() {
               onClick={async () => {
                 setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]);
                 setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({});
-                setPreviewPage("home");
+                setPreviewPage("home"); setPageOverrides({});
                 if (window.storage) { try { await window.storage.delete("spec-blueprint-draft"); } catch(e) {} }
               }}
               style={{ fontSize: "12px", color: "#6b7280", background: "none", border: "1px solid #e5e7eb", borderRadius: "6px", padding: "6px 12px", cursor: "pointer" }}>
@@ -1983,7 +2038,7 @@ export default function CustomBuild() {
         </div>
 
         {generated && (
-          <div style={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <div style={{ display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
             <div style={{ padding: "12px 16px", borderBottom: "1px solid #e5e7eb", background: "#fff", display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
               <span style={{ fontSize: "12px", color: "#6b7280", fontWeight: 600, marginRight: "4px" }}>PREVIEW</span>
               {generated.pages.map(p => (
@@ -1993,7 +2048,15 @@ export default function CustomBuild() {
                   {p.label}
                 </button>
               ))}
-              {/* Layout variant switcher — only for pages with two variants */}
+              {/* Swap sections button */}
+              {sectionLibrary.length > 0 && (
+                <button
+                  onClick={() => { setSwapDrawer(previewPage); setSwapFilter(""); }}
+                  style={{ marginLeft: "8px", padding: "6px 14px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "1px solid #e5e7eb", borderRadius: "20px", background: swapDrawer === previewPage ? "#09090b" : "#fff", color: swapDrawer === previewPage ? "#fff" : "#09090b" }}>
+                  Swap sections
+                </button>
+              )}
+              {/* Layout variant switcher */}
               {generated.pages.filter(p => p.id === previewPage && p.hasVariants).map(p => (
                 <div key="switcher" style={{ marginLeft: "auto", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "4px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
@@ -2024,6 +2087,74 @@ export default function CustomBuild() {
                 </div>
               ))}
             </div>
+
+            {/* Swap drawer */}
+            {swapDrawer && (
+              <div style={{ position: "absolute", top: "57px", right: 0, width: "360px", height: "calc(100% - 57px)", background: "#fff", borderLeft: "1px solid #e5e7eb", zIndex: 10, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                <div style={{ padding: "16px", borderBottom: "1px solid #e5e7eb", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div>
+                    <div style={{ fontSize: "14px", fontWeight: 700, color: "#09090b" }}>Swap a section</div>
+                    <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "2px" }}>From past builds — click to swap into this page</div>
+                  </div>
+                  <button onClick={() => setSwapDrawer(null)} style={{ background: "none", border: "none", fontSize: "18px", cursor: "pointer", color: "#6b7280", padding: "4px 8px" }}>×</button>
+                </div>
+                {/* Filter by page type */}
+                <div style={{ padding: "10px 16px", borderBottom: "1px solid #e5e7eb", display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                  {["", "home", "work", "services", "about", "process", "contact"].map(f => (
+                    <button key={f}
+                      onClick={() => setSwapFilter(f)}
+                      style={{ padding: "4px 10px", fontSize: "11px", fontWeight: 600, cursor: "pointer", border: swapFilter === f ? "1px solid #000" : "1px solid #e5e7eb", borderRadius: "12px", background: swapFilter === f ? "#000" : "#fff", color: swapFilter === f ? "#fff" : "#6b7280" }}>
+                      {f || "All"}
+                    </button>
+                  ))}
+                </div>
+                {/* Section list */}
+                <div style={{ flex: 1, overflowY: "auto", padding: "12px 16px" }}>
+                  {sectionLibrary
+                    .filter(s => !swapFilter || s.pageId === swapFilter)
+                    .slice(0, 40)
+                    .map((s, i) => {
+                      var colors = s.colors || {};
+                      var ink = colors.ink || "#1C1A17";
+                      var brass = colors.brass || "#C2A35B";
+                      var bone = colors.bone || "#EDE7DB";
+                      return (
+                        <div key={s.id || i}
+                          onClick={() => {
+                            // Apply section override to current page
+                            setPageOverrides(prev => {
+                              var pageOverride = prev[swapDrawer] || {};
+                              var sectionCount = Object.keys(pageOverride).length;
+                              return { ...prev, [swapDrawer]: { ...pageOverride, [sectionCount]: s.data } };
+                            });
+                            setSwapDrawer(null);
+                          }}
+                          style={{ padding: "12px", border: "1px solid #e5e7eb", borderRadius: "8px", marginBottom: "8px", cursor: "pointer", transition: "border-color 0.15s" }}
+                          onMouseOver={e => e.currentTarget.style.borderColor = "#000"}
+                          onMouseOut={e => e.currentTarget.style.borderColor = "#e5e7eb"}>
+                          {/* Color preview bar */}
+                          <div style={{ height: "6px", borderRadius: "3px", background: "linear-gradient(to right, " + ink + " 0%, " + ink + " 40%, " + brass + " 40%, " + brass + " 60%, " + bone + " 60%)", marginBottom: "8px" }} />
+                          <div style={{ fontSize: "12px", fontWeight: 600, color: "#09090b", marginBottom: "2px" }}>
+                            {s.client} · {s.pageLabel}
+                          </div>
+                          <div style={{ fontSize: "11px", color: "#6b7280" }}>Section {s.sectionIndex + 1} · {s.date}</div>
+                          <div style={{ display: "flex", gap: "4px", marginTop: "6px", flexWrap: "wrap" }}>
+                            {(s.tags || []).slice(0, 3).map(t => (
+                              <span key={t} style={{ fontSize: "10px", padding: "2px 6px", background: "#f4f4f5", borderRadius: "3px", color: "#6b7280" }}>{t}</span>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  {sectionLibrary.filter(s => !swapFilter || s.pageId === swapFilter).length === 0 && (
+                    <div style={{ textAlign: "center", color: "#6b7280", fontSize: "13px", padding: "32px 16px" }}>
+                      No sections saved yet. Download a build to add sections to this library.
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             <iframe
               srcDoc={buildPreviewHTML(brief, previewPage, layoutVariants[previewPage] || "A")}
               style={{ flex: 1, border: "none", width: "100%", minHeight: "calc(100vh - 100px)" }}
@@ -2035,6 +2166,7 @@ export default function CustomBuild() {
     </div>
   );
 }
+
 
 
 
