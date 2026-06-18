@@ -5116,7 +5116,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             )}
           </div>
         )}
-        
+
+        {briefRec && (
           <div style={{ background: "#ffffff", border: "1px solid #e7e7e4", borderRadius: "12px", padding: "32px 36px", marginBottom: "28px" }}>
             {/* Header row — template name + action buttons */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "28px", gap: "16px", flexWrap: "wrap", paddingBottom: "24px", borderBottom: "1px solid #e7e7e4" }}>
@@ -6497,5 +6498,6 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
     </div>
   );
 }
+
 
 
