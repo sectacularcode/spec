@@ -1670,6 +1670,7 @@ export default function CustomBuild() {
   const [generating, setGenerating]     = useState(false);
   const [generatingStatus, setGeneratingStatus] = useState("");
   const [generated, setGenerated]       = useState(null);
+  const [draftedFields, setDraftedFields] = useState(null); // pending AI drafts for approval
   const [previewPage, setPreviewPage]   = useState("home");
   const [layoutVariants, setLayoutVariants] = useState({}); // {pageId: "A"|"B"}
   const [swapDrawer, setSwapDrawer]         = useState(null); // pageId of page being swapped, or null
@@ -1936,7 +1937,34 @@ export default function CustomBuild() {
     // Step 1: build shared inspo pool
     const inspoContext = buildInspoContext(crawlResults, storedPatterns);
 
-    // Step 2: if we have patterns and inspo URLs, ask AI for recommendations
+    // Step 2: if "No" copy setting, draft blank fields in brand voice first
+    let workingBrief = { ...brief };
+    if (!copyBriefOnly) {
+      setGeneratingStatus("Drafting blank fields in brand voice...");
+      try {
+        const res = await fetch("/api/draft-copy", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ brief }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.drafts && Object.keys(data.drafts).length > 0) {
+            // Merge drafts into brief — only fill truly blank fields
+            Object.keys(data.drafts).forEach(key => {
+              if (!workingBrief[key] || workingBrief[key].trim() === "") {
+                workingBrief[key] = data.drafts[key];
+              }
+            });
+            setDraftedFields(data.drafts);
+          }
+        }
+      } catch(e) {
+        // Silent fallback — continue with original brief
+      }
+    }
+
+    // Step 3: if we have patterns and inspo URLs, ask AI for recommendations
     let aiRecs = {};
     const hasInspo = inspoContext && inspoContext.length > 20;
     const variantPages = selectedPages.filter(p => p !== "home" && p !== "services");
@@ -1951,9 +1979,9 @@ export default function CustomBuild() {
             patterns: inspoContext,
             pages: variantPages,
             brandVoice: [
-              brief.brandName,
-              (brief.voiceRules || []).join(". "),
-              brief.tagline,
+              workingBrief.brandName,
+              (workingBrief.voiceRules || []).join(". "),
+              workingBrief.tagline,
             ].filter(Boolean).join(" — "),
           }),
         });
@@ -1961,16 +1989,14 @@ export default function CustomBuild() {
           const data = await res.json();
           aiRecs = data.recommendations || {};
         }
-      } catch (e) {
-        // Silent fallback — keyword matching handles it
-      }
+      } catch (e) {}
     }
 
-    // Step 3: build pages
+    // Step 4: build pages
     setGeneratingStatus("Building pages...");
-    await new Promise(r => setTimeout(r, 300)); // small pause so status is visible
+    await new Promise(r => setTimeout(r, 300));
 
-    const pages = generatePages(brief, selectedPages, inspoContext, aiRecs);
+    const pages = generatePages(workingBrief, selectedPages, inspoContext, aiRecs);
     const variants = {};
     pages.forEach(p => { variants[p.id] = p.recommended || "A"; });
     setLayoutVariants(variants);
@@ -2264,6 +2290,35 @@ export default function CustomBuild() {
 
           {generated && (
             <div style={{ marginTop: "24px", ...T.surface }}>
+              {/* AI Drafted fields approval */}
+              {draftedFields && Object.keys(draftedFields).length > 0 && (
+                <div style={{ marginBottom: "20px", padding: "16px", background: "#f4f4f5", borderRadius: "8px" }}>
+                  <div style={{ fontSize: "12px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>
+                    {Object.keys(draftedFields).length} field{Object.keys(draftedFields).length !== 1 ? "s" : ""} drafted in brand voice
+                  </div>
+                  <div style={{ fontSize: "11px", color: "#6b7280", marginBottom: "12px" }}>Review and edit before downloading. These replaced blank fields in the brief.</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    {Object.entries(draftedFields).map(([key, value]) => (
+                      <div key={key}>
+                        <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "4px" }}>
+                          {key.replace(/([A-Z])/g, ' $1').trim()}
+                        </div>
+                        <textarea
+                          value={value}
+                          onChange={e => setDraftedFields(prev => ({ ...prev, [key]: e.target.value }))}
+                          rows={2}
+                          style={{ width: "100%", padding: "8px 10px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px", resize: "vertical", fontFamily: "Inter, system-ui, sans-serif", boxSizing: "border-box" }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => setDraftedFields(null)}
+                    style={{ ...T.btnGhost, marginTop: "10px", fontSize: "12px" }}>
+                    Dismiss
+                  </button>
+                </div>
+              )}
               <div style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "12px" }}>Download</div>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 {generated.pages.map(p => (
@@ -2444,6 +2499,7 @@ export default function CustomBuild() {
     </div>
   );
 }
+
 
 
 
