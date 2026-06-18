@@ -2154,7 +2154,9 @@ export default function CustomBuild() {
   const [briefName, setBriefName]       = useState("");
   const [briefError, setBriefError]     = useState("");
   const [clientName, setClientName]     = useState("");
-  const [showIntake, setShowIntake]     = useState(false); // editable export name
+  const [showIntake, setShowIntake]     = useState(false);
+  const [draftsView, setDraftsView]     = useState(true); // show drafts list on load
+  const [drafts, setDrafts]             = useState([]); // saved blueprint drafts
   const [inspoUrls, setInspoUrls]       = useState([""]);
   const [crawlResults, setCrawlResults] = useState({});  // keyed by URL
   const [crawling, setCrawling]         = useState({});  // keyed by URL
@@ -2235,7 +2237,68 @@ export default function CustomBuild() {
     return () => clearTimeout(timer);
   }, [brief, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants, previewPage, crawlResults, generated]);
 
-  // Load persisted inspo patterns on mount
+  // Load saved drafts list on mount
+  useEffect(() => {
+    async function loadDrafts() {
+      try {
+        const result = await kvStorageGet("spec-blueprint-drafts");
+        if (result && result.value) {
+          const parsed = JSON.parse(result.value);
+          if (Array.isArray(parsed)) setDrafts(parsed);
+        }
+      } catch(e) {}
+    }
+    loadDrafts();
+  }, []);
+
+  async function saveDraftToList(draftState) {
+    try {
+      const existing = await kvStorageGet("spec-blueprint-drafts");
+      let list = [];
+      if (existing && existing.value) {
+        try { list = JSON.parse(existing.value); } catch(e) {}
+      }
+      const id = "draft-" + Date.now();
+      const entry = {
+        id,
+        clientName: draftState.clientName || draftState.brief?.brandName || "Unnamed",
+        date: new Date().toISOString().slice(0, 10),
+        pages: draftState.selectedPages || [],
+        colors: draftState.brief?.colors || {},
+        hasGenerated: !!draftState.generated,
+        state: draftState,
+      };
+      // Replace existing draft for same client today
+      const deduped = list.filter(d => !(d.clientName === entry.clientName && d.date === entry.date));
+      deduped.unshift(entry);
+      if (deduped.length > 20) deduped.length = 20;
+      await kvStorageSet("spec-blueprint-drafts", JSON.stringify(deduped));
+      setDrafts(deduped);
+    } catch(e) {}
+  }
+
+  async function resumeDraft(draft) {
+    const s = draft.state;
+    if (s.brief) setBrief(s.brief);
+    if (s.briefName) setBriefName(s.briefName);
+    if (s.clientName) setClientName(s.clientName);
+    if (s.inspoUrls) setInspoUrls(s.inspoUrls);
+    if (s.selectedPages) setPages(s.selectedPages);
+    if (s.copyBriefOnly !== undefined) setCopy(s.copyBriefOnly);
+    if (s.layoutVariants) setLayoutVariants(s.layoutVariants);
+    if (s.generated) setGenerated(s.generated);
+    if (s.previewPage) setPreviewPage(s.previewPage);
+    if (s.crawlResults) setCrawlResults(s.crawlResults);
+    setDraftsView(false);
+  }
+
+  async function deleteDraft(id) {
+    try {
+      const updated = drafts.filter(d => d.id !== id);
+      await kvStorageSet("spec-blueprint-drafts", JSON.stringify(updated));
+      setDrafts(updated);
+    } catch(e) {}
+  }
   useEffect(() => {
     async function loadPatterns() {
       try {
@@ -2498,6 +2561,9 @@ export default function CustomBuild() {
     setPreviewPage(selectedPages[0] || "home");
     setGenerating(false);
     setGeneratingStatus("");
+    setDraftsView(false);
+    // Save to drafts list
+    saveDraftToList({ brief: workingBrief, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants: variants, generated: { pages, inspoContext, aiRecs }, previewPage: selectedPages[0] || "home", crawlResults });
   }
 
   function downloadHeader() {
@@ -2581,11 +2647,90 @@ export default function CustomBuild() {
             setBriefName("Intake form");
             setClientName(name || builtBrief.brandName || "");
             setShowIntake(false);
+            setDraftsView(false);
           }}
         />
       )}
 
+      {/* Drafts view — shown on load before starting a build */}
+      {draftsView && !showIntake && (
+        <div style={{ padding: "clamp(20px,3vw,40px)", maxWidth: "1100px", margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "32px" }}>
+            <div>
+              <div style={{ fontSize: "28px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>Blueprint builds</div>
+              <div style={{ fontSize: "14px", color: "#6b7280" }}>Resume a saved build or start a new one.</div>
+            </div>
+            <button
+              onClick={() => setDraftsView(false)}
+              style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
+              + New build
+            </button>
+          </div>
+
+          {drafts.length === 0 ? (
+            <div style={{ border: "2px dashed #e5e7eb", borderRadius: "12px", padding: "64px", textAlign: "center" }}>
+              <div style={{ fontSize: "15px", fontWeight: 600, color: "#09090b", marginBottom: "8px" }}>No saved builds yet</div>
+              <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "24px" }}>Upload a brief or fill out the intake form to get started.</div>
+              <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+                <button onClick={() => setDraftsView(false)} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>Start a build</button>
+                <button onClick={() => { setShowIntake(true); setDraftsView(false); }} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 500, background: "#fff", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "6px", cursor: "pointer" }}>Fill out intake form</button>
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px" }}>
+              {/* New build card */}
+              <div
+                onClick={() => setDraftsView(false)}
+                style={{ border: "2px dashed #e5e7eb", borderRadius: "10px", padding: "24px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "180px", gap: "8px" }}
+                onMouseOver={e => e.currentTarget.style.borderColor = "#09090b"}
+                onMouseOut={e => e.currentTarget.style.borderColor = "#e5e7eb"}>
+                <div style={{ fontSize: "24px", color: "#6b7280" }}>+</div>
+                <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>New build</div>
+              </div>
+
+              {drafts.map(draft => {
+                const colors = draft.colors || {};
+                const colorValues = Object.values(colors).filter(Boolean);
+                return (
+                  <div key={draft.id} style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: "10px", overflow: "hidden" }}>
+                    {/* Color preview */}
+                    <div style={{ height: "6px", background: colorValues.length > 0 ? `linear-gradient(to right, ${colorValues.slice(0,4).join(", ")})` : "#e5e7eb" }} />
+                    <div style={{ padding: "18px" }}>
+                      <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>{draft.clientName}</div>
+                      <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>
+                        {draft.date} · {draft.pages.length} page{draft.pages.length !== 1 ? "s" : ""}
+                        {draft.hasGenerated && <span style={{ marginLeft: "8px", fontSize: "11px", background: "#f0fdf4", color: "#15803d", padding: "2px 6px", borderRadius: "3px", fontWeight: 600 }}>Generated</span>}
+                      </div>
+                      <div style={{ display: "flex", gap: "4px", marginBottom: "14px", flexWrap: "wrap" }}>
+                        {draft.pages.slice(0, 4).map(p => (
+                          <span key={p} style={{ fontSize: "11px", padding: "2px 8px", background: "#f4f4f5", borderRadius: "3px", color: "#6b7280" }}>{p}</span>
+                        ))}
+                        {draft.pages.length > 4 && <span style={{ fontSize: "11px", color: "#9ca3af" }}>+{draft.pages.length - 4}</span>}
+                      </div>
+                      <div style={{ display: "flex", gap: "8px" }}>
+                        <button
+                          onClick={() => resumeDraft(draft)}
+                          style={{ flex: 1, padding: "8px 0", fontSize: "12px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
+                          Resume
+                        </button>
+                        <button
+                          onClick={() => deleteDraft(draft.id)}
+                          style={{ padding: "8px 12px", fontSize: "12px", background: "#fff", color: "#6b7280", border: "1px solid #e5e7eb", borderRadius: "6px", cursor: "pointer" }}>
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {!draftsView && (
       <div style={{ borderBottom: "1px solid #e5e7eb", background: "#fff", padding: "16px 24px", display: "flex", alignItems: "center", gap: "16px", width: "100%", boxSizing: "border-box" }}>
+        <button onClick={() => setDraftsView(true)} style={{ background: "none", border: "none", fontSize: "13px", color: "#6b7280", cursor: "pointer", padding: "0", marginRight: "4px" }}>← Builds</button>
         <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b" }}>Brief to Blueprint</div>
         <div style={{ marginLeft: "auto", display: "flex", gap: "8px", alignItems: "center" }}>
           {(brief || generated) && (
@@ -3007,9 +3152,11 @@ export default function CustomBuild() {
           </div>
         )}
       </div>
+      )} {/* end !draftsView */}
     </div>
   );
 }
+
 
 
 
