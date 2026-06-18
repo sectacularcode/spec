@@ -1,5 +1,40 @@
 import React, { useState, useRef, useEffect } from "react";
 
+// ─── Server-side KV storage helpers ──────────────────────────────────────────
+// Replaces window.storage — works on live Vercel deployment via Upstash Redis
+async function kvStorageGet(key) {
+  try {
+    const res = await fetch("/api/storage?key=" + encodeURIComponent(key));
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.value ? { value: data.value } : null;
+  } catch(e) { return null; }
+}
+
+async function kvStorageSet(key, value) {
+  try {
+    const res = await fetch("/api/storage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "set", key, value }),
+    });
+    return res.ok;
+  } catch(e) { return false; }
+}
+
+async function kvStorageDel(key) {
+  try {
+    const res = await fetch("/api/storage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "delete", key }),
+    });
+    return res.ok;
+  } catch(e) { return false; }
+}
+
+
+
 // ─── Intake Form Modal ────────────────────────────────────────────────────────
 const INTAKE_TABS = ["Brand", "Design", "Sitemap", "Copy", "Pricing", "SEO"];
 
@@ -534,12 +569,12 @@ function inferTags(brief, pages, layoutVariants) {
 }
 
 async function saveToLibrary(brief, pages, layoutVariants, selectedVariants) {
-  if (!window.storage) return;
+  
   try {
     // ── Save full build ────────────────────────────────────────────────────
     var existing = [];
     try {
-      var stored = await window.storage.get("spec-template-library");
+      var stored = await kvStorageGet("spec-template-library");
       if (stored && stored.value) existing = JSON.parse(stored.value);
     } catch(e) {}
 
@@ -576,12 +611,12 @@ async function saveToLibrary(brief, pages, layoutVariants, selectedVariants) {
     });
     deduped.unshift(entry);
     if (deduped.length > 50) deduped = deduped.slice(0, 50);
-    await window.storage.set("spec-template-library", JSON.stringify(deduped));
+    await kvStorageSet("spec-template-library", JSON.stringify(deduped));
 
     // ── Save individual sections ───────────────────────────────────────────
     var existingSections = [];
     try {
-      var storedSections = await window.storage.get("spec-section-library");
+      var storedSections = await kvStorageGet("spec-section-library");
       if (storedSections && storedSections.value) existingSections = JSON.parse(storedSections.value);
     } catch(e) {}
 
@@ -608,7 +643,7 @@ async function saveToLibrary(brief, pages, layoutVariants, selectedVariants) {
 
     var combinedSections = newSections.concat(existingSections);
     if (combinedSections.length > 300) combinedSections = combinedSections.slice(0, 300);
-    await window.storage.set("spec-section-library", JSON.stringify(combinedSections));
+    await kvStorageSet("spec-section-library", JSON.stringify(combinedSections));
 
   } catch(e) {
     console.warn("saveToLibrary failed:", e);
@@ -2145,9 +2180,9 @@ export default function CustomBuild() {
   // Load saved draft on mount
   useEffect(() => {
     async function loadDraft() {
-      if (!window.storage) return;
+      
       try {
-        const result = await window.storage.get("spec-blueprint-draft");
+        const result = await kvStorageGet("spec-blueprint-draft");
         if (!result || !result.value) return;
         const draft = JSON.parse(result.value);
         if (draft.brief)          setBrief(draft.brief);
@@ -2167,7 +2202,7 @@ export default function CustomBuild() {
 
   // Save draft whenever key state changes (debounced)
   useEffect(() => {
-    if (!window.storage) return;
+    
     const timer = setTimeout(() => {
       const draft = {
         brief,
@@ -2195,7 +2230,7 @@ export default function CustomBuild() {
           }))
         } : null,
       };
-      window.storage.set("spec-blueprint-draft", JSON.stringify(draft)).catch(() => {});
+      kvStorageSet("spec-blueprint-draft", JSON.stringify(draft)).catch(() => {});
     }, 800);
     return () => clearTimeout(timer);
   }, [brief, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants, previewPage, crawlResults, generated]);
@@ -2204,7 +2239,7 @@ export default function CustomBuild() {
   useEffect(() => {
     async function loadPatterns() {
       try {
-        const result = await window.storage.get("spec-inspo-patterns");
+        const result = await kvStorageGet("spec-inspo-patterns");
         if (result && result.value) {
           const parsed = JSON.parse(result.value);
           // Handle both old per-page format and new flat pool format
@@ -2214,15 +2249,15 @@ export default function CustomBuild() {
         // No stored patterns yet
       }
     }
-    if (window.storage) loadPatterns();
+    loadPatterns();
   }, []);
 
   // Load section library for swap drawer
   useEffect(() => {
     async function loadSectionLibrary() {
-      if (!window.storage) return;
+      
       try {
-        const result = await window.storage.get("spec-section-library");
+        const result = await kvStorageGet("spec-section-library");
         if (result && result.value) setSectionLibrary(JSON.parse(result.value));
       } catch(e) {}
     }
@@ -2371,9 +2406,9 @@ export default function CustomBuild() {
         setCrawlResults(r => {
           const updated = { ...r, [trimmed]: data };
           // Persist the merged pattern pool to storage
-          if (window.storage && data.patterns) {
+          if (data.patterns) {
             const merged = buildInspoContext(updated, storedPatterns);
-            window.storage.set("spec-inspo-patterns", JSON.stringify({ pool: merged })).catch(() => {});
+            kvStorageSet("spec-inspo-patterns", JSON.stringify({ pool: merged })).catch(() => {});
             setStoredPatterns({ pool: merged });
           }
           return updated;
@@ -2559,7 +2594,7 @@ export default function CustomBuild() {
                 setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]);
                 setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({});
                 setPreviewPage("home"); setPageOverrides({});
-                if (window.storage) { try { await window.storage.delete("spec-blueprint-draft"); } catch(e) {} }
+                { try { await kvStorageDel("spec-blueprint-draft"); } catch(e) {} }
               }}
               style={{ fontSize: "12px", color: "#6b7280", background: "none", border: "1px solid #e5e7eb", borderRadius: "6px", padding: "6px 12px", cursor: "pointer" }}>
               Clear draft
@@ -2653,7 +2688,7 @@ export default function CustomBuild() {
                 <button
                   onClick={async () => {
                     setStoredPatterns({});
-                    if (window.storage) { try { await window.storage.delete("spec-inspo-patterns"); } catch(e) {} }
+                    { try { await kvStorageDel("spec-inspo-patterns"); } catch(e) {} }
                   }}
                   style={{ fontSize: "11px", color: "#6b7280", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
                   Clear
@@ -2975,6 +3010,7 @@ export default function CustomBuild() {
     </div>
   );
 }
+
 
 
 
