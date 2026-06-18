@@ -3777,6 +3777,7 @@ export default function App() {
   const [projects, setProjects] = useState([]);
   const [activeId, setActiveId] = useState(function(){try{return localStorage.getItem("spec_activeId")||"";}catch(e){return "";}});
   const [view, setView] = useState(function(){try{return localStorage.getItem("spec_view")||"projects";}catch(e){return "projects";}});
+  const [mobilePreviewTS, setMobilePreviewTS] = useState(false);
   const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_tab")||"discovery";}catch(e){return "discovery";}});
   const [pageIdx, setPageIdx] = useState(function(){try{return parseInt(localStorage.getItem("spec_pageIdx")||"0",10);}catch(e){return 0;}});
   const [showAudit, setShowAudit] = useState(false);
@@ -4894,9 +4895,15 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   if (effectiveView === "preview" && project) return (
     <div style={{ position: "fixed", inset: 0, background: "#000", display: "flex", flexDirection: "column", zIndex: 1000 }}>
       <div style={{ padding: "10px 16px", background: "#09090b", borderBottom: "1px solid #27272a", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-        <div style={{ color: "#ffffff", fontSize: "14px", fontWeight: 500 }}>
-          Preview — {brand.name} / {page.name}
-          <span style={{ marginLeft: "12px", fontSize: "12px", color: "#a3a39e", fontWeight: 400 }}>Click any heading or paragraph to edit inline</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{ color: "#ffffff", fontSize: "14px", fontWeight: 500 }}>
+            Preview — {brand.name} / {page.name}
+            <span style={{ marginLeft: "12px", fontSize: "12px", color: "#a3a39e", fontWeight: 400 }}>Click any heading or paragraph to edit inline</span>
+          </div>
+          <div style={{ display: "flex", border: "1px solid #3f3f46", borderRadius: "6px", overflow: "hidden", flexShrink: 0 }}>
+            <button onClick={() => setMobilePreviewTS(false)} style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: !mobilePreviewTS ? "#ffffff" : "transparent", color: !mobilePreviewTS ? "#09090b" : "#a3a39e", borderRight: "1px solid #3f3f46" }}>Desktop</button>
+            <button onClick={() => setMobilePreviewTS(true)} style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: mobilePreviewTS ? "#ffffff" : "transparent", color: mobilePreviewTS ? "#09090b" : "#a3a39e" }}>Mobile</button>
+          </div>
         </div>
         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
           <FormatToggle />
@@ -4907,7 +4914,13 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           <button onClick={() => setView("editor")} style={{ padding: "8px 14px", background: "transparent", color: "#a3a39e", border: "1px solid #3f3f46", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>← Back to Editor</button>
         </div>
       </div>
-      <iframe srcDoc={previewHTML(page, brand)} style={{ flex: 1, border: "none", width: "100%", background: "#000" }} title="Preview" sandbox="allow-same-origin allow-scripts" />
+      {mobilePreviewTS ? (
+        <div style={{ flex: 1, overflow: "auto", background: "#1a1a1a", display: "flex", justifyContent: "center", alignItems: "flex-start", padding: "24px 0" }}>
+          <iframe srcDoc={previewHTML(page, brand)} style={{ width: "390px", minHeight: "844px", border: "1px solid #3f3f46", borderRadius: "12px", flexShrink: 0, background: "#000", boxShadow: "0 8px 32px rgba(0,0,0,0.5)" }} title="Preview" sandbox="allow-same-origin allow-scripts" />
+        </div>
+      ) : (
+        <iframe srcDoc={previewHTML(page, brand)} style={{ flex: 1, border: "none", width: "100%", background: "#000" }} title="Preview" sandbox="allow-same-origin allow-scripts" />
+      )}
     </div>
   );
 
@@ -6500,6 +6513,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
     </div>
   );
 }
+
 
 
 
