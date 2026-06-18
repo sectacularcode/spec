@@ -1455,6 +1455,7 @@ export default function CustomBuild() {
   const [sectionLibrary, setSectionLibrary] = useState([]); // saved sections from past builds
   const [swapFilter, setSwapFilter]         = useState(""); // filter by page type
   const [pageOverrides, setPageOverrides]   = useState({}); // {pageId: {sectionIndex: sectionData}}
+  const [mobilePreview, setMobilePreview]   = useState(false); // desktop vs mobile preview toggle
   const fileRef = useRef();
   const [parsing, setParsing]           = useState(false);
   const canGenerate = !!brief && selectedPages.length > 0;
@@ -2056,6 +2057,21 @@ export default function CustomBuild() {
                   Swap sections
                 </button>
               )}
+              {/* Desktop / Mobile toggle */}
+              <div style={{ marginLeft: "auto", display: "flex", border: "1px solid #e5e7eb", borderRadius: "6px", overflow: "hidden" }}>
+                <button
+                  onClick={() => setMobilePreview(false)}
+                  title="Desktop preview"
+                  style={{ padding: "6px 12px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: !mobilePreview ? "#09090b" : "#fff", color: !mobilePreview ? "#fff" : "#6b7280", borderRight: "1px solid #e5e7eb" }}>
+                  Desktop
+                </button>
+                <button
+                  onClick={() => setMobilePreview(true)}
+                  title="Mobile preview"
+                  style={{ padding: "6px 12px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: mobilePreview ? "#09090b" : "#fff", color: mobilePreview ? "#fff" : "#6b7280" }}>
+                  Mobile
+                </button>
+              </div>
               {/* Layout variant switcher */}
               {generated.pages.filter(p => p.id === previewPage && p.hasVariants).map(p => (
                 <div key="switcher" style={{ marginLeft: "auto", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "4px" }}>
@@ -2155,17 +2171,27 @@ export default function CustomBuild() {
               </div>
             )}
 
-            <iframe
-              srcDoc={buildPreviewHTML(brief, previewPage, layoutVariants[previewPage] || "A")}
-              style={{ flex: 1, border: "none", width: "100%", minHeight: "calc(100vh - 100px)" }}
-              title="Site preview"
-            />
+            <div style={{ flex: 1, overflow: "auto", background: mobilePreview ? "#f4f4f5" : "#fff", display: "flex", justifyContent: mobilePreview ? "center" : "stretch", alignItems: mobilePreview ? "flex-start" : "stretch", padding: mobilePreview ? "24px 0" : "0" }}>
+              <iframe
+                srcDoc={buildPreviewHTML(brief, previewPage, layoutVariants[previewPage] || "A")}
+                style={{
+                  border: mobilePreview ? "1px solid #e5e7eb" : "none",
+                  borderRadius: mobilePreview ? "12px" : "0",
+                  width: mobilePreview ? "390px" : "100%",
+                  minHeight: mobilePreview ? "844px" : "calc(100vh - 100px)",
+                  flexShrink: 0,
+                  boxShadow: mobilePreview ? "0 4px 24px rgba(0,0,0,0.12)" : "none",
+                }}
+                title="Site preview"
+              />
+            </div>
           </div>
         )}
       </div>
     </div>
   );
 }
+
 
 
 
