@@ -1,6 +1,464 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
-// ─── Template Library ─────────────────────────────────────────────────────────
+// ─── Intake Form Modal ────────────────────────────────────────────────────────
+const INTAKE_TABS = ["Brand", "Design", "Sitemap", "Copy", "Pricing", "SEO"];
+
+const DEFAULT_COLORS = [
+  { name: "Ink", hex: "", use: "Primary text, dark section backgrounds" },
+  { name: "Accent", hex: "", use: "Buttons, accent elements" },
+  { name: "Accent Deep", hex: "", use: "Links, hover states" },
+  { name: "Background", hex: "", use: "Primary surface, default background" },
+  { name: "Dark Panel", hex: "", use: "Dark panels, cards, pricing tiers" },
+  { name: "Muted", hex: "", use: "Muted labels, captions" },
+  { name: "Warm White", hex: "", use: "Clean surface, text on dark" },
+  { name: "Text", hex: "", use: "Body copy on light backgrounds" },
+];
+
+const DEFAULT_TIERS = [
+  { name: "", subtitle: "", description: "", price: "" },
+  { name: "", subtitle: "", description: "", price: "" },
+  { name: "", subtitle: "", description: "", price: "" },
+];
+
+const DEFAULT_SEO_PAGES = ["Home", "Work", "Services", "About", "Process", "Contact"];
+
+function IntakeForm({ onClose, onComplete }) {
+  const [tab, setTab] = React.useState(0);
+  const [form, setForm] = React.useState({
+    // Brand
+    brandName: "", whatItIs: "", whoItIsFor: "", storyBehindName: "",
+    voiceRules: "", tagline: "", signatureLine: "",
+    // Design
+    colors: DEFAULT_COLORS.map(c => ({ ...c })),
+    primaryFont: "", accentFont: "", typographyNotes: "",
+    buttonsLinks: "", componentMotif: "", layoutImagery: "",
+    // Sitemap
+    pages: "Home · The hook, the difference, the niche, a taste of the work and the pricing.\nWork · The portfolio.\nServices & Pricing · Open pricing, the three tiers, and the full menu.\nAbout · The maker.\nProcess · How it gets made, start to finish.\nContact · A short form and a promise of a real reply.",
+    headerDescription: "", footerDescription: "",
+    headerNav: "Work, Services, About, Process, Contact",
+    headerCta: "Start a project",
+    // Copy — Home
+    heroEyebrow: "", heroH1: "", heroSubhead: "", heroCta1: "See the work", heroCta2: "See pricing",
+    hookStatement: "",
+    serviceCard1Title: "", serviceCard1Body: "",
+    serviceCard2Title: "", serviceCard2Body: "",
+    serviceCard3Title: "", serviceCard3Body: "",
+    serviceCard4Title: "", serviceCard4Body: "",
+    differenceEyebrow: "", differenceH2: "", differenceBody: "",
+    whoEyebrow: "", whoH2: "", whoBody: "",
+    workH2: "Recent work.", pricingTeaserH2: "", pricingTeaserBody: "", pricingTeaserCta: "See packages",
+    closingPullQuote: "", closingCta: "Start a project",
+    // Copy — About
+    aboutEyebrow: "", aboutH1: "", aboutStory: "", whyOneMaker: "", founderValues: "",
+    // Copy — Process
+    processEyebrow: "", processH1: "", processIntro: "",
+    step1Title: "", step1Body: "", step2Title: "", step2Body: "",
+    step3Title: "", step3Body: "", step4Title: "", step4Body: "",
+    step5Title: "", step5Body: "",
+    // Copy — Contact
+    contactEyebrow: "", contactH1: "", contactIntro: "",
+    contactSubmit: "Send it over", contactReassurance: "",
+    // Pricing
+    tiers: DEFAULT_TIERS.map(t => ({ ...t })),
+    alwaysIncluded: "",
+    // SEO
+    seo: DEFAULT_SEO_PAGES.map(page => ({ page, title: "", desc: "" })),
+  });
+
+  function set(key, val) { setForm(f => ({ ...f, [key]: val })); }
+  function setColor(i, key, val) {
+    setForm(f => {
+      const colors = f.colors.map((c, j) => j === i ? { ...c, [key]: val } : c);
+      return { ...f, colors };
+    });
+  }
+  function setTier(i, key, val) {
+    setForm(f => {
+      const tiers = f.tiers.map((t, j) => j === i ? { ...t, [key]: val } : t);
+      return { ...f, tiers };
+    });
+  }
+  function setSeo(i, key, val) {
+    setForm(f => {
+      const seo = f.seo.map((s, j) => j === i ? { ...s, [key]: val } : s);
+      return { ...f, seo };
+    });
+  }
+
+  function buildBriefFromForm() {
+    const colors = {};
+    const colorNames = ["ink", "brass", "brass-deep", "bone", "asphalt", "stone", "warm-white", "text"];
+    form.colors.forEach((c, i) => { if (c.hex) colors[colorNames[i]] = c.hex; });
+
+    return {
+      brandName: form.brandName,
+      tagline: form.tagline,
+      signatureLine: form.signatureLine,
+      colors,
+      fonts: [form.primaryFont, form.accentFont].filter(Boolean),
+      voiceRules: form.voiceRules.split("\n").map(r => r.trim()).filter(Boolean),
+      headerNav: form.headerNav.split(",").map(s => s.trim()),
+      headerCta: form.headerCta,
+      footerTagline: form.signatureLine,
+      heroHeadline: form.heroH1,
+      heroSubhead: form.heroSubhead,
+      heroCta1: form.heroCta1,
+      heroCta2: form.heroCta2,
+      hookStatement: form.hookStatement,
+      serviceCards: [
+        [form.serviceCard1Title, form.serviceCard1Body],
+        [form.serviceCard2Title, form.serviceCard2Body],
+        [form.serviceCard3Title, form.serviceCard3Body],
+        [form.serviceCard4Title, form.serviceCard4Body],
+      ].filter(c => c[0] || c[1]),
+      differenceEyebrow: form.differenceEyebrow,
+      differenceH2: form.differenceH2,
+      differenceBody: form.differenceBody,
+      whoEyebrow: form.whoEyebrow,
+      whoH2: form.whoH2,
+      whoBody: form.whoBody,
+      workH2: form.workH2,
+      pricingH2: form.pricingTeaserH2,
+      pricingSubhead: form.pricingTeaserBody,
+      pricingCta: form.pricingTeaserCta,
+      closingCta: form.closingCta,
+      aboutEyebrow: form.aboutEyebrow,
+      aboutH1: form.aboutH1,
+      aboutStory: form.aboutStory,
+      whyOneMaker: form.whyOneMaker,
+      founderValues: form.founderValues.split(",").map(v => v.trim()).filter(Boolean),
+      processEyebrow: form.processEyebrow,
+      processH1: form.processH1,
+      processIntro: form.processIntro,
+      processSteps: [
+        ["01", form.step1Title, form.step1Body],
+        ["02", form.step2Title, form.step2Body],
+        ["03", form.step3Title, form.step3Body],
+        ["04", form.step4Title, form.step4Body],
+        ["05", form.step5Title, form.step5Body],
+      ].filter(s => s[1] || s[2]),
+      contactEyebrow: form.contactEyebrow,
+      contactH1: form.contactH1,
+      contactIntro: form.contactIntro,
+      contactCta: form.contactSubmit,
+      contactReassurance: form.contactReassurance,
+      pricingTiers: form.tiers.filter(t => t.name).map(t => [t.name, t.subtitle, t.description, t.price]),
+    };
+  }
+
+  const S = { // field styles
+    label: { display: "block", fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "4px" },
+    hint: { fontSize: "11px", color: "#9ca3af", marginBottom: "6px", lineHeight: 1.5 },
+    input: { width: "100%", padding: "9px 12px", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "14px", color: "#09090b", outline: "none", background: "#fff", boxSizing: "border-box" },
+    textarea: { width: "100%", padding: "9px 12px", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "14px", color: "#09090b", outline: "none", background: "#fff", boxSizing: "border-box", resize: "vertical", fontFamily: "Inter, system-ui, sans-serif", lineHeight: 1.6 },
+    field: { marginBottom: "18px" },
+    section: { marginBottom: "28px" },
+    sectionTitle: { fontSize: "13px", fontWeight: 700, color: "#09090b", marginBottom: "14px", paddingBottom: "8px", borderBottom: "1px solid #e5e7eb" },
+  };
+
+  const tabs = {
+    0: ( // Brand
+      <div>
+        <div style={S.section}>
+          <div style={S.sectionTitle}>01 · The Brand in Brief</div>
+          <div style={S.field}>
+            <label style={S.label}>Brand name</label>
+            <input style={S.input} value={form.brandName} onChange={e => set("brandName", e.target.value)} placeholder="e.g. Mile Marker Films" />
+          </div>
+          <div style={S.field}>
+            <label style={S.label}>What it is</label>
+            <div style={S.hint}>Feeds tone and framing for the whole site. Not placed on a page directly.</div>
+            <textarea rows={4} style={S.textarea} value={form.whatItIs} onChange={e => set("whatItIs", e.target.value)} placeholder="Mile Marker Films is a one person, full-service video studio. Ben writes, shoots, records sound, and edits every film himself…" />
+          </div>
+          <div style={S.field}>
+            <label style={S.label}>Who it is for</label>
+            <div style={S.hint}>The audience the site speaks to. Shapes voice and the Who it is for section on Home.</div>
+            <textarea rows={4} style={S.textarea} value={form.whoItIsFor} onChange={e => set("whoItIsFor", e.target.value)} placeholder="Industrial and founder-led companies, and the businesses backed by private equity…" />
+          </div>
+          <div style={S.field}>
+            <label style={S.label}>The story behind the name</label>
+            <div style={S.hint}>Brand narrative. Informs the About page and the closing lines.</div>
+            <textarea rows={4} style={S.textarea} value={form.storyBehindName} onChange={e => set("storyBehindName", e.target.value)} placeholder="A mile marker is a small, certain thing on the side of the road…" />
+          </div>
+          <div style={S.field}>
+            <label style={S.label}>Voice, in five rules <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>(one per line)</span></label>
+            <div style={S.hint}>The rules the AI obeys on every drafted field. This is what makes copy sound like the brand.</div>
+            <textarea rows={6} style={S.textarea} value={form.voiceRules} onChange={e => set("voiceRules", e.target.value)} placeholder={"Say less. Confidence is quiet. Short sentences win.\nPlain words. No buzzwords, no filler.\nSpecific beats grand. Show the detail instead of claiming greatness.\nClean punctuation. Commas and periods, not dashes.\nWarm, but grounded. Premium without trying too hard."} />
+          </div>
+          <div style={S.field}>
+            <label style={S.label}>Tagline</label>
+            <div style={S.hint}>Closing call to action and footer area.</div>
+            <input style={S.input} value={form.tagline} onChange={e => set("tagline", e.target.value)} placeholder="The stories that move a company forward." />
+          </div>
+          <div style={S.field}>
+            <label style={S.label}>Signature line</label>
+            <div style={S.hint}>Footer, beneath the wordmark.</div>
+            <input style={S.input} value={form.signatureLine} onChange={e => set("signatureLine", e.target.value)} placeholder="Mark what matters." />
+          </div>
+        </div>
+      </div>
+    ),
+    1: ( // Design
+      <div>
+        <div style={S.section}>
+          <div style={S.sectionTitle}>02 · Design System</div>
+          <div style={S.field}>
+            <label style={S.label}>Color palette</label>
+            <div style={S.hint}>Eight named colors. Each becomes a preset applied site-wide. Dominance rule: background and ink carry the site. Accent stays rare.</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              {form.colors.map((c, i) => (
+                <div key={i} style={{ display: "grid", gridTemplateColumns: "120px 110px 1fr", gap: "8px", alignItems: "center" }}>
+                  <input style={{ ...S.input, fontSize: "13px" }} value={c.name} onChange={e => setColor(i, "name", e.target.value)} placeholder="Color name" />
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <input type="color" value={c.hex || "#ffffff"} onChange={e => setColor(i, "hex", e.target.value)} style={{ width: "32px", height: "32px", border: "1px solid #e5e7eb", borderRadius: "4px", cursor: "pointer", padding: "2px" }} />
+                    <input style={{ ...S.input, fontSize: "12px", fontFamily: "monospace" }} value={c.hex} onChange={e => setColor(i, "hex", e.target.value)} placeholder="#000000" />
+                  </div>
+                  <input style={{ ...S.input, fontSize: "12px", color: "#6b7280" }} value={c.use} onChange={e => setColor(i, "use", e.target.value)} placeholder="Use…" />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            <div style={S.field}>
+              <label style={S.label}>Primary font</label>
+              <input style={S.input} value={form.primaryFont} onChange={e => set("primaryFont", e.target.value)} placeholder="Inter" />
+            </div>
+            <div style={S.field}>
+              <label style={S.label}>Accent font</label>
+              <input style={S.input} value={form.accentFont} onChange={e => set("accentFont", e.target.value)} placeholder="Fraunces" />
+            </div>
+          </div>
+          <div style={S.field}>
+            <label style={S.label}>Typography notes</label>
+            <div style={S.hint}>Font roles, weights, sizes, and line heights. Becomes the typography presets in the brand kit.</div>
+            <textarea rows={4} style={S.textarea} value={form.typographyNotes} onChange={e => set("typographyNotes", e.target.value)} placeholder={"Inter is the primary face. Fraunces is the accent, used only for the wordmark, hero, and pull-quotes.\nH1 · Inter 800, 1.1 lh\nBody · Inter 400, 17px, 1.65 lh"} />
+          </div>
+          <div style={S.field}>
+            <label style={S.label}>Buttons and links</label>
+            <div style={S.hint}>Theme style for buttons and in-copy links.</div>
+            <textarea rows={3} style={S.textarea} value={form.buttonsLinks} onChange={e => set("buttonsLinks", e.target.value)} placeholder="Primary button: brass fill, ink text, Inter 600, uppercase, 2px radius. Hover deepens to Brass Deep." />
+          </div>
+          <div style={S.field}>
+            <label style={S.label}>Components and motif</label>
+            <div style={S.hint}>Section styling rules — signature accents, card treatment, dark sections.</div>
+            <textarea rows={3} style={S.textarea} value={form.componentMotif} onChange={e => set("componentMotif", e.target.value)} placeholder="The marker tick: a short brass bar. Cards: bone or warm white, one hairline border, generous padding." />
+          </div>
+          <div style={S.field}>
+            <label style={S.label}>Layout and imagery</label>
+            <div style={S.hint}>Layout defaults and photo direction.</div>
+            <textarea rows={3} style={S.textarea} value={form.layoutImagery} onChange={e => set("layoutImagery", e.target.value)} placeholder="Generous whitespace. Content max width 1080–1200px. Imagery is real and grounded: people at work, plant floors, hands." />
+          </div>
+        </div>
+      </div>
+    ),
+    2: ( // Sitemap
+      <div>
+        <div style={S.section}>
+          <div style={S.sectionTitle}>03 · Sitemap and Global Elements</div>
+          <div style={S.field}>
+            <label style={S.label}>Pages</label>
+            <div style={S.hint}>Which pages get built, and the one-line purpose of each. One per line.</div>
+            <textarea rows={6} style={S.textarea} value={form.pages} onChange={e => set("pages", e.target.value)} />
+          </div>
+          <div style={S.field}>
+            <label style={S.label}>Header nav links <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>(comma-separated)</span></label>
+            <input style={S.input} value={form.headerNav} onChange={e => set("headerNav", e.target.value)} placeholder="Work, Services, About, Process, Contact" />
+          </div>
+          <div style={S.field}>
+            <label style={S.label}>Header CTA button</label>
+            <input style={S.input} value={form.headerCta} onChange={e => set("headerCta", e.target.value)} placeholder="Start a project" />
+          </div>
+          <div style={S.field}>
+            <label style={S.label}>Header description</label>
+            <div style={S.hint}>Style and layout notes for the global header.</div>
+            <textarea rows={3} style={S.textarea} value={form.headerDescription} onChange={e => set("headerDescription", e.target.value)} placeholder="Logo left. Links: Work, Services, About, Process, Contact. One brass button on the right: Start a project." />
+          </div>
+          <div style={S.field}>
+            <label style={S.label}>Footer description</label>
+            <div style={S.hint}>Style and layout notes for the global footer.</div>
+            <textarea rows={3} style={S.textarea} value={form.footerDescription} onChange={e => set("footerDescription", e.target.value)} placeholder="Warm-white wordmark on Ink, the tagline beneath it, nav repeated, email address, and a small line." />
+          </div>
+        </div>
+      </div>
+    ),
+    3: ( // Copy
+      <div>
+        <div style={S.section}>
+          <div style={S.sectionTitle}>04 · Home Page Copy</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            <div style={S.field}><label style={S.label}>Hero eyebrow</label><input style={S.input} value={form.heroEyebrow} onChange={e => set("heroEyebrow", e.target.value)} placeholder="Mile Marker Films" /></div>
+            <div style={S.field}><label style={S.label}>Hero CTA 1</label><input style={S.input} value={form.heroCta1} onChange={e => set("heroCta1", e.target.value)} placeholder="See the work" /></div>
+          </div>
+          <div style={S.field}><label style={S.label}>Hero H1 (display)</label><textarea rows={2} style={S.textarea} value={form.heroH1} onChange={e => set("heroH1", e.target.value)} placeholder="Films for companies worth marking." /></div>
+          <div style={S.field}><label style={S.label}>Hero subhead</label><textarea rows={2} style={S.textarea} value={form.heroSubhead} onChange={e => set("heroSubhead", e.target.value)} placeholder="Full-service video for industrial and founder-led companies. One person, from the first idea to the final cut." /></div>
+          <div style={S.field}><label style={S.label}>The honest hook</label><div style={S.hint}>Single statement block under the hero.</div><textarea rows={3} style={S.textarea} value={form.hookStatement} onChange={e => set("hookStatement", e.target.value)} placeholder="Most studios send a ten person crew and a vague quote. This is one maker who does all of it…" /></div>
+          <div style={S.sectionTitle} style={{ fontSize: "12px", fontWeight: 600, color: "#6b7280", marginBottom: "12px" }}>What we make — 4 cards</div>
+          {[1,2,3,4].map(n => (
+            <div key={n} style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "8px", marginBottom: "10px" }}>
+              <input style={{ ...S.input, fontSize: "13px" }} value={form["serviceCard" + n + "Title"]} onChange={e => set("serviceCard" + n + "Title", e.target.value)} placeholder={"Card " + n + " title"} />
+              <input style={{ ...S.input, fontSize: "13px" }} value={form["serviceCard" + n + "Body"]} onChange={e => set("serviceCard" + n + "Body", e.target.value)} placeholder={"Card " + n + " body"} />
+            </div>
+          ))}
+          <div style={{ ...S.section, marginTop: "20px" }}>
+            <div style={{ fontSize: "12px", fontWeight: 600, color: "#6b7280", marginBottom: "12px" }}>The difference section</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "8px" }}>
+              <input style={{ ...S.input, fontSize: "13px" }} value={form.differenceEyebrow} onChange={e => set("differenceEyebrow", e.target.value)} placeholder="Eyebrow: Why one maker" />
+              <input style={{ ...S.input, fontSize: "13px" }} value={form.differenceH2} onChange={e => set("differenceH2", e.target.value)} placeholder="H2: One person. The whole film." />
+            </div>
+            <textarea rows={3} style={S.textarea} value={form.differenceBody} onChange={e => set("differenceBody", e.target.value)} placeholder="No crew to feed, house, or fly. One mind carries the story…" />
+          </div>
+          <div style={{ ...S.section }}>
+            <div style={{ fontSize: "12px", fontWeight: 600, color: "#6b7280", marginBottom: "12px" }}>Who it is for section</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "8px" }}>
+              <input style={{ ...S.input, fontSize: "13px" }} value={form.whoEyebrow} onChange={e => set("whoEyebrow", e.target.value)} placeholder="Eyebrow: Who it is for" />
+              <input style={{ ...S.input, fontSize: "13px" }} value={form.whoH2} onChange={e => set("whoH2", e.target.value)} placeholder="H2: For the underfilmed." />
+            </div>
+            <textarea rows={3} style={S.textarea} value={form.whoBody} onChange={e => set("whoBody", e.target.value)} placeholder="Industrial and founder-led companies…" />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "18px" }}>
+            <div><label style={S.label}>Work H2</label><input style={S.input} value={form.workH2} onChange={e => set("workH2", e.target.value)} placeholder="Recent work." /></div>
+            <div><label style={S.label}>Pricing teaser H2</label><input style={S.input} value={form.pricingTeaserH2} onChange={e => set("pricingTeaserH2", e.target.value)} placeholder="Clear prices." /></div>
+            <div><label style={S.label}>Pricing CTA</label><input style={S.input} value={form.pricingTeaserCta} onChange={e => set("pricingTeaserCta", e.target.value)} placeholder="See packages" /></div>
+          </div>
+          <div style={S.field}><label style={S.label}>Closing pull-quote (Fraunces)</label><input style={S.input} value={form.closingPullQuote} onChange={e => set("closingPullQuote", e.target.value)} placeholder="The stories that move a company forward." /></div>
+        </div>
+
+        <div style={S.section}>
+          <div style={S.sectionTitle}>About page copy</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "12px" }}>
+            <input style={{ ...S.input, fontSize: "13px" }} value={form.aboutEyebrow} onChange={e => set("aboutEyebrow", e.target.value)} placeholder="Eyebrow: The maker" />
+            <input style={{ ...S.input, fontSize: "13px" }} value={form.aboutH1} onChange={e => set("aboutH1", e.target.value)} placeholder="H1: One person. Every frame." />
+          </div>
+          <div style={S.field}><label style={S.label}>Founder story</label><div style={S.hint}>Use [brackets] for anything a human must confirm. AI never fills brackets.</div><textarea rows={5} style={S.textarea} value={form.aboutStory} onChange={e => set("aboutStory", e.target.value)} placeholder={"Mile Marker Films is Ben [last name]. He writes the films, shoots them, records the sound, and cuts them…"} /></div>
+          <div style={S.field}><label style={S.label}>Why one maker / approach</label><textarea rows={3} style={S.textarea} value={form.whyOneMaker} onChange={e => set("whyOneMaker", e.target.value)} placeholder="One mind on the whole film keeps the voice honest and the cost lean…" /></div>
+          <div style={S.field}><label style={S.label}>Five values <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>(comma-separated)</span></label><input style={S.input} value={form.founderValues} onChange={e => set("founderValues", e.target.value)} placeholder="Grounded, Forward, Exact, Singular, Human" /></div>
+        </div>
+
+        <div style={S.section}>
+          <div style={S.sectionTitle}>Process page copy</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "12px" }}>
+            <input style={{ ...S.input, fontSize: "13px" }} value={form.processEyebrow} onChange={e => set("processEyebrow", e.target.value)} placeholder="Eyebrow: Process" />
+            <input style={{ ...S.input, fontSize: "13px" }} value={form.processH1} onChange={e => set("processH1", e.target.value)} placeholder="H1: How a film gets made." />
+          </div>
+          <div style={S.field}><input style={S.input} value={form.processIntro} onChange={e => set("processIntro", e.target.value)} placeholder="Intro: Simple and calm, from first call to final files." /></div>
+          {[1,2,3,4,5].map(n => (
+            <div key={n} style={{ display: "grid", gridTemplateColumns: "40px 120px 1fr", gap: "8px", marginBottom: "8px", alignItems: "center" }}>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "#6b7280", textAlign: "center" }}>0{n}</div>
+              <input style={{ ...S.input, fontSize: "13px" }} value={form["step" + n + "Title"]} onChange={e => set("step" + n + "Title", e.target.value)} placeholder={"Step title"} />
+              <input style={{ ...S.input, fontSize: "13px" }} value={form["step" + n + "Body"]} onChange={e => set("step" + n + "Body", e.target.value)} placeholder={"Step body copy"} />
+            </div>
+          ))}
+        </div>
+
+        <div style={S.section}>
+          <div style={S.sectionTitle}>Contact page copy</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "12px" }}>
+            <input style={{ ...S.input, fontSize: "13px" }} value={form.contactEyebrow} onChange={e => set("contactEyebrow", e.target.value)} placeholder="Eyebrow: Contact" />
+            <input style={{ ...S.input, fontSize: "13px" }} value={form.contactH1} onChange={e => set("contactH1", e.target.value)} placeholder="H1: Tell me about the company." />
+          </div>
+          <div style={S.field}><textarea rows={3} style={S.textarea} value={form.contactIntro} onChange={e => set("contactIntro", e.target.value)} placeholder="A sentence or two about the business and what you are trying to show. You will get a real reply…" /></div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+            <div style={S.field}><label style={S.label}>Submit button</label><input style={S.input} value={form.contactSubmit} onChange={e => set("contactSubmit", e.target.value)} placeholder="Send it over" /></div>
+            <div style={S.field}><label style={S.label}>Reassurance line</label><input style={S.input} value={form.contactReassurance} onChange={e => set("contactReassurance", e.target.value)} placeholder="No sales team. No automated funnel." /></div>
+          </div>
+        </div>
+      </div>
+    ),
+    4: ( // Pricing
+      <div>
+        <div style={S.section}>
+          <div style={S.sectionTitle}>05 · Pricing, Built Out</div>
+          <div style={{ fontSize: "12px", fontWeight: 600, color: "#6b7280", marginBottom: "12px" }}>The three tiers</div>
+          {form.tiers.map((tier, i) => (
+            <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: "8px", padding: "14px", marginBottom: "12px" }}>
+              <div style={{ fontSize: "12px", fontWeight: 700, color: "#09090b", marginBottom: "10px" }}>Tier {i + 1}</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "8px" }}>
+                <input style={{ ...S.input, fontSize: "13px" }} value={tier.name} onChange={e => setTier(i, "name", e.target.value)} placeholder="Name e.g. Front Door" />
+                <input style={{ ...S.input, fontSize: "13px" }} value={tier.subtitle} onChange={e => setTier(i, "subtitle", e.target.value)} placeholder="Subtitle e.g. CASH FLOW & TRUST" />
+              </div>
+              <textarea rows={2} style={{ ...S.textarea, fontSize: "13px", marginBottom: "8px" }} value={tier.description} onChange={e => setTier(i, "description", e.target.value)} placeholder="Description of this tier…" />
+              <input style={{ ...S.input, fontSize: "13px" }} value={tier.price} onChange={e => setTier(i, "price", e.target.value)} placeholder="Price e.g. From 2.5K per film" />
+            </div>
+          ))}
+          <div style={S.field}>
+            <label style={S.label}>Always included (in every package)</label>
+            <textarea rows={3} style={S.textarea} value={form.alwaysIncluded} onChange={e => set("alwaysIncluded", e.target.value)} placeholder="A set number of revision rounds, agreed up front. Professional lighting and audio, color grading, and a licensed music track." />
+          </div>
+          <div style={{ padding: "12px 14px", background: "#f4f4f5", borderRadius: "6px", fontSize: "12px", color: "#6b7280", lineHeight: 1.6 }}>
+            Full service menu (Customer Story, Case Study Film, Founder Story, etc.) is pre-built in Spec from the Mile Marker brief. Add custom line items by editing the brief after generation.
+          </div>
+        </div>
+      </div>
+    ),
+    5: ( // SEO
+      <div>
+        <div style={S.section}>
+          <div style={S.sectionTitle}>06 · SEO Starter</div>
+          <div style={S.hint} style={{ marginBottom: "16px", fontSize: "12px", color: "#6b7280" }}>Titles and descriptions for each page. Keep them in voice, plain and specific. Drop these into your SEO plugin.</div>
+          {form.seo.map((s, i) => (
+            <div key={i} style={{ marginBottom: "18px", padding: "14px", border: "1px solid #e5e7eb", borderRadius: "8px" }}>
+              <div style={{ fontSize: "12px", fontWeight: 700, color: "#09090b", marginBottom: "10px" }}>{s.page}</div>
+              <div style={S.field}>
+                <label style={S.label}>Title <span style={{ fontWeight: 400, color: "#9ca3af" }}>{s.title.length}/60</span></label>
+                <input style={S.input} value={s.title} onChange={e => setSeo(i, "title", e.target.value)} placeholder={"e.g. " + s.page + " | " + (form.brandName || "Brand Name")} />
+              </div>
+              <div>
+                <label style={S.label}>Description <span style={{ fontWeight: 400, color: s.desc.length > 160 ? "#dc2626" : "#9ca3af" }}>{s.desc.length}/160</span></label>
+                <textarea rows={2} style={S.textarea} value={s.desc} onChange={e => setSeo(i, "desc", e.target.value)} placeholder="Full-service video by one maker. Brand films, testimonials…" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    ),
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+      <div style={{ background: "#fff", borderRadius: "12px", width: "100%", maxWidth: "760px", maxHeight: "90vh", display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" }}>
+        {/* Header */}
+        <div style={{ padding: "18px 24px", borderBottom: "1px solid #e5e7eb", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+          <div>
+            <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b" }}>Client intake form</div>
+            <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "2px" }}>Fill out each section — this replaces uploading a brief doc</div>
+          </div>
+          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: "20px", cursor: "pointer", color: "#6b7280", padding: "4px 8px" }}>×</button>
+        </div>
+        {/* Tab bar */}
+        <div style={{ display: "flex", borderBottom: "1px solid #e5e7eb", flexShrink: 0, overflowX: "auto" }}>
+          {INTAKE_TABS.map((t, i) => (
+            <button key={i} onClick={() => setTab(i)} style={{ padding: "10px 18px", fontSize: "13px", fontWeight: tab === i ? 600 : 400, color: tab === i ? "#09090b" : "#6b7280", background: "transparent", border: "none", cursor: "pointer", borderBottom: tab === i ? "2px solid #09090b" : "2px solid transparent", whiteSpace: "nowrap" }}>
+              {t}
+            </button>
+          ))}
+        </div>
+        {/* Content */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px" }}>
+          {tabs[tab]}
+        </div>
+        {/* Footer */}
+        <div style={{ padding: "14px 24px", borderTop: "1px solid #e5e7eb", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+          <div style={{ display: "flex", gap: "8px" }}>
+            {tab > 0 && <button onClick={() => setTab(tab - 1)} style={{ padding: "8px 16px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px", background: "#fff", cursor: "pointer" }}>← {INTAKE_TABS[tab - 1]}</button>}
+          </div>
+          <div style={{ display: "flex", gap: "8px" }}>
+            {tab < INTAKE_TABS.length - 1 ? (
+              <button onClick={() => setTab(tab + 1)} style={{ padding: "8px 20px", fontSize: "13px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
+                Next → {INTAKE_TABS[tab + 1]}
+              </button>
+            ) : (
+              <button onClick={() => onComplete(buildBriefFromForm(), form.brandName)} style={{ padding: "8px 24px", fontSize: "13px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
+                Build from intake →
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 const TEMPLATE_LIBRARY = [
   {
     id: "mile-marker-2026",
@@ -1660,7 +2118,8 @@ export default function CustomBuild() {
   const [brief, setBrief]               = useState(null);
   const [briefName, setBriefName]       = useState("");
   const [briefError, setBriefError]     = useState("");
-  const [clientName, setClientName]     = useState(""); // editable export name
+  const [clientName, setClientName]     = useState("");
+  const [showIntake, setShowIntake]     = useState(false); // editable export name
   const [inspoUrls, setInspoUrls]       = useState([""]);
   const [crawlResults, setCrawlResults] = useState({});  // keyed by URL
   const [crawling, setCrawling]         = useState({});  // keyed by URL
@@ -2079,6 +2538,17 @@ export default function CustomBuild() {
 
   return (
     <div style={{ minHeight: "100vh", width: "100%", background: "#fafafa", fontFamily: "Inter, system-ui, sans-serif", boxSizing: "border-box" }}>
+      {showIntake && (
+        <IntakeForm
+          onClose={() => setShowIntake(false)}
+          onComplete={(builtBrief, name) => {
+            setBrief(builtBrief);
+            setBriefName("Intake form");
+            setClientName(name || builtBrief.brandName || "");
+            setShowIntake(false);
+          }}
+        />
+      )}
 
       <div style={{ borderBottom: "1px solid #e5e7eb", background: "#fff", padding: "16px 24px", display: "flex", alignItems: "center", gap: "16px", width: "100%", boxSizing: "border-box" }}>
         <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b" }}>Brief to Blueprint</div>
@@ -2133,6 +2603,12 @@ export default function CustomBuild() {
                     <div style={{ fontSize: "12px", color: "#6b7280" }}>PDF, DOCX, JSON, or TXT</div>
                     <input ref={fileRef} type="file" accept=".json,.pdf,.txt,.docx" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
                   </div>
+                  <div style={{ textAlign: "center", margin: "12px 0", fontSize: "12px", color: "#9ca3af" }}>or</div>
+                  <button
+                    onClick={() => setShowIntake(true)}
+                    style={{ width: "100%", padding: "12px", fontSize: "13px", fontWeight: 600, background: "#fff", border: "1px solid #e5e7eb", borderRadius: "6px", cursor: "pointer", color: "#09090b" }}>
+                    Fill out intake form
+                  </button>
                   {parsing && <div style={{ marginTop: "12px", padding: "12px", background: "#f4f4f5", borderRadius: "6px", fontSize: "13px", color: "#09090b" }}>Reading brief — this takes a few seconds...</div>}
                   {briefError && <div style={{ fontSize: "12px", color: "#dc2626", marginTop: "8px" }}>{briefError}</div>}
                 </>
@@ -2499,6 +2975,7 @@ export default function CustomBuild() {
     </div>
   );
 }
+
 
 
 
