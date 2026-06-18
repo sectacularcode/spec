@@ -1809,9 +1809,9 @@ export default function CustomBuild() {
   ];
 
   return (
-    <div style={{ minHeight: "100vh", background: "#fafafa", fontFamily: "Inter, system-ui, sans-serif" }}>
+    <div style={{ minHeight: "100vh", width: "100%", background: "#fafafa", fontFamily: "Inter, system-ui, sans-serif", boxSizing: "border-box" }}>
 
-      <div style={{ borderBottom: "1px solid #e5e7eb", background: "#fff", padding: "16px 24px", display: "flex", alignItems: "center", gap: "16px" }}>
+      <div style={{ borderBottom: "1px solid #e5e7eb", background: "#fff", padding: "16px 24px", display: "flex", alignItems: "center", gap: "16px", width: "100%", boxSizing: "border-box" }}>
         <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b" }}>Brief to Blueprint</div>
         <div style={{ marginLeft: "auto", display: "flex", gap: "8px", alignItems: "center" }}>
           {(brief || generated) && (
@@ -2191,6 +2191,7 @@ export default function CustomBuild() {
     </div>
   );
 }
+
 
 
 
