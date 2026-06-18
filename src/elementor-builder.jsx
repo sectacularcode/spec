@@ -3777,7 +3777,6 @@ export default function App() {
   const [projects, setProjects] = useState([]);
   const [activeId, setActiveId] = useState(function(){try{return localStorage.getItem("spec_activeId")||"";}catch(e){return "";}});
   const [view, setView] = useState(function(){try{return localStorage.getItem("spec_view")||"projects";}catch(e){return "projects";}});
-  const [mobilePreviewTS, setMobilePreviewTS] = useState(false); // mobile preview toggle for Template Studio
   const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_tab")||"discovery";}catch(e){return "discovery";}});
   const [pageIdx, setPageIdx] = useState(function(){try{return parseInt(localStorage.getItem("spec_pageIdx")||"0",10);}catch(e){return 0;}});
   const [showAudit, setShowAudit] = useState(false);
@@ -3900,8 +3899,6 @@ export default function App() {
     const interval = setInterval(loadSavedBuilds, 10000);
     return () => clearInterval(interval);
   }, []);
-
-  const project = projects.find(p => p.id === activeId) || projects[0] || null;
   const brand = project ? project.brand : null;
   const page = project ? (project.pages[pageIdx] || project.pages[0]) : null;
   const audit = useMemo(() => project ? auditBrand(brand, project.pages) : [], [brand, project]);
@@ -4895,24 +4892,9 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   if (effectiveView === "preview" && project) return (
     <div style={{ position: "fixed", inset: 0, background: "#000", display: "flex", flexDirection: "column", zIndex: 1000 }}>
       <div style={{ padding: "10px 16px", background: "#09090b", borderBottom: "1px solid #27272a", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div style={{ color: "#ffffff", fontSize: "14px", fontWeight: 500 }}>
-            Preview — {brand.name} / {page.name}
-            <span style={{ marginLeft: "12px", fontSize: "12px", color: "#a3a39e", fontWeight: 400 }}>Click any heading or paragraph to edit inline</span>
-          </div>
-          {/* Desktop / Mobile toggle */}
-          <div style={{ display: "flex", border: "1px solid #3f3f46", borderRadius: "6px", overflow: "hidden", flexShrink: 0 }}>
-            <button
-              onClick={() => setMobilePreviewTS(false)}
-              style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: !mobilePreviewTS ? "#ffffff" : "transparent", color: !mobilePreviewTS ? "#09090b" : "#a3a39e", borderRight: "1px solid #3f3f46" }}>
-              Desktop
-            </button>
-            <button
-              onClick={() => setMobilePreviewTS(true)}
-              style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: mobilePreviewTS ? "#ffffff" : "transparent", color: mobilePreviewTS ? "#09090b" : "#a3a39e" }}>
-              Mobile
-            </button>
-          </div>
+        <div style={{ color: "#ffffff", fontSize: "14px", fontWeight: 500 }}>
+          Preview — {brand.name} / {page.name}
+          <span style={{ marginLeft: "12px", fontSize: "12px", color: "#a3a39e", fontWeight: 400 }}>Click any heading or paragraph to edit inline</span>
         </div>
         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
           <FormatToggle />
@@ -4923,18 +4905,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           <button onClick={() => setView("editor")} style={{ padding: "8px 14px", background: "transparent", color: "#a3a39e", border: "1px solid #3f3f46", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>← Back to Editor</button>
         </div>
       </div>
-      {mobilePreviewTS ? (
-        <div style={{ flex: 1, overflow: "auto", background: "#1a1a1a", display: "flex", justifyContent: "center", alignItems: "flex-start", padding: "24px 0" }}>
-          <iframe
-            srcDoc={previewHTML(page, brand)}
-            style={{ width: "390px", minHeight: "844px", border: "1px solid #3f3f46", borderRadius: "12px", flexShrink: 0, background: "#000", boxShadow: "0 8px 32px rgba(0,0,0,0.5)" }}
-            title="Preview"
-            sandbox="allow-same-origin allow-scripts"
-          />
-        </div>
-      ) : (
-        <iframe srcDoc={previewHTML(page, brand)} style={{ flex: 1, border: "none", width: "100%", background: "#000" }} title="Preview" sandbox="allow-same-origin allow-scripts" />
-      )}
+      <iframe srcDoc={previewHTML(page, brand)} style={{ flex: 1, border: "none", width: "100%", background: "#000" }} title="Preview" sandbox="allow-same-origin allow-scripts" />
     </div>
   );
 
@@ -4948,7 +4919,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           input, textarea, select{font-size:16px !important;}
         }
       `}</style>
-      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+      <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
           <div style={{ fontSize: "24px", fontWeight: 800, letterSpacing: "-0.03em", color: "#09090b" }}>spec</div>
           <div style={{ fontSize: "10px", color: "#09090b", padding: "3px 9px", background: "#ffffff", border: "1px solid #e8e6dd", borderRadius: "10px", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>Beta</div>
@@ -5145,10 +5116,9 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             )}
           </div>
         )}
-
-        {/* Recommendation card */}
-        {briefRec && (
+        
           <div style={{ background: "#ffffff", border: "1px solid #e7e7e4", borderRadius: "12px", padding: "32px 36px", marginBottom: "28px" }}>
+            {/* Header row — template name + action buttons */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "28px", gap: "16px", flexWrap: "wrap", paddingBottom: "24px", borderBottom: "1px solid #e7e7e4" }}>
               <div style={{ flex: "1 1 280px" }}>
                 <div style={{ fontSize: "9px", color: "#09090b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "6px" }}>Recommended Template</div>
@@ -5602,7 +5572,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
           {/* DISCOVERY TAB */}
           {tab === "discovery" && (
-            <div className="editor-padding" style={{ padding: "0 20px 40px", maxWidth: "900px" }}>
+            <div className="editor-padding" style={{ padding: "0 20px 40px", maxWidth: "1200px" }}>
               {/* Project switcher — quick "where am I + jump to another project" bar */}
               <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "14px 16px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
                 <div style={{ flex: "1 1 220px", minWidth: "180px" }}>
@@ -6425,7 +6395,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
         {/* EXPORT & IMPORT TAB */}
         {tab === "export" && (
-          <div className="editor-padding" style={{ padding: "0 20px 40px", maxWidth: "900px" }}>
+          <div className="editor-padding" style={{ padding: "0 20px 40px", maxWidth: "1200px" }}>
             <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "20px", marginBottom: "16px" }}>
               <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Active Page</div>
               <div style={{ fontSize: "18px", fontWeight: 600, color: "#09090b", marginBottom: "4px" }}>{page.name}</div>
