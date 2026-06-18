@@ -4893,24 +4893,26 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   if (effectiveView === "preview" && project) return (
     <div style={{ position: "fixed", inset: 0, background: "#000", display: "flex", flexDirection: "column", zIndex: 1000 }}>
       <div style={{ padding: "10px 16px", background: "#09090b", borderBottom: "1px solid #27272a", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-        <div style={{ color: "#ffffff", fontSize: "14px", fontWeight: 500 }}>
-          Preview — {brand.name} / {page.name}
-          <span style={{ marginLeft: "12px", fontSize: "12px", color: "#a3a39e", fontWeight: 400 }}>Click any heading or paragraph to edit inline</span>
-        </div>
-        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{ color: "#ffffff", fontSize: "14px", fontWeight: 500 }}>
+            Preview — {brand.name} / {page.name}
+            <span style={{ marginLeft: "12px", fontSize: "12px", color: "#a3a39e", fontWeight: 400 }}>Click any heading or paragraph to edit inline</span>
+          </div>
           {/* Desktop / Mobile toggle */}
-          <div style={{ display: "flex", border: "1px solid #3f3f46", borderRadius: "6px", overflow: "hidden", marginRight: "4px" }}>
+          <div style={{ display: "flex", border: "1px solid #3f3f46", borderRadius: "6px", overflow: "hidden", flexShrink: 0 }}>
             <button
               onClick={() => setMobilePreviewTS(false)}
-              style={{ padding: "6px 12px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: !mobilePreviewTS ? "#ffffff" : "transparent", color: !mobilePreviewTS ? "#09090b" : "#a3a39e", borderRight: "1px solid #3f3f46" }}>
+              style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: !mobilePreviewTS ? "#ffffff" : "transparent", color: !mobilePreviewTS ? "#09090b" : "#a3a39e", borderRight: "1px solid #3f3f46" }}>
               Desktop
             </button>
             <button
               onClick={() => setMobilePreviewTS(true)}
-              style={{ padding: "6px 12px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: mobilePreviewTS ? "#ffffff" : "transparent", color: mobilePreviewTS ? "#09090b" : "#a3a39e" }}>
+              style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: mobilePreviewTS ? "#ffffff" : "transparent", color: mobilePreviewTS ? "#09090b" : "#a3a39e" }}>
               Mobile
             </button>
           </div>
+        </div>
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
           <FormatToggle />
           <button onClick={downloadPage} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>Download Template</button>
           <button onClick={downloadHeader} style={{ padding: "8px 14px", background: "transparent", color: "#ffffff", border: "1px solid #3f3f46", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>Header Template</button>
