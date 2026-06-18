@@ -3900,6 +3900,8 @@ export default function App() {
     const interval = setInterval(loadSavedBuilds, 10000);
     return () => clearInterval(interval);
   }, []);
+
+  const project = projects.find(p => p.id === activeId) || projects[0] || null;
   const brand = project ? project.brand : null;
   const page = project ? (project.pages[pageIdx] || project.pages[0]) : null;
   const audit = useMemo(() => project ? auditBrand(brand, project.pages) : [], [brand, project]);
