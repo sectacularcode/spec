@@ -1838,7 +1838,7 @@ export default function CustomBuild() {
 
       <div style={{ display: "grid", gridTemplateColumns: generated ? "440px 1fr" : "1fr", gap: "0", minHeight: "calc(100vh - 57px)" }}>
 
-        <div style={{ padding: "24px", borderRight: generated ? "1px solid #e5e7eb" : "none", overflowY: "auto", maxWidth: generated ? "520px" : "860px", margin: generated ? "0" : "0 auto" }}>
+        <div style={{ padding: "24px", borderRight: generated ? "1px solid #e5e7eb" : "none", overflowY: "auto", width: generated ? "520px" : "100%", flexShrink: 0 }}>
 
           {/* STEP 1 */}
           <div style={{ marginBottom: "20px" }}>
@@ -2191,6 +2191,7 @@ export default function CustomBuild() {
     </div>
   );
 }
+
 
 
 
