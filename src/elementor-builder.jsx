@@ -5971,7 +5971,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     <div style={{ padding: "12px 14px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "6px", marginBottom: "12px" }}>
                       <div style={{ fontSize: "12px", color: "#09090b", fontWeight: 700, marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Suggested from your {activeTpl.name} template</div>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-                        {missing.map(k => (<button key={k} onClick={() => { const next = currentList.concat(k).join(", "); updBrand("primaryKeywords", next); }} style={{ padding: "5px 10px", background: "#f0eff3", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>+ {k}</button>))}
+                        {missing.map(k => (<button key={k} onClick={() => { const next = currentList.concat(k).join(", "); updBrand("primaryKeywords", next); }} style={{ padding: "5px 10px", background: "rgba(180, 83, 9, 0.1)", color: "#b45309", border: "1px solid rgba(180, 83, 9, 0.25)", borderRadius: "4px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>+ {k}</button>))}
                       </div>
                       <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "8px" }}>Click a keyword to add it to your list below. These are pulled from your template's industry category.</div>
                     </div>
