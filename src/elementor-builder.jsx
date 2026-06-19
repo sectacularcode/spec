@@ -4596,7 +4596,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   };
 
   const TabBtn = ({ id, label }) => (
-    <button onClick={() => setTab(id)} style={{ padding: "6px 12px", background: tab === id ? "rgba(255,255,255,0.18)" : "transparent", color: "#ffffff", border: "none", borderRadius: "7px", fontSize: "11px", fontWeight: 700, cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.06em", margin: "2px", whiteSpace: "nowrap" }}>{label}</button>
+    <button onClick={() => setTab(id)} style={{ padding: "6px 12px", background: tab === id ? "rgba(255,255,255,0.18)" : "transparent", color: "#ffffff", border: "none", borderRadius: "7px", fontSize: "12px", fontWeight: 700, cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.06em", margin: "2px", whiteSpace: "nowrap" }}>{label}</button>
   );
 
   // Builder format toggle — applies to both Page and Footer downloads
@@ -5575,7 +5575,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <TabBtn id="export" label="Export & Import" />
               </div>
             {/* Page switcher row — pills centered, Add Page right */}
-            <div style={{ display: "flex", alignItems: "center", padding: "8px 0 10px", position: "relative" }}>
+            <div style={{ display: "flex", alignItems: "center", padding: "10px 0 12px", position: "relative" }}>
               <div style={{ flex: 1, display: "flex", justifyContent: "center", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
                 {project.pages.map((p, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: "3px" }}>
