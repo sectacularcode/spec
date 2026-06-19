@@ -4930,7 +4930,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
   // ── PROJECTS VIEW ──────────────────────────────────────────────────────────
   if (effectiveView === "projects") return (
-    <div style={{ minHeight: "100vh", background: "#ffffff", color: "#09090b", padding: "clamp(20px,5vw,40px) clamp(12px,3vw,24px)", fontFamily: "'Be Vietnam Pro', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#eeedf1", color: "#09090b", padding: "clamp(20px,5vw,40px) clamp(12px,3vw,24px)", fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Yeseva+One&family=Manrope:wght@400;500;700&family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Oswald:wght@500;700&family=Space+Mono&family=Inter:wght@500;700&display=swap');
         * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; box-sizing: border-box; }
@@ -5358,7 +5358,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           .responsive-2col, .responsive-4col{grid-template-columns:1fr !important;}
           .tab-bar button{padding:8px 10px !important; font-size:11px !important;}
           .editor-padding{padding:0 12px 40px !important;}
-          .tab-panel-bg{background-image: radial-gradient(circle, #ebe9e2 1px, transparent 1px); background-size: 24px 24px;}
+          .tab-panel-bg{background-image: radial-gradient(circle, #dddce3 1px, transparent 1px); background-size: 24px 24px;}
         }
         /* Inputs and buttons always full-width on touch */
         @media(max-width:600px){
@@ -5559,7 +5559,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
       <div className="main-grid" style={{ display: "grid", gridTemplateColumns: "1fr", minHeight: "calc(100vh - 60px)" }}>
         {/* LEFT — FORM */}
-        <div className="tab-panel-bg" style={{ padding: "0", overflowY: "auto", maxHeight: "calc(100vh - 60px)", background: "#ffffff" }}>
+        <div className="tab-panel-bg" style={{ padding: "0", overflowY: "auto", maxHeight: "calc(100vh - 60px)", background: "#eeedf1" }}>
 
           {/* Tabs — full width warm stone bar */}
           <div style={{ background: "#6b635c", width: "100%" }}>
