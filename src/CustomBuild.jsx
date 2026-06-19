@@ -3048,7 +3048,7 @@ export default function CustomBuild() {
                       </div>
                       <div style={{ display: "flex", gap: "4px", marginBottom: "14px", flexWrap: "wrap" }}>
                         {draft.pages.slice(0, 4).map(p => (
-                          <span key={p} style={{ fontSize: "11px", padding: "2px 8px", background: "#ffffff", borderRadius: "3px", color: "#6b7280" }}>{p}</span>
+                          <span key={p} style={ fontSize: "9px", padding: "3px 8px", background: "#09090b", color: "#ffffff", borderRadius: "10px", whiteSpace: "nowrap", fontWeight: 500, letterSpacing: "0.02em" }>{p}</span>
                         ))}
                         {draft.pages.length > 4 && <span style={{ fontSize: "11px", color: "#9ca3af" }}>+{draft.pages.length - 4}</span>}
                       </div>
@@ -3217,7 +3217,7 @@ export default function CustomBuild() {
                       </div>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
                         {(crawlResults[url.trim()].pages || []).map((p, pi) => (
-                          <span key={pi} style={{ fontSize: "11px", padding: "3px 8px", background: "#eeedf1", borderRadius: "3px", color: "#09090b" }}>
+                          <span key={pi} style={ fontSize: "9px", padding: "3px 8px", background: "#09090b", color: "#ffffff", borderRadius: "10px", whiteSpace: "nowrap", fontWeight: 500, letterSpacing: "0.02em" }>
                             {p.pageType !== "other" ? p.pageType : p.path}
                           </span>
                         ))}
@@ -3505,7 +3505,7 @@ export default function CustomBuild() {
                           <div style={{ fontSize: "11px", color: "#6b7280" }}>Section {s.sectionIndex + 1} · {s.date}</div>
                           <div style={{ display: "flex", gap: "4px", marginTop: "6px", flexWrap: "wrap" }}>
                             {(s.tags || []).slice(0, 3).map(t => (
-                              <span key={t} style={{ fontSize: "10px", padding: "2px 6px", background: "#ffffff", borderRadius: "3px", color: "#6b7280" }}>{t}</span>
+                              <span key={t} style={ fontSize: "9px", padding: "3px 8px", background: "#09090b", color: "#ffffff", borderRadius: "10px", whiteSpace: "nowrap", fontWeight: 500, letterSpacing: "0.02em" }>{t}</span>
                             ))}
                           </div>
                         </div>
