@@ -1162,8 +1162,8 @@ const TAB_ORDER = [
   { id: "discovery", label: "Discovery" },
   { id: "positioning", label: "Positioning" },
   { id: "brand", label: "Brand" },
-  { id: "page", label: "Page" },
   { id: "content", label: "Content" },
+  { id: "page", label: "Page" },
   { id: "social", label: "Social" },
   { id: "footer", label: "Header & Footer" },
   { id: "export", label: "Export & Import" },
@@ -1465,18 +1465,18 @@ const newPage = (name = "Homepage", pageType = "Homepage") => {
     aboutImage: "",
     aboutHeading: template.aboutHeading || "About",
     aboutBody: template.aboutBody || "",
-    services: template.services || "Video Production|Long & short-form video for social and brand campaigns\nProduct Photography|Editorial product imagery with art direction\nModel & Lifestyle|On-figure shoots and lifestyle content\nContent Strategy|Consulting on content systems and ROI",
-    portfolio: template.portfolio || "Sephora Spring Campaign|Beauty Editorial|\nKérastase Hero Product|Product Photography|\nGarnier Skincare Launch|Video & Photo|\nLaura Mercier Lifestyle|Brand Content|",
-    process: template.process || "Discover|Kickoff workshop to align on goals, audience, deliverables\nPlan|Creative direction, mood boards, shot lists, talent, locations\nProduce|Full shoot day with crew, equipment, and art direction\nDeliver|Edit, color, sound, and final asset handoff",
-    team: template.team || "Kalei|Founder & Creative Director|\nLena|Producer|\nMarcus|Director of Photography|\nSarah|Post Production Lead|",
-    blog: template.blog || "The case for premium content in 2026|Strategy|6 min read\nWhy your hero shot matters more than your ad spend|Production|4 min read\nHow we scaled Sephora's spring campaign in 3 weeks|Case Study|8 min read",
-    stats: template.stats || "10|+|Years in Business\n100|+|Brand Clients\n500|+|Campaigns Delivered\n50|M+|Impressions Generated",
-    testimonials: template.testimonials || "Editorial Vibes turned our launch into our best-performing quarter ever.|Marketing Director|Top 10 Beauty Brand\nThey don't just shoot — they think strategically about every frame.|Brand Manager|Skincare Brand",
-    pricing: template.pricing || "Starter|$3,500|1 day shoot, 1 location, 20 finals\nGrowth|$7,500|2 day shoot, 2 locations, 50 finals + video\nFull Campaign|$15,000+|Full production, strategy, multi-deliverable",
-    faq: template.faq || "How long does production take?|2-4 weeks from kickoff to delivery typically\nDo you handle talent and locations?|Yes, full production including casting and scouting\nWhat's included in a shoot day?|Director, photographer, assistants, equipment, and post",
+    services: template.services || "",
+    portfolio: template.portfolio || "",
+    process: template.process || "",
+    team: template.team || "",
+    blog: template.blog || "",
+    stats: template.stats || "",
+    testimonials: template.testimonials || "||\n||\n||",
+    pricing: template.pricing || "",
+    faq: template.faq || "||\n||\n||",
     videoUrl: "",
     forms: template.forms || "Project Inquiry|Name,Email,Company,Project Type,Budget,Timeline,Project Details|Send Inquiry",
-    ctaHeading: template.ctaHeading || "Ready to make something worth seeing?",
+    ctaHeading: template.ctaHeading || "",
     heroEyebrow: template.heroEyebrow || "",
     aboutEyebrow: template.aboutEyebrow || "About",
     servicesEyebrow: template.servicesEyebrow || "Services",
@@ -5587,8 +5587,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <TabBtn id="discovery" label="Discovery" />
                 <TabBtn id="positioning" label="Positioning" />
                 <TabBtn id="brand" label="Brand" />
-                <TabBtn id="page" label="Page" />
                 <TabBtn id="content" label="Content" />
+                <TabBtn id="page" label="Page" />
                 <TabBtn id="social" label="Social" />
                 <TabBtn id="footer" label="Header & Footer" />
                 <TabBtn id="export" label="Export & Import" />
@@ -6292,9 +6292,9 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One service per line. Format: <strong>Name|Description</strong></div>
               </Section>}
               {(page.sections.includes("Portfolio") || page.sections.includes("Portfolio Carousel")) && <Section id="content-portfolio" title="Portfolio" icon="">
-                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>Your past work. Each line becomes a project card — shown as a grid or carousel depending on your page layout.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={6} value={page.portfolio} onChange={e => updPage("portfolio", e.target.value)} placeholder={"Project Name|Category|https://yoursite.com/wp-content/uploads/image.jpg\nProject Name|Category|"} />
-                <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One project per line. Format: <strong>Project Name|Category|Image URL</strong>. Leave the image URL blank to use a placeholder.</div>
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>Your past work. Each line becomes a project card. Add placeholder images in Elementor after import.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontSize: "13px", maxWidth: "560px" }} rows={6} value={page.portfolio} onChange={e => updPage("portfolio", e.target.value)} placeholder={"Project Name|Client or Category\nProject Name|Client or Category"} />
+                <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One project per line. Format: <strong>Project Name|Client or Category</strong>. Images are added in Elementor after import.</div>
               </Section>}
               {page.sections.includes("Process") && <Section id="content-process" title="Process" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>How you work, step by step. Steps are numbered automatically.</p>
@@ -6317,9 +6317,23 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One stat per line. Format: <strong>Number|Suffix|Label</strong>. Leave suffix blank if not needed.</div>
               </Section>}
               {page.sections.includes("Testimonials") && <Section id="content-testimonials" title="Testimonials" icon="">
-                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>Client quotes. Shown as a carousel or grid, usually near the bottom of the page before the final call to action.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={4} value={page.testimonials} onChange={e => updPage("testimonials", e.target.value)} placeholder={"The quote.|Client Name|Their Role or Company\nThe quote.|Client Name|Their Role or Company"} />
-                <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One testimonial per line. Format: <strong>Quote|Name|Role or Company</strong></div>
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>Client quotes shown as a carousel or grid. Add up to 3 — edit or add more directly in Elementor after import.</p>
+                {(page.testimonials || "||\n||\n||").split("\n").slice(0, 3).map((line, i) => {
+                  const parts = line.split("|");
+                  return (
+                    <div key={i} style={{ background: "#f5f5f7", border: "1px solid #dde0e6", borderRadius: "8px", padding: "14px 16px", marginBottom: "10px" }}>
+                      <div style={{ fontSize: "10px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>Testimonial {i + 1}</div>
+                      <div style={{ marginBottom: "8px" }}>
+                        <label style={I.lbl}>Quote</label>
+                        <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={parts[0] || ""} placeholder="What the client said about working with you." onChange={e => { const lines = (page.testimonials || "||\n||\n||").split("\n"); const p = (lines[i] || "||").split("|"); p[0] = e.target.value; lines[i] = p.join("|"); updPage("testimonials", lines.join("\n")); }} />
+                      </div>
+                      <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                        <div><label style={I.lbl}>Name</label><input style={I.inp} value={parts[1] || ""} placeholder="Client Name" onChange={e => { const lines = (page.testimonials || "||\n||\n||").split("\n"); const p = (lines[i] || "||").split("|"); p[1] = e.target.value; lines[i] = p.join("|"); updPage("testimonials", lines.join("\n")); }} /></div>
+                        <div><label style={I.lbl}>Role or Company</label><input style={I.inp} value={parts[2] || ""} placeholder="CEO, Company Name" onChange={e => { const lines = (page.testimonials || "||\n||\n||").split("\n"); const p = (lines[i] || "||").split("|"); p[2] = e.target.value; lines[i] = p.join("|"); updPage("testimonials", lines.join("\n")); }} /></div>
+                      </div>
+                    </div>
+                  );
+                })}
               </Section>}
               {page.sections.includes("Pricing") && <Section id="content-pricing" title="Pricing" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>Your pricing tiers, shown as side-by-side cards.</p>
@@ -6327,9 +6341,23 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One tier per line. Format: <strong>Name|Price|Description</strong></div>
               </Section>}
               {page.sections.includes("FAQ") && <Section id="content-faq" title="FAQ" icon="">
-                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>Common questions in an accordion. Usually near the bottom of the page after testimonials.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={4} value={page.faq} onChange={e => updPage("faq", e.target.value)} placeholder={"Question?|The answer goes here.\nQuestion?|The answer goes here."} />
-                <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One Q&amp;A per line. Format: <strong>Question|Answer</strong></div>
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>Common questions shown in an accordion. Add up to 4 here — add more directly in Elementor after import.</p>
+                {(page.faq || "||\n||\n||\n||").split("\n").slice(0, 4).map((line, i) => {
+                  const parts = line.split("|");
+                  return (
+                    <div key={i} style={{ background: "#f5f5f7", border: "1px solid #dde0e6", borderRadius: "8px", padding: "14px 16px", marginBottom: "10px" }}>
+                      <div style={{ fontSize: "10px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>FAQ {i + 1}</div>
+                      <div style={{ marginBottom: "8px" }}>
+                        <label style={I.lbl}>Question</label>
+                        <input style={I.inp} value={parts[0] || ""} placeholder="What's the most common question clients ask?" onChange={e => { const lines = (page.faq || "||\n||\n||\n||").split("\n"); const p = (lines[i] || "|").split("|"); p[0] = e.target.value; lines[i] = p.join("|"); updPage("faq", lines.join("\n")); }} />
+                      </div>
+                      <div>
+                        <label style={I.lbl}>Answer</label>
+                        <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={parts[1] || ""} placeholder="A clear, concise answer." onChange={e => { const lines = (page.faq || "||\n||\n||\n||").split("\n"); const p = (lines[i] || "|").split("|"); p[1] = e.target.value; lines[i] = p.join("|"); updPage("faq", lines.join("\n")); }} />
+                      </div>
+                    </div>
+                  );
+                })}
               </Section>}
               {page.sections.includes("Video") && <Section id="content-video" title="Video" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>A YouTube or Vimeo embed. Can sit anywhere on the page.</p>
