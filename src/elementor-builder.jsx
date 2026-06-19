@@ -5564,7 +5564,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* Tabs — full width warm stone bar */}
           <div style={{ background: "#6b635c", width: "100%" }}>
             <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px" }}>
-              <div className="tab-bar" style={{ display: "flex", justifyContent: "center", overflowX: "auto", WebkitOverflowScrolling: "touch", paddingTop: "10px" }}>
+              <div className="tab-bar" style={{ display: "flex", justifyContent: "center", overflowX: "auto", WebkitOverflowScrolling: "touch", paddingTop: "14px" }}>
                 <TabBtn id="discovery" label="Discovery" />
                 <TabBtn id="positioning" label="Positioning" />
                 <TabBtn id="brand" label="Brand" />
@@ -5575,7 +5575,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <TabBtn id="export" label="Export & Import" />
               </div>
             {/* Page switcher row — pills centered, Add Page right */}
-            <div style={{ display: "flex", alignItems: "center", padding: "14px 0 16px", position: "relative" }}>
+            <div style={{ display: "flex", alignItems: "center", padding: "12px 0 12px", position: "relative" }}>
               <div style={{ flex: 1, display: "flex", justifyContent: "center", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
                 {project.pages.map((p, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: "3px" }}>
