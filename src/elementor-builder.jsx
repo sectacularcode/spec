@@ -5414,7 +5414,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             const hasDescription = !!p.brand.industry;
             const isPendingDelete = confirmDeleteId === p.id;
             return (
-              <div key={p.id} style={{ background: "#ffffff", border: isPendingDelete ? "1px solid #fecaca" : "1px solid #dde0e6", padding: "18px 20px", borderRadius: "10px", display: "flex", flexDirection: "column", gap: "12px" }}>
+              <div key={p.id} style={{ background: "#ffffff", border: isPendingDelete ? "1px solid #fecaca" : "1px solid #dde0e6", padding: "18px 20px", borderRadius: "10px", display: "flex", flexDirection: "column", gap: "12px", overflow: "hidden", minWidth: 0 }}>
                 <div onClick={() => { setActiveId(p.id); setView("editor"); setPageIdx(0); }} style={{ cursor: "pointer", flex: 1 }}>
                   <div style={{ fontSize: "14px", fontWeight: 500, marginBottom: "4px", color: "#09090b", letterSpacing: "0" }}>{displayName}</div>
                   <div style={{ fontSize: "12px", color: "#09090b", marginBottom: "12px" }}>
@@ -6413,6 +6413,12 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {tab === "content" && (
             <>
               <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%", padding: "24px 24px 40px" }}>
+              {(page.services || page.process || page.testimonials || page.faq || page.portfolio) && (
+                <div style={{ marginBottom: "16px", padding: "12px 16px", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "8px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
+                  <div style={{ fontSize: "13px", color: "#92400e" }}>This page has demo content from the template. Clear it to start fresh with your client's copy.</div>
+                  <button onClick={() => { updPage("services", ""); updPage("process", ""); updPage("testimonials", ""); updPage("faq", ""); updPage("portfolio", ""); updPage("team", ""); updPage("stats", ""); updPage("pricing", ""); }} style={{ padding: "6px 14px", background: "#09090b", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>Clear demo content</button>
+                </div>
+              )}
               <Section id="page-hero" title="Hero Text" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>The first thing visitors see. Your main headline and supporting line.</p>
                 <div><label style={I.lbl}>Heading</label><input style={I.inp} value={page.heroHeading} onChange={e => updPage("heroHeading", e.target.value)} placeholder="e.g. Your main headline goes here." /></div>
