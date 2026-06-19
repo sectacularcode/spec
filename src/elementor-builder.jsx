@@ -6272,13 +6272,13 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {tab === "content" && (
             <>
               <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%", padding: "24px 24px 40px" }}>
-              <Section id="page-hero" title="Hero" icon="">
+              <Section id="page-hero" title="Hero Text" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>The first thing visitors see. Your main headline and supporting line.</p>
                 <div><label style={I.lbl}>Heading</label><input style={I.inp} value={page.heroHeading} onChange={e => updPage("heroHeading", e.target.value)} placeholder="e.g. Your main headline goes here." /></div>
                 <div><label style={I.lbl}>Subheading</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={page.heroSubhead} onChange={e => updPage("heroSubhead", e.target.value)} placeholder="e.g. A short supporting line under the headline." /></div>
                 <div><label style={I.lbl}>Hero Image</label><input style={I.inp} value={page.heroImage} onChange={e => updPage("heroImage", e.target.value)} placeholder="Paste your WordPress media URL — leave blank for a placeholder" /></div>
               </Section>
-              <Section id="page-about" title="About" icon="">
+              <Section id="page-about" title="About the Company" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>A short brand story — usually image and text side by side, just below the hero.</p>
                 <div><label style={I.lbl}>Heading</label><input style={I.inp} value={page.aboutHeading} onChange={e => updPage("aboutHeading", e.target.value)} placeholder="e.g. A short about heading." /></div>
                 <div><label style={I.lbl}>Body</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={4} value={page.aboutBody} onChange={e => updPage("aboutBody", e.target.value)} placeholder="Write your about copy here, or leave blank to pull from your brand description." /></div>
@@ -6293,7 +6293,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <textarea style={{ ...I.inp, resize: "vertical", fontSize: "13px", maxWidth: "560px" }} rows={6} value={page.portfolio} onChange={e => updPage("portfolio", e.target.value)} placeholder={"Project Name|Client or Category\nProject Name|Client or Category"} />
                 <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One project per line. Format: <strong>Project Name|Client or Category</strong>. Images are added in Elementor after import.</div>
               </Section>}
-              {page.sections.includes("Process") && <Section id="content-process" title="Process" icon="">
+              {page.sections.includes("Process") && <Section id="content-process" title="Your Process" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>How you work, step by step. Steps are numbered automatically.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={5} value={page.process} onChange={e => updPage("process", e.target.value)} placeholder={"Step Name|What happens at this stage\nStep Name|What happens at this stage"} />
                 <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One step per line. Format: <strong>Step Name|Description</strong></div>
@@ -6313,7 +6313,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={4} value={page.stats} onChange={e => updPage("stats", e.target.value)} placeholder={"10|+|Years in Business\n150||Projects Shipped\n98|%|Client Satisfaction"} />
                 <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One stat per line. Format: <strong>Number|Suffix|Label</strong>. Leave suffix blank if not needed.</div>
               </Section>}
-              {page.sections.includes("Testimonials") && <Section id="content-testimonials" title="Testimonials" icon="">
+              {page.sections.includes("Testimonials") && <Section id="content-testimonials" title="Client Testimonials" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>Client quotes shown as a carousel or grid. Add up to 3 — edit or add more directly in Elementor after import.</p>
                 {(page.testimonials || "||\n||\n||").split("\n").slice(0, 3).map((line, i) => {
                   const parts = line.split("|");
