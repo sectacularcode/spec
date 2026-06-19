@@ -5625,7 +5625,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div>
                   <label style={I.lbl}>Brands Worked With (one per line)</label>
                   <textarea style={{ ...I.inp, resize: "vertical", fontSize: "13px" }} rows={5} value={brand.clientLogos} onChange={e => updBrand("clientLogos", e.target.value)} placeholder="Sephora&#10;Glossier&#10;Kérastase" />
-                  <div style={{ fontSize: "10px", color: "#09090b", marginTop: "4px" }}>Used in the Logo Carousel section and as context for the AI when drafting copy.</div>
+                  <div style={{ fontSize: "10px", color: "#09090b", marginTop: "4px" }}>One per line.</div>
                 </div>
               </Section>
 
@@ -5651,6 +5651,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               <Section id="positioning-goals" title="Goals & Desired Outcome" icon="">
                 <div>
                   <label style={I.lbl}>Primary Goals — select all that apply</label>
+                  <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "10px", lineHeight: 1.5 }}>What the site is supposed to do. Pick everything that applies — these drive the CTA language in your AI-drafted copy. A coaching site is typically Bookings + Lead Generation. A services site is Lead Generation + Awareness.</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "6px" }}>
                     {["Lead Generation", "Direct Sales / E-commerce", "Bookings & Reservations", "Free Trial / Demo Sign-ups", "Account Creation / Registration", "Resource Downloads / Lead Magnets", "Awareness & Brand Building", "Community & Newsletter Growth", "Applications & Sign-ups", "Donations & Fundraising"].map(g => {
                       const currentGoals = brand.goals || (brand.goal ? [brand.goal] : []);
@@ -5663,17 +5664,17 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                       );
                     })}
                   </div>
-                  <div style={{ fontSize: "10px", color: "#09090b", marginTop: "8px" }}>Pick everything the site should do. An e-commerce site is often Sales + Newsletter Growth. A coaching site is often Bookings + Lead Generation.</div>
                 </div>
                 <div>
                   <label style={I.lbl}>Desired Outcome (one sentence)</label>
-                  <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.outcome || ""} onChange={e => updBrand("outcome", e.target.value)} placeholder="Example: Book 4-6 qualified strategy calls per month from B2B SaaS founders." />
+                  <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.outcome || ""} onChange={e => updBrand("outcome", e.target.value)} placeholder="e.g. Book 4–6 qualified strategy calls per month from B2B SaaS founders." />
+                  <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "4px" }}>Used by Draft Starter Copy — the more specific, the better the output.</div>
                 </div>
               </Section>
 
               <Section id="positioning-keywords" title="Keywords for Search & AI Discovery" icon="">
-                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
-                  Terms you want this site to rank for in Google AND get cited in AI search (ChatGPT, Perplexity, Gemini). These are fed to Draft Starter Copy so copy gets written around them naturally.
+                <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.6 }}>
+                  The terms you want this site to rank for in Google and get cited in AI search (ChatGPT, Perplexity, Gemini). These are fed into Draft Starter Copy so copy gets written around them naturally — no stuffing, just context.
                 </p>
                 {(() => {
                   const activeTpl = brand.templateId ? WEBSITE_TEMPLATES.find(t => t.id === brand.templateId) : null;
@@ -5684,31 +5685,38 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   const missing = tplKeywords.filter(k => !currentList.some(c => c.toLowerCase() === k.toLowerCase()));
                   if (!missing.length) return null;
                   return (
-                    <div style={{ padding: "12px 14px", background: "#f5f5f4", border: "1px solid #e5e7eb", borderRadius: "6px" }}>
+                    <div style={{ padding: "12px 14px", background: "#f5f5f4", border: "1px solid #e5e7eb", borderRadius: "6px", marginBottom: "12px" }}>
                       <div style={{ fontSize: "12px", color: "#09090b", fontWeight: 700, marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Suggested from your {activeTpl.name} template</div>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                         {missing.map(k => (<button key={k} onClick={() => { const next = currentList.concat(k).join(", "); updBrand("primaryKeywords", next); }} style={{ padding: "5px 10px", background: "#eeeeec", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "4px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>+ {k}</button>))}
                       </div>
-                      <div style={{ fontSize: "10px", color: "#09090b", marginTop: "8px" }}>Click a chip to add it to your keywords below.</div>
+                      <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "8px" }}>Click a keyword to add it to your list below. These are pulled from your template's industry category.</div>
                     </div>
                   );
                 })()}
                 <div>
-                  <label style={I.lbl}>Primary Keywords (comma-separated)</label>
                   <textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.primaryKeywords || ""} onChange={e => updBrand("primaryKeywords", e.target.value)} placeholder="freelance videographer, video production, cinematic video, music video, brand film" />
-                  <div style={{ fontSize: "10px", color: "#09090b", marginTop: "5px" }}>3–5 keywords ideal.</div>
+                  <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "5px" }}>Comma-separated. 3–5 is ideal.</div>
                 </div>
               </Section>
 
               <Section id="positioning-seo" title="Page SEO — Meta Titles & Descriptions" icon="">
-                <p style={{ fontSize: "12px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.5 }}>These don't get embedded in the template — copy them into your SEO plugin (Yoast, Rank Math) after importing. Currently showing: <strong>{page.name}</strong></p>
-                <div><label style={I.lbl}>Meta Title</label><input style={I.inp} value={page.metaTitle || ""} onChange={e => updPage("metaTitle", e.target.value)} placeholder={`${brand.name} — ${page.name}`} /></div>
-                <div><label style={I.lbl}>Meta Description</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={page.metaDesc || ""} onChange={e => updPage("metaDesc", e.target.value)} placeholder="150-160 character description of this page for search engines." /></div>
+                <p style={{ fontSize: "12px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.5 }}>These don't get embedded in the template. After importing into WordPress, paste them into your SEO plugin — the field is called <strong>SEO Title</strong> in Yoast and <strong>Meta Title</strong> in Rank Math. Currently showing: <strong>{page.name}</strong></p>
+                <div>
+                  <label style={I.lbl}>SEO Title</label>
+                  <input style={I.inp} value={page.metaTitle || ""} onChange={e => updPage("metaTitle", e.target.value)} placeholder={`${brand.name || "Brand Name"} | Short descriptor — keep under 60 characters`} />
+                  <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "4px" }}>Format: Brand Name | Page descriptor. Example: Mile Marker Films | Video for Industrial Companies. Under 60 characters.</div>
+                </div>
+                <div>
+                  <label style={I.lbl}>Meta Description</label>
+                  <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={page.metaDesc || ""} onChange={e => updPage("metaDesc", e.target.value)} placeholder="150–160 characters. What shows under your page title in Google search results." />
+                  <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "4px" }}>{page.metaDesc ? `${page.metaDesc.length} characters${page.metaDesc.length > 160 ? " — too long, trim to 160" : page.metaDesc.length < 120 ? " — a little short, aim for 150–160" : " ✓"}` : "Aim for 150–160 characters."}</div>
+                </div>
               </Section>
 
               <Section id="positioning-draft" title="Draft Starter Copy with AI" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
-                  Generates hero copy, about text, and key messaging using your positioning inputs above. Fill in Goals, Desired Outcome, and Keywords first for best results.
+                  Generates hero copy, about text, and key messaging using everything in this tab. Fill in Goals, Desired Outcome, and Keywords first — the more context you give, the less generic the output.
                 </p>
                 <button
                   onClick={() => generateStarterCopy()}
@@ -5723,7 +5731,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 {briefDirty && ((brand.goals && brand.goals.length) || brand.goal) && brand.outcome && (
                   <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#b45309", fontWeight: 500, marginTop: "4px" }}>
                     <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#b45309", display: "inline-block" }} />
-                    Inputs updated — re-run to refresh your copy
+                    You've made changes — re-run Draft Starter Copy to update your copy
                   </div>
                 )}
               </Section>
