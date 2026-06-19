@@ -3789,7 +3789,7 @@ function previewHTML(page, brand) {
 // Accepts id so the audit can scroll to and flash-highlight a specific section.
 const Section = ({ title, icon, id, children }) => (
   <div id={id} style={{ marginBottom: "16px", padding: "20px 24px", borderRadius: "10px", background: "#ffffff", border: "1px solid #dde0e6", transition: "box-shadow 0.2s" }}>
-    <div style={{ fontSize: "13px", color: "#09090b", textTransform: "none", letterSpacing: "0", fontWeight: 700, marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid #f0eee6" }}>
+    <div style={{ fontSize: "13px", color: "#09090b", textTransform: "none", letterSpacing: "0", fontWeight: 700, marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid #dde0e6" }}>
       {title}
     </div>
     <div style={{ display: "grid", gap: "16px" }}>{children}</div>
@@ -5305,7 +5305,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     </div>
                   )}
                 </div>
-                <div onClick={e => e.stopPropagation()} style={{ borderTop: "1px solid #f0eee6", paddingTop: "12px" }}>
+                <div onClick={e => e.stopPropagation()} style={{ borderTop: "1px solid #dde0e6", paddingTop: "12px" }}>
                   <label style={{ display: "block", fontSize: "10px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700, marginBottom: "4px" }}>Inspiration URLs</label>
                   <textarea
                     value={p.brand.inspoUrls || ""}
@@ -5316,7 +5316,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   />
                   <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "3px" }}>Feeds AI copy drafting — one URL per line</div>
                 </div>
-                <div style={{ display: "flex", gap: "6px", paddingTop: "12px", borderTop: "1px solid #f0eee6" }}>
+                <div style={{ display: "flex", gap: "6px", paddingTop: "12px", borderTop: "1px solid #dde0e6" }}>
                   {isPendingDelete ? (
                     <>
                       <button onClick={(e) => { e.stopPropagation(); deleteProject(p.id); }} style={{ flex: 1, padding: "8px 10px", background: "#c93939", color: "#fff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer" }}>Yes, delete "{displayName}"</button>
