@@ -5678,12 +5678,6 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {tab === "positioning" && (
             <div className="editor-padding" style={{ padding: "24px 20px 40px", maxWidth: "1080px", margin: "0 auto" }}>
 
-              <Section id="positioning-intro" title="Strategy & Positioning" icon="">
-                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
-                  Use this section to define the strategy behind the site. What you fill in here drives the SEO and AI-search audit, powers Draft Starter Copy, and informs how copy gets written across every page.
-                </p>
-              </Section>
-
               <Section id="positioning-audience" title="Target Audience" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 10px", lineHeight: 1.6 }}>Who you're talking to — their role, company type, industry, or life stage. The AI uses this to write copy that speaks directly to the right person, not a generic visitor.</p>
                 <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.targetAudience} onChange={e => updBrand("targetAudience", e.target.value)} placeholder="e.g. Small business owners looking for a premium online presence without the agency price tag." />
@@ -5715,6 +5709,34 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   <div style={{ fontSize: "12px", color: "#6b7280", margin: "4px 0 8px", lineHeight: 1.5 }}>One sentence — the specific result this site should drive. The more concrete, the better. The AI uses this to shape the tone and urgency of every drafted section.</div>
                   <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.outcome || ""} onChange={e => updBrand("outcome", e.target.value)} placeholder="e.g. Book 4–6 qualified leads per month through the website contact form." />
                 </div>
+              </Section>
+
+              <Section id="positioning-ctas" title="CTAs & Contact" icon="">
+                <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.6 }}>Your call-to-action labels and contact details. These feed into the AI draft copy — hero buttons, nav CTA, footer, and contact form.</p>
+                <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                  <div><label style={I.lbl}>Primary CTA</label><input style={I.inp} value={brand.cta1} onChange={e => updBrand("cta1", e.target.value)} placeholder="e.g. Book a call" /></div>
+                  <div><label style={I.lbl}>Secondary CTA</label><input style={I.inp} value={brand.cta2} onChange={e => updBrand("cta2", e.target.value)} placeholder="e.g. View our work" /></div>
+                </div>
+                <div>
+                  <label style={I.lbl}>Final CTA Heading</label>
+                  <input style={I.inp} value={page.ctaHeading} onChange={e => updPage("ctaHeading", e.target.value)} placeholder="e.g. Ready to get started?" />
+                  <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "4px" }}>The big conversion heading in the bottom CTA section before the footer. Each page can have a different one.</div>
+                </div>
+                <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                  <div><label style={I.lbl}>Contact Email</label><input style={I.inp} value={brand.contactEmail} onChange={e => updBrand("contactEmail", e.target.value)} placeholder="e.g. hello@yourbrand.com" /></div>
+                  <div><label style={I.lbl}>Phone</label><input style={I.inp} value={brand.contactPhone} onChange={e => updBrand("contactPhone", e.target.value)} placeholder="e.g. (555) 000-0000" /></div>
+                </div>
+              </Section>
+
+              <Section id="positioning-style-notes" title="Style Notes" icon="">
+                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Specific aesthetic principles you want applied — typography quirks, hierarchy preferences, ornamental rules, things you've seen and liked. Fed directly to the AI Draft Starter Copy as concrete style guidance.</p>
+                <textarea
+                  style={{ ...I.inp, resize: "vertical" }}
+                  rows={5}
+                  value={brand.styleNotes}
+                  onChange={e => updBrand("styleNotes", e.target.value)}
+                  placeholder="e.g. Lowercase navigation, dramatic numbered sections, generous negative space, all-caps eyebrow labels, dark background with one bold accent color, work-first hierarchy."
+                />
               </Section>
 
               <Section id="positioning-keywords" title="Keywords for Search & AI Discovery" icon="">
@@ -5759,35 +5781,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 </div>
               </Section>
 
-              <Section id="positioning-style-notes" title="Style Notes" icon="">
-                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Specific aesthetic principles you want applied — typography quirks, hierarchy preferences, ornamental rules, things you've seen and liked. Fed directly to the AI Draft Starter Copy as concrete style guidance.</p>
-                <textarea
-                  style={{ ...I.inp, resize: "vertical" }}
-                  rows={5}
-                  value={brand.styleNotes}
-                  onChange={e => updBrand("styleNotes", e.target.value)}
-                  placeholder="e.g. Lowercase navigation, dramatic numbered sections, generous negative space, all-caps eyebrow labels, dark background with one bold accent color, work-first hierarchy."
-                />
-              </Section>
-
-                            <Section id="positioning-ctas" title="CTAs & Contact" icon="">
-                <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.6 }}>Your call-to-action labels and contact details. These feed into the AI draft copy — hero buttons, nav CTA, footer, and contact form.</p>
-                <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                  <div><label style={I.lbl}>Primary CTA</label><input style={I.inp} value={brand.cta1} onChange={e => updBrand("cta1", e.target.value)} placeholder="e.g. Book a call" /></div>
-                  <div><label style={I.lbl}>Secondary CTA</label><input style={I.inp} value={brand.cta2} onChange={e => updBrand("cta2", e.target.value)} placeholder="e.g. View our work" /></div>
-                </div>
-                <div>
-                  <label style={I.lbl}>Final CTA Heading</label>
-                  <input style={I.inp} value={page.ctaHeading} onChange={e => updPage("ctaHeading", e.target.value)} placeholder="e.g. Ready to get started?" />
-                  <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "4px" }}>The big conversion heading in the bottom CTA section before the footer. Each page can have a different one.</div>
-                </div>
-                <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                  <div><label style={I.lbl}>Contact Email</label><input style={I.inp} value={brand.contactEmail} onChange={e => updBrand("contactEmail", e.target.value)} placeholder="e.g. hello@yourbrand.com" /></div>
-                  <div><label style={I.lbl}>Phone</label><input style={I.inp} value={brand.contactPhone} onChange={e => updBrand("contactPhone", e.target.value)} placeholder="e.g. (555) 000-0000" /></div>
-                </div>
-              </Section>
-
-                            <Section id="positioning-draft" title="Draft Starter Copy with AI" icon="">
+              <Section id="positioning-draft" title="Draft Starter Copy with AI" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
                   Generates hero copy, about text, and key messaging using everything in this tab. Fill in Goals, Desired Outcome, and Keywords first — the more context you give, the less generic the output.
                 </p>
