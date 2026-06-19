@@ -4939,10 +4939,6 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         }
       `}</style>
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-          <div style={{ fontSize: "24px", fontWeight: 800, letterSpacing: "-0.03em", color: "#09090b" }}>spec</div>
-          <div style={{ fontSize: "10px", color: "#09090b", padding: "3px 9px", background: "#ffffff", border: "1px solid #e8e6dd", borderRadius: "10px", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>Beta</div>
-        </div>
         <h1 style={{ fontSize: "36px", margin: "0 0 6px", fontWeight: 200, letterSpacing: "0", color: "#09090b" }}>Projects</h1>
         <p style={{ color: "#09090b", fontSize: "14px", margin: "0 0 32px", lineHeight: 1.6 }}>Plan, spec, and export Elementor or Divi templates.</p>
 
