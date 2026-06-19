@@ -5367,7 +5367,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
       `}</style>
 
       {/* Header */}
-      <div style={{ background: "#ffffff", borderBottom: "1px solid #e5e7eb", padding: "8px 0", position: "sticky", top: 0, zIndex: 50 }}>
+      <div style={{ background: "#ffffff", borderBottom: "1px solid #e5e7eb", padding: "8px 0", position: "sticky", top: "48px", zIndex: 50 }}>
         <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
           {/* Left: All Projects + project info */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
