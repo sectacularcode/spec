@@ -4589,8 +4589,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   // ── Styles ─────────────────────────────────────────────────────────────────
   const I = {
     lbl: { display: "block", fontSize: "11px", color: "#6b7280", marginBottom: "6px", textTransform: "none", letterSpacing: "0", fontWeight: 600 },
-    inp: { width: "100%", padding: "11px 13px", background: "#ffffff", border: "1px solid #e5e7eb", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5 },
-    sel: { width: "100%", padding: "11px 36px 11px 13px", background: "#ffffff", border: "1px solid #e5e7eb", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5, appearance: "auto" },
+    inp: { width: "100%", maxWidth: "100%", padding: "11px 13px", background: "#ffffff", border: "1px solid #dde0e6", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5, boxSizing: "border-box" },
+    sel: { width: "100%", padding: "11px 36px 11px 13px", background: "#ffffff", border: "1px solid #dde0e6", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5, appearance: "auto" },
     btn: { padding: "8px 16px", background: "#6b635c", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer" },
     btnGhost: { padding: "8px 16px", background: "#ffffff", color: "#6b635c", border: "1px solid #6b635c", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer" },
   };
@@ -4601,7 +4601,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
   // Builder format toggle — applies to both Page and Footer downloads
   const FormatToggle = () => (
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "6px", padding: "3px", marginRight: "4px" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "6px", padding: "3px", marginRight: "4px" }}>
       <span style={{ fontSize: "10px", color: "#a3a39e", padding: "0 6px", letterSpacing: "0.05em", textTransform: "uppercase" }}>Export</span>
       <button onClick={() => setExportFormat("elementor")} style={{ padding: "5px 10px", background: exportFormat === "elementor" ? "#09090b" : "transparent", color: exportFormat === "elementor" ? "#ffffff" : "#09090b", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Elementor</button>
       <button onClick={() => setExportFormat("divi")} style={{ padding: "5px 10px", background: exportFormat === "divi" ? "#09090b" : "transparent", color: exportFormat === "divi" ? "#ffffff" : "#09090b", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Divi</button>
@@ -4990,7 +4990,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             {briefLoading && <span style={{ fontSize: "12px", color: "#000000", fontWeight: 500 }}>Picking template, layout, colors, fonts… usually 5–10 seconds.</span>}
           </div>
           {briefLoading && (
-            <div style={{ marginTop: "14px", padding: "10px 14px", background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px", color: "#09090b", lineHeight: 1.6 }}>
+            <div style={{ marginTop: "14px", padding: "10px 14px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "12px", color: "#09090b", lineHeight: 1.6 }}>
               <div style={{ marginBottom: "4px", color: "#000000", fontWeight: 500 }}></div>
               
             </div>
@@ -5015,7 +5015,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <select
                   value={libraryFilter.visual}
                   onChange={e => setLibraryFilter(f => ({ ...f, visual: e.target.value }))}
-                  style={{ padding: "8px 12px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px", background: "#fff", color: "#09090b", cursor: "pointer", outline: "none" }}>
+                  style={{ padding: "8px 12px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", cursor: "pointer", outline: "none" }}>
                   <option value="">All visual styles</option>
                   {[...new Set(savedBuilds.flatMap(b => b.visualTags || []))].map(tag => (
                     <option key={tag} value={tag}>{tag.replace(/-/g, " ")}</option>
@@ -5024,14 +5024,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <select
                   value={libraryFilter.industry}
                   onChange={e => setLibraryFilter(f => ({ ...f, industry: e.target.value }))}
-                  style={{ padding: "8px 12px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px", background: "#fff", color: "#09090b", cursor: "pointer", outline: "none" }}>
+                  style={{ padding: "8px 12px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", cursor: "pointer", outline: "none" }}>
                   <option value="">All industries</option>
                   {[...new Set(savedBuilds.flatMap(b => b.industryFit || []))].sort().map(ind => (
                     <option key={ind} value={ind}>{ind.replace(/-/g, " ")}</option>
                   ))}
                 </select>
                 {(libraryFilter.visual || libraryFilter.industry) && (
-                  <button onClick={() => setLibraryFilter({ visual: "", industry: "" })} style={{ padding: "8px 12px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px", background: "#fff", color: "#6b7280", cursor: "pointer" }}>Clear</button>
+                  <button onClick={() => setLibraryFilter({ visual: "", industry: "" })} style={{ padding: "8px 12px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#6b7280", cursor: "pointer" }}>Clear</button>
                 )}
               </div>
             </div>
@@ -5050,7 +5050,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   var brass = colors.brass || "#C2A35B";
                   var stone = colors.stone || "#8A8170";
                   return (
-                    <div key={build.id} style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: "10px", overflow: "hidden" }}>
+                    <div key={build.id} style={{ background: "#fff", border: "1px solid #dde0e6", borderRadius: "10px", overflow: "hidden" }}>
                       {/* Color swatch preview */}
                       <div style={{ height: "80px", background: ink, display: "flex", alignItems: "flex-end", padding: "12px 16px", gap: "6px" }}>
                         {Object.values(colors).slice(0, 6).map((hex, i) => (
@@ -5110,7 +5110,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                                 setSavedBuilds(updated);
                               } catch(e) {}
                             }}
-                            style={{ padding: "9px 12px", fontSize: "12px", fontWeight: 500, background: "#fff", color: "#6b7280", border: "1px solid #e5e7eb", borderRadius: "6px", cursor: "pointer" }}>
+                            style={{ padding: "9px 12px", fontSize: "12px", fontWeight: 500, background: "#fff", color: "#6b7280", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
                             Remove
                           </button>
                         </div>
@@ -5124,7 +5124,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               if (libraryFilter.industry && !(b.industryFit || []).includes(libraryFilter.industry)) return false;
               return true;
             }).length === 0 && (
-              <div style={{ padding: "32px", textAlign: "center", color: "#6b7280", fontSize: "13px", border: "1px dashed #e5e7eb", borderRadius: "8px" }}>
+              <div style={{ padding: "32px", textAlign: "center", color: "#6b7280", fontSize: "13px", border: "1px dashed #dde0e6", borderRadius: "8px" }}>
                 No builds match these filters.
               </div>
             )}
@@ -5132,9 +5132,9 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         )}
 
         {briefRec && (
-          <div style={{ background: "#ffffff", border: "1px solid #e7e7e4", borderRadius: "12px", padding: "32px 36px", marginBottom: "28px" }}>
+          <div style={{ background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "12px", padding: "32px 36px", marginBottom: "28px" }}>
             {/* Header row — template name + action buttons */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "28px", gap: "16px", flexWrap: "wrap", paddingBottom: "24px", borderBottom: "1px solid #e7e7e4" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "28px", gap: "16px", flexWrap: "wrap", paddingBottom: "24px", borderBottom: "1px solid #dde0e6" }}>
               <div style={{ flex: "1 1 280px" }}>
                 <div style={{ fontSize: "9px", color: "#09090b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "6px" }}>Recommended Template</div>
                 <div style={{ fontSize: "22px", fontWeight: 700, color: "#09090b", letterSpacing: "-0.02em", lineHeight: 1.2, marginBottom: briefRec.templateReason ? "8px" : 0 }}>{WEBSITE_TEMPLATES.find(t => t.id === briefRec.templateId)?.name || briefRec.templateId}</div>
@@ -5144,10 +5144,10 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <button onClick={applyBriefRecommendation} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px", background: "#000000", color: "#fff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
                   <Icon name="check" size={14} color="#fff" /> Create this project
                 </button>
-                <button onClick={describeMySite} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px", background: "#ffffff", color: "#09090b", border: "1px solid #e7e7e4", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
+                <button onClick={describeMySite} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
                   <Icon name="refresh" size={14} color="#09090b" /> Regenerate
                 </button>
-                <button onClick={() => setBriefRec(null)} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 14px", background: "transparent", color: "#09090b", border: "1px solid #e7e7e4", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
+                <button onClick={() => setBriefRec(null)} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 14px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
                   Discard
                 </button>
               </div>
@@ -5155,7 +5155,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
             {/* Tagline pull-quote (if present) */}
             {briefRec.tagline && (
-              <div style={{ marginBottom: "28px", paddingBottom: "24px", borderBottom: "1px solid #e7e7e4" }}>
+              <div style={{ marginBottom: "28px", paddingBottom: "24px", borderBottom: "1px solid #dde0e6" }}>
                 <div style={{ fontSize: "9px", color: "#09090b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "8px" }}>The Brief</div>
                 <div style={{ fontSize: "16px", color: "#09090b", fontStyle: "italic", lineHeight: 1.45, letterSpacing: "-0.01em", fontWeight: 500 }}>"{briefRec.tagline.replace(/^["']|["']$/g, "")}"</div>
               </div>
@@ -5187,7 +5187,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                         if (theme) swatches = [theme.primaryColor, theme.accentColor, theme.cardBgColor];
                       }
                       return swatches.slice(0, 3).map((c, i) => (
-                        <div key={i} style={{ width: "24px", height: "24px", background: c, border: "1px solid #e7e7e4", borderRadius: "4px" }} />
+                        <div key={i} style={{ width: "24px", height: "24px", background: c, border: "1px solid #dde0e6", borderRadius: "4px" }} />
                       ));
                     })()}
                     <span style={{ fontSize: "16px", color: "#09090b", fontWeight: 700, marginLeft: "4px", letterSpacing: "-0.015em" }}>
@@ -5251,7 +5251,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           </div>
         )}
         {importMsg && (
-          <div style={{ marginBottom: "16px", padding: "12px 16px", background: importMsg.startsWith("Import failed") ? "#fef2f2" : "#f5f5f4", border: importMsg.startsWith("Import failed") ? "1px solid #fecaca" : "1px solid #e5e7eb", borderRadius: "8px", fontSize: "13px", color: importMsg.startsWith("Import failed") ? "#991b1b" : "#09090b" }}>
+          <div style={{ marginBottom: "16px", padding: "12px 16px", background: importMsg.startsWith("Import failed") ? "#fef2f2" : "#f5f5f7", border: importMsg.startsWith("Import failed") ? "1px solid #fecaca" : "1px solid #dde0e6", borderRadius: "8px", fontSize: "13px", color: importMsg.startsWith("Import failed") ? "#991b1b" : "#09090b" }}>
             {importMsg}
           </div>
         )}
@@ -5278,7 +5278,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                       </span>
                     </div>
                   ) : (
-                    <div style={{ fontSize: "10px", color: "#09090b", fontStyle: "italic", padding: "6px 10px", background: "#ffffff", border: "1px dashed #d4d2c8", borderRadius: "4px", display: "inline-block" }}>
+                    <div style={{ fontSize: "10px", color: "#09090b", fontStyle: "italic", padding: "6px 10px", background: "#ffffff", border: "1px dashed #dde0e6", borderRadius: "4px", display: "inline-block" }}>
                       No template applied yet
                     </div>
                   )}
@@ -5321,10 +5321,10 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </div>
             );
           })}
-          <button onClick={newProject} style={{ background: "transparent", border: "1.5px dashed #d4d2c8", color: "#09090b", padding: "32px", borderRadius: "10px", cursor: "pointer", fontSize: "14px", fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+          <button onClick={newProject} style={{ background: "transparent", border: "1.5px dashed #dde0e6", color: "#09090b", padding: "32px", borderRadius: "10px", cursor: "pointer", fontSize: "14px", fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
             <Icon name="plus" size={18} color="#09090b" /> New Project
           </button>
-          <label style={{ background: "transparent", border: "1.5px dashed #d4d2c8", color: "#09090b", padding: "32px", borderRadius: "10px", cursor: "pointer", fontSize: "14px", fontWeight: 500, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+          <label style={{ background: "transparent", border: "1.5px dashed #dde0e6", color: "#09090b", padding: "32px", borderRadius: "10px", cursor: "pointer", fontSize: "14px", fontWeight: 500, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
             <Icon name="upload" size={18} color="#09090b" /> Import Project
             <input type="file" accept="application/json,.json" onChange={importProjectFile} style={{ display: "none" }} />
           </label>
@@ -5365,7 +5365,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
       `}</style>
 
       {/* Header */}
-      <div style={{ background: "#ffffff", borderBottom: "1px solid #e5e7eb", padding: "8px 0", position: "sticky", top: "48px", zIndex: 50 }}>
+      <div style={{ background: "#ffffff", borderBottom: "1px solid #dde0e6", padding: "8px 0", position: "sticky", top: "48px", zIndex: 50 }}>
         <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
           {/* Left: All Projects + project info */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
@@ -5391,7 +5391,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
       {/* Audit drawer — categorized */}
       {showAudit && (
-        <div style={{ background: "#eeedf1", borderBottom: "1px solid #e5e7eb", padding: "20px 24px", maxHeight: "420px", overflowY: "auto" }}>
+        <div style={{ background: "#eeedf1", borderBottom: "1px solid #dde0e6", padding: "20px 24px", maxHeight: "420px", overflowY: "auto" }}>
           {audit.length === 0 ? (
             <div style={{ fontSize: "14px", color: "#000000", fontWeight: 600 }}>Everything looks good. Ready to build.</div>
           ) : (
@@ -5423,8 +5423,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                             cursor: clickable ? "pointer" : "default",
                             transition: "background 0.15s",
                           }}
-                          onMouseEnter={e => { if (clickable) e.currentTarget.style.background = "#eeeeec"; }}
-                          onMouseLeave={e => { if (clickable) e.currentTarget.style.background = "#f5f5f4"; }}
+                          onMouseEnter={e => { if (clickable) e.currentTarget.style.background = "#f0eff3"; }}
+                          onMouseLeave={e => { if (clickable) e.currentTarget.style.background = "#f5f5f7"; }}
                         >
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px" }}>
                             <strong style={{ color: "#09090b" }}>{a.msg}</strong>
@@ -5449,14 +5449,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
       {/* AI Draft Modal — preview the generated copy before applying */}
       {(aiDraft || aiError || aiLoading) && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: "20px" }}>
-          <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "28px", maxWidth: "720px", width: "100%", maxHeight: "85vh", overflowY: "auto" }}>
+          <div style={{ background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "12px", padding: "28px", maxWidth: "720px", width: "100%", maxHeight: "85vh", overflowY: "auto" }}>
             {aiError ? (
               <>
                 <div style={{ fontSize: "16px", fontWeight: 700, color: "#ef4444", marginBottom: "12px" }}>Couldn't draft copy</div>
                 <div style={{ fontSize: "14px", color: "#09090b", marginBottom: "20px", lineHeight: 1.6 }}>{aiError}</div>
                 <div style={{ display: "flex", gap: "10px" }}>
                   <button onClick={() => { setAiError(""); generateStarterCopy(); }} style={{ padding: "10px 18px", background: "#000000", color: "#09090b", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}>Try again</button>
-                  <button onClick={() => setAiError("")} style={{ padding: "10px 18px", background: "transparent", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}>Cancel</button>
+                  <button onClick={() => setAiError("")} style={{ padding: "10px 18px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}>Cancel</button>
                 </div>
               </>
             ) : (aiLoading && !aiDraft) ? (
@@ -5467,9 +5467,9 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   Writing tagline, hero heading, hero subhead, about copy, CTAs, and key messages based on your brand brief. Usually 8–15 seconds.
                 </div>
                 {[1,2,3,4,5,6].map(i => (
-                  <div key={i} style={{ marginBottom: "10px", background: "#ffffff", padding: "12px 14px", borderRadius: "6px", border: "1px solid #e5e7eb" }}>
-                    <div style={{ height: "10px", width: "30%", background: "#eeeeec", borderRadius: "3px", marginBottom: "8px" }} />
-                    <div style={{ height: "12px", width: "85%", background: "#eeeeec", borderRadius: "3px" }} />
+                  <div key={i} style={{ marginBottom: "10px", background: "#ffffff", padding: "12px 14px", borderRadius: "6px", border: "1px solid #dde0e6" }}>
+                    <div style={{ height: "10px", width: "30%", background: "#f0eff3", borderRadius: "3px", marginBottom: "8px" }} />
+                    <div style={{ height: "12px", width: "85%", background: "#f0eff3", borderRadius: "3px" }} />
                   </div>
                 ))}
               </>
@@ -5494,7 +5494,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   const value = aiDraft[key] || "";
                   const isRegenerating = aiFieldRegen === key;
                   return (
-                    <div key={key} style={{ marginBottom: "14px", background: "#ffffff", padding: "12px 14px", borderRadius: "6px", border: isRegenerating ? "1px solid #18181b" : "1px solid #e5e7eb", position: "relative" }}>
+                    <div key={key} style={{ marginBottom: "14px", background: "#ffffff", padding: "12px 14px", borderRadius: "6px", border: isRegenerating ? "1px solid #18181b" : "1px solid #dde0e6", position: "relative" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
                         <div style={{ fontSize: "10px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>{label}</div>
                         <button
@@ -5504,7 +5504,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           style={{
                             background: isRegenerating ? "#000000" : "transparent",
                             color: isRegenerating ? "#ffffff" : "#09090b",
-                            border: "1px solid #e5e7eb",
+                            border: "1px solid #dde0e6",
                             borderRadius: "4px",
                             padding: "4px 9px",
                             fontSize: "10px",
@@ -5525,7 +5525,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           onChange={e => setAiDraft({ ...aiDraft, [key]: e.target.value })}
                           rows={rows || 3}
                           disabled={isRegenerating}
-                          style={{ width: "100%", padding: "8px 10px", background: "#ffffff", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.5, opacity: isRegenerating ? 0.5 : 1 }}
+                          style={{ width: "100%", padding: "8px 10px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.5, opacity: isRegenerating ? 0.5 : 1 }}
                         />
                       ) : (
                         <input
@@ -5533,7 +5533,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           value={value}
                           onChange={e => setAiDraft({ ...aiDraft, [key]: e.target.value })}
                           disabled={isRegenerating}
-                          style={{ width: "100%", padding: "8px 10px", background: "#ffffff", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", opacity: isRegenerating ? 0.5 : 1 }}
+                          style={{ width: "100%", padding: "8px 10px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", opacity: isRegenerating ? 0.5 : 1 }}
                         />
                       )}
                     </div>
@@ -5544,10 +5544,10 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   <button onClick={applyAiDraft} disabled={!!aiFieldRegen || aiLoading} style={{ padding: "12px 20px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: (aiFieldRegen || aiLoading) ? "not-allowed" : "pointer", opacity: (aiFieldRegen || aiLoading) ? 0.5 : 1, display: "inline-flex", alignItems: "center", gap: "6px" }}>
                     <Icon name="check" size={14} color="#ffffff" /> Apply to brand & page
                   </button>
-                  <button onClick={() => { setAiDraft(null); generateStarterCopy(); }} disabled={!!aiFieldRegen || aiLoading} style={{ padding: "12px 20px", background: "#ffffff", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: (aiFieldRegen || aiLoading) ? "not-allowed" : "pointer", opacity: (aiFieldRegen || aiLoading) ? 0.5 : 1, display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <button onClick={() => { setAiDraft(null); generateStarterCopy(); }} disabled={!!aiFieldRegen || aiLoading} style={{ padding: "12px 20px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: (aiFieldRegen || aiLoading) ? "not-allowed" : "pointer", opacity: (aiFieldRegen || aiLoading) ? 0.5 : 1, display: "inline-flex", alignItems: "center", gap: "6px" }}>
                     <Icon name="refresh" size={14} color="#09090b" /> Regenerate all
                   </button>
-                  <button onClick={() => { setAiDraft(null); setAiFieldRegen(""); }} disabled={!!aiFieldRegen} style={{ padding: "12px 20px", background: "transparent", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: aiFieldRegen ? "not-allowed" : "pointer" }}>Cancel</button>
+                  <button onClick={() => { setAiDraft(null); setAiFieldRegen(""); }} disabled={!!aiFieldRegen} style={{ padding: "12px 20px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: aiFieldRegen ? "not-allowed" : "pointer" }}>Cancel</button>
                 </div>
               </>
             )}
@@ -5587,10 +5587,10 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   <Icon name="plus" size={11} color="#ffffff" /> Add Page
                 </button>
                 {showAddPage && (
-                  <div style={{ position: "absolute", top: "36px", right: "0", background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "12px", zIndex: 30, minWidth: "280px", maxHeight: "420px", overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,0.08)" }}>
+                  <div style={{ position: "absolute", top: "36px", right: "0", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "8px", padding: "12px", zIndex: 30, minWidth: "280px", maxHeight: "420px", overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,0.08)" }}>
                     <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "10px", padding: "0 4px", fontWeight: 600 }}>Start from a template</div>
                     {PAGE_TYPES.map(pt => (
-                      <button key={pt} onClick={() => addPage(pt)} style={{ width: "100%", textAlign: "left", padding: "10px 12px", background: "transparent", border: "none", color: "#09090b", fontSize: "14px", cursor: "pointer", borderRadius: "4px", marginBottom: "2px" }} onMouseEnter={e => e.currentTarget.style.background = "#eeeeec"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                      <button key={pt} onClick={() => addPage(pt)} style={{ width: "100%", textAlign: "left", padding: "10px 12px", background: "transparent", border: "none", color: "#09090b", fontSize: "14px", cursor: "pointer", borderRadius: "4px", marginBottom: "2px" }} onMouseEnter={e => e.currentTarget.style.background = "#f0eff3"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                         <div style={{ fontWeight: 600, color: "#000000" }}>{pt}</div>
                         <div style={{ fontSize: "12px", color: "#09090b", marginTop: "2px" }}>{(PAGE_TEMPLATES[pt]?.sections || []).slice(0, 4).join(" · ")}{PAGE_TEMPLATES[pt]?.sections?.length > 4 ? " ..." : ""}</div>
                       </button>
@@ -5608,7 +5608,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
               <Section id="discovery-voice" title="Tone &amp; Voice" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.6 }}>How the brand sounds. This shapes every word the AI drafts across the site.</p>
-                <div><label style={I.lbl}>Tone</label><select style={{ width: "100%", padding: "11px 40px 11px 13px", background: "#ffffff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\") no-repeat right 14px center", border: "1px solid #e5e7eb", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5, appearance: "none", WebkitAppearance: "none" }} value={TONES.includes(brand.tone) ? brand.tone : (brand.tone ? "Other" : brand.tone)} onChange={e => updBrand("tone", e.target.value)}>{TONES.map(t => <option key={t}>{t}</option>)}</select></div>
+                <div><label style={I.lbl}>Tone</label><select style={{ width: "100%", padding: "11px 40px 11px 13px", background: "#ffffff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\") no-repeat right 14px center", border: "1px solid #dde0e6", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5, appearance: "none", WebkitAppearance: "none" }} value={TONES.includes(brand.tone) ? brand.tone : (brand.tone ? "Other" : brand.tone)} onChange={e => updBrand("tone", e.target.value)}>{TONES.map(t => <option key={t}>{t}</option>)}</select></div>
                 {(brand.tone === "Other" || (brand.tone && !TONES.slice(0, -1).includes(brand.tone))) && (
                   <div style={{ marginTop: "10px" }}>
                     <label style={I.lbl}>Describe the tone</label>
@@ -5678,8 +5678,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                       const currentGoals = brand.goals || (brand.goal ? [brand.goal] : []);
                       const isSelected = currentGoals.includes(g);
                       return (
-                        <label key={g} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 12px", background: isSelected ? "#eeeeec" : "#f5f5f4", border: `1px solid ${isSelected ? "#000000" : "#e7e7e4"}`, borderRadius: "6px", cursor: "pointer", fontSize: "13px", color: "#09090b", userSelect: "none" }}>
-                          <input type="checkbox" checked={isSelected} onChange={e => { const next = e.target.checked ? [...currentGoals, g] : currentGoals.filter(x => x !== g); updBrand("goals", next); updBrand("goal", next[0] || ""); }} style={{ cursor: "pointer", accentColor: "#000000" }} />
+                        <label key={g} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 12px", background: isSelected ? "#f0eff3" : "#f5f5f7", border: `1px solid ${isSelected ? "#000000" : "#dde0e6"}`, borderRadius: "6px", cursor: "pointer", fontSize: "13px", color: "#09090b", userSelect: "none" }}>
+                          <input type="checkbox" checked={isSelected} onChange={e => { const next = e.target.checked ? [...currentGoals, g] : currentGoals.filter(x => x !== g); updBrand("goals", next); updBrand("goal", next[0] || ""); }} style={{ cursor: "pointer", accentColor: "#6b635c" }} />
                           {g}
                         </label>
                       );
@@ -5706,10 +5706,10 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   const missing = tplKeywords.filter(k => !currentList.some(c => c.toLowerCase() === k.toLowerCase()));
                   if (!missing.length) return null;
                   return (
-                    <div style={{ padding: "12px 14px", background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "6px", marginBottom: "12px" }}>
+                    <div style={{ padding: "12px 14px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "6px", marginBottom: "12px" }}>
                       <div style={{ fontSize: "12px", color: "#09090b", fontWeight: 700, marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Suggested from your {activeTpl.name} template</div>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-                        {missing.map(k => (<button key={k} onClick={() => { const next = currentList.concat(k).join(", "); updBrand("primaryKeywords", next); }} style={{ padding: "5px 10px", background: "#eeeeec", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "4px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>+ {k}</button>))}
+                        {missing.map(k => (<button key={k} onClick={() => { const next = currentList.concat(k).join(", "); updBrand("primaryKeywords", next); }} style={{ padding: "5px 10px", background: "#f0eff3", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>+ {k}</button>))}
                       </div>
                       <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "8px" }}>Click a keyword to add it to your list below. These are pulled from your template's industry category.</div>
                     </div>
@@ -5792,7 +5792,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                         style={{
                           padding: "16px",
                           background: "#ffffff",
-                          border: isActive ? "2px solid #000000" : "1px solid #e5e7eb",
+                          border: isActive ? "2px solid #000000" : "1px solid #dde0e6",
                           borderRadius: "10px",
                           cursor: "pointer",
                           textAlign: "left",
@@ -5800,7 +5800,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           position: "relative",
                         }}
                         onMouseOver={e => { if (!isActive) { e.currentTarget.style.borderColor = "#a3a39e"; } }}
-                        onMouseOut={e => { if (!isActive) { e.currentTarget.style.borderColor = "#e7e7e4"; } }}
+                        onMouseOut={e => { if (!isActive) { e.currentTarget.style.borderColor = "#dde0e6"; } }}
                       >
                         {isActive && (
                           <div style={{ position: "absolute", top: "12px", right: "12px", background: "#000000", color: "#ffffff", fontSize: "10px", fontWeight: 500, padding: "4px 10px", borderRadius: "10px", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: "4px" }}>
@@ -5809,7 +5809,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                         )}
                         <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: "200px" }}>
                           <div style={{ fontSize: "15px", fontWeight: 700, color: "#000000", marginBottom: "10px", letterSpacing: "-0.02em", lineHeight: 1.3, paddingRight: isActive ? "70px" : 0 }}>{t.name}</div>
-                          <div style={{ height: "1px", background: "#e7e7e4", marginBottom: "12px" }} />
+                          <div style={{ height: "1px", background: "#dde0e6", marginBottom: "12px" }} />
                           <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.55, marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{t.desc}</div>
                           <div style={{ display: "flex", gap: "5px", flexWrap: "wrap", marginTop: "auto" }}>
                             {t.homepageSections.slice(0, 5).map(s => (
@@ -5852,7 +5852,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                             bodyFont: activeTemplate.bodyFont,
                           }
                         } : p));
-                      }} style={{ padding: "18px 20px", background: "#ffffff", border: isOnDefault ? "2px solid #000000" : "1.5px dashed #d6d6d2", borderRadius: "10px", cursor: "pointer", textAlign: "left", position: "relative", display: "flex", flexDirection: "column", minHeight: "180px" }}>
+                      }} style={{ padding: "18px 20px", background: "#ffffff", border: isOnDefault ? "2px solid #000000" : "1.5px dashed #dde0e6", borderRadius: "10px", cursor: "pointer", textAlign: "left", position: "relative", display: "flex", flexDirection: "column", minHeight: "180px" }}>
                         {isOnDefault && (
                           <div style={{ position: "absolute", top: "12px", right: "12px", background: "#000000", color: "#ffffff", fontSize: "10px", fontWeight: 500, padding: "4px 10px", borderRadius: "10px", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: "4px", zIndex: 1 }}>
                             <Icon name="check" size={11} color="#ffffff" /> Current
@@ -5869,7 +5869,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           fontStyle: activeTemplate.headingFont === "Cormorant Garamond" ? "italic" : "normal",
                           letterSpacing: "-0.01em",
                         }}>Aa</div>
-                        <div style={{ height: "1px", background: "#e7e7e4", marginBottom: "12px" }} />
+                        <div style={{ height: "1px", background: "#dde0e6", marginBottom: "12px" }} />
                         <div style={{ fontSize: "14px", fontWeight: 700, color: "#000000", marginBottom: "4px", letterSpacing: "-0.02em", paddingRight: isOnDefault ? "70px" : 0 }}>None — Template Default</div>
                         <div style={{ fontSize: "12px", color: "#09090b", lineHeight: 1.55, marginBottom: "12px" }}>Keep {activeTemplate.name}'s built-in layout ({defaultLayout?.name || "default"}).</div>
                         <div style={{ display: "flex", gap: "6px", marginTop: "auto", fontSize: "10px", color: "#09090b", flexWrap: "wrap" }}>
@@ -5898,9 +5898,9 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                             ...(l.bodyFont ? { bodyFont: l.bodyFont } : {}),
                           }
                         } : p));
-                      }} style={{ padding: "18px 20px", background: "#ffffff", border: active ? "2px solid #000000" : "1px solid #e7e7e4", borderRadius: "10px", cursor: "pointer", textAlign: "left", position: "relative", transition: "border-color .15s", display: "flex", flexDirection: "column", minHeight: "180px" }}
+                      }} style={{ padding: "18px 20px", background: "#ffffff", border: active ? "2px solid #000000" : "1px solid #dde0e6", borderRadius: "10px", cursor: "pointer", textAlign: "left", position: "relative", transition: "border-color .15s", display: "flex", flexDirection: "column", minHeight: "180px" }}
                           onMouseOver={e => { if (!active) e.currentTarget.style.borderColor = "#a3a39e"; }}
-                          onMouseOut={e => { if (!active) e.currentTarget.style.borderColor = "#e7e7e4"; }}>
+                          onMouseOut={e => { if (!active) e.currentTarget.style.borderColor = "#dde0e6"; }}>
                         {active && (
                           <div style={{ position: "absolute", top: "12px", right: "12px", background: "#000000", color: "#ffffff", fontSize: "10px", fontWeight: 500, padding: "4px 10px", borderRadius: "10px", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: "4px", zIndex: 1 }}>
                             <Icon name="check" size={11} color="#ffffff" /> Active
@@ -5917,7 +5917,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           fontStyle: l.headingFont === "Cormorant Garamond" ? "italic" : "normal",
                           letterSpacing: "-0.01em",
                         }}>Aa</div>
-                        <div style={{ height: "1px", background: "#e7e7e4", marginBottom: "12px" }} />
+                        <div style={{ height: "1px", background: "#dde0e6", marginBottom: "12px" }} />
                         <div style={{ fontSize: "14px", fontWeight: 700, color: "#000000", marginBottom: "4px", letterSpacing: "-0.02em", paddingRight: active ? "70px" : 0 }}>{l.name}</div>
                         <div style={{ fontSize: "12px", color: "#09090b", lineHeight: 1.55, marginBottom: "12px" }}>{l.desc}</div>
                         <div style={{ display: "flex", gap: "6px", marginTop: "auto", fontSize: "10px", color: "#09090b", flexWrap: "wrap", alignItems: "center" }}>
@@ -5963,7 +5963,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                             type="color"
                             value={val || "#000000"}
                             onChange={e => updBrand("brandColors", { ...bc, [key]: e.target.value })}
-                            style={{ width: "36px", height: "36px", padding: "2px", border: "1px solid #e5e7eb", borderRadius: "6px", background: "#ffffff", cursor: "pointer" }}
+                            style={{ width: "36px", height: "36px", padding: "2px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", cursor: "pointer" }}
                           />
                           <input
                             style={{ ...I.inp, fontFamily: "monospace", textTransform: "lowercase" }}
@@ -5982,7 +5982,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   const filled = ["background", "accent", "text", "card"].filter(k => bc[k] && /^#[0-9a-f]{6}$/i.test(bc[k]));
                   const canApply = filled.includes("background") && filled.includes("accent");
                   if (!canApply) return (
-                    <div style={{ fontSize: "12px", color: "#09090b", padding: "10px 12px", background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "6px", lineHeight: 1.5 }}>
+                    <div style={{ fontSize: "12px", color: "#09090b", padding: "10px 12px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "6px", lineHeight: 1.5 }}>
                       Add valid hex codes for at least Background and Accent to enable the custom palette.
                     </div>
                   );
@@ -5997,7 +5997,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   return (
                     <>
                       <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "12px", alignItems: "center", marginTop: "4px" }}>
-                        <div style={{ background: bc.background, padding: "16px", borderRadius: "8px", border: "1px solid #e5e7eb" }}>
+                        <div style={{ background: bc.background, padding: "16px", borderRadius: "8px", border: "1px solid #dde0e6" }}>
                           <div style={{ fontFamily: "Georgia,serif", fontSize: "16px", color: txt, marginBottom: "4px" }}>Aa Preview</div>
                           <div style={{ fontSize: "12px", color: txt, opacity: 0.7, marginBottom: "10px" }}>Body text on background</div>
                           <span style={{ display: "inline-block", background: bc.accent, color: isDark ? "#0a0a0a" : "#09090b", padding: "5px 12px", borderRadius: "4px", fontSize: "10px", fontWeight: 600 }}>Accent Button</span>
@@ -6046,7 +6046,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   if (!activeTpl || activeTpl.themeId !== brand.themeId) return null;
                   const tplTheme = THEMES.find(t => t.id === activeTpl.themeId);
                   return (
-                    <div style={{ padding: "10px 14px", background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px", color: "#09090b", fontWeight: 500, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <div style={{ padding: "10px 14px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "12px", color: "#09090b", fontWeight: 500, display: "flex", alignItems: "center", gap: "8px" }}>
                       <span style={{ background: "#000000", color: "#ffffff", padding: "3px 8px", borderRadius: "4px", fontSize: "9px", fontWeight: 600, letterSpacing: "0.05em" }}>TEMPLATE DEFAULT</span>
                       <span>Using <strong style={{ color: "#000000" }}>{tplTheme?.name}</strong> from the {activeTpl.name} template. Pick a different theme below to override.</span>
                     </div>
@@ -6056,9 +6056,9 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   {THEMES.map(t => {
                     const active = brand.themeId === t.id;
                     return (
-                      <button key={t.id} onClick={() => setProjects(ps => ps.map(p => p.id === activeId ? { ...p, brand: applyTheme(t, p.brand) } : p))} style={{ padding: 0, background: "#ffffff", border: active ? "2px solid #000000" : "1px solid #e7e7e4", borderRadius: "10px", cursor: "pointer", overflow: "hidden", textAlign: "left", transition: "border-color .15s", display: "flex", flexDirection: "column", minHeight: "200px", position: "relative" }}
+                      <button key={t.id} onClick={() => setProjects(ps => ps.map(p => p.id === activeId ? { ...p, brand: applyTheme(t, p.brand) } : p))} style={{ padding: 0, background: "#ffffff", border: active ? "2px solid #000000" : "1px solid #dde0e6", borderRadius: "10px", cursor: "pointer", overflow: "hidden", textAlign: "left", transition: "border-color .15s", display: "flex", flexDirection: "column", minHeight: "200px", position: "relative" }}
                           onMouseOver={e => { if (!active) e.currentTarget.style.borderColor = "#a3a39e"; }}
-                          onMouseOut={e => { if (!active) e.currentTarget.style.borderColor = "#e7e7e4"; }}>
+                          onMouseOut={e => { if (!active) e.currentTarget.style.borderColor = "#dde0e6"; }}>
                         {active && (
                           <div style={{ position: "absolute", top: "10px", right: "10px", background: "#000000", color: "#ffffff", fontSize: "10px", fontWeight: 500, padding: "4px 10px", borderRadius: "10px", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: "4px", zIndex: 1 }}>
                             <Icon name="check" size={11} color="#ffffff" /> Active
@@ -6078,14 +6078,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                         {/* Meta block — title + divider + description */}
                         <div style={{ padding: "14px 16px", background: "#ffffff", display: "flex", flexDirection: "column", flex: 1 }}>
                           <div style={{ fontSize: "14px", fontWeight: 700, color: "#000000", letterSpacing: "-0.02em", marginBottom: "8px", paddingRight: active ? "70px" : 0 }}>{t.name}</div>
-                          <div style={{ height: "1px", background: "#e7e7e4", marginBottom: "10px" }} />
+                          <div style={{ height: "1px", background: "#dde0e6", marginBottom: "10px" }} />
                           <div style={{ fontSize: "12px", color: "#09090b", lineHeight: 1.55 }}>{t.desc}</div>
                         </div>
                       </button>
                     );
                   })}
                 </div>
-                <div style={{ marginTop: "16px", padding: "20px 22px", background: "#ffffff", border: "1px solid #e7e7e4", borderRadius: "10px" }}>
+                <div style={{ marginTop: "16px", padding: "20px 22px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "10px" }}>
                   <div style={{ fontSize: "12px", color: "#000000", textTransform: "uppercase", letterSpacing: "0.14em", fontWeight: 700, marginBottom: "6px" }}>Quick Accent Swap</div>
                   <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 16px", lineHeight: 1.55 }}>Override just the accent. Works with any theme.</p>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
@@ -6102,7 +6102,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                               height: "36px",
                               background: a.value,
                               borderRadius: "50%",
-                              border: active ? "2px solid #000000" : (isLight ? "1px solid #e7e7e4" : "2px solid transparent"),
+                              border: active ? "2px solid #000000" : (isLight ? "1px solid #dde0e6" : "2px solid transparent"),
                               boxShadow: active ? "inset 0 0 0 2px #ffffff" : "none",
                               cursor: "pointer",
                               padding: 0,
@@ -6178,26 +6178,26 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               <Section id="page-nav" title="Navigation Menus" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Header and footer menu items. Menus output as Elementor Nav Menu widgets linked to WordPress menus by name — create matching menus in WP → Appearance → Menus.</p>
                 <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}>
-                  <input type="checkbox" checked={brand.multiMenu} onChange={e => updBrand("multiMenu", e.target.checked)} style={{ accentColor: "#000000" }} /> Enable multi-menu (primary + utility)
+                  <input type="checkbox" checked={brand.multiMenu} onChange={e => updBrand("multiMenu", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Enable multi-menu (primary + utility)
                 </label>
                 <div><label style={I.lbl}>Primary Menu (comma-separated)</label><input style={I.inp} value={brand.primaryMenu} onChange={e => updBrand("primaryMenu", e.target.value)} placeholder="Home, About, Services, Work, Contact" /></div>
                 {brand.multiMenu && <div><label style={I.lbl}>Utility Menu (footer/legal)</label><input style={I.inp} value={brand.utilityMenu} onChange={e => updBrand("utilityMenu", e.target.value)} placeholder="Privacy, Terms, Sitemap" /></div>}
               </Section>
               <Section id="page-sections" title="Sections on this Page" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.55 }}>Compose the page top to bottom. Tap a section in the library to add it to the outline. Tap the × to remove.</p>
-                <div style={{ background: "#ffffff", border: "1px solid #e7e7e4", borderRadius: "10px", padding: "22px 24px" }}>
+                <div style={{ background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "10px", padding: "22px 24px" }}>
                   {/* PAGE OUTLINE — selected sections in order */}
                   <div style={{ fontSize: "9px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.18em", fontWeight: 600, marginBottom: "12px" }}>
                     Page Outline {page.sections.length > 0 && <span style={{ color: "#a3a39e" }}>· {page.sections.length} {page.sections.length === 1 ? "section" : "sections"}</span>}
                   </div>
                   {page.sections.length === 0 ? (
-                    <div style={{ padding: "20px 16px", background: "#ffffff", border: "1px dashed #d6d6d2", borderRadius: "8px", textAlign: "center", fontSize: "13px", color: "#09090b", marginBottom: "24px" }}>
+                    <div style={{ padding: "20px 16px", background: "#ffffff", border: "1px dashed #dde0e6", borderRadius: "8px", textAlign: "center", fontSize: "13px", color: "#09090b", marginBottom: "24px" }}>
                       No sections added yet. Tap a section from the library below to start composing this page.
                     </div>
                   ) : (
                     <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "24px" }}>
                       {page.sections.map((s, i) => (
-                        <div key={`${s}-${i}`} draggable onDragStart={e=>{e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",String(i));e.currentTarget.style.opacity="0.4";}} onDragEnd={e=>{e.currentTarget.style.opacity="1";document.querySelectorAll("[data-dnd]").forEach(el=>{el.style.borderTop="";el.style.borderBottom="";});}} onDragOver={e=>{e.preventDefault();const r=e.currentTarget.getBoundingClientRect();const mid=r.top+r.height/2;e.currentTarget.style.borderTop=e.clientY<mid?"2px solid #09090b":"";e.currentTarget.style.borderBottom=e.clientY>=mid?"2px solid #09090b":"";}} onDragLeave={e=>{e.currentTarget.style.borderTop="";e.currentTarget.style.borderBottom="";}} onDrop={e=>{e.preventDefault();e.currentTarget.style.borderTop="";e.currentTarget.style.borderBottom="";const from=parseInt(e.dataTransfer.getData("text/plain"),10);const r=e.currentTarget.getBoundingClientRect();const mid=r.top+r.height/2;let to=e.clientY<mid?i:i+1;if(from===to||from+1===to)return;const arr=[...page.sections];const[moved]=arr.splice(from,1);arr.splice(to>from?to-1:to,0,moved);updPage("sections",arr);}} data-dnd style={{ display: "flex", alignItems: "center", gap: "14px", padding: "12px 16px", background: "#f9f9f7", border: "1px solid #e7e7e4", borderRadius: "8px", cursor: "grab", userSelect: "none" }}>
+                        <div key={`${s}-${i}`} draggable onDragStart={e=>{e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",String(i));e.currentTarget.style.opacity="0.4";}} onDragEnd={e=>{e.currentTarget.style.opacity="1";document.querySelectorAll("[data-dnd]").forEach(el=>{el.style.borderTop="";el.style.borderBottom="";});}} onDragOver={e=>{e.preventDefault();const r=e.currentTarget.getBoundingClientRect();const mid=r.top+r.height/2;e.currentTarget.style.borderTop=e.clientY<mid?"2px solid #6b635c":"";e.currentTarget.style.borderBottom=e.clientY>=mid?"2px solid #6b635c":"";}} onDragLeave={e=>{e.currentTarget.style.borderTop="";e.currentTarget.style.borderBottom="";}} onDrop={e=>{e.preventDefault();e.currentTarget.style.borderTop="";e.currentTarget.style.borderBottom="";const from=parseInt(e.dataTransfer.getData("text/plain"),10);const r=e.currentTarget.getBoundingClientRect();const mid=r.top+r.height/2;let to=e.clientY<mid?i:i+1;if(from===to||from+1===to)return;const arr=[...page.sections];const[moved]=arr.splice(from,1);arr.splice(to>from?to-1:to,0,moved);updPage("sections",arr);}} data-dnd style={{ display: "flex", alignItems: "center", gap: "14px", padding: "12px 16px", background: "#f5f5f7", border: "1px solid #dde0e6", borderRadius: "8px", cursor: "grab", userSelect: "none" }}>
                           <span style={{ fontSize: "12px", fontWeight: 700, color: "#09090b", fontVariantNumeric: "tabular-nums", minWidth: "20px", letterSpacing: "0.02em" }}>{String(i + 1).padStart(2, "0")}</span>
                           <span style={{ flex: 1, fontSize: "14px", color: "#09090b", fontWeight: 500 }}>{s}</span>
                           <span title="Drag to reorder" style={{ display: "inline-flex", flexDirection: "column", gap: "3px", cursor: "grab", opacity: 0.4, flexShrink: 0 }}>{[0,1,2].map(r => (<span key={r} style={{ display: "flex", gap: "3px" }}><span style={{ width:"3px",height:"3px",borderRadius:"50%",background:"#09090b",display:"block" }}/><span style={{ width:"3px",height:"3px",borderRadius:"50%",background:"#09090b",display:"block" }}/></span>))}</span>
@@ -6215,7 +6215,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   )}
 
                   {/* Divider */}
-                  <div style={{ height: "1px", background: "#e7e7e4", marginBottom: "18px" }} />
+                  <div style={{ height: "1px", background: "#dde0e6", marginBottom: "18px" }} />
 
                   {/* AVAILABLE LIBRARY — unselected sections as add pills */}
                   <div style={{ fontSize: "9px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.18em", fontWeight: 600, marginBottom: "12px" }}>Available Sections</div>
@@ -6231,9 +6231,9 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           <button
                             key={s}
                             onClick={() => toggleSection(s)}
-                            style={{ fontSize: "13px", padding: "7px 12px", background: "#ffffff", border: "1px solid #e7e7e4", borderRadius: "999px", color: "#09090b", cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: "4px", transition: "border-color 0.15s, background 0.15s" }}
-                            onMouseOver={e => { e.currentTarget.style.borderColor = "#000000"; e.currentTarget.style.background = "#f9f9f7"; }}
-                            onMouseOut={e => { e.currentTarget.style.borderColor = "#e7e7e4"; e.currentTarget.style.background = "#ffffff"; }}>
+                            style={{ fontSize: "13px", padding: "7px 12px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "999px", color: "#09090b", cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: "4px", transition: "border-color 0.15s, background 0.15s" }}
+                            onMouseOver={e => { e.currentTarget.style.borderColor = "#000000"; e.currentTarget.style.background = "#f5f5f7"; }}
+                            onMouseOut={e => { e.currentTarget.style.borderColor = "#dde0e6"; e.currentTarget.style.background = "#ffffff"; }}>
                             <Icon name="plus" size={11} color="#09090b" /> {s}
                           </button>
                         ))}
@@ -6336,9 +6336,9 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 ))}
                 <button onClick={addSocial} style={{ ...I.btnGhost, alignSelf: "start", display: "inline-flex", alignItems: "center", gap: "6px" }}>+ Add Social</button>
                 <div style={{ display: "grid", gap: "8px", marginTop: "10px" }}>
-                  <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInNav} onChange={e => updBrand("showSocialInNav", e.target.checked)} style={{ accentColor: "#000000" }} /> Show icons in top navigation</label>
-                  <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInPage} onChange={e => updBrand("showSocialInPage", e.target.checked)} style={{ accentColor: "#000000" }} /> Show as a section while scrolling (requires "Social" section enabled)</label>
-                  <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInFooter} onChange={e => updBrand("showSocialInFooter", e.target.checked)} style={{ accentColor: "#000000" }} /> Show in footer</label>
+                  <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInNav} onChange={e => updBrand("showSocialInNav", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Show icons in top navigation</label>
+                  <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInPage} onChange={e => updBrand("showSocialInPage", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Show as a section while scrolling (requires "Social" section enabled)</label>
+                  <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInFooter} onChange={e => updBrand("showSocialInFooter", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Show in footer</label>
                 </div>
               </Section>
               </div>
@@ -6352,7 +6352,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               <Section id="footer-header" title="Header Style" icon="">
                 <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "10px" }}>
                   {HEADER_STYLES.map(f => (
-                    <button key={f} onClick={() => updBrand("headerStyle", f)} style={{ padding: "16px", background: "#ffffff", border: brand.headerStyle === f ? "2px solid #000000" : "1px solid #e5e7eb", color: "#000000", borderRadius: "8px", cursor: "pointer", textAlign: "left", transition: "border-color .15s" }} onMouseOver={e => { if (brand.headerStyle !== f) e.currentTarget.style.borderColor = "#a3a39e"; }} onMouseOut={e => { if (brand.headerStyle !== f) e.currentTarget.style.borderColor = "#e7e7e4"; }}>
+                    <button key={f} onClick={() => updBrand("headerStyle", f)} style={{ padding: "16px", background: "#ffffff", border: brand.headerStyle === f ? "2px solid #000000" : "1px solid #dde0e6", color: "#000000", borderRadius: "8px", cursor: "pointer", textAlign: "left", transition: "border-color .15s" }} onMouseOver={e => { if (brand.headerStyle !== f) e.currentTarget.style.borderColor = "#a3a39e"; }} onMouseOut={e => { if (brand.headerStyle !== f) e.currentTarget.style.borderColor = "#dde0e6"; }}>
                       <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: "4px" }}>{f}</div>
                       <div style={{ fontSize: "12px", color: "#09090b" }}>
                         {f === "Editorial" && "Logo left, nav center, social right"}
@@ -6368,7 +6368,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               <Section id="footer-footer" title="Footer Style" icon="">
                 <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "10px" }}>
                   {FOOTER_STYLES.map(f => (
-                    <button key={f} onClick={() => updBrand("footerStyle", f)} style={{ padding: "16px", background: "#ffffff", border: brand.footerStyle === f ? "2px solid #000000" : "1px solid #e5e7eb", color: "#000000", borderRadius: "8px", cursor: "pointer", textAlign: "left", transition: "border-color .15s" }} onMouseOver={e => { if (brand.footerStyle !== f) e.currentTarget.style.borderColor = "#a3a39e"; }} onMouseOut={e => { if (brand.footerStyle !== f) e.currentTarget.style.borderColor = "#e7e7e4"; }}>
+                    <button key={f} onClick={() => updBrand("footerStyle", f)} style={{ padding: "16px", background: "#ffffff", border: brand.footerStyle === f ? "2px solid #000000" : "1px solid #dde0e6", color: "#000000", borderRadius: "8px", cursor: "pointer", textAlign: "left", transition: "border-color .15s" }} onMouseOver={e => { if (brand.footerStyle !== f) e.currentTarget.style.borderColor = "#a3a39e"; }} onMouseOut={e => { if (brand.footerStyle !== f) e.currentTarget.style.borderColor = "#dde0e6"; }}>
                       <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: "4px" }}>{f}</div>
                       <div style={{ fontSize: "12px", color: "#09090b" }}>
                         {f === "Editorial" && "Minimal centered — logo, social, copyright"}
@@ -6388,13 +6388,13 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* EXPORT & IMPORT TAB */}
           {tab === "export" && (
             <div className="editor-padding" style={{ padding: "24px 20px 40px", maxWidth: "1080px", margin: "0 auto" }}>
-            <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "20px", marginBottom: "16px" }}>
+            <div style={{ background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "8px", padding: "20px", marginBottom: "16px" }}>
               <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Active Page</div>
               <div style={{ fontSize: "18px", fontWeight: 600, color: "#09090b", marginBottom: "4px" }}>{page.name}</div>
               <div style={{ fontSize: "14px", color: "#09090b" }}>{page.sections.length} section{page.sections.length !== 1 ? "s" : ""}</div>
             </div>
 
-            <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "20px", marginBottom: "16px" }}>
+            <div style={{ background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "8px", padding: "20px", marginBottom: "16px" }}>
               <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>Download</div>
               <div style={{ display: "flex", gap: "6px", flexWrap: "nowrap", marginBottom: "16px", overflowX: "auto" }}>
                 <button onClick={downloadPage} style={{ padding: "8px 14px", background: "#6b635c", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
@@ -6430,7 +6430,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </div>
             </div>
 
-            <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "20px" }}>
+            <div style={{ background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "8px", padding: "20px" }}>
               <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>How to import — {exportFormat === "divi" ? "Divi" : "Elementor"}</div>
               {exportFormat === "elementor" ? (
                 <ol style={{ fontSize: "14px", color: "#09090b", lineHeight: 1.8, paddingLeft: "20px", margin: 0 }}>
@@ -6460,7 +6460,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           const prev = idx > 0 ? TAB_ORDER[idx - 1] : null;
           const next = idx < TAB_ORDER.length - 1 ? TAB_ORDER[idx + 1] : null;
           return (
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", padding: "24px 20px", marginTop: "30px", borderTop: "1px solid #e5e7eb", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", padding: "24px 20px", marginTop: "30px", borderTop: "1px solid #dde0e6", flexWrap: "wrap" }}>
               {prev ? (
                 <button
                   onClick={() => setTab(prev.id)}
@@ -6490,6 +6490,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
     </div>
   );
 }
+
 
 
 
