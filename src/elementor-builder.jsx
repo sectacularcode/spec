@@ -5401,7 +5401,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 const items = audit.filter(a => a.category === cat);
                 if (!items.length) return null;
                 const label = { critical: "Critical", content: "Content", seo: "SEO", aio: "AI Search", best: "Best Practices" }[cat];
-                const color = { critical: "#ef4444", content: "#b45309", seo: "#3b82f6", aio: "#000000", best: "#000000" }[cat];
+                const color = { critical: "#ef4444", content: "#b45309", seo: "#6b635c", aio: "#6b635c", best: "#6b635c" }[cat];
                 return (
                   <div key={cat} style={{ marginBottom: "16px" }}>
                     <div style={{ fontSize: "12px", color, fontWeight: 700, marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.08em" }}>{label} ({items.length})</div>
