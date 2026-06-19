@@ -5627,7 +5627,12 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "4px" }}>One or two sentences. What do they offer that no one else does, or does the same way? The AI uses this to avoid generic copy.</div>
               </Section>
 
-              <Section id="founder" title="Founder" icon="">
+              <Section id="founder" title="Founder &amp; Brand" icon="">
+                <div>
+                  <label style={I.lbl}>Brand / Company Name</label>
+                  <input style={I.inp} value={brand.name || ""} onChange={e => updBrand("name", e.target.value)} placeholder="e.g. Mile Marker Films" />
+                  <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "4px" }}>Used in the hero, about section, footer, and throughout AI-drafted copy.</div>
+                </div>
                 <div><label style={I.lbl}>Founder Name</label><input style={I.inp} value={brand.founderName} onChange={e => updBrand("founderName", e.target.value)} placeholder="e.g. Alex Morgan" /></div>
                 <div><label style={I.lbl}>Founder Title</label><input style={I.inp} value={brand.founderTitle} onChange={e => updBrand("founderTitle", e.target.value)} placeholder="e.g. Founder & Creative Director" /></div>
                 <div><label style={I.lbl}>Founder Bio</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.founderBio} onChange={e => updBrand("founderBio", e.target.value)} /></div>
