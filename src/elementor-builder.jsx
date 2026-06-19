@@ -5763,6 +5763,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* BRAND TAB */}
           {tab === "brand" && (
             <>
+              <div style={{ maxWidth: "680px", padding: "0 20px 40px" }}>
               <Section id="brand-templates" title="Industry Template" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
                   {brand.templateId
@@ -6162,6 +6163,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   placeholder="e.g. Lowercase navigation, dramatic numbered sections, generous negative space, all-caps eyebrow labels, dark background with one bold accent color, work-first hierarchy."
                 />
               </Section>
+              </div>
 
             </>
           )}
@@ -6169,6 +6171,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* PAGE TAB */}
           {tab === "page" && (
             <>
+              <div style={{ maxWidth: "680px", padding: "0 20px 40px" }}>
               <Section id="page-setup" title="Page Setup" icon="">
                 <div><label style={I.lbl}>Page Name</label><input style={I.inp} value={page.name} onChange={e => updPage("name", e.target.value)} /></div>
                 <div><label style={I.lbl}>Page Type</label><select style={{ ...I.inp, paddingRight: "36px", appearance: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center" }} value={page.pageType} onChange={e => updPage("pageType", e.target.value)}>{PAGE_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
@@ -6240,12 +6243,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   })()}
                 </div>
               </Section>
+              </div>
             </>
           )}
 
           {/* CONTENT TAB */}
           {tab === "content" && (
             <>
+              <div style={{ maxWidth: "680px", padding: "0 20px 40px" }}>
               <Section id="page-hero" title="Hero" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>The first thing visitors see. Your main headline and supporting line.</p>
                 <div><label style={I.lbl}>Heading</label><input style={I.inp} value={page.heroHeading} onChange={e => updPage("heroHeading", e.target.value)} placeholder="e.g. Films for companies worth marking." /></div>
@@ -6311,12 +6316,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={5} value={page.blog} onChange={e => updPage("blog", e.target.value)} placeholder={"Post Title|Category|6 min read\nPost Title|Category|4 min read"} />
                 <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One post per line. Format: <strong>Title|Category|Read time</strong>. Placeholder images applied automatically.</div>
               </Section>}
+              </div>
             </>
           )}
 
           {/* SOCIAL TAB */}
           {tab === "social" && (
             <>
+              <div style={{ maxWidth: "680px", padding: "0 20px 40px" }}>
               <Section id="social-links" title="Social Media Links" icon="">
                 {brand.socialLinks.map((s, i) => (
                   <div key={i} className="responsive-4col" style={{ display: "grid", gridTemplateColumns: "100px 1fr 1fr 30px", gap: "8px", alignItems: "end" }}>
@@ -6328,13 +6335,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     <button onClick={() => delSocial(i)} style={{ ...I.btnGhost, padding: "8px" }}>×</button>
                   </div>
                 ))}
-                <button onClick={addSocial} style={{ ...I.btnGhost, alignSelf: "start" }}>+ Add Social</button>
+                <button onClick={addSocial} style={{ ...I.btnGhost, alignSelf: "start", display: "inline-flex", alignItems: "center", gap: "6px" }}>+ Add Social</button>
                 <div style={{ display: "grid", gap: "8px", marginTop: "10px" }}>
                   <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInNav} onChange={e => updBrand("showSocialInNav", e.target.checked)} style={{ accentColor: "#000000" }} /> Show icons in top navigation</label>
                   <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInPage} onChange={e => updBrand("showSocialInPage", e.target.checked)} style={{ accentColor: "#000000" }} /> Show as a section while scrolling (requires "Social" section enabled)</label>
                   <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInFooter} onChange={e => updBrand("showSocialInFooter", e.target.checked)} style={{ accentColor: "#000000" }} /> Show in footer</label>
                 </div>
               </Section>
+              </div>
             </>
           )}
 
