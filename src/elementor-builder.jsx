@@ -5368,46 +5368,23 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
       {/* Header */}
       <div style={{ background: "#ffffff", borderBottom: "1px solid #e5e7eb", padding: "12px 20px", position: "sticky", top: 0, zIndex: 50 }}>
-        <div style={{ maxWidth: "1080px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-          {/* Left: All Projects + project name */}
+        <div style={{ maxWidth: "1080px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
+          {/* Left: All Projects + project info */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <button onClick={() => setView("projects")} style={{ ...I.btnGhost, padding: "7px 12px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px" }}>
               <Icon name="arrowLeft" size={13} color="#09090b" /> All Projects
             </button>
             <div>
-              <div style={{ fontSize: "18px", fontWeight: 800, letterSpacing: "-0.02em", color: "#000000", lineHeight: 1 }}>{brand.name || "Untitled"}</div>
+              <div style={{ fontSize: "16px", fontWeight: 700, letterSpacing: "-0.01em", color: "#000000", lineHeight: 1 }}>{brand.name || "Untitled"}</div>
               <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "3px" }}>{project.pages.length} page{project.pages.length !== 1 ? "s" : ""} · {exportFormat === "divi" ? "Divi" : "Elementor"}</div>
             </div>
           </div>
-          {/* Center: page tabs + add page */}
-          <div style={{ display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap", position: "relative" }}>
-            {project.pages.map((p, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                <button onClick={() => setPageIdx(i)} style={{ padding: "7px 12px", background: i === pageIdx ? "#000000" : "#f5f5f4", color: i === pageIdx ? "#ffffff" : "#09090b", border: i === pageIdx ? "1px solid #000000" : "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>{p.name}</button>
-                {project.pages.length > 1 && <button onClick={() => delPage(i)} style={{ background: "transparent", border: "none", color: "#09090b", cursor: "pointer", fontSize: "14px" }}>×</button>}
-              </div>
-            ))}
-            <button onClick={() => setShowAddPage(!showAddPage)} style={{ ...I.btnGhost, padding: "7px 12px", display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px" }}>
-              <Icon name="plus" size={13} color="#09090b" /> Add Page
-            </button>
-            {showAddPage && (
-              <div style={{ position: "absolute", top: "40px", left: "0", background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "12px", zIndex: 30, minWidth: "280px", maxHeight: "420px", overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,0.08)" }}>
-                <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "10px", padding: "0 4px", fontWeight: 600 }}>Start from a template</div>
-                {PAGE_TYPES.map(pt => (
-                  <button key={pt} onClick={() => addPage(pt)} style={{ width: "100%", textAlign: "left", padding: "10px 12px", background: "transparent", border: "none", color: "#09090b", fontSize: "14px", cursor: "pointer", borderRadius: "4px", marginBottom: "2px" }} onMouseEnter={e => e.currentTarget.style.background = "#eeeeec"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                    <div style={{ fontWeight: 600, color: "#000000" }}>{pt}</div>
-                    <div style={{ fontSize: "12px", color: "#09090b", marginTop: "2px" }}>{(PAGE_TEMPLATES[pt]?.sections || []).slice(0, 4).join(" · ")}{PAGE_TEMPLATES[pt]?.sections?.length > 4 ? " ..." : ""}</div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-          {/* Right: Audit, Preview */}
+          {/* Right: Audit icon + Preview */}
           <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-            <button onClick={() => setShowAudit(!showAudit)} style={{ ...I.btnGhost, padding: "7px 10px", color: audit.length ? "#b45309" : "#09090b", display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "13px" }}>
-              <Icon name="alertTriangle" size={13} color={audit.length ? "#b45309" : "#09090b"} /> {audit.length}
+            <button onClick={() => setShowAudit(!showAudit)} title={`Audit — ${audit.length} item${audit.length !== 1 ? "s" : ""}`} style={{ background: "none", border: "none", padding: "7px 8px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", color: audit.length ? "#b45309" : "#a1a1aa", fontSize: "12px", fontWeight: 600, borderRadius: "6px" }}>
+              <Icon name="alertTriangle" size={14} color={audit.length ? "#b45309" : "#a1a1aa"} /> {audit.length}
             </button>
-            <button onClick={() => setView("preview")} style={{ padding: "7px 12px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}>
+            <button onClick={() => setView("preview")} style={{ padding: "7px 14px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}>
               <Icon name="eye" size={13} color="#ffffff" /> Preview
             </button>
           </div>
@@ -5586,7 +5563,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
           {/* Tabs */}
           <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "20px 24px 0" }}>
-            <div className="tab-bar" style={{ borderBottom: "1px solid #e7e7e4", marginBottom: "20px", display: "flex", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+            <div className="tab-bar" style={{ borderBottom: "1px solid #e7e7e4", marginBottom: "16px", display: "flex", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
               <TabBtn id="discovery" label="Discovery" />
               <TabBtn id="positioning" label="Positioning" />
               <TabBtn id="brand" label="Brand" />
@@ -5595,6 +5572,33 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               <TabBtn id="social" label="Social" />
               <TabBtn id="footer" label="Header & Footer" />
               <TabBtn id="export" label="Export & Import" />
+            </div>
+            {/* Page switcher row */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px", position: "relative" }}>
+              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
+                {project.pages.map((p, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: "3px" }}>
+                    <button onClick={() => setPageIdx(i)} style={{ padding: "6px 12px", background: i === pageIdx ? "#000000" : "#ffffff", color: i === pageIdx ? "#ffffff" : "#09090b", border: i === pageIdx ? "1px solid #000000" : "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>{p.name}</button>
+                    {project.pages.length > 1 && <button onClick={() => delPage(i)} style={{ background: "transparent", border: "none", color: "#a1a1aa", cursor: "pointer", fontSize: "14px", lineHeight: 1, padding: "0 2px" }}>×</button>}
+                  </div>
+                ))}
+              </div>
+              <div style={{ position: "relative" }}>
+                <button onClick={() => setShowAddPage(!showAddPage)} style={{ ...I.btnGhost, padding: "6px 12px", display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "12px" }}>
+                  <Icon name="plus" size={12} color="#09090b" /> Add Page
+                </button>
+                {showAddPage && (
+                  <div style={{ position: "absolute", top: "36px", right: "0", background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "12px", zIndex: 30, minWidth: "280px", maxHeight: "420px", overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,0.08)" }}>
+                    <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "10px", padding: "0 4px", fontWeight: 600 }}>Start from a template</div>
+                    {PAGE_TYPES.map(pt => (
+                      <button key={pt} onClick={() => addPage(pt)} style={{ width: "100%", textAlign: "left", padding: "10px 12px", background: "transparent", border: "none", color: "#09090b", fontSize: "14px", cursor: "pointer", borderRadius: "4px", marginBottom: "2px" }} onMouseEnter={e => e.currentTarget.style.background = "#eeeeec"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                        <div style={{ fontWeight: 600, color: "#000000" }}>{pt}</div>
+                        <div style={{ fontSize: "12px", color: "#09090b", marginTop: "2px" }}>{(PAGE_TEMPLATES[pt]?.sections || []).slice(0, 4).join(" · ")}{PAGE_TEMPLATES[pt]?.sections?.length > 4 ? " ..." : ""}</div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
