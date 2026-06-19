@@ -5589,10 +5589,10 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
       <div className="main-grid" style={{ display: "grid", gridTemplateColumns: "1fr", minHeight: "calc(100vh - 60px)" }}>
         {/* LEFT — FORM */}
-        <div className="tab-panel-bg" style={{ padding: "24px", overflowY: "auto", maxHeight: "calc(100vh - 60px)", background: "#f5f5f4" }}>
+        <div className="tab-panel-bg" style={{ padding: "0", overflowY: "auto", maxHeight: "calc(100vh - 60px)", background: "#f5f5f4" }}>
 
           {/* Tabs */}
-          <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
+          <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "20px 24px 0" }}>
             <div className="tab-bar" style={{ borderBottom: "1px solid #e7e7e4", marginBottom: "20px", display: "flex", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
               <TabBtn id="discovery" label="Discovery" />
               <TabBtn id="positioning" label="Positioning" />
@@ -5766,7 +5766,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* BRAND TAB */}
           {tab === "brand" && (
             <>
-              <div style={{ background: "#ffffff", padding: "0 24px 40px" }}>
+              <div style={{ background: "#ffffff", padding: "0 24px 40px", maxWidth: "1080px", margin: "0 auto" }}>
               <Section id="brand-templates" title="Industry Template" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
                   {brand.templateId
@@ -6174,7 +6174,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* PAGE TAB */}
           {tab === "page" && (
             <>
-              <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%", padding: "0 0 24px" }}>
+              <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%", padding: "0 24px 24px" }}>
               <Section id="page-setup" title="Page Setup" icon="">
                 <div><label style={I.lbl}>Page Name</label><input style={I.inp} value={page.name} onChange={e => updPage("name", e.target.value)} /></div>
                 <div><label style={I.lbl}>Page Type</label><select style={{ ...I.inp, paddingRight: "36px", appearance: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center" }} value={page.pageType} onChange={e => updPage("pageType", e.target.value)}>{PAGE_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
@@ -6253,7 +6253,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* CONTENT TAB */}
           {tab === "content" && (
             <>
-              <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%", padding: "0 0 24px" }}>
+              <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%", padding: "0 24px 24px" }}>
               <Section id="page-hero" title="Hero" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>The first thing visitors see. Your main headline and supporting line.</p>
                 <div><label style={I.lbl}>Heading</label><input style={I.inp} value={page.heroHeading} onChange={e => updPage("heroHeading", e.target.value)} placeholder="e.g. Films for companies worth marking." /></div>
@@ -6326,7 +6326,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* SOCIAL TAB */}
           {tab === "social" && (
             <>
-              <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%", padding: "0 0 24px" }}>
+              <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%", padding: "0 24px 24px" }}>
               <Section id="social-links" title="Social Media Links" icon="">
                 {brand.socialLinks.map((s, i) => (
                   <div key={i} className="responsive-4col" style={{ display: "grid", gridTemplateColumns: "100px 1fr 1fr 30px", gap: "8px", alignItems: "end" }}>
