@@ -64,21 +64,26 @@ export default function App() {
   return (
     <div style={{ width: "100%", minHeight: "100vh", fontFamily: "Inter, system-ui, sans-serif", boxSizing: "border-box" }}>
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: "#ffffff", borderBottom: "1px solid #e5e7eb", width: "100%", boxSizing: "border-box" }}>
-        <div style={{ maxWidth: "1080px", margin: "0 auto", display: "flex", alignItems: "center", padding: "0 24px", boxSizing: "border-box" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginRight: "32px", padding: "16px 0" }}>
-          <div style={{ fontSize: "22px", fontWeight: 800, letterSpacing: "-0.03em", color: "#09090b", lineHeight: 1 }}>spec</div>
-          <div style={{ fontSize: "10px", color: "#09090b", padding: "3px 8px", background: "#f5f5f4", border: "1px solid #e8e6dd", borderRadius: "10px", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>Beta</div>
-        </div>
-        {[{ id: "spec", label: "Template Studio" }, { id: "custom", label: "Brief to Blueprint" }].map(tab => (
-          <button key={tab.id} onClick={() => switchMode(tab.id)} style={{ padding: "18px 16px", fontSize: "13px", fontWeight: mode === tab.id ? 700 : 500, color: mode === tab.id ? "#09090b" : "#6b7280", background: "transparent", border: "none", cursor: "pointer", borderBottom: mode === tab.id ? "2px solid #09090b" : "2px solid transparent" }}>
-            {tab.label}
+        <div style={{ maxWidth: "1080px", margin: "0 auto", display: "flex", alignItems: "center", padding: "0 24px", boxSizing: "border-box", position: "relative" }}>
+          {/* spec + Beta — left anchor */}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "16px 0", marginRight: "auto" }}>
+            <div style={{ fontSize: "28px", fontWeight: 800, letterSpacing: "-0.04em", color: "#09090b", lineHeight: 1 }}>spec</div>
+            <div style={{ fontSize: "10px", color: "#09090b", padding: "3px 8px", background: "#f5f5f4", border: "1px solid #e8e6dd", borderRadius: "10px", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>Beta</div>
+          </div>
+          {/* Centered tabs */}
+          <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center" }}>
+            {[{ id: "spec", label: "Template Studio" }, { id: "custom", label: "Brief to Blueprint" }].map(tab => (
+              <button key={tab.id} onClick={() => switchMode(tab.id)} style={{ padding: "18px 16px", fontSize: "13px", fontWeight: mode === tab.id ? 700 : 500, color: mode === tab.id ? "#09090b" : "#6b7280", background: "transparent", border: "none", cursor: "pointer", borderBottom: mode === tab.id ? "2px solid #09090b" : "2px solid transparent", whiteSpace: "nowrap" }}>
+                {tab.label}
+              </button>
+            ))}
+          </div>
+          {/* Lock — right anchor */}
+          <button
+            onClick={() => { try { localStorage.removeItem(STORAGE_KEY); } catch(e) {} setAuthed(false); }}
+            style={{ marginLeft: "auto", fontSize: "12px", color: "#9ca3af", background: "none", border: "none", cursor: "pointer", padding: "8px" }}>
+            Lock
           </button>
-        ))}
-        <button
-          onClick={() => { try { localStorage.removeItem(STORAGE_KEY); } catch(e) {} setAuthed(false); }}
-          style={{ marginLeft: "auto", fontSize: "12px", color: "#9ca3af", background: "none", border: "none", cursor: "pointer", padding: "8px" }}>
-          Lock
-        </button>
         </div>
       </div>
       {mode === "spec" && <ElementorBuilder />}
