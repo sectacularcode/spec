@@ -4117,6 +4117,38 @@ export default function App() {
   };
   const updPage = (k, v) => setProjects(ps => ps.map(p => p.id === activeId ? { ...p, pages: p.pages.map((pg, i) => i === pageIdx ? { ...pg, [k]: v } : pg) } : p));
 
+  const clearDemoContent = () => {
+    setProjects(prev => {
+      return prev.map(proj => {
+        if (proj.id !== activeId) return proj;
+        const updatedPages = proj.pages.map((pg, idx) => {
+          if (idx !== pageIdx) return pg;
+          return {
+            ...pg,
+            heroHeading: "", heroSubhead: "", heroImage: "",
+            heroEyebrow: "",
+            aboutHeading: "", aboutBody: "", aboutImage: "",
+            aboutEyebrow: "",
+            services: "", servicesHeading: "", servicesEyebrow: "",
+            portfolio: "", portfolioHeading: "", portfolioEyebrow: "",
+            process: "", processHeading: "", processEyebrow: "",
+            leaders: "", leadershipEyebrow: "",
+            stats: "",
+            testimonials: "", testimonialsEyebrow: "",
+            pricing: "", pricingHeading: "", pricingEyebrow: "",
+            faq: "", faqHeading: "", faqEyebrow: "",
+            blog: "", blogHeading: "", blogEyebrow: "",
+            team: "", teamHeading: "", teamEyebrow: "",
+            videoUrl: "",
+            ctaHeading: "",
+            forms: "",
+          };
+        });
+        return { ...proj, pages: updatedPages };
+      });
+    });
+  };
+
   // Jump from an audit item to the exact section it refers to.
   // Switches tab, scrolls to the section, briefly highlights it.
   const goToSection = (tab, sectionId) => {
@@ -6464,20 +6496,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               {(!!(page.heroHeading || page.heroSubhead || page.aboutBody || page.services || page.process || page.testimonials || page.faq || page.portfolio || page.stats || page.pricing || page.blog || page.leaders)) && (
                 <div style={{ marginBottom: "16px", padding: "12px 16px", background: "#b45309", border: "none", borderRadius: "8px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
                   <div style={{ fontSize: "13px", color: "#ffffff" }}>This page has demo content from the template. Clear it to start fresh with your client's copy.</div>
-                  <button onClick={() => {
-                    const clearFields = {
-                      heroHeading: "", heroSubhead: "", heroImage: "",
-                      aboutHeading: "", aboutBody: "",
-                      services: "", portfolio: "", process: "",
-                      leaders: "", stats: "", testimonials: "",
-                      pricing: "", faq: "", blog: "", team: "",
-                      videoUrl: "", ctaHeading: "",
-                    };
-                    setProjects(prev => prev.map(proj => {
-                      if (proj.id !== activeId) return proj;
-                      return { ...proj, pages: proj.pages.map((pg, idx) => idx !== pageIdx ? pg : { ...pg, ...clearFields }) };
-                    }));
-                  }} style={{ padding: "6px 14px", background: "#ffffff", color: "#b45309", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>Clear demo content</button>
+                  <button onClick={clearDemoContent} style={{ padding: "6px 14px", background: "#ffffff", color: "#b45309", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>Clear demo content</button>
                 </div>
               )}
               <Section id="page-hero" title="Hero Text" icon="">
