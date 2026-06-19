@@ -6075,7 +6075,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.55, marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{t.desc}</div>
                           <div style={{ display: "flex", gap: "5px", flexWrap: "wrap", marginTop: "auto" }}>
                             {t.homepageSections.slice(0, 5).map(s => (
-                              <span key={s} style={{ fontSize: "9px", padding: "3px 8px", background: "#000000", color: "#ffffff", borderRadius: "10px", whiteSpace: "nowrap", fontWeight: 500, letterSpacing: "0.02em" }}>{s}</span>
+                              <span key={s} style={{ fontSize: "9px", padding: "3px 8px", background: "#6b635c", color: "#ffffff", borderRadius: "10px", whiteSpace: "nowrap", fontWeight: 500, letterSpacing: "0.02em" }}>{s}</span>
                             ))}
                             {t.homepageSections.length > 5 && <span style={{ fontSize: "9px", color: "#09090b", padding: "3px 4px", alignSelf: "center" }}>+{t.homepageSections.length - 5}</span>}
                           </div>
