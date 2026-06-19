@@ -2937,7 +2937,7 @@ function buildHeaderJSON(brand) {
     if (socialEl) colRight.elements.push(socialEl);
     row.elements.push(colLogo, colRight);
     sec.elements.push(row);
-  } else {
+  } else if (headerStyle === "Premium") {
     // Premium — logo left, nav center, CTA + social right
     const row = eContainer({
       content_width: "full",
