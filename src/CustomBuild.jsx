@@ -820,12 +820,36 @@ async function saveToLibrary(brief, pages, layoutVariants, selectedVariants) {
 }
 
 const ALL_PAGES = [
-  { id: "home",     label: "Home",               slug: "/" },
-  { id: "work",     label: "Work / Portfolio",    slug: "/work" },
-  { id: "services", label: "Services & Pricing",  slug: "/services" },
-  { id: "about",    label: "About",               slug: "/about" },
-  { id: "process",  label: "Process",             slug: "/process" },
-  { id: "contact",  label: "Contact",             slug: "/contact" },
+  { id: "home",        label: "Home",                slug: "/" },
+  { id: "work",        label: "Work / Portfolio",     slug: "/work" },
+  { id: "services",    label: "Services & Pricing",   slug: "/services" },
+  { id: "about",       label: "About",                slug: "/about" },
+  { id: "process",     label: "Process",              slug: "/process" },
+  { id: "contact",     label: "Contact",              slug: "/contact" },
+];
+
+const ADDITIONAL_PAGE_TYPES = [
+  { id: "landing",       label: "Landing Page",         slug: "/landing" },
+  { id: "team",          label: "Team",                 slug: "/team" },
+  { id: "blog",          label: "Blog / Journal",       slug: "/blog" },
+  { id: "blog-post",     label: "Blog Post",            slug: "/blog/post" },
+  { id: "case-study",    label: "Case Study",           slug: "/case-study" },
+  { id: "testimonials",  label: "Testimonials",         slug: "/testimonials" },
+  { id: "faq",           label: "FAQ",                  slug: "/faq" },
+  { id: "pricing",       label: "Pricing",              slug: "/pricing" },
+  { id: "portfolio",     label: "Portfolio Single",     slug: "/portfolio/project" },
+  { id: "events",        label: "Events",               slug: "/events" },
+  { id: "event-single",  label: "Event Single",         slug: "/events/event" },
+  { id: "location",      label: "Location",             slug: "/location" },
+  { id: "careers",       label: "Careers",              slug: "/careers" },
+  { id: "press",         label: "Press / Media",        slug: "/press" },
+  { id: "partners",      label: "Partners",             slug: "/partners" },
+  { id: "resources",     label: "Resources",            slug: "/resources" },
+  { id: "downloads",     label: "Downloads",            slug: "/downloads" },
+  { id: "thank-you",     label: "Thank You",            slug: "/thank-you" },
+  { id: "privacy",       label: "Privacy Policy",       slug: "/privacy-policy" },
+  { id: "terms",         label: "Terms of Service",     slug: "/terms" },
+  { id: "404",           label: "404",                  slug: "/404" },
 ];
 
 // ─── Elementor helpers ────────────────────────────────────────────────────────
@@ -1920,17 +1944,131 @@ function buildInspoContext(crawlResults, storedPatterns) {
   return allNotes.join(" | ");
 }
 
-function generatePages(brief, selectedPages, inspoContext, aiRecs) {
+function buildGenericPage(colors, brief, pageDef, inspoContext) {
+  var ink = colors.ink || "#1C1A17";
+  var bone = colors.bone || "#EDE7DB";
+  var brass = colors.brass || "#C2A35B";
+  var warmWhite = colors["warm-white"] || "#FBFAF7";
+  var text = colors.text || "#2A2722";
+  var stone = colors.stone || "#8A8170";
+  var asphalt = colors.asphalt || "#2B2823";
+  var label = pageDef.label;
+  var pid = pageDef.id;
+
+  // Page-type specific sections
+  var sections = [];
+
+  // Hero section for every page
+  var heroEyebrow = mkHeading(brief.brandName || "", brass, "h6", { eyebrow: true });
+  var heroH1 = mkHeading(label, warmWhite, "h1", { font: (brief.fonts && brief.fonts[1]) || "Inter", weight: 800, px: 52 });
+  var heroContainer = mkContainer([heroEyebrow, mkSpacer(16), heroH1], ink, { padY: "80", minH: 50, center: true });
+
+  sections.push(heroContainer);
+
+  // Page-specific content
+  if (pid === "team") {
+    sections.push(mkContainer([
+      mkHeading("The team.", text, "h2", { weight: 700, px: 40 }),
+      mkSpacer(16),
+      mkText("The people behind the work.", stone),
+    ], bone, { padY: "80" }));
+  } else if (pid === "blog" || pid === "blog-post") {
+    sections.push(mkContainer([
+      mkHeading(pid === "blog" ? "Journal." : "[Post title]", text, "h2", { weight: 700, px: 40 }),
+      mkSpacer(16),
+      mkText(pid === "blog" ? "Thinking, writing, and updates from the studio." : "[Post content — add in WordPress editor]", stone),
+    ], bone, { padY: "80" }));
+  } else if (pid === "faq") {
+    sections.push(mkContainer([
+      mkHeading("Questions, answered.", text, "h2", { weight: 700, px: 40 }),
+      mkSpacer(16),
+      mkText("[Add your FAQ items in Elementor after import]", stone),
+    ], bone, { padY: "80" }));
+  } else if (pid === "testimonials") {
+    sections.push(mkContainer([
+      mkHeading("Kind words.", text, "h2", { weight: 700, px: 40 }),
+      mkSpacer(16),
+      mkText("[Add testimonials in Elementor after import]", stone),
+    ], bone, { padY: "80" }));
+  } else if (pid === "careers") {
+    sections.push(mkContainer([
+      mkHeading("Work with us.", text, "h2", { weight: 700, px: 40 }),
+      mkSpacer(16),
+      mkText("[Add open roles and career information here]", stone),
+    ], bone, { padY: "80" }));
+  } else if (pid === "press") {
+    sections.push(mkContainer([
+      mkHeading("Press & media.", text, "h2", { weight: 700, px: 40 }),
+      mkSpacer(16),
+      mkText("[Add press mentions, media kit, and brand assets here]", stone),
+    ], bone, { padY: "80" }));
+  } else if (pid === "pricing") {
+    sections.push(mkContainer([
+      mkHeading("Investment.", text, "h2", { weight: 700, px: 40 }),
+      mkSpacer(16),
+      mkText("Transparent pricing. No surprises.", stone),
+    ], bone, { padY: "80" }));
+  } else if (pid === "landing") {
+    sections.push(mkContainer([
+      mkHeading(brief.tagline || "[Landing page headline]", text, "h2", { weight: 700, px: 40 }),
+      mkSpacer(16),
+      mkText(brief.hookStatement || "[Landing page subheadline — specific and direct]", stone),
+      mkSpacer(24),
+      mkButton(brief.heroCta1 || "Get started", brass, ink),
+    ], bone, { padY: "80", center: true }));
+  } else if (pid === "thank-you") {
+    sections.push(mkContainer([
+      mkHeading("You're all set.", text, "h2", { weight: 700, px: 40 }),
+      mkSpacer(16),
+      mkText("We'll be in touch shortly.", stone),
+    ], bone, { padY: "80", center: true }));
+  } else if (pid === "privacy" || pid === "terms") {
+    sections.push(mkContainer([
+      mkHeading(pid === "privacy" ? "Privacy Policy" : "Terms of Service", text, "h2", { weight: 700, px: 32 }),
+      mkSpacer(16),
+      mkText("[Add your " + (pid === "privacy" ? "privacy policy" : "terms of service") + " content here — consult a legal professional]", stone),
+    ], bone, { padY: "80" }));
+  } else if (pid === "404") {
+    sections.push(mkContainer([
+      mkHeading("404", brass, "h1", { weight: 800, px: 80 }),
+      mkSpacer(8),
+      mkHeading("Page not found.", text, "h2", { weight: 700, px: 36 }),
+      mkSpacer(16),
+      mkText("The page you're looking for doesn't exist or has moved.", stone),
+      mkSpacer(24),
+      mkButton("Go home", brass, ink),
+    ], bone, { padY: "80", center: true }));
+  } else {
+    // Generic fallback
+    sections.push(mkContainer([
+      mkHeading(label + ".", text, "h2", { weight: 700, px: 40 }),
+      mkSpacer(16),
+      mkText("[Add content for this page in Elementor after import]", stone),
+    ], bone, { padY: "80" }));
+  }
+
+  // Closing CTA
+  sections.push(mkContainer([
+    mkHeading(brief.tagline || brief.closingCta || "Ready to get started?", warmWhite, "h2", { font: (brief.fonts && brief.fonts[1]) || "Inter", weight: 400, px: 40 }),
+    mkSpacer(24),
+    mkButton(brief.headerCta || "Start a project", brass, ink),
+  ], asphalt, { padY: "80", center: true }));
+
+  return { version: "0.4", title: (brief.brandName || "Site") + " — " + label, type: "page", page_settings: {}, content: sections };
+}
+
+function generatePages(brief, selectedPages, inspoContext, aiRecs, customPagesArg) {
   var colors = brief.colors || {
     ink: "#1C1A17", brass: "#C2A35B", "brass-deep": "#9C7E3A",
     bone: "#EDE7DB", asphalt: "#2B2823", stone: "#8A8170",
     "warm-white": "#FBFAF7", text: "#2A2722"
   };
-  // aiRecs: { work: {variant:"B", reason:"..."}, about: {variant:"A",...}, ... }
   var recs = aiRecs || {};
+  var allPageDefs = ALL_PAGES.concat(ADDITIONAL_PAGE_TYPES).concat(customPagesArg || []);
 
   return selectedPages.map(function(pid) {
-    var label = (ALL_PAGES.find(function(p) { return p.id === pid; }) || {}).label || pid;
+    var pageDef = allPageDefs.find(function(p) { return p.id === pid; }) || { id: pid, label: pid, slug: "/" + pid };
+    var label = pageDef.label;
     var result = null;
 
     if (pid === "home") {
@@ -1945,9 +2083,13 @@ function generatePages(brief, selectedPages, inspoContext, aiRecs) {
     if (pid === "about")   result = buildAboutPage(colors, brief, inspoContext);
     if (pid === "process") result = buildProcessPage(colors, brief, inspoContext);
     if (pid === "contact") result = buildContactPage(colors, brief, inspoContext);
-    if (!result) return null;
 
-    // Use AI recommendation if available, otherwise fall back to keyword match
+    // Additional and custom page types
+    if (!result) {
+      var genericData = buildGenericPage(colors, brief, pageDef, inspoContext);
+      return { id: pid, label: label, data: genericData, variantA: genericData, variantB: null, recommended: "A", hasVariants: false };
+    }
+
     var recommended = (recs[pid] && recs[pid].variant) ? recs[pid].variant : result.recommended;
     var reason = (recs[pid] && recs[pid].reason) ? recs[pid].reason : null;
 
@@ -2333,6 +2475,8 @@ export default function CustomBuild() {
   const [crawling, setCrawling]         = useState({});  // keyed by URL
   const [storedPatterns, setStoredPatterns] = useState({}); // persisted across sessions
   const [selectedPages, setPages]       = useState(["home"]);
+  const [customPages, setCustomPages]   = useState([]); // user-added pages beyond the defaults
+  const [showAddPage, setShowAddPage]   = useState(false); // add page dropdown open
   const [copyBriefOnly, setCopy]        = useState(true);
   const [generating, setGenerating]     = useState(false);
   const [generatingStatus, setGeneratingStatus] = useState("");
@@ -2363,6 +2507,7 @@ export default function CustomBuild() {
         if (draft.clientName)     setClientName(draft.clientName);
         if (draft.inspoUrls)      setInspoUrls(draft.inspoUrls);
         if (draft.selectedPages)  setPages(draft.selectedPages);
+        if (draft.customPages)    setCustomPages(draft.customPages);
         if (draft.copyBriefOnly !== undefined) setCopy(draft.copyBriefOnly);
         if (draft.layoutVariants) setLayoutVariants(draft.layoutVariants);
         if (draft.generated)      setGenerated(draft.generated);
@@ -2383,6 +2528,7 @@ export default function CustomBuild() {
         clientName,
         inspoUrls,
         selectedPages,
+        customPages,
         copyBriefOnly,
         layoutVariants,
         previewPage,
@@ -2728,7 +2874,7 @@ export default function CustomBuild() {
     setGeneratingStatus("Building pages...");
     await new Promise(r => setTimeout(r, 300));
 
-    const pages = generatePages(workingBrief, selectedPages, inspoContext, aiRecs);
+    const pages = generatePages(workingBrief, selectedPages, inspoContext, aiRecs, customPages);
     const variants = {};
     pages.forEach(p => { variants[p.id] = p.recommended || "A"; });
     setLayoutVariants(variants);
@@ -2927,7 +3073,7 @@ export default function CustomBuild() {
               onClick={async () => {
                 setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]);
                 setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({});
-                setPreviewPage("home"); setPageOverrides({});
+                setPreviewPage("home"); setPageOverrides({}); setCustomPages([]);
                 { try { await kvStorageDel("spec-blueprint-draft"); } catch(e) {} }
               }}
               style={{ fontSize: "12px", color: "#6b7280", background: "none", border: "1px solid #e5e7eb", borderRadius: "6px", padding: "6px 12px", cursor: "pointer" }}>
@@ -3097,7 +3243,45 @@ export default function CustomBuild() {
                     <span>{p.label}</span>
                   </label>
                 ))}
+                {customPages.map(p => (
+                  <label key={p.id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px", border: selectedPages.includes(p.id) ? "1px solid #000" : "1px solid #e5e7eb", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: 500, color: "#09090b" }}>
+                    <input type="checkbox" checked={selectedPages.includes(p.id)} onChange={() => togglePage(p.id)} style={{ accentColor: "#000", width: "15px", height: "15px" }} />
+                    <span style={{ flex: 1 }}>{p.label}</span>
+                    <button
+                      onClick={e => { e.preventDefault(); setCustomPages(prev => prev.filter(cp => cp.id !== p.id)); setPages(prev => prev.filter(pid => pid !== p.id)); }}
+                      style={{ background: "none", border: "none", cursor: "pointer", color: "#9ca3af", fontSize: "14px", padding: "0 2px", lineHeight: 1 }}>×</button>
+                  </label>
+                ))}
               </div>
+
+              {/* Add page button */}
+              <div style={{ marginTop: "10px", position: "relative" }}>
+                <button
+                  onClick={() => setShowAddPage(!showAddPage)}
+                  style={{ fontSize: "12px", color: "#6b7280", background: "none", border: "1px dashed #e5e7eb", borderRadius: "6px", padding: "8px 14px", cursor: "pointer", width: "100%" }}>
+                  + Add page
+                </button>
+                {showAddPage && (
+                  <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px", boxShadow: "0 4px 16px rgba(0,0,0,0.1)", zIndex: 50, maxHeight: "240px", overflowY: "auto" }}>
+                    {ADDITIONAL_PAGE_TYPES.filter(p => !customPages.find(cp => cp.id === p.id)).map(p => (
+                      <button
+                        key={p.id}
+                        onClick={() => {
+                          const newPage = { ...p, id: p.id + "-" + Date.now() };
+                          setCustomPages(prev => [...prev, newPage]);
+                          setPages(prev => [...prev, newPage.id]);
+                          setShowAddPage(false);
+                        }}
+                        style={{ display: "block", width: "100%", padding: "10px 14px", fontSize: "13px", textAlign: "left", background: "none", border: "none", cursor: "pointer", color: "#09090b", borderBottom: "1px solid #f4f4f5" }}
+                        onMouseOver={e => e.currentTarget.style.background = "#f9f9f9"}
+                        onMouseOut={e => e.currentTarget.style.background = "none"}>
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "10px" }}>{selectedPages.length} page{selectedPages.length !== 1 ? "s" : ""} selected</div>
             </div>
           </div>
@@ -3345,6 +3529,7 @@ export default function CustomBuild() {
     </div>
   );
 }
+
 
 
 
