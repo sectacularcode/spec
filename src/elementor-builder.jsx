@@ -6416,7 +6416,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               {(page.services || page.process || page.testimonials || page.faq || page.portfolio) && (
                 <div style={{ marginBottom: "16px", padding: "12px 16px", background: "#b45309", border: "none", borderRadius: "8px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
                   <div style={{ fontSize: "13px", color: "#ffffff" }}>This page has demo content from the template. Clear it to start fresh with your client's copy.</div>
-                  <button onClick={() => { updPage("services", ""); updPage("process", ""); updPage("testimonials", ""); updPage("faq", ""); updPage("portfolio", ""); updPage("team", ""); updPage("stats", ""); updPage("pricing", ""); }} style={{ padding: "6px 14px", background: "#ffffff", color: "#b45309", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>Clear demo content</button>
+                  <button onClick={() => { setProjects(ps => ps.map(p => p.id === activeId ? { ...p, pages: p.pages.map((pg, i) => i === pageIdx ? { ...pg, services: "", process: "", testimonials: "", faq: "", portfolio: "", team: "", stats: "", pricing: "", blog: "" } : pg) } : p)); }} style={{ padding: "6px 14px", background: "#ffffff", color: "#b45309", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>Clear demo content</button>
                 </div>
               )}
               <Section id="page-hero" title="Hero Text" icon="">
