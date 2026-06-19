@@ -5367,8 +5367,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
       `}</style>
 
       {/* Header */}
-      <div style={{ background: "#ffffff", borderBottom: "1px solid #e5e7eb", padding: "12px 20px", position: "sticky", top: 0, zIndex: 50 }}>
-        <div style={{ maxWidth: "1080px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
+      <div style={{ background: "#ffffff", borderBottom: "1px solid #e5e7eb", padding: "12px 0", position: "sticky", top: 0, zIndex: 50 }}>
+        <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
           {/* Left: All Projects + project info */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <button onClick={() => setView("projects")} style={{ ...I.btnGhost, padding: "7px 12px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px" }}>
@@ -5573,19 +5573,19 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               <TabBtn id="footer" label="Header & Footer" />
               <TabBtn id="export" label="Export & Import" />
             </div>
-            {/* Page switcher row */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px", position: "relative" }}>
-              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
+            {/* Page switcher row — pills centered, Add Page right */}
+            <div style={{ display: "flex", alignItems: "center", marginBottom: "16px", position: "relative" }}>
+              <div style={{ flex: 1, display: "flex", justifyContent: "center", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
                 {project.pages.map((p, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: "3px" }}>
-                    <button onClick={() => setPageIdx(i)} style={{ padding: "6px 12px", background: i === pageIdx ? "#000000" : "#ffffff", color: i === pageIdx ? "#ffffff" : "#09090b", border: i === pageIdx ? "1px solid #000000" : "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>{p.name}</button>
-                    {project.pages.length > 1 && <button onClick={() => delPage(i)} style={{ background: "transparent", border: "none", color: "#a1a1aa", cursor: "pointer", fontSize: "14px", lineHeight: 1, padding: "0 2px" }}>×</button>}
+                    <button onClick={() => setPageIdx(i)} style={{ padding: "5px 14px", background: i === pageIdx ? "#09090b" : "transparent", color: i === pageIdx ? "#ffffff" : "#6b7280", border: `1px solid ${i === pageIdx ? "#09090b" : "#e5e7eb"}`, borderRadius: "999px", fontSize: "12px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap" }}>{p.name}</button>
+                    {project.pages.length > 1 && <button onClick={() => delPage(i)} style={{ background: "transparent", border: "none", color: "#a1a1aa", cursor: "pointer", fontSize: "13px", lineHeight: 1, padding: "0 1px" }}>×</button>}
                   </div>
                 ))}
               </div>
               <div style={{ position: "relative" }}>
-                <button onClick={() => setShowAddPage(!showAddPage)} style={{ ...I.btnGhost, padding: "6px 12px", display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "12px" }}>
-                  <Icon name="plus" size={12} color="#09090b" /> Add Page
+                <button onClick={() => setShowAddPage(!showAddPage)} style={{ ...I.btnGhost, padding: "5px 12px", display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "12px", borderRadius: "999px" }}>
+                  <Icon name="plus" size={11} color="#09090b" /> Add Page
                 </button>
                 {showAddPage && (
                   <div style={{ position: "absolute", top: "36px", right: "0", background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "12px", zIndex: 30, minWidth: "280px", maxHeight: "420px", overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,0.08)" }}>
