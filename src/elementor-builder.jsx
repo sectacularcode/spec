@@ -4590,7 +4590,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   const I = {
     lbl: { display: "block", fontSize: "11px", color: "#6b7280", marginBottom: "6px", textTransform: "none", letterSpacing: "0", fontWeight: 600 },
     inp: { width: "100%", maxWidth: "100%", padding: "11px 13px", background: "#ffffff", border: "1px solid #dde0e6", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5, boxSizing: "border-box" },
-    sel: { width: "100%", padding: "11px 36px 11px 13px", background: "#ffffff", border: "1px solid #dde0e6", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5, appearance: "auto" },
+    sel: { width: "100%", maxWidth: "100%", padding: "11px 36px 11px 13px", background: "#ffffff", border: "1px solid #dde0e6", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5, appearance: "auto", boxSizing: "border-box" },
     btn: { padding: "8px 16px", background: "#6b635c", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer" },
     btnGhost: { padding: "8px 16px", background: "#ffffff", color: "#6b635c", border: "1px solid #6b635c", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer" },
   };
@@ -5608,7 +5608,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
               <Section id="discovery-voice" title="Tone &amp; Voice" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.6 }}>How the brand sounds. This shapes every word the AI drafts across the site.</p>
-                <div><label style={I.lbl}>Tone</label><select style={{ width: "100%", padding: "11px 40px 11px 13px", background: "#ffffff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\") no-repeat right 14px center", border: "1px solid #dde0e6", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5, appearance: "none", WebkitAppearance: "none" }} value={TONES.includes(brand.tone) ? brand.tone : (brand.tone ? "Other" : brand.tone)} onChange={e => updBrand("tone", e.target.value)}>{TONES.map(t => <option key={t}>{t}</option>)}</select></div>
+                <div><label style={I.lbl}>Tone</label><select style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box", padding: "11px 40px 11px 13px", background: "#ffffff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\") no-repeat right 14px center", border: "1px solid #dde0e6", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5, appearance: "none", WebkitAppearance: "none" }} value={TONES.includes(brand.tone) ? brand.tone : (brand.tone ? "Other" : brand.tone)} onChange={e => updBrand("tone", e.target.value)}>{TONES.map(t => <option key={t}>{t}</option>)}</select></div>
                 {(brand.tone === "Other" || (brand.tone && !TONES.slice(0, -1).includes(brand.tone))) && (
                   <div style={{ marginTop: "10px" }}>
                     <label style={I.lbl}>Describe the tone</label>
@@ -5624,14 +5624,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </Section>
 
               <Section id="discovery-differentiator" title="What sets this brand apart from competitors" icon="">
-                <textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.differentiator || ""} onChange={e => updBrand("differentiator", e.target.value)} placeholder="e.g. One maker who writes, shoots, and edits every film — no crew, no markup, no game of telephone." />
+                <textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.differentiator || ""} onChange={e => updBrand("differentiator", e.target.value)} placeholder="e.g. What makes this brand different from everyone else in the space? Be specific." />
                 <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "4px" }}>One or two sentences. What do they offer that no one else does, or does the same way? The AI uses this to avoid generic copy.</div>
               </Section>
 
               <Section id="founder" title="Founder &amp; Brand" icon="">
                 <div>
                   <label style={I.lbl}>Brand / Company Name</label>
-                  <input style={I.inp} value={brand.name || ""} onChange={e => updBrand("name", e.target.value)} placeholder="e.g. Mile Marker Films" />
+                  <input style={I.inp} value={brand.name || ""} onChange={e => updBrand("name", e.target.value)} placeholder="e.g. Acme Design Co." />
                   <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "4px" }}>Used in the hero, about section, footer, and throughout AI-drafted copy.</div>
                 </div>
                 <div><label style={I.lbl}>Founder Name</label><input style={I.inp} value={brand.founderName} onChange={e => updBrand("founderName", e.target.value)} placeholder="e.g. Alex Morgan" /></div>
@@ -5642,7 +5642,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               <Section id="client-logos" title="Brands Worked With" icon="">
                 <div>
                   <label style={I.lbl}>Brands Worked With (one per line)</label>
-                  <textarea style={{ ...I.inp, resize: "vertical", fontSize: "13px" }} rows={5} value={brand.clientLogos} onChange={e => updBrand("clientLogos", e.target.value)} placeholder="Sephora&#10;Glossier&#10;Kérastase" />
+                  <textarea style={{ ...I.inp, resize: "vertical", fontSize: "13px" }} rows={5} value={brand.clientLogos} onChange={e => updBrand("clientLogos", e.target.value)} placeholder="Client or partner name&#10;Client or partner name&#10;Client or partner name" />
                   <div style={{ fontSize: "10px", color: "#09090b", marginTop: "4px" }}>One per line.</div>
                 </div>
               </Section>
@@ -5662,11 +5662,11 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
               <Section id="positioning-audience" title="Target Audience" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 10px", lineHeight: 1.6 }}>Who you're talking to — their role, company type, industry, or life stage. The AI uses this to write copy that speaks directly to the right person, not a generic visitor.</p>
-                <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.targetAudience} onChange={e => updBrand("targetAudience", e.target.value)} placeholder="e.g. Marketing directors at industrial and PE-backed companies with $5M–$50M in revenue" />
+                <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.targetAudience} onChange={e => updBrand("targetAudience", e.target.value)} placeholder="e.g. Small business owners looking for a premium online presence without the agency price tag." />
                 <div style={{ marginTop: "16px" }}>
                   <label style={I.lbl}>Key Messages</label>
                   <div style={{ fontSize: "12px", color: "#6b7280", margin: "4px 0 8px", lineHeight: 1.5 }}>The 2–4 things you want every visitor to walk away knowing. These show up across the hero, about section, and services — the AI weaves them in naturally when drafting copy.</div>
-                  <textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.keyMessages} onChange={e => updBrand("keyMessages", e.target.value)} placeholder="e.g. One maker, start to finish. Open pricing. Built for companies the big studios skip." />
+                  <textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.keyMessages} onChange={e => updBrand("keyMessages", e.target.value)} placeholder="e.g. The core messages visitors should walk away with after seeing this site." />
                 </div>
               </Section>
 
@@ -5689,7 +5689,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div style={{ marginTop: "16px" }}>
                   <label style={I.lbl}>What does a win look like?</label>
                   <div style={{ fontSize: "12px", color: "#6b7280", margin: "4px 0 8px", lineHeight: 1.5 }}>One sentence — the specific result this site should drive. The more concrete, the better. The AI uses this to shape the tone and urgency of every drafted section.</div>
-                  <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.outcome || ""} onChange={e => updBrand("outcome", e.target.value)} placeholder="e.g. Book 4–6 qualified inquiries per month from PE-backed companies needing a brand film before a sale." />
+                  <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.outcome || ""} onChange={e => updBrand("outcome", e.target.value)} placeholder="e.g. Book 4–6 qualified leads per month through the website contact form." />
                 </div>
               </Section>
 
@@ -5716,7 +5716,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   );
                 })()}
                 <div>
-                  <textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.primaryKeywords || ""} onChange={e => updBrand("primaryKeywords", e.target.value)} placeholder="freelance videographer, video production, cinematic video, music video, brand film" />
+                  <textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.primaryKeywords || ""} onChange={e => updBrand("primaryKeywords", e.target.value)} placeholder="web design, brand strategy, small business website, creative agency" />
                   <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "5px" }}>Comma-separated. 3–5 is ideal.</div>
                 </div>
               </Section>
@@ -6146,7 +6146,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 </div>
                 <div>
                   <label style={I.lbl}>Final CTA Heading (used in the bottom CTA section before footer)</label>
-                  <input style={I.inp} value={page.ctaHeading} onChange={e => updPage("ctaHeading", e.target.value)} placeholder="e.g. Ready to ship better creative, faster?" />
+                  <input style={I.inp} value={page.ctaHeading} onChange={e => updPage("ctaHeading", e.target.value)} placeholder="e.g. Ready to get started?" />
                   <div style={{ fontSize: "10px", color: "#09090b", marginTop: "4px" }}>This is the big conversion heading on the homepage's bottom CTA section. Each page can have a different one.</div>
                 </div>
                 <div><label style={I.lbl}>Contact Email</label><input style={I.inp} value={brand.contactEmail} onChange={e => updBrand("contactEmail", e.target.value)} /></div>
@@ -6252,13 +6252,13 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%", padding: "24px 24px 40px" }}>
               <Section id="page-hero" title="Hero" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>The first thing visitors see. Your main headline and supporting line.</p>
-                <div><label style={I.lbl}>Heading</label><input style={I.inp} value={page.heroHeading} onChange={e => updPage("heroHeading", e.target.value)} placeholder="e.g. Films for companies worth marking." /></div>
-                <div><label style={I.lbl}>Subheading</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={page.heroSubhead} onChange={e => updPage("heroSubhead", e.target.value)} placeholder="e.g. Full-service video for industrial and founder-led companies." /></div>
+                <div><label style={I.lbl}>Heading</label><input style={I.inp} value={page.heroHeading} onChange={e => updPage("heroHeading", e.target.value)} placeholder="e.g. Your main headline goes here." /></div>
+                <div><label style={I.lbl}>Subheading</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={page.heroSubhead} onChange={e => updPage("heroSubhead", e.target.value)} placeholder="e.g. A short supporting line under the headline." /></div>
                 <div><label style={I.lbl}>Hero Image</label><input style={I.inp} value={page.heroImage} onChange={e => updPage("heroImage", e.target.value)} placeholder="Paste your WordPress media URL — leave blank for a placeholder" /></div>
               </Section>
               <Section id="page-about" title="About" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>A short brand story — usually image and text side by side, just below the hero.</p>
-                <div><label style={I.lbl}>Heading</label><input style={I.inp} value={page.aboutHeading} onChange={e => updPage("aboutHeading", e.target.value)} placeholder="e.g. One person. Every frame." /></div>
+                <div><label style={I.lbl}>Heading</label><input style={I.inp} value={page.aboutHeading} onChange={e => updPage("aboutHeading", e.target.value)} placeholder="e.g. A short about heading." /></div>
                 <div><label style={I.lbl}>Body</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={4} value={page.aboutBody} onChange={e => updPage("aboutBody", e.target.value)} placeholder="Write your about copy here, or leave blank to pull from your brand description." /></div>
               </Section>
               {page.sections.some(s => s === "Services" || s === "Service Cards") && <Section id="content-services" title="Services" icon="">
@@ -6490,6 +6490,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
     </div>
   );
 }
+
 
 
 
