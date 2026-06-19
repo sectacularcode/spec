@@ -36,7 +36,7 @@ async function kvStorageDel(key) {
 
 
 // ─── Intake Form Modal ────────────────────────────────────────────────────────
-const INTAKE_TABS = ["Brand", "Design", "Sitemap", "Copy", "Pricing", "SEO"];
+const INTAKE_TABS = ["Brand", "Design", "Sitemap", "Copy", "Pricing", "Positioning"];
 
 const DEFAULT_COLORS = [
   { name: "Ink", hex: "", use: "Primary text, dark section backgrounds" },
@@ -96,8 +96,14 @@ function IntakeForm({ onClose, onComplete }) {
     // Pricing
     tiers: DEFAULT_TIERS.map(t => ({ ...t })),
     alwaysIncluded: "",
-    // SEO
-    seo: DEFAULT_SEO_PAGES.map(page => ({ page, title: "", desc: "" })),
+    // Positioning & SEO
+    valueProposition: "",
+    targetAudience: "",
+    primaryKeywords: "",
+    secondaryKeywords: "",
+    keyMessages: "",
+    competitiveDifferentiator: "",
+    seoPageTitles: ["Home", "Work", "Services", "About", "Process", "Contact"].map(page => ({ page, title: "", desc: "" })),
   });
 
   function set(key, val) { setForm(f => ({ ...f, [key]: val })); }
@@ -113,10 +119,10 @@ function IntakeForm({ onClose, onComplete }) {
       return { ...f, tiers };
     });
   }
-  function setSeo(i, key, val) {
+  function setPageTitle(i, key, val) {
     setForm(f => {
-      const seo = f.seo.map((s, j) => j === i ? { ...s, [key]: val } : s);
-      return { ...f, seo };
+      const seoPageTitles = f.seoPageTitles.map((s, j) => j === i ? { ...s, [key]: val } : s);
+      return { ...f, seoPageTitles };
     });
   }
 
@@ -178,6 +184,13 @@ function IntakeForm({ onClose, onComplete }) {
       contactCta: form.contactSubmit,
       contactReassurance: form.contactReassurance,
       pricingTiers: form.tiers.filter(t => t.name).map(t => [t.name, t.subtitle, t.description, t.price]),
+      valueProposition: form.valueProposition,
+      targetAudience: form.targetAudience,
+      competitiveDifferentiator: form.competitiveDifferentiator,
+      keyMessages: form.keyMessages.split("\n").map(m => m.trim()).filter(Boolean),
+      primaryKeywords: form.primaryKeywords.split(",").map(k => k.trim()).filter(Boolean),
+      secondaryKeywords: form.secondaryKeywords.split(",").map(k => k.trim()).filter(Boolean),
+      seoPageTitles: form.seoPageTitles,
     };
   }
 
@@ -425,21 +438,67 @@ function IntakeForm({ onClose, onComplete }) {
         </div>
       </div>
     ),
-    5: ( // SEO
+    5: ( // Positioning & SEO
       <div>
         <div style={S.section}>
-          <div style={S.sectionTitle}>06 · SEO Starter</div>
-          <div style={S.hint} style={{ marginBottom: "16px", fontSize: "12px", color: "#6b7280" }}>Titles and descriptions for each page. Keep them in voice, plain and specific. Drop these into your SEO plugin.</div>
-          {form.seo.map((s, i) => (
+          <div style={S.sectionTitle}>Positioning & Messaging</div>
+          <div style={S.hint} style={{ marginBottom: "16px", fontSize: "12px", color: "#6b7280" }}>Define the strategic foundation. This feeds the AI when drafting copy and informs the SEO audit.</div>
+
+          <div style={S.field}>
+            <label style={S.label}>Core value proposition</label>
+            <div style={S.hint}>One sentence. What this business does, for who, and why it's different.</div>
+            <textarea rows={2} style={S.textarea} value={form.valueProposition} onChange={e => set("valueProposition", e.target.value)} placeholder="e.g. Full-service video production for industrial companies that need a real story, not a polished ad." />
+          </div>
+
+          <div style={S.field}>
+            <label style={S.label}>Target audience</label>
+            <div style={S.hint}>Who specifically. Be precise — industry, role, situation.</div>
+            <textarea rows={2} style={S.textarea} value={form.targetAudience} onChange={e => set("targetAudience", e.target.value)} placeholder="e.g. Marketing directors at industrial and manufacturing companies with 50–500 employees." />
+          </div>
+
+          <div style={S.field}>
+            <label style={S.label}>Competitive differentiator</label>
+            <div style={S.hint}>What makes this brand the only real choice. Not just better — different.</div>
+            <textarea rows={2} style={S.textarea} value={form.competitiveDifferentiator} onChange={e => set("competitiveDifferentiator", e.target.value)} placeholder="e.g. One person does everything — no crew, no game of telephone, no inflated budget." />
+          </div>
+
+          <div style={S.field}>
+            <label style={S.label}>Key messages <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>(one per line)</span></label>
+            <div style={S.hint}>The 3–5 things the site must communicate. Every page should reinforce at least one.</div>
+            <textarea rows={5} style={S.textarea} value={form.keyMessages} onChange={e => set("keyMessages", e.target.value)} placeholder={"One person, the whole film — voice stays consistent, cost stays lean.\nReal prices, published openly — no discovery call required.\nBuilt for the companies the big studios skip."} />
+          </div>
+        </div>
+
+        <div style={S.section}>
+          <div style={S.sectionTitle}>SEO Keywords</div>
+          <div style={S.hint} style={{ marginBottom: "16px", fontSize: "12px", color: "#6b7280" }}>These feed the SEO audit and inform copy drafting. Primary keywords should appear in headings and opening paragraphs.</div>
+
+          <div style={S.field}>
+            <label style={S.label}>Primary keywords <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>(comma-separated)</span></label>
+            <div style={S.hint}>What this business needs to rank for. 2–4 terms max.</div>
+            <input style={S.input} value={form.primaryKeywords} onChange={e => set("primaryKeywords", e.target.value)} placeholder="e.g. industrial video production, corporate video company, manufacturer video" />
+          </div>
+
+          <div style={S.field}>
+            <label style={S.label}>Secondary keywords <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>(comma-separated)</span></label>
+            <div style={S.hint}>Supporting terms — long tail, location-based, service-specific.</div>
+            <input style={S.input} value={form.secondaryKeywords} onChange={e => set("secondaryKeywords", e.target.value)} placeholder="e.g. founder story video, PE portfolio video, factory tour video, one-man video crew" />
+          </div>
+        </div>
+
+        <div style={S.section}>
+          <div style={S.sectionTitle}>Page Titles & Meta Descriptions</div>
+          <div style={S.hint} style={{ marginBottom: "16px", fontSize: "12px", color: "#6b7280" }}>Used in the SEO audit and exported as a reference sheet for your SEO plugin (Yoast, RankMath, etc.).</div>
+          {form.seoPageTitles.map((s, i) => (
             <div key={i} style={{ marginBottom: "18px", padding: "14px", border: "1px solid #e5e7eb", borderRadius: "8px" }}>
               <div style={{ fontSize: "12px", fontWeight: 700, color: "#09090b", marginBottom: "10px" }}>{s.page}</div>
               <div style={S.field}>
-                <label style={S.label}>Title <span style={{ fontWeight: 400, color: "#9ca3af" }}>{s.title.length}/60</span></label>
-                <input style={S.input} value={s.title} onChange={e => setSeo(i, "title", e.target.value)} placeholder={"e.g. " + s.page + " | " + (form.brandName || "Brand Name")} />
+                <label style={S.label}>Title <span style={{ fontWeight: 400, color: s.title.length > 60 ? "#dc2626" : "#9ca3af" }}>{s.title.length}/60</span></label>
+                <input style={S.input} value={s.title} onChange={e => setPageTitle(i, "title", e.target.value)} placeholder={"e.g. " + s.page + " | " + (form.brandName || "Brand Name")} />
               </div>
               <div>
                 <label style={S.label}>Description <span style={{ fontWeight: 400, color: s.desc.length > 160 ? "#dc2626" : "#9ca3af" }}>{s.desc.length}/160</span></label>
-                <textarea rows={2} style={S.textarea} value={s.desc} onChange={e => setSeo(i, "desc", e.target.value)} placeholder="Full-service video by one maker. Brand films, testimonials…" />
+                <textarea rows={2} style={S.textarea} value={s.desc} onChange={e => setPageTitle(i, "desc", e.target.value)} placeholder="Plain, specific, in voice. What this page is about and why someone should click." />
               </div>
             </div>
           ))}
@@ -3156,6 +3215,7 @@ export default function CustomBuild() {
     </div>
   );
 }
+
 
 
 
