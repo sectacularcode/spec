@@ -3999,6 +3999,7 @@ Desired outcome: ${b.outcome || ""}
 Primary keywords (work these in naturally where they fit): ${b.primaryKeywords || "(none specified)"}
 Tone: ${b.tone || "professional but warm"}
 Target audience: ${b.targetAudience || "(not specified)"}
+${b.differentiator ? `What makes them different (use this to avoid generic copy — this is the core hook): ${b.differentiator}` : ""}
 ${b.description ? `Existing description for context: ${b.description}` : ""}
 ${b.inspoUrls ? `Inspiration sites (the user loves the aesthetic of these — match the voice and rhythm): ${b.inspoUrls.replace(/\n/g, ", ")}` : ""}
 ${b.styleNotes ? `Style notes (specific aesthetic principles to honor): ${b.styleNotes}` : ""}
@@ -4232,6 +4233,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
     if (b.primaryKeywords) ctx.push(`Primary keywords already set: ${b.primaryKeywords}`);
     if (b.inspoUrls) ctx.push(`Inspiration sites (use these to infer aesthetic preferences): ${b.inspoUrls.replace(/\n/g, ", ")}`);
     if (b.styleNotes) ctx.push(`Style notes (concrete aesthetic principles to apply): ${b.styleNotes}`);
+    if (b.differentiator) ctx.push(`What makes them different: ${b.differentiator}`);
     if (b.clientLogos) ctx.push(`Client logos / past brands worked with: ${b.clientLogos.replace(/\n/g, ", ")}`);
     if (b.founderName) ctx.push(`Founder: ${b.founderName}${b.founderTitle ? `, ${b.founderTitle}` : ""}`);
     if (b.founderBio) ctx.push(`Founder bio: ${b.founderBio}`);
@@ -5285,6 +5287,17 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     </div>
                   )}
                 </div>
+                <div onClick={e => e.stopPropagation()} style={{ borderTop: "1px solid #f0eee6", paddingTop: "12px" }}>
+                  <label style={{ display: "block", fontSize: "10px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700, marginBottom: "4px" }}>Inspiration URLs</label>
+                  <textarea
+                    value={p.brand.inspoUrls || ""}
+                    onChange={e => setProjects(ps => ps.map(proj => proj.id === p.id ? { ...proj, brand: { ...proj.brand, inspoUrls: e.target.value } } : proj))}
+                    placeholder={"https://example.com\nhttps://another.com"}
+                    rows={2}
+                    style={{ width: "100%", padding: "8px 10px", background: "#f5f5f4", color: "#09090b", border: "1px solid #ebe9e2", borderRadius: "6px", fontSize: "12px", fontFamily: "monospace", resize: "vertical", lineHeight: 1.5, outline: "none", boxSizing: "border-box" }}
+                  />
+                  <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "3px" }}>Feeds AI copy drafting — one URL per line</div>
+                </div>
                 <div style={{ display: "flex", gap: "6px", paddingTop: "12px", borderTop: "1px solid #f0eee6" }}>
                   {isPendingDelete ? (
                     <>
@@ -5591,45 +5604,15 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* DISCOVERY TAB */}
           {tab === "discovery" && (
             <div className="editor-padding" style={{ padding: "0 20px 40px", maxWidth: "1200px" }}>
-              {/* Project switcher — quick "where am I + jump to another project" bar */}
-              <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "14px 16px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-                <div style={{ flex: "1 1 220px", minWidth: "180px" }}>
-                  <label style={{ display: "block", fontSize: "10px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700, marginBottom: "3px" }}>Editing</label>
-                  <input
-                    type="text"
-                    value={brand.name || ""}
-                    onChange={e => updBrand("name", e.target.value)}
-                    placeholder="Type a project name…"
-                    style={{ width: "100%", padding: "6px 0", background: "transparent", color: "#000000", border: "none", borderBottom: "1px solid transparent", fontSize: "16px", fontWeight: 700, fontFamily: "inherit", outline: "none", transition: "border-color 0.15s" }}
-                    onFocus={e => e.target.style.borderBottomColor = "#000000"}
-                    onBlur={e => e.target.style.borderBottomColor = "transparent"}
-                  />
-                </div>
-                {projects.length > 1 && (
-                  <select
-                    value={activeId}
-                    onChange={e => { setActiveId(e.target.value); setPageIdx(0); }}
-                    style={{ padding: "9px 12px", background: "#ffffff", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", minWidth: "180px" }}
-                    title="Switch to another project">
-                    {projects.map(p => (
-                      <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
-                  </select>
-                )}
-                <button onClick={newProject} style={{ padding: "9px 14px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                  <Icon name="plus" size={13} color="#ffffff" /> New Project
-                </button>
-                <button onClick={() => setView("projects")} style={{ padding: "9px 14px", background: "transparent", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "6px" }} title="View, duplicate, import, or export projects">
-                  <Icon name="folder" size={13} color="#09090b" /> Manage Projects
-                </button>
-              </div>
 
-<Section id="inspo-sites" title="Inspiration Sites" icon="">
-                <p style={{ fontSize: "13px", color: "#09090b", margin: 0 }}>URLs of sites you love. The AI Draft Starter Copy uses these to infer aesthetic preferences — adding more or different sites here will change the recommendation when you regenerate.</p>
-                <div><label style={I.lbl}>Inspiration URLs (one per line)</label><textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={6} value={brand.inspoUrls} onChange={e => updBrand("inspoUrls", e.target.value)} placeholder="https://faure.octrace.com&#10;https://nevo.themevillain.com&#10;https://breef.com" /></div>
-                <div style={{ marginTop: "12px", padding: "12px 14px", background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px", color: "#09090b", lineHeight: 1.6 }}>
-                  <strong style={{ color: "#09090b" }}>How this gets used:</strong> Whenever you go to Discovery → Brand Brief and click <strong>Draft Starter Copy</strong>, these URLs are sent to the AI as aesthetic context. To refresh recommendations after adding new URLs, head to Discovery and re-run Draft Starter Copy.
-                </div>
+              <Section id="discovery-voice" title="Tone &amp; Voice" icon="">
+                <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.6 }}>How the brand sounds. This shapes every word the AI drafts across the site.</p>
+                <div><label style={I.lbl}>Tone</label><select style={I.inp} value={brand.tone} onChange={e => updBrand("tone", e.target.value)}>{TONES.map(t => <option key={t}>{t}</option>)}</select></div>
+              </Section>
+
+              <Section id="discovery-differentiator" title="What Makes Them Different" icon="">
+                <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.6 }}>One or two sentences. What separates this brand from everyone else in the category. The AI uses this to avoid generic copy.</p>
+                <div><label style={I.lbl}>Differentiator</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.differentiator || ""} onChange={e => updBrand("differentiator", e.target.value)} placeholder="e.g. One maker who writes, shoots, and edits every film — no crew, no markup, no game of telephone." /></div>
               </Section>
 
               <Section id="founder" title="Founder" icon="">
@@ -5638,28 +5621,12 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div><label style={I.lbl}>Founder Bio</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.founderBio} onChange={e => updBrand("founderBio", e.target.value)} /></div>
               </Section>
 
-                            
-              <Section id="client-logos" title="Clients & Brands" icon="">
+              <Section id="client-logos" title="Brands Worked With" icon="">
                 <div>
-                  <label style={I.lbl}>Client Logos / Brands Worked With (one per line)</label>
+                  <label style={I.lbl}>Brands Worked With (one per line)</label>
                   <textarea style={{ ...I.inp, resize: "vertical", fontSize: "13px" }} rows={5} value={brand.clientLogos} onChange={e => updBrand("clientLogos", e.target.value)} placeholder="Sephora&#10;Glossier&#10;Kérastase" />
                   <div style={{ fontSize: "10px", color: "#09090b", marginTop: "4px" }}>Used in the Logo Carousel section and as context for the AI when drafting copy.</div>
                 </div>
-              </Section>
-
-                            <Section id="brand-business" title="Business" icon="">
-                <div>
-                  <label style={I.lbl}>Business Name</label>
-                  <input style={I.inp} value={brand.name} onChange={e => updBrand("name", e.target.value)} placeholder="e.g. Ben Papa Films" />
-                  <div style={{ fontSize: "10px", color: "#09090b", marginTop: "4px" }}>This is also the project name shown on the Projects page.</div>
-                </div>
-                <div><label style={I.lbl}>Industry / Tagline Line</label><input style={I.inp} value={brand.industry} onChange={e => updBrand("industry", e.target.value)} placeholder="e.g. Documentary & commercial film production" /></div>
-                <div><label style={I.lbl}>Tagline (used in hero)</label><input style={I.inp} value={brand.tagline} onChange={e => updBrand("tagline", e.target.value)} placeholder="e.g. Stories told in motion." /></div>
-                <div><label style={I.lbl}>Description</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={4} value={brand.description} onChange={e => updBrand("description", e.target.value)} placeholder="1–2 sentences describing what you do. Used as the meta description for SEO." /></div>
-                <div><label style={I.lbl}>Target Audience</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.targetAudience} onChange={e => updBrand("targetAudience", e.target.value)} placeholder="Who you're talking to. Be specific about role, company size, or life stage." /></div>
-                <div><label style={I.lbl}>Key Messages</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.keyMessages} onChange={e => updBrand("keyMessages", e.target.value)} placeholder="2–4 sentences. What you want every visitor to walk away knowing." /></div>
-                <div><label style={I.lbl}>Marquee Text (used by Marquee section)</label><input style={I.inp} value={brand.marqueeText || ""} onChange={e => updBrand("marqueeText", e.target.value)} placeholder="A short rotating message — e.g. 'We put story first'" /></div>
-                <div><label style={I.lbl}>Promo Banner Text (used by Promo Banner section)</label><input style={I.inp} value={brand.promoBanner || ""} onChange={e => updBrand("promoBanner", e.target.value)} placeholder="e.g. FREE SHIPPING ON ORDERS OVER $75  ·  EASY 30-DAY RETURNS" /></div>
               </Section>
 
             </div>
@@ -5673,10 +5640,6 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
                   Define the strategic foundation. This drives the audit's SEO and AI-search recommendations, powers Draft Starter Copy, and informs how copy gets written across every page.
                 </p>
-              </Section>
-
-              <Section id="positioning-tone" title="Tone & Voice" icon="">
-                <div><label style={I.lbl}>Tone</label><select style={I.inp} value={brand.tone} onChange={e => updBrand("tone", e.target.value)}>{TONES.map(t => <option key={t}>{t}</option>)}</select></div>
               </Section>
 
               <Section id="positioning-audience" title="Target Audience" icon="">
@@ -6499,6 +6462,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
     </div>
   );
 }
+
 
 
 
