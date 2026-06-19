@@ -3933,6 +3933,7 @@ export default function App() {
   const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_tab")||"discovery";}catch(e){return "discovery";}});
   const [pageIdx, setPageIdx] = useState(function(){try{return parseInt(localStorage.getItem("spec_pageIdx")||"0",10);}catch(e){return 0;}});
   const [showAudit, setShowAudit] = useState(false);
+  const [showAllThemes, setShowAllThemes] = useState(false);
   const [showAddPage, setShowAddPage] = useState(false);
   const [exportFormat, setExportFormat] = useState("elementor"); // "elementor" or "divi"
   const [aiLoading, setAiLoading] = useState(false);
@@ -4747,7 +4748,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   };
 
   const TabBtn = ({ id, label }) => (
-    <button onClick={() => setTab(id)} style={{ padding: "6px 12px", background: tab === id ? "rgba(255,255,255,0.18)" : "transparent", color: "#ffffff", border: "none", borderRadius: "7px", fontSize: "12px", fontWeight: 700, cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.06em", margin: "2px", whiteSpace: "nowrap" }}>{label}</button>
+    <button onClick={() => setTab(id)} style={{ padding: "6px 12px", background: tab === id ? "rgba(255,255,255,0.18)" : "transparent", color: "#ffffff", border: "none", borderRadius: "7px", fontSize: "12px", fontWeight: 700, cursor: "pointer", margin: "2px", whiteSpace: "nowrap" }}>{label}</button>
   );
 
   // Builder format toggle — applies to both Page and Footer downloads
@@ -5439,6 +5440,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   <textarea
                     value={p.brand.inspoUrls || ""}
                     onChange={e => setProjects(ps => ps.map(proj => proj.id === p.id ? { ...proj, brand: { ...proj.brand, inspoUrls: e.target.value } } : proj))}
+                    style={{ width: "100%", boxSizing: "border-box" }}
                     placeholder={"https://example.com\nhttps://another.com"}
                     rows={2}
                     style={{ width: "100%", padding: "8px 10px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "12px", fontFamily: "monospace", resize: "vertical", lineHeight: 1.5, outline: "none", boxSizing: "border-box" }}
@@ -5540,9 +5542,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         </div>
       </div>
 
-      {/* Audit drawer — categorized */}
+      {/* Audit panel — slides in from right */}
       {showAudit && (
-        <div style={{ background: "#eeedf1", borderBottom: "1px solid #dde0e6", padding: "20px 24px", maxHeight: "420px", overflowY: "auto" }}>
+        <div style={{ position: "fixed", top: 0, right: 0, width: "360px", height: "100vh", background: "#ffffff", borderLeft: "1px solid #dde0e6", zIndex: 200, display: "flex", flexDirection: "column", boxShadow: "-4px 0 24px rgba(0,0,0,0.08)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", borderBottom: "1px solid #dde0e6", flexShrink: 0 }}>
+            <div style={{ fontSize: "13px", fontWeight: 700, color: "#09090b" }}>Build Audit — {audit.length} item{audit.length !== 1 ? "s" : ""}</div>
+            <button onClick={() => setShowAudit(false)} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px", color: "#09090b", fontSize: "18px", lineHeight: 1 }}>×</button>
+          </div>
+          <div style={{ overflowY: "auto", flex: 1, padding: "16px 20px" }}>
           {audit.length === 0 ? (
             <div style={{ fontSize: "14px", color: "#000000", fontWeight: 600 }}>Everything looks good. Ready to build.</div>
           ) : (
@@ -5552,7 +5559,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 const items = audit.filter(a => a.category === cat);
                 if (!items.length) return null;
                 const label = { critical: "Critical", content: "Content", seo: "SEO", aio: "AI Search", best: "Best Practices" }[cat];
-                const color = { critical: "#ef4444", content: "#b45309", seo: "#6b635c", aio: "#6b635c", best: "#6b635c" }[cat];
+                const color = { critical: "#b45309", content: "#b45309", seo: "#6b635c", aio: "#6b635c", best: "#6b635c" }[cat];
                 return (
                   <div key={cat} style={{ marginBottom: "16px" }}>
                     <div style={{ fontSize: "12px", color, fontWeight: 700, marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.08em" }}>{label} ({items.length})</div>
@@ -5581,7 +5588,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                             <strong style={{ color: "#09090b" }}>{a.msg}</strong>
                             {clickable && (
                               <span style={{ fontSize: "10px", color: "#09090b", whiteSpace: "nowrap", textTransform: "uppercase", letterSpacing: "0.08em", flexShrink: 0 }}>
-                                {TABLABEL[target.tab] || target.tab} → →
+                                {TABLABEL[target.tab] || target.tab} →
                               </span>
                             )}
                           </div>
@@ -5594,6 +5601,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               })}
             </>
           )}
+          </div>
         </div>
       )}
 
@@ -5897,7 +5905,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </Section>
 
               <Section id="positioning-seo" title="Page SEO — Meta Titles & Descriptions" icon="">
-                <p style={{ fontSize: "12px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.5 }}>These don't get embedded in the template. After importing into WordPress, paste them into your SEO plugin — the field is called <strong>SEO Title</strong> in Yoast and <strong>Meta Title</strong> in Rank Math. Currently showing: <strong>{page.name}</strong></p>
+                <p style={{ fontSize: "12px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.5 }}>Each page has its own SEO title and description — switch pages using the page pills above to fill them in for each one. After importing into WordPress, paste them into your SEO plugin (Yoast: <strong>SEO Title</strong> / Rank Math: <strong>Meta Title</strong>). Currently editing: <strong>{page.name}</strong></p>
                 <div>
                   <label style={I.lbl}>SEO Title</label>
                   <input style={I.inp} value={page.metaTitle || ""} onChange={e => updPage("metaTitle", e.target.value)} placeholder={`${brand.name || "Brand Name"} | Short descriptor — keep under 60 characters`} />
@@ -6228,7 +6236,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   );
                 })()}
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: "10px" }}>
-                  {THEMES.map(t => {
+                  {(showAllThemes ? THEMES : THEMES.slice(0, 10)).map(t => {
                     const active = brand.themeId === t.id;
                     return (
                       <button key={t.id} onClick={() => setProjects(ps => ps.map(p => p.id === activeId ? { ...p, brand: applyTheme(t, p.brand) } : p))} style={{ padding: 0, background: "#ffffff", border: active ? "2px solid #000000" : "1px solid #dde0e6", borderRadius: "10px", cursor: "pointer", overflow: "hidden", textAlign: "left", transition: "border-color .15s", display: "flex", flexDirection: "column", minHeight: "200px", position: "relative" }}
@@ -6260,6 +6268,11 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     );
                   })}
                 </div>
+                {THEMES.length > 10 && (
+                  <button onClick={() => setShowAllThemes(v => !v)} style={{ marginTop: "10px", padding: "8px 16px", background: "transparent", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "12px", fontWeight: 500, color: "#09090b", cursor: "pointer" }}>
+                    {showAllThemes ? "▲ Show less" : `▼ Show ${THEMES.length - 10} more themes`}
+                  </button>
+                )}
                 <div style={{ marginTop: "16px", padding: "20px 22px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "10px" }}>
                   <div style={{ fontSize: "12px", color: "#000000", textTransform: "uppercase", letterSpacing: "0.14em", fontWeight: 700, marginBottom: "6px" }}>Quick Accent Swap</div>
                   <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 16px", lineHeight: 1.55 }}>Override just the accent. Works with any theme.</p>
@@ -6542,6 +6555,34 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     </button>
                   ))}
                 </div>
+                {(() => {
+                  const pc = brand.primaryColor || "#ffffff";
+                  const ac = brand.accentColor || "#000000";
+                  const bf = brand.bodyFont || "Inter";
+                  const hf = brand.headingFont || "Inter";
+                  const theme = THEMES.find(t => t.id === brand.themeId);
+                  const isDark = (brand.themeMode || (theme && theme.mode)) === "dark";
+                  const hc = (theme && theme.headingColor) || (isDark ? "#ffffff" : "#0a0a0a");
+                  const tc = brand.bodyTextColor || (isDark ? "#aaa" : "#444");
+                  const logoEl = brand.logoUrl
+                    ? `<img src="${brand.logoUrl}" style="height:28px;width:auto;" />`
+                    : `<span style="font-family:'${hf}',sans-serif;font-size:20px;font-weight:700;color:${hc};">${brand.logoText || brand.name || "Brand"}</span>`;
+                  const navLinks = (brand.primaryMenu || "Home, About, Services, Contact").split(",").map(l =>
+                    `<a href="#" style="font-family:'${bf}',sans-serif;font-size:13px;color:${tc};text-decoration:none;margin:0 12px;white-space:nowrap;">${l.trim()}</a>`).join("");
+                  const btnTxt = `<a href="#" style="font-family:'${bf}',sans-serif;font-size:12px;font-weight:600;color:#fff;background:${ac};padding:8px 18px;text-decoration:none;border-radius:4px;white-space:nowrap;">${brand.cta1 || "Get in touch"}</a>`;
+                  const hs = brand.headerStyle || "Editorial";
+                  let headerHTML = "";
+                  if (hs === "Editorial") headerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding:0 40px;height:60px;background:${pc};border-bottom:1px solid rgba(128,128,128,0.15);">${logoEl}<div style="display:flex;">${navLinks}</div><div></div></div>`;
+                  else if (hs === "Studio") headerHTML = `<div style="text-align:center;padding:16px 40px;background:${pc};border-bottom:1px solid rgba(128,128,128,0.15);"><div style="margin-bottom:10px;">${logoEl}</div><div>${navLinks}</div></div>`;
+                  else if (hs === "Agency") headerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding:0 40px;height:60px;background:${pc};border-bottom:1px solid rgba(128,128,128,0.15);">${logoEl}<div style="display:flex;align-items:center;">${navLinks}</div></div>`;
+                  else headerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding:0 40px;height:60px;background:${pc};border-bottom:1px solid rgba(128,128,128,0.15);">${logoEl}<div style="display:flex;align-items:center;">${navLinks}</div>${btnTxt}</div>`;
+                  return (
+                    <div style={{ marginTop: "12px", border: "1px solid #dde0e6", borderRadius: "8px", overflow: "hidden" }}>
+                      <div style={{ fontSize: "10px", color: "#6b7280", padding: "6px 12px", background: "#f5f5f7", borderBottom: "1px solid #dde0e6", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>Header Preview — {brand.headerStyle || "Editorial"}</div>
+                      <div dangerouslySetInnerHTML={{ __html: headerHTML }} />
+                    </div>
+                  );
+                })()}
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Download separately and import once in Elementor → Theme Builder → Header. Set display conditions to "Entire Site".</p>
               </Section>
               <Section id="footer-footer" title="Footer Style" icon="">
@@ -6573,16 +6614,16 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <button onClick={downloadPage} style={{ padding: "8px 14px", background: "#6b635c", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="download" size={14} color="#ffffff" /> Download Template
                 </button>
-                <button onClick={downloadHeader} style={{ padding: "8px 14px", background: "#ffffff", color: "#6b635c", border: "1px solid #6b635c", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
+                <button onClick={downloadHeader} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #09090b", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="download" size={14} color="#09090b" /> Header Template
                 </button>
-                <button onClick={downloadFooter} style={{ padding: "8px 14px", background: "#ffffff", color: "#6b635c", border: "1px solid #6b635c", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
+                <button onClick={downloadFooter} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #09090b", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="download" size={14} color="#09090b" /> Footer Template
                 </button>
-                <button onClick={exportBrief} style={{ padding: "8px 14px", background: "#ffffff", color: "#6b635c", border: "1px solid #6b635c", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
+                <button onClick={exportBrief} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #09090b", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="file-text" size={14} color="#09090b" /> Export Brief
                 </button>
-                <button onClick={shareBrief} style={{ padding: "8px 14px", background: "#ffffff", color: "#6b635c", border: "1px solid #6b635c", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
+                <button onClick={shareBrief} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #09090b", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="arrowRight" size={14} color="#09090b" /> Share Brief Link
                 </button>
                 {project.pages.length > 1 && (
