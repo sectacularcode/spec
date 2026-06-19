@@ -4589,8 +4589,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   // ── Styles ─────────────────────────────────────────────────────────────────
   const I = {
     lbl: { display: "block", fontSize: "13px", color: "#000000", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700 },
-    inp: { width: "100%", padding: "11px 13px", background: "#ffffff", border: "1px solid #e5e7eb", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5 },
-    sel: { width: "100%", padding: "11px 36px 11px 13px", background: "#ffffff", border: "1px solid #e5e7eb", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5, appearance: "auto" },
+    inp: { width: "100%", maxWidth: "560px", padding: "11px 13px", background: "#ffffff", border: "1px solid #e5e7eb", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5 },
+    sel: { width: "100%", maxWidth: "560px", padding: "11px 36px 11px 13px", background: "#ffffff", border: "1px solid #e5e7eb", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5, appearance: "auto" },
     btn: { padding: "10px 18px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "14px", fontWeight: 500, cursor: "pointer" },
     btnGhost: { padding: "10px 18px", background: "#ffffff", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "14px", fontWeight: 500, cursor: "pointer" },
   };
@@ -5656,7 +5656,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
               <Section id="positioning-intro" title="Strategy & Positioning" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
-                  Define the strategic foundation. This drives the audit's SEO and AI-search recommendations, powers Draft Starter Copy, and informs how copy gets written across every page.
+                  Use this section to define the strategy behind the site. What you fill in here drives the SEO and AI-search audit, powers Draft Starter Copy, and informs how copy gets written across every page.
                 </p>
               </Section>
 
@@ -5670,7 +5670,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 </div>
               </Section>
 
-              <Section id="positioning-goals" title="Goals & Desired Outcome" icon="">
+              <Section id="positioning-goals" title="Goals & What Success Looks Like" icon="">
                 <div>
                   <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "10px", lineHeight: 1.5 }}>What the site is supposed to do. Pick everything that applies — these drive the CTA language in your AI-drafted copy. A coaching site is typically Bookings + Lead Generation. A services site is Lead Generation + Awareness.</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
@@ -5687,7 +5687,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   </div>
                 </div>
                 <div style={{ marginTop: "16px" }}>
-                  <label style={I.lbl}>Desired Outcome</label>
+                  <label style={I.lbl}>What does a win look like?</label>
                   <div style={{ fontSize: "12px", color: "#6b7280", margin: "4px 0 8px", lineHeight: 1.5 }}>One sentence — the specific result this site should drive. The more concrete, the better. The AI uses this to shape the tone and urgency of every drafted section.</div>
                   <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.outcome || ""} onChange={e => updBrand("outcome", e.target.value)} placeholder="e.g. Book 4–6 qualified inquiries per month from PE-backed companies needing a brand film before a sale." />
                 </div>
@@ -5742,7 +5742,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <button
                   onClick={() => generateStarterCopy()}
                   disabled={aiLoading || !brand.goal || !brand.outcome}
-                  style={{ marginTop: "8px", padding: "14px 18px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: (aiLoading || !((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) ? "not-allowed" : "pointer", opacity: (aiLoading || !((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) ? 0.4 : 1, display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                  style={{ marginTop: "8px", padding: "12px 20px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: (aiLoading || !((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) ? "not-allowed" : "pointer", opacity: (aiLoading || !((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) ? 0.4 : 1, display: "inline-flex", alignItems: "center", gap: "8px", whiteSpace: "nowrap" }}>
                   <Icon name="sparkles" size={15} color="#ffffff" />
                   {aiLoading ? "Drafting starter copy…" : "Draft Starter Copy with AI"}
                 </button>
