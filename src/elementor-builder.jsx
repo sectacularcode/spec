@@ -6416,7 +6416,13 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               {(page.services || page.process || page.testimonials || page.faq || page.portfolio) && (
                 <div style={{ marginBottom: "16px", padding: "12px 16px", background: "#b45309", border: "none", borderRadius: "8px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
                   <div style={{ fontSize: "13px", color: "#ffffff" }}>This page has demo content from the template. Clear it to start fresh with your client's copy.</div>
-                  <button onClick={() => { setProjects(ps => ps.map(p => p.id === activeId ? { ...p, pages: p.pages.map((pg, i) => i === pageIdx ? { ...pg, services: "", process: "", testimonials: "", faq: "", portfolio: "", team: "", stats: "", pricing: "", blog: "" } : pg) } : p)); }} style={{ padding: "6px 14px", background: "#ffffff", color: "#b45309", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>Clear demo content</button>
+                  <button onClick={() => {
+                    const clearFields = { services: "", process: "", testimonials: "", faq: "", portfolio: "", team: "", stats: "", pricing: "", blog: "" };
+                    setProjects(prev => prev.map(proj => {
+                      if (proj.id !== activeId) return proj;
+                      return { ...proj, pages: proj.pages.map((pg, idx) => idx !== pageIdx ? pg : { ...pg, ...clearFields }) };
+                    }));
+                  }} style={{ padding: "6px 14px", background: "#ffffff", color: "#b45309", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>Clear demo content</button>
                 </div>
               )}
               <Section id="page-hero" title="Hero Text" icon="">
@@ -6432,22 +6438,22 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </Section>
               {page.sections.some(s => s === "Services" || s === "Service Cards") && <Section id="content-services" title="Services" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>What you offer. Each line becomes a card or list item on the page.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={5} value={page.services} onChange={e => updPage("services", e.target.value)} placeholder={"Service Name|What it includes or who it's for\nService Name|What it includes or who it's for"} />
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={5} value={page.services || ""} onChange={e => updPage("services", e.target.value)} placeholder={"Service Name|What it includes or who it's for\nService Name|What it includes or who it's for"} />
                 <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One service per line. Format: <strong>Name|Description</strong></div>
               </Section>}
               {(page.sections.includes("Portfolio") || page.sections.includes("Portfolio Carousel")) && <Section id="content-portfolio" title="Portfolio" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>Your past work. Each line becomes a project card. Add placeholder images in Elementor after import.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontSize: "13px", maxWidth: "560px" }} rows={6} value={page.portfolio} onChange={e => updPage("portfolio", e.target.value)} placeholder={"Project Name|Client or Category\nProject Name|Client or Category"} />
+                <textarea style={{ ...I.inp, resize: "vertical", fontSize: "13px", maxWidth: "560px" }} rows={6} value={page.portfolio || ""} onChange={e => updPage("portfolio", e.target.value)} placeholder={"Project Name|Client or Category\nProject Name|Client or Category"} />
                 <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One project per line. Format: <strong>Project Name|Client or Category</strong>. Images are added in Elementor after import.</div>
               </Section>}
               {page.sections.includes("Process") && <Section id="content-process" title="Your Process" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>How you work, step by step. Steps are numbered automatically.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={5} value={page.process} onChange={e => updPage("process", e.target.value)} placeholder={"Step Name|What happens at this stage\nStep Name|What happens at this stage"} />
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={5} value={page.process || ""} onChange={e => updPage("process", e.target.value)} placeholder={"Step Name|What happens at this stage\nStep Name|What happens at this stage"} />
                 <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One step per line. Format: <strong>Step Name|Description</strong></div>
               </Section>}
               {(page.sections.includes("Team") || page.sections.includes("Team Carousel")) && <Section id="content-team" title="Team" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>Your team members. Each line becomes a card with photo, name, and role.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={5} value={page.team} onChange={e => updPage("team", e.target.value)} placeholder={"Name|Role|https://yoursite.com/wp-content/uploads/photo.jpg\nName|Role|"} />
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={5} value={page.team || ""} onChange={e => updPage("team", e.target.value)} placeholder={"Name|Role|https://yoursite.com/wp-content/uploads/photo.jpg\nName|Role|"} />
                 <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One person per line. Format: <strong>Name|Role|Image URL</strong>. Leave image URL blank for a placeholder.</div>
               </Section>}
               {page.sections.includes("Leadership") && <Section id="content-leadership" title="Leadership" icon="">
@@ -6457,7 +6463,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </Section>}
               {page.sections.includes("Stats") && <Section id="content-stats" title="Stats" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>Big numbers that build credibility — years in business, projects shipped, clients served.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={4} value={page.stats} onChange={e => updPage("stats", e.target.value)} placeholder={"10|+|Years in Business\n150||Projects Shipped\n98|%|Client Satisfaction"} />
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={4} value={page.stats || ""} onChange={e => updPage("stats", e.target.value)} placeholder={"10|+|Years in Business\n150||Projects Shipped\n98|%|Client Satisfaction"} />
                 <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One stat per line. Format: <strong>Number|Suffix|Label</strong>. Leave suffix blank if not needed.</div>
               </Section>}
               {page.sections.includes("Testimonials") && <Section id="content-testimonials" title="Client Testimonials" icon="">
@@ -6481,7 +6487,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </Section>}
               {page.sections.includes("Pricing") && <Section id="content-pricing" title="Pricing" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>Your pricing tiers, shown as side-by-side cards.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={4} value={page.pricing} onChange={e => updPage("pricing", e.target.value)} placeholder={"Tier Name|$Price|What's included\nTier Name|$Price|What's included"} />
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={4} value={page.pricing || ""} onChange={e => updPage("pricing", e.target.value)} placeholder={"Tier Name|$Price|What's included\nTier Name|$Price|What's included"} />
                 <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One tier per line. Format: <strong>Name|Price|Description</strong></div>
               </Section>}
               {page.sections.includes("FAQ") && <Section id="content-faq" title="FAQ" icon="">
@@ -6509,7 +6515,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </Section>}
               {page.sections.includes("Blog") && <Section id="content-blog" title="Blog Preview" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>Preview cards for recent posts — shown on the homepage or a blog index page. Write the actual posts inside WordPress.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={5} value={page.blog} onChange={e => updPage("blog", e.target.value)} placeholder={"Post Title|Category|6 min read\nPost Title|Category|4 min read"} />
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={5} value={page.blog || ""} onChange={e => updPage("blog", e.target.value)} placeholder={"Post Title|Category|6 min read\nPost Title|Category|4 min read"} />
                 <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One post per line. Format: <strong>Title|Category|Read time</strong>. Placeholder images applied automatically.</div>
               </Section>}
               </div>
