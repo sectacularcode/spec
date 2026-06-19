@@ -5604,7 +5604,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
           {/* DISCOVERY TAB */}
           {tab === "discovery" && (
-            <div className="editor-padding" style={{ padding: "0 20px 40px", maxWidth: "1200px" }}>
+            <div className="editor-padding" style={{ padding: "0 32px 40px", maxWidth: "760px", margin: "0 auto" }}>
 
               <Section id="discovery-voice" title="Tone &amp; Voice" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.6 }}>How the brand sounds. This shapes every word the AI drafts across the site.</p>
@@ -5652,7 +5652,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
           {/* POSITIONING TAB */}
           {tab === "positioning" && (
-            <div className="editor-padding" style={{ padding: "0 20px 40px", maxWidth: "1200px" }}>
+            <div className="editor-padding" style={{ padding: "0 32px 40px", maxWidth: "760px", margin: "0 auto" }}>
 
               <Section id="positioning-intro" title="Strategy & Positioning" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
@@ -6171,7 +6171,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             <>
               <Section id="page-setup" title="Page Setup" icon="">
                 <div><label style={I.lbl}>Page Name</label><input style={I.inp} value={page.name} onChange={e => updPage("name", e.target.value)} /></div>
-                <div><label style={I.lbl}>Page Type</label><select style={I.inp} value={page.pageType} onChange={e => updPage("pageType", e.target.value)}>{PAGE_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
+                <div><label style={I.lbl}>Page Type</label><select style={{ ...I.inp, paddingRight: "36px", appearance: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center" }} value={page.pageType} onChange={e => updPage("pageType", e.target.value)}>{PAGE_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
               </Section>
               <Section id="page-nav" title="Navigation Menus" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Header and footer menu items. Menus output as Elementor Nav Menu widgets linked to WordPress menus by name — create matching menus in WP → Appearance → Menus.</p>
@@ -6247,79 +6247,69 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {tab === "content" && (
             <>
               <Section id="page-hero" title="Hero" icon="">
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Shows at the very top of the page — the first thing visitors see when they arrive.</p>
-                <div><label style={I.lbl}>Hero Heading</label><input style={I.inp} value={page.heroHeading} onChange={e => updPage("heroHeading", e.target.value)} /></div>
-                <div><label style={I.lbl}>Hero Subhead</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={page.heroSubhead} onChange={e => updPage("heroSubhead", e.target.value)} /></div>
-                <div><label style={I.lbl}>Hero Image URL (WordPress media URL)</label><input style={I.inp} value={page.heroImage} onChange={e => updPage("heroImage", e.target.value)} placeholder="https://yoursite.com/wp-content/uploads/hero.jpg" /></div>
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Leave empty to use a placeholder photo. Paste your WordPress media URL when ready.</p>
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>The first thing visitors see. Your main headline and supporting line.</p>
+                <div><label style={I.lbl}>Heading</label><input style={I.inp} value={page.heroHeading} onChange={e => updPage("heroHeading", e.target.value)} placeholder="e.g. Films for companies worth marking." /></div>
+                <div><label style={I.lbl}>Subheading</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={page.heroSubhead} onChange={e => updPage("heroSubhead", e.target.value)} placeholder="e.g. Full-service video for industrial and founder-led companies." /></div>
+                <div><label style={I.lbl}>Hero Image</label><input style={I.inp} value={page.heroImage} onChange={e => updPage("heroImage", e.target.value)} placeholder="Paste your WordPress media URL — leave blank for a placeholder" /></div>
               </Section>
               <Section id="page-about" title="About" icon="">
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>A story section that typically sits below the hero or after a logo carousel. Usually image-and-text side by side.</p>
-                <div><label style={I.lbl}>About Heading</label><input style={I.inp} value={page.aboutHeading} onChange={e => updPage("aboutHeading", e.target.value)} /></div>
-                <div><label style={I.lbl}>About Body</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={4} value={page.aboutBody} onChange={e => updPage("aboutBody", e.target.value)} placeholder="Leave blank to use brand description" /></div>
-                <div><label style={I.lbl}>About Image URL (WordPress media URL)</label><input style={I.inp} value={page.aboutImage} onChange={e => updPage("aboutImage", e.target.value)} placeholder="https://yoursite.com/wp-content/uploads/about.jpg" /></div>
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>A short brand story — usually image and text side by side, just below the hero.</p>
+                <div><label style={I.lbl}>Heading</label><input style={I.inp} value={page.aboutHeading} onChange={e => updPage("aboutHeading", e.target.value)} placeholder="e.g. One person. Every frame." /></div>
+                <div><label style={I.lbl}>Body</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={4} value={page.aboutBody} onChange={e => updPage("aboutBody", e.target.value)} placeholder="Write your about copy here, or leave blank to pull from your brand description." /></div>
               </Section>
-              {page.sections.some(s => s === "Services" || s === "Service Cards") && <Section id="content-services" title="Services — Title|Description per line" icon="">
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Mid-page grid or list showing what you offer. Typically follows the hero/about, before portfolio.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={5} value={page.services} onChange={e => updPage("services", e.target.value)} />
+              {page.sections.some(s => s === "Services" || s === "Service Cards") && <Section id="content-services" title="Services" icon="">
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>What you offer. Each line becomes a card or list item on the page.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={5} value={page.services} onChange={e => updPage("services", e.target.value)} placeholder={"Service Name|What it includes or who it's for\nService Name|What it includes or who it's for"} />
+                <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One service per line. Format: <strong>Name|Description</strong></div>
               </Section>}
-              {(page.sections.includes("Portfolio") || page.sections.includes("Portfolio Carousel")) && <Section id="content-portfolio" title="Portfolio — Title|Category|ImageURL per line" icon="">
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Visual showcase of past work — usually a grid or carousel of project cards.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={6} value={page.portfolio} onChange={e => updPage("portfolio", e.target.value)} placeholder={"Sephora Spring Campaign|Beauty Editorial|https://yoursite.com/wp-content/uploads/sephora.jpg\nKérastase Hero|Product Photography|"} />
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Add your WordPress image URL as the 3rd field. Leave the URL blank (keep the trailing pipe) to use a placeholder photo.</p>
+              {(page.sections.includes("Portfolio") || page.sections.includes("Portfolio Carousel")) && <Section id="content-portfolio" title="Portfolio" icon="">
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>Your past work. Each line becomes a project card — shown as a grid or carousel depending on your page layout.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={6} value={page.portfolio} onChange={e => updPage("portfolio", e.target.value)} placeholder={"Project Name|Category|https://yoursite.com/wp-content/uploads/image.jpg\nProject Name|Category|"} />
+                <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One project per line. Format: <strong>Project Name|Category|Image URL</strong>. Leave the image URL blank to use a placeholder.</div>
               </Section>}
-              {page.sections.includes("Process") && <Section id="content-process" title="Process — Step Title|Description per line" icon="">
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Step-by-step breakdown of how you work. Often appears between services and testimonials.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={5} value={page.process} onChange={e => updPage("process", e.target.value)} />
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Numbered automatically. Best on About, Services, Careers pages.</p>
+              {page.sections.includes("Process") && <Section id="content-process" title="Process" icon="">
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>How you work, step by step. Steps are numbered automatically.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={5} value={page.process} onChange={e => updPage("process", e.target.value)} placeholder={"Step Name|What happens at this stage\nStep Name|What happens at this stage"} />
+                <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One step per line. Format: <strong>Step Name|Description</strong></div>
               </Section>}
-              {(page.sections.includes("Team") || page.sections.includes("Team Carousel")) && <Section id="content-team" title="Team — Name|Role|ImageURL per line" icon="">
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Grid of team member cards (portrait + name + role). Usually on About pages.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={5} value={page.team} onChange={e => updPage("team", e.target.value)} placeholder={"Kalei|Founder & Creative Director|https://yoursite.com/wp-content/uploads/kalei.jpg\nLena|Producer|"} />
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Used by both "Team" (grid) and "Team Carousel" sections. Best on About, Studio, Careers pages.</p>
+              {(page.sections.includes("Team") || page.sections.includes("Team Carousel")) && <Section id="content-team" title="Team" icon="">
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>Your team members. Each line becomes a card with photo, name, and role.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={5} value={page.team} onChange={e => updPage("team", e.target.value)} placeholder={"Name|Role|https://yoursite.com/wp-content/uploads/photo.jpg\nName|Role|"} />
+                <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One person per line. Format: <strong>Name|Role|Image URL</strong>. Leave image URL blank for a placeholder.</div>
               </Section>}
-              {page.sections.includes("Leadership") && <Section id="content-leadership" title="Leadership — Name|Title|ImageURL|Quote|Bio per line" icon="">
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Large editorial profiles for founders or principals. Typically on About / Leadership pages.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={4} value={page.leaders || ""} onChange={e => updPage("leaders", e.target.value)} placeholder={"Kalei|Founder & Creative Director|https://...|Great content lives at the intersection of strategy and craft.|10+ years producing premium content for L'Oréal Group brands."} />
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Renders as a magazine-style 2-column profile per leader — large portrait, name, title, pulled quote, full bio. Image position alternates left/right when you have multiple leaders. Best for founder pages, About, leadership directory.</p>
+              {page.sections.includes("Leadership") && <Section id="content-leadership" title="Leadership" icon="">
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>Full editorial profiles for founders or principals — large portrait, quote, and bio. Usually on About pages.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={4} value={page.leaders || ""} onChange={e => updPage("leaders", e.target.value)} placeholder={"Name|Title|Image URL|Pull quote|Short bio"} />
+                <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One leader per line. Format: <strong>Name|Title|Image URL|Quote|Bio</strong></div>
               </Section>}
-              {page.sections.includes("Stats") && <Section id="content-stats" title="Stats — Number|Suffix|Label per line" icon="">
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Strip of big numbers — years in business, projects shipped, clients served. Often above testimonials.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={4} value={page.stats} onChange={e => updPage("stats", e.target.value)} />
+              {page.sections.includes("Stats") && <Section id="content-stats" title="Stats" icon="">
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>Big numbers that build credibility — years in business, projects shipped, clients served.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={4} value={page.stats} onChange={e => updPage("stats", e.target.value)} placeholder={"10|+|Years in Business\n150||Projects Shipped\n98|%|Client Satisfaction"} />
+                <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One stat per line. Format: <strong>Number|Suffix|Label</strong>. Leave suffix blank if not needed.</div>
               </Section>}
-              {page.sections.includes("Testimonials") && <Section id="content-testimonials" title="Testimonials — Quote|Name|Role per line" icon="">
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Carousel or grid of client quotes. Usually near the bottom of the homepage, before the final CTA.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={4} value={page.testimonials} onChange={e => updPage("testimonials", e.target.value)} />
+              {page.sections.includes("Testimonials") && <Section id="content-testimonials" title="Testimonials" icon="">
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>Client quotes. Shown as a carousel or grid, usually near the bottom of the page before the final call to action.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={4} value={page.testimonials} onChange={e => updPage("testimonials", e.target.value)} placeholder={"The quote.|Client Name|Their Role or Company\nThe quote.|Client Name|Their Role or Company"} />
+                <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One testimonial per line. Format: <strong>Quote|Name|Role or Company</strong></div>
               </Section>}
-              {page.sections.includes("Pricing") && <Section id="content-pricing" title="Pricing — Tier|Price|Description per line" icon="">
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Pricing tiers shown as side-by-side cards. Usually on Services, Landing, or Shop pages.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={4} value={page.pricing} onChange={e => updPage("pricing", e.target.value)} />
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Leave empty to skip — best on Services, Landing, Shop pages.</p>
+              {page.sections.includes("Pricing") && <Section id="content-pricing" title="Pricing" icon="">
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>Your pricing tiers, shown as side-by-side cards.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={4} value={page.pricing} onChange={e => updPage("pricing", e.target.value)} placeholder={"Tier Name|$Price|What's included\nTier Name|$Price|What's included"} />
+                <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One tier per line. Format: <strong>Name|Price|Description</strong></div>
               </Section>}
-              {page.sections.includes("FAQ") && <Section id="content-faq" title="FAQ — Question|Answer per line" icon="">
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Accordion of common questions. Usually toward the bottom of the page, after testimonials.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={4} value={page.faq} onChange={e => updPage("faq", e.target.value)} />
+              {page.sections.includes("FAQ") && <Section id="content-faq" title="FAQ" icon="">
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>Common questions in an accordion. Usually near the bottom of the page after testimonials.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={4} value={page.faq} onChange={e => updPage("faq", e.target.value)} placeholder={"Question?|The answer goes here.\nQuestion?|The answer goes here."} />
+                <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One Q&amp;A per line. Format: <strong>Question|Answer</strong></div>
               </Section>}
-              {page.sections.includes("Video") && <Section id="content-video" title="Video URL (YouTube/Vimeo)" icon="">
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Embedded video block. Can sit anywhere — often between hero and about, or in a process section.</p>
-                <input style={I.inp} value={page.videoUrl} onChange={e => updPage("videoUrl", e.target.value)} placeholder="https://youtube.com/watch?v=..." />
+              {page.sections.includes("Video") && <Section id="content-video" title="Video" icon="">
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>A YouTube or Vimeo embed. Can sit anywhere on the page.</p>
+                <input style={I.inp} value={page.videoUrl} onChange={e => updPage("videoUrl", e.target.value)} placeholder="https://youtube.com/watch?v=... or https://vimeo.com/..." />
               </Section>}
-              {(page.sections.includes("Form") || page.sections.includes("Contact")) && <Section id="content-forms" title="Forms — Title|Fields|Button|Shortcode (optional) per line" icon="">
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Contact form section. Usually appears near the bottom of the page, before the footer.</p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={5} value={page.forms} onChange={e => updPage("forms", e.target.value)} />
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
-                  <strong style={{ color: "#09090b" }}>Built-in form:</strong> Project Inquiry|Name,Email,Message|Send<br />
-                  <strong style={{ color: "#09090b" }}>With form plugin:</strong> Project Inquiry|||[wpforms id="123"]<br />
-                  Add a 4th field with your plugin's shortcode (WPForms, Contact Form 7, Gravity Forms, Fluent Forms, Ninja Forms, etc.) and the tool will use that instead. Leave fields/button empty when using a shortcode.
-                </p>
-              </Section>}
-              {page.sections.includes("Blog") && <Section id="content-blog" title="Blog Posts Preview" icon="">
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Preview cards for recent posts. Usually on the homepage near the bottom, or as the main grid on a Blog Index page.</p>
-                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
-                  This is for the <strong>preview cards</strong> that show on the homepage or a blog index page — not for writing actual blog posts. Each line becomes a card with title, category, and read-time meta. Write the real posts inside WordPress later.
-                </p>
-                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px" }} rows={5} value={page.blog} onChange={e => updPage("blog", e.target.value)} placeholder={"How we approach hero shots|Strategy|6 min read\nThe ROI of premium content|Insights|4 min read"} />
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Format: <strong>Title|Category|Meta</strong> per line. Best on Journal, Blog Index pages. Placeholder images auto-applied.</p>
+              {page.sections.includes("Blog") && <Section id="content-blog" title="Blog Preview" icon="">
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>Preview cards for recent posts — shown on the homepage or a blog index page. Write the actual posts inside WordPress.</p>
+                <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={5} value={page.blog} onChange={e => updPage("blog", e.target.value)} placeholder={"Post Title|Category|6 min read\nPost Title|Category|4 min read"} />
+                <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "6px" }}>One post per line. Format: <strong>Title|Category|Read time</strong>. Placeholder images applied automatically.</div>
               </Section>}
             </>
           )}
@@ -6389,7 +6379,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
         {/* EXPORT & IMPORT TAB */}
         {tab === "export" && (
-          <div className="editor-padding" style={{ padding: "0 20px 40px", maxWidth: "1200px" }}>
+          <div className="editor-padding" style={{ padding: "0 32px 40px", maxWidth: "760px", margin: "0 auto" }}>
             <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "20px", marginBottom: "16px" }}>
               <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Active Page</div>
               <div style={{ fontSize: "18px", fontWeight: 600, color: "#09090b", marginBottom: "4px" }}>{page.name}</div>
