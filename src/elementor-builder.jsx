@@ -6376,7 +6376,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               <Section id="social-links" title="Social Media Links" icon="">
                 {brand.socialLinks.map((s, i) => (
                   <div key={i} className="responsive-4col" style={{ display: "grid", gridTemplateColumns: "140px 1fr 1fr 30px", gap: "8px", alignItems: "end" }}>
-                    <select style={{ width: "100%", padding: "11px 32px 11px 13px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", color: "#09090b", outline: "none", boxSizing: "border-box", appearance: "auto", WebkitAppearance: "auto" }} value={s.key} onChange={e => updSocial(i, "key", e.target.value)}>
+                    <select style={{ width: "100%", padding: "11px 40px 11px 13px", background: "#ffffff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\") no-repeat right 14px center", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", color: "#09090b", outline: "none", boxSizing: "border-box", appearance: "none", WebkitAppearance: "none" }} value={s.key} onChange={e => updSocial(i, "key", e.target.value)}>
                       {Object.keys(SVG).map(k => <option key={k}>{k}</option>)}
                     </select>
                     <input style={I.inp} value={s.label} onChange={e => updSocial(i, "label", e.target.value)} placeholder="Label" />
@@ -6384,7 +6384,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     <button onClick={() => delSocial(i)} style={{ ...I.btnGhost, padding: "8px" }}>×</button>
                   </div>
                 ))}
-                <button onClick={addSocial} style={{ ...I.btnGhost, alignSelf: "start", display: "inline-flex", alignItems: "center", gap: "6px" }}>+ Add Social</button>
+                <button onClick={addSocial} style={{ ...I.btnGhost, alignSelf: "start", display: "inline-flex", alignItems: "center", gap: "6px", color: "#09090b", borderColor: "#09090b" }}>+ Add Social</button>
                 <div style={{ display: "grid", gap: "8px", marginTop: "10px" }}>
                   <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInNav} onChange={e => updBrand("showSocialInNav", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Show icons in top navigation</label>
                   <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInPage} onChange={e => updBrand("showSocialInPage", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Show as a section while scrolling (requires "Social" section enabled)</label>
