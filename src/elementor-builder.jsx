@@ -5210,7 +5210,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               style={{
                 display: "inline-flex", alignItems: "center", gap: "8px",
                 padding: "10px 18px",
-                background: briefLoading ? "#09090b" : "#09090b",
+                background: briefLoading ? "#6b635c" : "#6b635c",
                 color: "#fff", border: "none", borderRadius: "8px",
                 fontSize: "14px", fontWeight: 500,
                 cursor: (briefLoading || (!briefText.trim() && !lockedTemplateId)) ? "not-allowed" : "pointer",
@@ -5373,7 +5373,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 {briefRec.templateReason && <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.55 }}>{briefRec.templateReason}</div>}
               </div>
               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                <button onClick={applyBriefRecommendation} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px", background: "#000000", color: "#fff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
+                <button onClick={applyBriefRecommendation} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px", background: "#6b635c", color: "#fff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
                   <Icon name="check" size={14} color="#fff" /> Create this project
                 </button>
                 <button onClick={describeMySite} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
@@ -5534,7 +5534,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     </>
                   ) : (
                     <>
-                      <button onClick={(e) => { e.stopPropagation(); setActiveId(p.id); setView("editor"); setPageIdx(0); }} style={{ flex: 1, padding: "8px 10px", background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Open</button>
+                      <button onClick={(e) => { e.stopPropagation(); setActiveId(p.id); setView("editor"); setPageIdx(0); }} style={{ flex: 1, padding: "8px 10px", background: "#6b635c", color: "#fff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Open</button>
                       <button onClick={(e) => { e.stopPropagation(); duplicateProject(p.id); }} title="Duplicate this project" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
                         <Icon name="copy" size={14} color="#09090b" />
                       </button>
