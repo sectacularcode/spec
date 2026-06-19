@@ -2,7 +2,54 @@ import { useState } from "react";
 import ElementorBuilder from "./elementor-builder";
 import CustomBuild from "./CustomBuild";
 
+const PASS = "Spec#21?5!";
+const STORAGE_KEY = "spec_auth";
+
+function LoginScreen({ onAuth }) {
+  const [val, setVal] = useState("");
+  const [error, setError] = useState(false);
+
+  function attempt() {
+    if (val === PASS) {
+      try { localStorage.setItem(STORAGE_KEY, "1"); } catch(e) {}
+      onAuth();
+    } else {
+      setError(true);
+      setVal("");
+      setTimeout(() => setError(false), 2000);
+    }
+  }
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#fafafa", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Inter, system-ui, sans-serif" }}>
+      <div style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: "12px", padding: "40px", width: "100%", maxWidth: "360px", boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}>
+        <div style={{ fontSize: "22px", fontWeight: 800, color: "#09090b", marginBottom: "4px" }}>spec.</div>
+        <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "28px" }}>Enter your password to continue.</div>
+        <input
+          type="password"
+          value={val}
+          onChange={e => setVal(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && attempt()}
+          placeholder="Password"
+          autoFocus
+          style={{ width: "100%", padding: "10px 12px", border: error ? "1px solid #dc2626" : "1px solid #e5e7eb", borderRadius: "6px", fontSize: "14px", outline: "none", boxSizing: "border-box", marginBottom: "12px", background: error ? "#fef2f2" : "#fff" }}
+        />
+        {error && <div style={{ fontSize: "12px", color: "#dc2626", marginBottom: "10px" }}>Incorrect password.</div>}
+        <button
+          onClick={attempt}
+          style={{ width: "100%", padding: "10px", fontSize: "13px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
+          Continue
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
+  const [authed, setAuthed] = useState(function() {
+    try { return localStorage.getItem(STORAGE_KEY) === "1"; } catch(e) { return false; }
+  });
+
   const [mode, setMode] = useState(function() {
     try { return localStorage.getItem("spec_tab_mode") || "spec"; } catch(e) { return "spec"; }
   });
@@ -11,6 +58,8 @@ export default function App() {
     setMode(m);
     try { localStorage.setItem("spec_tab_mode", m); } catch(e) {}
   }
+
+  if (!authed) return <LoginScreen onAuth={() => setAuthed(true)} />;
 
   return (
     <div style={{ width: "100%", minHeight: "100vh", fontFamily: "Inter, system-ui, sans-serif", boxSizing: "border-box" }}>
@@ -21,6 +70,11 @@ export default function App() {
             {tab.label}
           </button>
         ))}
+        <button
+          onClick={() => { try { localStorage.removeItem(STORAGE_KEY); } catch(e) {} setAuthed(false); }}
+          style={{ marginLeft: "auto", fontSize: "12px", color: "#9ca3af", background: "none", border: "none", cursor: "pointer", padding: "8px" }}>
+          Lock
+        </button>
       </div>
       {mode === "spec" && <ElementorBuilder />}
       {mode === "custom" && <CustomBuild />}
