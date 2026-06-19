@@ -5604,7 +5604,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
           {/* DISCOVERY TAB */}
           {tab === "discovery" && (
-            <div className="editor-padding" style={{ padding: "20px 20px 40px", maxWidth: "860px", margin: "0 auto" }}>
+            <div className="editor-padding" style={{ padding: "20px 20px 40px", maxWidth: "960px", margin: "0 auto" }}>
 
               <Section id="discovery-voice" title="Tone &amp; Voice" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.6 }}>How the brand sounds. This shapes every word the AI drafts across the site.</p>
@@ -5652,7 +5652,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
           {/* POSITIONING TAB */}
           {tab === "positioning" && (
-            <div className="editor-padding" style={{ padding: "0 20px 40px", maxWidth: "860px", margin: "0 auto" }}>
+            <div className="editor-padding" style={{ padding: "0 20px 40px", maxWidth: "960px", margin: "0 auto" }}>
 
               <Section id="positioning-intro" title="Strategy & Positioning" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
@@ -6171,7 +6171,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* PAGE TAB */}
           {tab === "page" && (
             <>
-              <div style={{ maxWidth: "860px", margin: "0 auto", width: "100%", padding: "0 0 24px" }}>
+              <div style={{ maxWidth: "960px", margin: "0 auto", width: "100%", padding: "0 0 24px" }}>
               <Section id="page-setup" title="Page Setup" icon="">
                 <div><label style={I.lbl}>Page Name</label><input style={I.inp} value={page.name} onChange={e => updPage("name", e.target.value)} /></div>
                 <div><label style={I.lbl}>Page Type</label><select style={{ ...I.inp, paddingRight: "36px", appearance: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center" }} value={page.pageType} onChange={e => updPage("pageType", e.target.value)}>{PAGE_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
@@ -6250,7 +6250,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* CONTENT TAB */}
           {tab === "content" && (
             <>
-              <div style={{ maxWidth: "860px", margin: "0 auto", width: "100%", padding: "0 0 24px" }}>
+              <div style={{ maxWidth: "960px", margin: "0 auto", width: "100%", padding: "0 0 24px" }}>
               <Section id="page-hero" title="Hero" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>The first thing visitors see. Your main headline and supporting line.</p>
                 <div><label style={I.lbl}>Heading</label><input style={I.inp} value={page.heroHeading} onChange={e => updPage("heroHeading", e.target.value)} placeholder="e.g. Films for companies worth marking." /></div>
@@ -6323,7 +6323,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* SOCIAL TAB */}
           {tab === "social" && (
             <>
-              <div style={{ maxWidth: "860px", margin: "0 auto", width: "100%", padding: "0 0 24px" }}>
+              <div style={{ maxWidth: "960px", margin: "0 auto", width: "100%", padding: "0 0 24px" }}>
               <Section id="social-links" title="Social Media Links" icon="">
                 {brand.socialLinks.map((s, i) => (
                   <div key={i} className="responsive-4col" style={{ display: "grid", gridTemplateColumns: "100px 1fr 1fr 30px", gap: "8px", alignItems: "end" }}>
@@ -6387,7 +6387,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
         {/* EXPORT & IMPORT TAB */}
         {tab === "export" && (
-          <div className="editor-padding" style={{ padding: "0 20px 40px", maxWidth: "860px", margin: "0 auto" }}>
+          <div className="editor-padding" style={{ padding: "0 20px 40px", maxWidth: "960px", margin: "0 auto" }}>
             <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "20px", marginBottom: "16px" }}>
               <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Active Page</div>
               <div style={{ fontSize: "18px", fontWeight: 600, color: "#09090b", marginBottom: "4px" }}>{page.name}</div>
