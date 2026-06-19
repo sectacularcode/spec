@@ -5622,9 +5622,9 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 )}
               </Section>
 
-              <Section id="discovery-differentiator" title="What Makes Them Different" icon="">
-                <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.6 }}>One or two sentences. What separates this brand from everyone else in the category. The AI uses this to avoid generic copy.</p>
-                <div><label style={I.lbl}>Differentiator</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.differentiator || ""} onChange={e => updBrand("differentiator", e.target.value)} placeholder="e.g. One maker who writes, shoots, and edits every film — no crew, no markup, no game of telephone." /></div>
+              <Section id="discovery-differentiator" title="What sets this brand apart from competitors" icon="">
+                <textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.differentiator || ""} onChange={e => updBrand("differentiator", e.target.value)} placeholder="e.g. One maker who writes, shoots, and edits every film — no crew, no markup, no game of telephone." />
+                <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "4px" }}>One or two sentences. What do they offer that no one else does, or does the same way? The AI uses this to avoid generic copy.</div>
               </Section>
 
               <Section id="founder" title="Founder" icon="">
