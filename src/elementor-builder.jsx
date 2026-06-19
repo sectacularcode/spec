@@ -5562,7 +5562,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         <div className="tab-panel-bg" style={{ padding: "0", overflowY: "auto", maxHeight: "calc(100vh - 60px)", background: "#eeedf1" }}>
 
           {/* Tabs — full width warm stone bar */}
-          <div style={{ background: "#6b635c", width: "100%" }}>
+          <div style={{ background: "#6b635c", width: "100%", paddingTop: "10px" }}>
             <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px" }}>
               <div className="tab-bar" style={{ display: "flex", justifyContent: "center", overflowX: "auto", WebkitOverflowScrolling: "touch", paddingTop: "18px" }}>
                 <TabBtn id="discovery" label="Discovery" />
