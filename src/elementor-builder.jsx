@@ -1165,18 +1165,29 @@ const TAB_ORDER = [
 // ──────────────────────────────────────────────────────────────────────────────
 const PREMIUM_ACCENTS = [
   { name: "Champagne", value: "#c9a86a" },
+  { name: "Gold", value: "#d4a017" },
   { name: "Bronze", value: "#b87333" },
+  { name: "Copper", value: "#cb6d51" },
   { name: "Terracotta", value: "#a64f30" },
+  { name: "Rust", value: "#8b3a2a" },
   { name: "Burgundy", value: "#722f37" },
   { name: "Dusty Rose", value: "#c97d7d" },
+  { name: "Blush", value: "#e8a598" },
   { name: "Coral", value: "#ed7464" },
+  { name: "Marigold", value: "#e8a020" },
+  { name: "Warm Sand", value: "#c4a882" },
   { name: "Sage", value: "#4a5d44" },
+  { name: "Moss", value: "#6b7c4a" },
   { name: "Forest", value: "#2d4a3e" },
+  { name: "Teal", value: "#2a7d6f" },
+  { name: "Steel Blue", value: "#4a6fa5" },
   { name: "Ink Navy", value: "#1f2940" },
+  { name: "Slate", value: "#4a5568" },
   { name: "Electric Blue", value: "#3b82f6" },
-  { name: "Neon Green", value: "#39ff14" },
-  { name: "Acid Lime", value: "#c8ff00" },
-  { name: "Hot Pink", value: "#ff2d92" },
+  { name: "Lavender", value: "#7c6fa5" },
+  { name: "Plum", value: "#5c3a6e" },
+  { name: "Warm Stone", value: "#6b635c" },
+  { name: "Charcoal", value: "#3d3935" },
   { name: "Pure Black", value: "#0a0a0a" },
   { name: "Pure White", value: "#ffffff" },
 ];
@@ -5735,7 +5746,18 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 </div>
               </Section>
 
-              <Section id="positioning-draft" title="Draft Starter Copy with AI" icon="">
+              <Section id="positioning-style-notes" title="Style Notes" icon="">
+                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Specific aesthetic principles you want applied — typography quirks, hierarchy preferences, ornamental rules, things you've seen and liked. Fed directly to the AI Draft Starter Copy as concrete style guidance.</p>
+                <textarea
+                  style={{ ...I.inp, resize: "vertical" }}
+                  rows={5}
+                  value={brand.styleNotes}
+                  onChange={e => updBrand("styleNotes", e.target.value)}
+                  placeholder="e.g. Lowercase navigation, dramatic numbered sections, generous negative space, all-caps eyebrow labels, dark background with one bold accent color, work-first hierarchy."
+                />
+              </Section>
+
+                            <Section id="positioning-draft" title="Draft Starter Copy with AI" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
                   Generates hero copy, about text, and key messaging using everything in this tab. Fill in Goals, Desired Outcome, and Keywords first — the more context you give, the less generic the output.
                 </p>
@@ -6138,8 +6160,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Pair a distinctive display font (heading) with a clean sans-serif (body). All fonts are Google Fonts and load automatically.</p>
               </Section>
 
-              <Section id="brand-logo" title="Logo, Identity & CTAs" icon="">
-                <div><label style={I.lbl}>Logo Text Fallback</label><input style={I.inp} value={brand.logoText} onChange={e => updBrand("logoText", e.target.value)} placeholder="Your business name" /></div>
+              <Section id="brand-logo" title="Identity & CTAs" icon="">
                 <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                   <div><label style={I.lbl}>Primary CTA</label><input style={I.inp} value={brand.cta1} onChange={e => updBrand("cta1", e.target.value)} placeholder="e.g. Book a call" /></div>
                   <div><label style={I.lbl}>Secondary CTA</label><input style={I.inp} value={brand.cta2} onChange={e => updBrand("cta2", e.target.value)} placeholder="e.g. View our work" /></div>
@@ -6152,16 +6173,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div><label style={I.lbl}>Contact Email</label><input style={I.inp} value={brand.contactEmail} onChange={e => updBrand("contactEmail", e.target.value)} /></div>
                 <div><label style={I.lbl}>Phone</label><input style={I.inp} value={brand.contactPhone} onChange={e => updBrand("contactPhone", e.target.value)} /></div>
               </Section>
-              <Section id="brand-style-notes" title="Style Notes" icon="">
-                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Specific aesthetic principles you want applied — typography quirks, hierarchy preferences, ornamental rules, things you've seen and liked. Fed to the AI Draft Starter Copy as concrete style guidance.</p>
-                <textarea
-                  style={{ ...I.inp, resize: "vertical" }}
-                  rows={5}
-                  value={brand.styleNotes}
-                  onChange={e => updBrand("styleNotes", e.target.value)}
-                  placeholder="e.g. Lowercase navigation, dramatic numbered sections, generous negative space, all-caps eyebrow labels, dark background with one bold accent color, work-first hierarchy."
-                />
-              </Section>
+
               </div>
 
             </>
