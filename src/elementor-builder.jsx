@@ -5765,14 +5765,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* BRAND TAB */}
           {tab === "brand" && (
             <>
-              <div style={{ background: "#ffffff", padding: "0 24px 40px", maxWidth: "1080px", margin: "0 auto" }}>
+              <div style={{ padding: "24px 24px 40px", maxWidth: "1400px", margin: "0 auto" }}>
               <Section id="brand-templates" title="Industry Template" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
                   {brand.templateId
                     ? <>Your project is using a template already (likely from your AI recommendation). You can switch to a different one below — one click applies the new layout, theme, accent, fonts, and default copy.</>
                     : <>No template applied yet. Pick one below — one click applies the layout, theme, accent, fonts, section composition, and default copy. Or go back to the Projects page and describe your site to get an AI recommendation.</>}
                 </p>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: "12px", marginTop: "12px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginTop: "12px" }}>
                   {WEBSITE_TEMPLATES.map(t => {
                     // Active = this template's id matches the one stored on the brand when applied.
                     // Survives accent swaps, theme changes, font tweaks — until you apply a different template.
