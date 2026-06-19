@@ -4932,7 +4932,6 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   if (effectiveView === "projects") return (
     <div style={{ minHeight: "100vh", background: "#eeedf1", color: "#09090b", padding: "clamp(20px,5vw,40px) clamp(12px,3vw,24px)", fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Yeseva+One&family=Manrope:wght@400;500;700&family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Oswald:wght@500;700&family=Space+Mono&family=Inter:wght@500;700&display=swap');
         
         @media(max-width:600px){
           input, textarea, select{font-size:16px !important;}
@@ -5341,7 +5340,6 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   return (
     <div style={{ minHeight: "100vh", background: "#ffffff", color: "#09090b", fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Yeseva+One&family=Manrope:wght@400;500;700&family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Oswald:wght@500;700&family=Space+Mono&family=Inter:wght@500;700&display=swap');
         
         /* Mobile + tablet responsiveness */
         @media(max-width:900px){
@@ -6492,6 +6490,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
     </div>
   );
 }
+
 
 
 
