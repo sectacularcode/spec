@@ -211,12 +211,12 @@ function IntakeForm({ onClose, onComplete }) {
           <div style={S.sectionTitle}>01 · The Brand in Brief</div>
           <div style={S.field}>
             <label style={S.label}>Brand name</label>
-            <input style={S.input} value={form.brandName} onChange={e => set("brandName", e.target.value)} placeholder="e.g. Mile Marker Films" />
+            <input style={S.input} value={form.brandName} onChange={e => set("brandName", e.target.value)} placeholder="e.g. Specish Studio" />
           </div>
           <div style={S.field}>
             <label style={S.label}>What it is</label>
             <div style={S.hint}>Feeds tone and framing for the whole site. Not placed on a page directly.</div>
-            <textarea rows={4} style={S.textarea} value={form.whatItIs} onChange={e => set("whatItIs", e.target.value)} placeholder="Mile Marker Films is a one person, full-service video studio. Ben writes, shoots, records sound, and edits every film himself…" />
+            <textarea rows={4} style={S.textarea} value={form.whatItIs} onChange={e => set("whatItIs", e.target.value)} placeholder="e.g. Specish Studio is a full-service creative agency. We write, design, and build every project in-house…" />
           </div>
           <div style={S.field}>
             <label style={S.label}>Who it is for</label>
@@ -226,7 +226,7 @@ function IntakeForm({ onClose, onComplete }) {
           <div style={S.field}>
             <label style={S.label}>The story behind the name</label>
             <div style={S.hint}>Brand narrative. Informs the About page and the closing lines.</div>
-            <textarea rows={4} style={S.textarea} value={form.storyBehindName} onChange={e => set("storyBehindName", e.target.value)} placeholder="A mile marker is a small, certain thing on the side of the road…" />
+            <textarea rows={4} style={S.textarea} value={form.storyBehindName} onChange={e => set("storyBehindName", e.target.value)} placeholder="e.g. The name came from the idea that every brand deserves a clear marker of where they started and where they're going…" />
           </div>
           <div style={S.field}>
             <label style={S.label}>Voice, in five rules <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>(one per line)</span></label>
@@ -334,7 +334,7 @@ function IntakeForm({ onClose, onComplete }) {
         <div style={S.section}>
           <div style={S.sectionTitle}>04 · Home Page Copy</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-            <div style={S.field}><label style={S.label}>Hero eyebrow</label><input style={S.input} value={form.heroEyebrow} onChange={e => set("heroEyebrow", e.target.value)} placeholder="Mile Marker Films" /></div>
+            <div style={S.field}><label style={S.label}>Hero eyebrow</label><input style={S.input} value={form.heroEyebrow} onChange={e => set("heroEyebrow", e.target.value)} placeholder="e.g. Specish Studio" /></div>
             <div style={S.field}><label style={S.label}>Hero CTA 1</label><input style={S.input} value={form.heroCta1} onChange={e => set("heroCta1", e.target.value)} placeholder="See the work" /></div>
           </div>
           <div style={S.field}><label style={S.label}>Hero H1 (display)</label><textarea rows={2} style={S.textarea} value={form.heroH1} onChange={e => set("heroH1", e.target.value)} placeholder="Films for companies worth marking." /></div>
@@ -377,7 +377,7 @@ function IntakeForm({ onClose, onComplete }) {
             <input style={{ ...S.input, fontSize: "13px" }} value={form.aboutEyebrow} onChange={e => set("aboutEyebrow", e.target.value)} placeholder="Eyebrow: The maker" />
             <input style={{ ...S.input, fontSize: "13px" }} value={form.aboutH1} onChange={e => set("aboutH1", e.target.value)} placeholder="H1: One person. Every frame." />
           </div>
-          <div style={S.field}><label style={S.label}>Founder story</label><div style={S.hint}>Use [brackets] for anything a human must confirm. AI never fills brackets.</div><textarea rows={5} style={S.textarea} value={form.aboutStory} onChange={e => set("aboutStory", e.target.value)} placeholder={"Mile Marker Films is Ben [last name]. He writes the films, shoots them, records the sound, and cuts them…"} /></div>
+          <div style={S.field}><label style={S.label}>Founder story</label><div style={S.hint}>Use [brackets] for anything a human must confirm. AI never fills brackets.</div><textarea rows={5} style={S.textarea} value={form.aboutStory} onChange={e => set("aboutStory", e.target.value)} placeholder={"e.g. Specish Studio is [Founder Name]. They [what they do] — write, design, and build every project in-house…"} /></div>
           <div style={S.field}><label style={S.label}>Why one maker / approach</label><textarea rows={3} style={S.textarea} value={form.whyOneMaker} onChange={e => set("whyOneMaker", e.target.value)} placeholder="One mind on the whole film keeps the voice honest and the cost lean…" /></div>
           <div style={S.field}><label style={S.label}>Five values <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>(comma-separated)</span></label><input style={S.input} value={form.founderValues} onChange={e => set("founderValues", e.target.value)} placeholder="Grounded, Forward, Exact, Singular, Human" /></div>
         </div>
@@ -433,7 +433,7 @@ function IntakeForm({ onClose, onComplete }) {
             <textarea rows={3} style={S.textarea} value={form.alwaysIncluded} onChange={e => set("alwaysIncluded", e.target.value)} placeholder="A set number of revision rounds, agreed up front. Professional lighting and audio, color grading, and a licensed music track." />
           </div>
           <div style={{ padding: "12px 14px", background: "#ffffff", borderRadius: "6px", fontSize: "12px", color: "#6b7280", lineHeight: 1.6 }}>
-            Full service menu (Customer Story, Case Study Film, Founder Story, etc.) is pre-built in Spec from the Mile Marker brief. Add custom line items by editing the brief after generation.
+            Full service menu is pre-built in Spec based on the brief. Add or customize line items by editing the brief after generation.
           </div>
         </div>
       </div>
@@ -666,7 +666,7 @@ function BriefReview({ parsed, onConfirm, onClose }) {
 const TEMPLATE_LIBRARY = [
   {
     id: "mile-marker-2026",
-    client: "Mile Marker Films",
+    client: "Specish Studio",
     industry: "Video Production",
     style: "Dark Premium · Editorial",
     tags: ["dark-premium", "warm-editorial", "confident", "direct"],
@@ -3150,7 +3150,7 @@ export default function CustomBuild() {
                     style={{ ...T.input, marginBottom: "12px", width: "100%", maxWidth: "100%", boxSizing: "border-box" }}
                     value={clientName}
                     onChange={e => setClientName(e.target.value)}
-                    placeholder="e.g. Mile Marker Films"
+                    placeholder="e.g. Specish Studio"
                   />
                   <div style={{ fontSize: "11px", color: "#9ca3af", marginBottom: "12px" }}>
                     Files will download as: <span style={{ color: "#09090b", fontWeight: 600 }}>{slugify(clientName || brief?.brandName)}-home.json</span>
@@ -3168,21 +3168,7 @@ export default function CustomBuild() {
               <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Inspo URLs</div>
               <span style={{ fontSize: "12px", color: "#6b7280", marginLeft: "auto" }}>Optional</span>
             </div>
-            {Object.keys(storedPatterns).length > 0 && (
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "6px", marginBottom: "10px" }}>
-                <span style={{ fontSize: "12px", color: "#09090b" }}>
-                  {Object.keys(storedPatterns).filter(k => k !== "site").length} page pattern{Object.keys(storedPatterns).filter(k => k !== "site").length !== 1 ? "s" : ""} learned from previous sessions
-                </span>
-                <button
-                  onClick={async () => {
-                    setStoredPatterns({});
-                    { try { await kvStorageDel("spec-inspo-patterns"); } catch(e) {} }
-                  }}
-                  style={{ fontSize: "11px", color: "#6b7280", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
-                  Clear
-                </button>
-              </div>
-            )}
+            {/* Stored patterns used silently — not shown to end users */}
             <div style={T.surface}>
               <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>
                 Paste a site URL and Spec will discover all pages in the nav, not just the home page. Each interior page informs the matching page type in your build.
@@ -3270,7 +3256,7 @@ export default function CustomBuild() {
                   + Add page
                 </button>
                 {showAddPage && (
-                  <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1px solid #dde0e6", borderRadius: "8px", boxShadow: "0 4px 16px rgba(0,0,0,0.1)", zIndex: 50, maxHeight: "240px", overflowY: "auto" }}>
+                  <div style={{ position: "fixed", top: "auto", left: "auto", width: "280px", background: "#fff", border: "1px solid #dde0e6", borderRadius: "8px", boxShadow: "0 4px 24px rgba(0,0,0,0.15)", zIndex: 999, maxHeight: "320px", overflowY: "auto" }}>
                     {ADDITIONAL_PAGE_TYPES.filter(p => !customPages.find(cp => cp.id === p.id)).map(p => (
                       <button
                         key={p.id}
@@ -3311,7 +3297,7 @@ export default function CustomBuild() {
                 <label style={{ flex: 1, padding: "14px", border: !copyBriefOnly ? "2px solid #000" : "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", textAlign: "center" }}>
                   <input type="radio" name="copy" checked={!copyBriefOnly} onChange={() => setCopy(false)} style={{ display: "none" }} />
                   <div style={{ fontSize: "14px", fontWeight: 700, color: "#09090b" }}>No</div>
-                  <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>AI may draft blank fields in the brand voice. You approve before export.</div>
+                  <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>AI will fill any empty fields using the brand voice from the brief. You can review and edit every drafted field before anything exports.</div>
                 </label>
               </div>
             </div>
