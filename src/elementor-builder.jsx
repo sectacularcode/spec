@@ -3965,7 +3965,7 @@ function previewHTML(page, brand) {
 // on every state change (would otherwise reset scroll position on each click).
 // Accepts id so the audit can scroll to and flash-highlight a specific section.
 const Section = ({ title, icon, id, children }) => (
-  <div id={id} style={{ marginBottom: "16px", padding: "20px 24px", borderRadius: "10px", background: "#ffffff", border: "1px solid #dde0e6", transition: "box-shadow 0.2s" }}>
+  <div id={id} style={{ marginBottom: "16px", padding: "20px 24px 28px", borderRadius: "10px", background: "#ffffff", border: "1px solid #dde0e6", transition: "box-shadow 0.2s" }}>
     <div style={{ fontSize: "13px", color: "#09090b", textTransform: "none", letterSpacing: "0", fontWeight: 700, marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid #dde0e6" }}>
       {title}
     </div>
