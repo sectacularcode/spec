@@ -38,8 +38,8 @@ const Icon = ({ name, size = 16, color = "currentColor", strokeWidth = 1.75, sty
   );
 };
 const TONES = ["Editorial & Minimal", "Bold & Direct", "Friendly & Conversational", "Premium & Refined", "Professional", "Warm & Approachable", "Authoritative & Expert", "Playful & Creative", "Honest & Grounded", "Luxe & Aspirational", "Other"];
-const FOOTER_STYLES = ["Editorial", "Studio", "Agency", "Premium"];
-const HEADER_STYLES = ["Editorial", "Studio", "Agency", "Premium"];
+const FOOTER_STYLES = ["Editorial", "Studio", "Agency", "Premium", "Two Column", "Dark Bar"];
+const HEADER_STYLES = ["Editorial", "Studio", "Agency", "Premium", "Social First", "Transparent"];
 const FONT_OPTIONS = [
   // Display & Serif
   "Yeseva One", "Playfair Display", "Cormorant Garamond", "Italiana", "Fraunces", "Spectral",
@@ -2963,6 +2963,45 @@ function buildHeaderJSON(brand) {
     colRight.elements.push(ctaEl);
     row.elements.push(colLogo, colNav, colRight);
     sec.elements.push(row);
+  } else if (headerStyle === "Social First") {
+    // Logo left, social icons right — no nav
+    const row = eContainer({
+      content_width: "full",
+      flex_direction: "row",
+      flex_wrap: "nowrap",
+      flex_gap: { unit: "px", size: 24, sizes: [] },
+      width: { unit: "%", size: 100, sizes: [] },
+      align_items: "center",
+      justify_content: "space-between",
+    });
+    const colLogo = eContainer({ content_width: "full", flex_grow: 0, flex_shrink: 0 });
+    colLogo.elements.push(logoEl);
+    const colSocial = eContainer({ content_width: "full", flex_grow: 0, flex_shrink: 0 });
+    if (socialEl) colSocial.elements.push(socialEl);
+    row.elements.push(colLogo, colSocial);
+    sec.elements.push(row);
+  } else if (headerStyle === "Transparent") {
+    // Transparent background — overlays the hero, goes solid on scroll via CSS
+    sec.settings.background_background = "classic";
+    sec.settings.background_color = "transparent";
+    sec.settings.position = "fixed";
+    const row = eContainer({
+      content_width: "full",
+      flex_direction: "row",
+      flex_wrap: "nowrap",
+      flex_gap: { unit: "px", size: 24, sizes: [] },
+      width: { unit: "%", size: 100, sizes: [] },
+      align_items: "center",
+      justify_content: "space-between",
+    });
+    const colLogo = eContainer({ content_width: "full", flex_grow: 0, flex_shrink: 0 });
+    colLogo.elements.push(logoEl);
+    const colNav = eContainer({ content_width: "full", flex_grow: 1, flex_shrink: 1 });
+    colNav.elements.push(navEl);
+    const colRight = eContainer({ content_width: "full", flex_grow: 0, flex_shrink: 0 });
+    if (socialEl) colRight.elements.push(socialEl);
+    row.elements.push(colLogo, colNav, colRight);
+    sec.elements.push(row);
   }
 
   return { version: "0.4", title: `${brand.name} — Header`, type: "header", content: [sec] };
@@ -3189,6 +3228,15 @@ function buildDiviFooter(brand) {
     inner = `[et_pb_row column_structure="1_3,1_3,1_3"][et_pb_column type="1_3"]${logo(24, "left")}${txt(brand.tagline || "", body, 13, "left")}${social}[/et_pb_column][et_pb_column type="1_3"]${txt(`<strong style="color:${ac};text-transform:uppercase;letter-spacing:0.15em;font-size:11px;">Pages</strong>`, ac, 11, "left")}${txt(menu(brand.primaryMenu), body, 13, "left")}[/et_pb_column][et_pb_column type="1_3"]${txt(`<strong style="color:${ac};text-transform:uppercase;letter-spacing:0.15em;font-size:11px;">Contact</strong>`, ac, 11, "left")}${txt(brand.contactEmail || "", body, 13, "left")}${txt(brand.contactPhone || "", body, 13, "left")}[/et_pb_column][/et_pb_row][et_pb_row][et_pb_column type="4_4"]${txt(`© ${new Date().getFullYear()} ${brand.name}. ${brand.utilityMenu || ""}`, body, 11, "left")}[/et_pb_column][/et_pb_row]`;
   } else {
     inner = `[et_pb_row column_structure="1_2,1_4,1_4"][et_pb_column type="1_2"]${logo(28, "left")}${txt(brand.tagline || "", body, 14, "left")}${txt(brand.contactEmail || "", body, 13, "left")}${social}[/et_pb_column][et_pb_column type="1_4"]${txt(`<strong style="color:${ac};text-transform:uppercase;letter-spacing:0.15em;font-size:11px;">Pages</strong>`, ac, 11, "left")}${txt(menu(brand.primaryMenu), body, 13, "left")}[/et_pb_column][et_pb_column type="1_4"]${txt(`<strong style="color:${ac};text-transform:uppercase;letter-spacing:0.15em;font-size:11px;">Legal</strong>`, ac, 11, "left")}${txt(menu(brand.utilityMenu), body, 13, "left")}[/et_pb_column][/et_pb_row][et_pb_row][et_pb_column type="4_4"]${txt(`© ${new Date().getFullYear()} ${brand.name}. All rights reserved.`, body, 11, "left")}[/et_pb_column][/et_pb_row]`;
+  }
+
+  if (footerStyle === "Two Column") {
+    inner = `[et_pb_row column_structure="1_2,1_2"][et_pb_column type="1_2"]${logo(24, "left")}${txt(brand.tagline || "", body, 13, "left")}${txt(`© ${new Date().getFullYear()} ${brand.name}`, body, 11, "left")}[/et_pb_column][et_pb_column type="1_2"]${txt(menu(brand.primaryMenu), body, 13, "right")}[/et_pb_column][/et_pb_row]`;
+  } else if (footerStyle === "Dark Bar") {
+    const darkCard = "#0a0a0a";
+    inner = `[et_pb_row][et_pb_column type="4_4"]<div style="display:flex;justify-content:space-between;align-items:center;">${logoText}<span style="color:#888;font-size:11px;">© ${new Date().getFullYear()} ${brand.name}. All rights reserved.</span></div>[/et_pb_column][/et_pb_row]`;
+    const shortcodeDark = `[et_pb_section fb_built="1" background_color="${darkCard}" custom_padding="20px|20px|20px|20px"]${inner}[/et_pb_section]`;
+    return { context: "et_builder", data: { "1": shortcodeDark }, presets: {}, global_colors: [] };
   }
 
   const shortcode = `[et_pb_section fb_built="1" background_color="${card}" custom_padding="80px|20px|40px|20px"]${inner}[/et_pb_section]`;
@@ -6562,6 +6610,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                         {f === "Studio" && "Centered logo with nav below — masthead"}
                         {f === "Agency" && "Logo left, nav + social right"}
                         {f === "Premium" && "Logo, nav, social + CTA button"}
+                        {f === "Social First" && "Logo left, social icons right — no nav links"}
+                        {f === "Transparent" && "Transparent over hero, solid on scroll"}
                       </div>
                     </button>
                   ))}
@@ -6583,10 +6633,12 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   const btnTxt = `<a href="#" style="font-family:'${bf}',sans-serif;font-size:12px;font-weight:600;color:#fff;background:${ac};padding:8px 18px;text-decoration:none;border-radius:4px;white-space:nowrap;">${brand.cta1 || "Get in touch"}</a>`;
                   const hs = brand.headerStyle || "Editorial";
                   let headerHTML = "";
-                  if (hs === "Editorial") headerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding:0 40px;height:60px;background:${pc};border-bottom:1px solid rgba(128,128,128,0.15);">${logoEl}<div style="display:flex;">${navLinks}</div><div></div></div>`;
-                  else if (hs === "Studio") headerHTML = `<div style="text-align:center;padding:16px 40px;background:${pc};border-bottom:1px solid rgba(128,128,128,0.15);"><div style="margin-bottom:10px;">${logoEl}</div><div>${navLinks}</div></div>`;
-                  else if (hs === "Agency") headerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding:0 40px;height:60px;background:${pc};border-bottom:1px solid rgba(128,128,128,0.15);">${logoEl}<div style="display:flex;align-items:center;">${navLinks}</div></div>`;
-                  else headerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding:0 40px;height:60px;background:${pc};border-bottom:1px solid rgba(128,128,128,0.15);">${logoEl}<div style="display:flex;align-items:center;">${navLinks}</div>${btnTxt}</div>`;
+                  if (hs === "Editorial") headerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding:0 40px;height:60px;background:${pc};border-bottom:1px solid ${brand.borderColor||"rgba(128,128,128,0.15)"};">${logoEl}<div style="display:flex;">${navLinks}</div><div></div></div>`;
+                  else if (hs === "Studio") headerHTML = `<div style="text-align:center;padding:16px 40px;background:${pc};border-bottom:1px solid ${brand.borderColor||"rgba(128,128,128,0.15)"};"><div style="margin-bottom:10px;">${logoEl}</div><div>${navLinks}</div></div>`;
+                  else if (hs === "Agency") headerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding:0 40px;height:60px;background:${pc};border-bottom:1px solid ${brand.borderColor||"rgba(128,128,128,0.15)"};">${logoEl}<div style="display:flex;align-items:center;">${navLinks}</div></div>`;
+                  else if (hs === "Social First") headerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding:0 40px;height:60px;background:${pc};border-bottom:1px solid ${brand.borderColor||"rgba(128,128,128,0.15)"};">${logoEl}<div style="display:flex;align-items:center;gap:16px;">${(brand.socialLinks||[]).slice(0,4).map(s=>`<span style="width:18px;height:18px;background:${tc};border-radius:50%;display:inline-block;opacity:0.6;"></span>`).join("")||`<span style="font-size:11px;color:${tc};opacity:0.6;">Social icons</span>`}</div></div>`;
+                  else if (hs === "Transparent") headerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding:0 40px;height:60px;background:linear-gradient(to bottom,rgba(0,0,0,0.3),transparent);border:none;">${logoEl}<div style="display:flex;">${navLinks}</div><div></div></div><div style="font-size:10px;color:#6b7280;padding:4px 12px;background:#f5f5f7;text-align:center;">Starts transparent over hero — goes solid on scroll</div>`;
+                  else headerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding:0 40px;height:60px;background:${pc};border-bottom:1px solid ${brand.borderColor||"rgba(128,128,128,0.15)"};">${logoEl}<div style="display:flex;align-items:center;">${navLinks}</div>${btnTxt}</div>`;
                   return (
                     <div style={{ marginTop: "12px", border: "1px solid #dde0e6", borderRadius: "8px", overflow: "hidden" }}>
                       <div style={{ fontSize: "10px", color: "#6b7280", padding: "6px 12px", background: "#f5f5f7", borderBottom: "1px solid #dde0e6", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>Header Preview — {brand.headerStyle || "Editorial"}</div>
@@ -6606,6 +6658,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                         {f === "Studio" && "Centered with nav links"}
                         {f === "Agency" && "3-column with menu and contact"}
                         {f === "Premium" && "4-column full with services, follow, legal"}
+                        {f === "Two Column" && "Logo + tagline left, nav links right"}
+                        {f === "Dark Bar" && "Single row — logo left, copyright right, minimal"}
                       </div>
                     </button>
                   ))}
@@ -6630,13 +6684,21 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   const fs = brand.footerStyle || "Editorial";
                   let footerHTML = "";
                   if (fs === "Editorial") {
-                    footerHTML = `<div style="text-align:center;padding:48px 40px 32px;background:${pc};">${logoEl}${tagline}<div style="margin:16px 0;">${navLinks}</div>${copy}</div>`;
+                    footerHTML = `<div style="text-align:center;padding:48px 40px 32px;background:${pc};border-top:1px solid ${brand.borderColor||"rgba(128,128,128,0.15)"};">${logoEl}${tagline}<div style="margin:16px 0;">${navLinks}</div>${copy}</div>`;
                   } else if (fs === "Studio") {
-                    footerHTML = `<div style="text-align:center;padding:48px 40px 32px;background:${pc};">${logoEl}<div style="margin:16px 0;">${navLinks}</div>${copy}</div>`;
+                    footerHTML = `<div style="text-align:center;padding:48px 40px 32px;background:${pc};border-top:1px solid ${brand.borderColor||"rgba(128,128,128,0.15)"};">${logoEl}<div style="margin:16px 0;">${navLinks}</div>${copy}</div>`;
                   } else if (fs === "Agency") {
-                    footerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px;padding:48px 40px 32px;background:${pc};">${logoEl}${tagline}<div><p style="font-size:10px;color:${ac};letter-spacing:0.12em;text-transform:uppercase;margin:0 0 12px;font-family:'${bf}',sans-serif;">Pages</p>${(brand.primaryMenu||"").split(",").map(l=>`<div style="font-size:12px;color:${tc};margin-bottom:6px;font-family:'${bf}',sans-serif;">${l.trim()}</div>`).join("")}</div><div><p style="font-size:10px;color:${ac};letter-spacing:0.12em;text-transform:uppercase;margin:0 0 12px;font-family:'${bf}',sans-serif;">Contact</p>${email}</div></div>`;
+                    footerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px;padding:48px 40px 32px;background:${pc};border-top:1px solid ${brand.borderColor||"rgba(128,128,128,0.15)"};">${logoEl}${tagline}<div><p style="font-size:10px;color:${ac};letter-spacing:0.12em;text-transform:uppercase;margin:0 0 12px;font-family:'${bf}',sans-serif;">Pages</p>${(brand.primaryMenu||"").split(",").map(l=>`<div style="font-size:12px;color:${tc};margin-bottom:6px;font-family:'${bf}',sans-serif;">${l.trim()}</div>`).join("")}</div><div><p style="font-size:10px;color:${ac};letter-spacing:0.12em;text-transform:uppercase;margin:0 0 12px;font-family:'${bf}',sans-serif;">Contact</p>${email}</div></div>`;
+                  } else if (fs === "Two Column") {
+                    footerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;padding:48px 40px 32px;background:${pc};border-top:1px solid ${brand.borderColor||"rgba(128,128,128,0.15)"};""><div>${logoEl}${tagline}${copy}</div><div style="text-align:right;">${(brand.primaryMenu||"").split(",").map(l=>`<div style="font-size:13px;color:${tc};margin-bottom:10px;font-family:'${bf}',sans-serif;">${l.trim()}</div>`).join("")}</div></div>`;
+                  } else if (fs === "Dark Bar") {
+                    const darkBg = isDark ? pc : "#0a0a0a";
+                    const darkTc = "#888888";
+                    const darkHc = "#ffffff";
+                    const darkLogoEl = brand.logoUrl ? `<img src="${brand.logoUrl}" style="height:20px;width:auto;" />` : `<span style="font-family:'${hf}',sans-serif;font-size:16px;font-weight:700;color:${darkHc};">${brand.logoText || brand.name || "Brand"}</span>`;
+                    footerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding:20px 40px;background:${darkBg};">${darkLogoEl}<p style="font-family:'${bf}',sans-serif;font-size:11px;color:${darkTc};margin:0;">© ${new Date().getFullYear()} ${brand.name||"Brand"}. All rights reserved.</p></div>`;
                   } else {
-                    footerHTML = `<div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:32px;padding:48px 40px 32px;background:${pc};"><div>${logoEl}${tagline}${email}</div><div><p style="font-size:10px;color:${ac};letter-spacing:0.12em;text-transform:uppercase;margin:0 0 12px;font-family:'${bf}',sans-serif;">Pages</p>${(brand.primaryMenu||"").split(",").map(l=>`<div style="font-size:12px;color:${tc};margin-bottom:6px;font-family:'${bf}',sans-serif;">${l.trim()}</div>`).join("")}</div><div><p style="font-size:10px;color:${ac};letter-spacing:0.12em;text-transform:uppercase;margin:0 0 12px;font-family:'${bf}',sans-serif;">Legal</p>${(brand.utilityMenu||"Privacy, Terms").split(",").map(l=>`<div style="font-size:12px;color:${tc};margin-bottom:6px;font-family:'${bf}',sans-serif;">${l.trim()}</div>`).join("")}</div></div>`;
+                    footerHTML = `<div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:32px;padding:48px 40px 32px;background:${pc};border-top:1px solid ${brand.borderColor||"rgba(128,128,128,0.15)"};""><div>${logoEl}${tagline}${email}</div><div><p style="font-size:10px;color:${ac};letter-spacing:0.12em;text-transform:uppercase;margin:0 0 12px;font-family:'${bf}',sans-serif;">Pages</p>${(brand.primaryMenu||"").split(",").map(l=>`<div style="font-size:12px;color:${tc};margin-bottom:6px;font-family:'${bf}',sans-serif;">${l.trim()}</div>`).join("")}</div><div><p style="font-size:10px;color:${ac};letter-spacing:0.12em;text-transform:uppercase;margin:0 0 12px;font-family:'${bf}',sans-serif;">Legal</p>${(brand.utilityMenu||"Privacy, Terms").split(",").map(l=>`<div style="font-size:12px;color:${tc};margin-bottom:6px;font-family:'${bf}',sans-serif;">${l.trim()}</div>`).join("")}</div></div>`;
                   }
                   return (
                     <div style={{ marginTop: "12px", border: "1px solid #dde0e6", borderRadius: "8px", overflow: "hidden" }}>
