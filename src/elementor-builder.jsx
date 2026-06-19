@@ -3766,7 +3766,7 @@ function previewHTML(page, brand) {
 // on every state change (would otherwise reset scroll position on each click).
 // Accepts id so the audit can scroll to and flash-highlight a specific section.
 const Section = ({ title, icon, id, children }) => (
-  <div id={id} style={{ marginBottom: "16px", padding: "20px 24px", borderRadius: "10px", background: "#ffffff", border: "1px solid #ebe9e2", transition: "box-shadow 0.2s" }}>
+  <div id={id} style={{ marginBottom: "16px", padding: "20px 24px", borderRadius: "10px", background: "#ffffff", border: "1px solid #dde0e6", transition: "box-shadow 0.2s" }}>
     <div style={{ fontSize: "13px", color: "#09090b", textTransform: "none", letterSpacing: "0", fontWeight: 700, marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid #f0eee6" }}>
       {title}
     </div>
@@ -4943,7 +4943,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         <p style={{ color: "#09090b", fontSize: "14px", margin: "0 0 32px", lineHeight: 1.6 }}>Plan, spec, and export Elementor or Divi templates.</p>
 
         {/* AI Describe Your Site — optional guided start */}
-        <div style={{ background: "#ffffff", border: "1px solid #ebe9e2", borderRadius: "12px", padding: "24px", marginBottom: "28px" }}>
+        <div style={{ background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "12px", padding: "24px", marginBottom: "28px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
             <Icon name="sparkles" size={18} color="#000000" />
             <h2 style={{ fontSize: "18px", margin: 0, fontWeight: 200, color: "#09090b", letterSpacing: "0" }}>Describe your site — get a custom recommendation</h2>
@@ -4957,14 +4957,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               value={briefText}
               onChange={e => setBriefText(e.target.value)}
               placeholder="e.g. A modern fitness coaching site for women over 40. Warm but no-nonsense. Earthy palette."
-              style={{ width: "100%", minHeight: "80px", padding: "12px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #ebe9e2", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.6, outline: "none" }}
+              style={{ width: "100%", minHeight: "80px", padding: "12px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.6, outline: "none" }}
             />
           </div>
           <div style={{ marginBottom: "12px" }}>
             <select
               value={lockedTemplateId}
               onChange={e => setLockedTemplateId(e.target.value)}
-              style={{ width: "100%", padding: "10px 12px", background: "#ffffff", color: "#09090b", border: lockedTemplateId ? "1px solid #7c3aed" : "1px solid #ebe9e2", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", cursor: "pointer", outline: "none" }}>
+              style={{ width: "100%", padding: "10px 12px", background: "#ffffff", color: "#09090b", border: lockedTemplateId ? "1px solid #7c3aed" : "1px solid #dde0e6", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", cursor: "pointer", outline: "none" }}>
               <option value="">Already know which template? Pick one (optional)</option>
               {WEBSITE_TEMPLATES.map(t => (
                 <option key={t.id} value={t.id}>{t.name} — {t.industry.split(/[,—]/)[0].trim().slice(0, 40)}</option>
@@ -5244,7 +5244,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
         <h2 style={{ fontSize: "22px", margin: "0 0 14px", fontWeight: 200, color: "#09090b", letterSpacing: "0" }}>Your projects</h2>
         {projects.length === 0 && (
-          <div style={{ marginBottom: "20px", padding: "20px 24px", background: "#ffffff", border: "1px solid #ebe9e2", borderRadius: "10px" }}>
+          <div style={{ marginBottom: "20px", padding: "20px 24px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "10px" }}>
             <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "6px" }}></div>
             <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.6 }}>
               
@@ -5263,7 +5263,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             const hasDescription = !!p.brand.industry;
             const isPendingDelete = confirmDeleteId === p.id;
             return (
-              <div key={p.id} style={{ background: "#ffffff", border: isPendingDelete ? "1px solid #fecaca" : "1px solid #ebe9e2", padding: "18px 20px", borderRadius: "10px", display: "flex", flexDirection: "column", gap: "12px" }}>
+              <div key={p.id} style={{ background: "#ffffff", border: isPendingDelete ? "1px solid #fecaca" : "1px solid #dde0e6", padding: "18px 20px", borderRadius: "10px", display: "flex", flexDirection: "column", gap: "12px" }}>
                 <div onClick={() => { setActiveId(p.id); setView("editor"); setPageIdx(0); }} style={{ cursor: "pointer", flex: 1 }}>
                   <div style={{ fontSize: "14px", fontWeight: 500, marginBottom: "4px", color: "#09090b", letterSpacing: "0" }}>{displayName}</div>
                   <div style={{ fontSize: "12px", color: "#09090b", marginBottom: "12px" }}>
@@ -5272,8 +5272,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   </div>
                   {hasTemplate ? (
                     <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-                      <div style={{ width: "18px", height: "18px", background: p.brand.primaryColor, border: "1px solid #ebe9e2", borderRadius: "3px" }} />
-                      <div style={{ width: "18px", height: "18px", background: p.brand.accentColor, border: "1px solid #ebe9e2", borderRadius: "3px" }} />
+                      <div style={{ width: "18px", height: "18px", background: p.brand.primaryColor, border: "1px solid #dde0e6", borderRadius: "3px" }} />
+                      <div style={{ width: "18px", height: "18px", background: p.brand.accentColor, border: "1px solid #dde0e6", borderRadius: "3px" }} />
                       <span style={{ fontSize: "10px", color: "#09090b", marginLeft: "4px" }}>
                         {WEBSITE_TEMPLATES.find(t => t.id === p.brand.templateId)?.name || "Template applied"}
                       </span>
@@ -5291,7 +5291,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     onChange={e => setProjects(ps => ps.map(proj => proj.id === p.id ? { ...proj, brand: { ...proj.brand, inspoUrls: e.target.value } } : proj))}
                     placeholder={"https://example.com\nhttps://another.com"}
                     rows={2}
-                    style={{ width: "100%", padding: "8px 10px", background: "#ffffff", color: "#09090b", border: "1px solid #ebe9e2", borderRadius: "6px", fontSize: "12px", fontFamily: "monospace", resize: "vertical", lineHeight: 1.5, outline: "none", boxSizing: "border-box" }}
+                    style={{ width: "100%", padding: "8px 10px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "12px", fontFamily: "monospace", resize: "vertical", lineHeight: 1.5, outline: "none", boxSizing: "border-box" }}
                   />
                   <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "3px" }}>Feeds AI copy drafting — one URL per line</div>
                 </div>
@@ -5299,21 +5299,21 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   {isPendingDelete ? (
                     <>
                       <button onClick={(e) => { e.stopPropagation(); deleteProject(p.id); }} style={{ flex: 1, padding: "8px 10px", background: "#c93939", color: "#fff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer" }}>Yes, delete "{displayName}"</button>
-                      <button onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(null); }} style={{ padding: "8px 12px", background: "transparent", color: "#09090b", border: "1px solid #ebe9e2", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Cancel</button>
+                      <button onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(null); }} style={{ padding: "8px 12px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Cancel</button>
                     </>
                   ) : (
                     <>
                       <button onClick={(e) => { e.stopPropagation(); setActiveId(p.id); setView("editor"); setPageIdx(0); }} style={{ flex: 1, padding: "8px 10px", background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Open</button>
-                      <button onClick={(e) => { e.stopPropagation(); duplicateProject(p.id); }} title="Duplicate this project" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#09090b", border: "1px solid #ebe9e2", borderRadius: "6px", cursor: "pointer" }}>
+                      <button onClick={(e) => { e.stopPropagation(); duplicateProject(p.id); }} title="Duplicate this project" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
                         <Icon name="copy" size={14} color="#09090b" />
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); exportProjectFile(p); }} title="Download as JSON backup file" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#09090b", border: "1px solid #ebe9e2", borderRadius: "6px", cursor: "pointer" }}>
+                      <button onClick={(e) => { e.stopPropagation(); exportProjectFile(p); }} title="Download as JSON backup file" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
                         <Icon name="download" size={14} color="#09090b" />
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); resetProject(p.id); }} title="Reset to blank" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#09090b", border: "1px solid #ebe9e2", borderRadius: "6px", cursor: "pointer" }}>
+                      <button onClick={(e) => { e.stopPropagation(); resetProject(p.id); }} title="Reset to blank" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
                         <Icon name="refresh" size={14} color="#09090b" />
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(p.id); }} title="Delete this project" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#c93939", border: "1px solid #ebe9e2", borderRadius: "6px", cursor: "pointer" }}>
+                      <button onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(p.id); }} title="Delete this project" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#c93939", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
                         <Icon name="trash" size={14} color="#c93939" />
                       </button>
                     </>
@@ -5938,7 +5938,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
 
 
-              <div style={{ border: "1px solid #ebe9e2", borderRadius: "10px", marginBottom: "16px", overflow: "hidden" }}>
+              <div style={{ border: "1px solid #dde0e6", borderRadius: "10px", marginBottom: "16px", overflow: "hidden" }}>
               <button onClick={() => setShowAdvancedColors(v => !v)} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", background: "#ffffff", border: "none", cursor: "pointer", fontSize: "13px", fontWeight: 600, color: "#09090b" }}>
                 <span>Advanced — Custom Brand Colors</span>
                 <span style={{ fontSize: "12px", color: "#09090b" }}>{showAdvancedColors ? "▲ Hide" : "▼ Show"}</span>
