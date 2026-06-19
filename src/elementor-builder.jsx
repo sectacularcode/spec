@@ -5375,12 +5375,15 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         <div style={{ maxWidth: "1080px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
           {/* Left: All Projects + spec wordmark */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <button onClick={() => setView("projects")} style={{ ...I.btnGhost, padding: "8px 14px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px" }}>
-              <Icon name="arrowLeft" size={14} color="#09090b" /> All Projects
+            <button onClick={() => setView("projects")} style={{ ...I.btnGhost, padding: "7px 12px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px" }}>
+              <Icon name="arrowLeft" size={13} color="#09090b" /> All Projects
             </button>
             <div>
-              <div style={{ fontSize: "24px", fontWeight: 800, letterSpacing: "-0.03em", color: "#000000", lineHeight: 1 }}>spec</div>
-              <div style={{ fontSize: "12px", color: "#09090b", marginTop: "4px" }}>{brand.name} · {project.pages.length} page{project.pages.length !== 1 ? "s" : ""} · Exporting for {exportFormat === "divi" ? "Divi" : "Elementor"}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <div style={{ fontSize: "20px", fontWeight: 800, letterSpacing: "-0.03em", color: "#000000", lineHeight: 1 }}>spec</div>
+                <div style={{ fontSize: "10px", color: "#09090b", padding: "3px 8px", background: "#f5f5f4", border: "1px solid #e8e6dd", borderRadius: "10px", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>Beta</div>
+              </div>
+              <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "3px" }}>{brand.name} · {project.pages.length} page{project.pages.length !== 1 ? "s" : ""} · {exportFormat === "divi" ? "Divi" : "Elementor"}</div>
             </div>
           </div>
           {/* Center: page tabs + add page */}
