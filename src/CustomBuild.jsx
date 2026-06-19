@@ -2969,7 +2969,7 @@ export default function CustomBuild() {
   ];
 
   return (
-    <div style={{ minHeight: "100vh", width: "100%", background: "#fafafa", fontFamily: "Inter, system-ui, sans-serif", boxSizing: "border-box" }}>
+    <div style={{ minHeight: "100vh", width: "100%", background: "#eeedf1", fontFamily: "Inter, system-ui, sans-serif", boxSizing: "border-box" }}>
       {showBriefReview && parsedBriefDraft && (
         <BriefReview
           parsed={parsedBriefDraft}
@@ -3541,6 +3541,7 @@ export default function CustomBuild() {
     </div>
   );
 }
+
 
 
 
