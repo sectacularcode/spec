@@ -5440,10 +5440,9 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   <textarea
                     value={p.brand.inspoUrls || ""}
                     onChange={e => setProjects(ps => ps.map(proj => proj.id === p.id ? { ...proj, brand: { ...proj.brand, inspoUrls: e.target.value } } : proj))}
-                    style={{ width: "100%", boxSizing: "border-box" }}
                     placeholder={"https://example.com\nhttps://another.com"}
                     rows={2}
-                    style={{ width: "100%", padding: "8px 10px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "12px", fontFamily: "monospace", resize: "vertical", lineHeight: 1.5, outline: "none", boxSizing: "border-box" }}
+                    style={{ width: "100%", padding: "8px 10px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "12px", fontFamily: "monospace", resize: "vertical", lineHeight: 1.5, outline: "none", boxSizing: "border-box", display: "block", maxWidth: "100%" }}
                   />
                   <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "3px" }}>Feeds AI copy drafting — one URL per line</div>
                 </div>
