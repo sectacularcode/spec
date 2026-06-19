@@ -63,7 +63,8 @@ export default function App() {
 
   return (
     <div style={{ width: "100%", minHeight: "100vh", fontFamily: "Inter, system-ui, sans-serif", boxSizing: "border-box" }}>
-      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "#ffffff", borderBottom: "1px solid #e5e7eb", display: "flex", alignItems: "center", padding: "0 24px", width: "100%", boxSizing: "border-box" }}>
+      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "#ffffff", borderBottom: "1px solid #e5e7eb", width: "100%", boxSizing: "border-box" }}>
+        <div style={{ maxWidth: "1080px", margin: "0 auto", display: "flex", alignItems: "center", padding: "0 24px", boxSizing: "border-box" }}>
         <div style={{ fontSize: "15px", fontWeight: 800, color: "#09090b", marginRight: "32px", padding: "16px 0" }}>Spec</div>
         {[{ id: "spec", label: "Template Studio" }, { id: "custom", label: "Brief to Blueprint" }].map(tab => (
           <button key={tab.id} onClick={() => switchMode(tab.id)} style={{ padding: "18px 16px", fontSize: "13px", fontWeight: mode === tab.id ? 700 : 500, color: mode === tab.id ? "#09090b" : "#6b7280", background: "transparent", border: "none", cursor: "pointer", borderBottom: mode === tab.id ? "2px solid #09090b" : "2px solid transparent" }}>
@@ -75,9 +76,11 @@ export default function App() {
           style={{ marginLeft: "auto", fontSize: "12px", color: "#9ca3af", background: "none", border: "none", cursor: "pointer", padding: "8px" }}>
           Lock
         </button>
+        </div>
       </div>
       {mode === "spec" && <ElementorBuilder />}
       {mode === "custom" && <CustomBuild />}
     </div>
   );
 }
+
