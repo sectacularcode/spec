@@ -5583,7 +5583,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* Tabs — full width warm stone bar */}
           <div style={{ background: "#6b635c", width: "100%", paddingTop: "10px" }}>
             <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px" }}>
-              <div className="tab-bar" style={{ display: "flex", justifyContent: "center", overflowX: "auto", WebkitOverflowScrolling: "touch", paddingTop: "18px" }}>
+              <div className="tab-bar" style={{ display: "flex", justifyContent: "center", overflowX: "auto", WebkitOverflowScrolling: "touch", paddingTop: "18px", paddingBottom: "16px" }}>
                 <TabBtn id="discovery" label="Discovery" />
                 <TabBtn id="positioning" label="Positioning" />
                 <TabBtn id="brand" label="Brand" />
@@ -5593,18 +5593,20 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <TabBtn id="footer" label="Header & Footer" />
                 <TabBtn id="export" label="Export & Import" />
               </div>
+              {/* Divider between tabs and page pills */}
+              <div style={{ height: "1px", background: "rgba(255,255,255,0.15)", margin: "0 0 0 0" }} />
             {/* Page switcher row — pills centered, Add Page right */}
-            <div style={{ display: "flex", alignItems: "center", padding: "14px 0 18px", position: "relative" }}>
-              <div style={{ flex: 1, display: "flex", justifyContent: "center", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", padding: "16px 0 20px", position: "relative" }}>
+              <div style={{ flex: 1, display: "flex", justifyContent: "center", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
                 {project.pages.map((p, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: "3px" }}>
-                    <button onClick={() => setPageIdx(i)} style={{ padding: "4px 14px", background: i === pageIdx ? "#ffffff" : "transparent", color: i === pageIdx ? "#09090b" : "#ffffff", border: `1px solid ${i === pageIdx ? "#ffffff" : "rgba(255,255,255,0.5)"}`, borderRadius: "999px", fontSize: "12px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>{p.name}</button>
+                    <button onClick={() => setPageIdx(i)} style={{ padding: "6px 18px", background: i === pageIdx ? "#ffffff" : "transparent", color: i === pageIdx ? "#09090b" : "#ffffff", border: `1px solid ${i === pageIdx ? "#ffffff" : "rgba(255,255,255,0.5)"}`, borderRadius: "999px", fontSize: "13px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>{p.name}</button>
                     {project.pages.length > 1 && <button onClick={() => delPage(i)} style={{ background: "transparent", border: "none", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontSize: "13px", lineHeight: 1, padding: "0 1px" }}>×</button>}
                   </div>
                 ))}
               </div>
               <div style={{ position: "relative" }}>
-                <button onClick={() => setShowAddPage(!showAddPage)} style={{ padding: "4px 12px", background: "transparent", color: "#ffffff", border: "1px solid rgba(255,255,255,0.5)", borderRadius: "999px", fontSize: "12px", fontWeight: 400, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                <button onClick={() => setShowAddPage(!showAddPage)} style={{ padding: "6px 14px", background: "transparent", color: "#ffffff", border: "1px solid rgba(255,255,255,0.5)", borderRadius: "999px", fontSize: "13px", fontWeight: 400, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}>
                   <Icon name="plus" size={11} color="#ffffff" /> Add Page
                 </button>
                 {showAddPage && (
