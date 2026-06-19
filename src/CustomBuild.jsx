@@ -3074,38 +3074,25 @@ export default function CustomBuild() {
       )}
 
       {!draftsView && (
-      <div style={{ borderBottom: "1px solid #dde0e6", background: "#fff", padding: "10px 24px", display: "flex", alignItems: "center", gap: "16px", width: "100%", boxSizing: "border-box" }}>
-        <button onClick={() => setDraftsView(true)} style={{ background: "none", border: "none", fontSize: "13px", color: "#6b7280", cursor: "pointer", padding: "0", marginRight: "4px" }}>← Builds</button>
-        <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b" }}>Brief to Blueprint</div>
-        <div style={{ marginLeft: "auto", display: "flex", gap: "8px", alignItems: "center" }}>
-          {(brief || generated) && (
-            <button
-              onClick={async () => {
-                setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]);
-                setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({});
-                setPreviewPage("home"); setPageOverrides({}); setCustomPages([]);
-                { try { await kvStorageDel("spec-blueprint-draft"); } catch(e) {} }
-              }}
-              style={{ fontSize: "12px", color: "#6b7280", background: "none", border: "1px solid #dde0e6", borderRadius: "6px", padding: "6px 12px", cursor: "pointer" }}>
-              Clear draft
-            </button>
-          )}
-          {steps.map(s => (
-            <div key={s.n} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <div style={T.stepNum(false, s.done)}>{s.done ? "✓" : s.n}</div>
-              <span style={{ fontSize: "12px", color: s.done ? "#09090b" : "#9ca3af", fontWeight: s.done ? 600 : 400 }}>{s.label}</span>
-              {s.n < 4 && <span style={{ color: "#dde0e6", margin: "0 4px" }}>›</span>}
-            </div>
-          ))}
-        </div>
-      </div>
-      )}
-
-      {!draftsView && (
       <div style={{ display: "grid", gridTemplateColumns: generated ? "520px 1fr" : "1fr", gap: "0", minHeight: "calc(100vh - 57px)" }}>
 
         <div style={{ padding: "clamp(20px,3vw,40px) clamp(16px,3vw,40px)", borderRight: generated ? "1px solid #dde0e6" : "none", overflowY: "auto", flexShrink: 0, background: "#eeedf1" }}>
           <div style={{ maxWidth: generated ? "100%" : "1100px", margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
+            <button onClick={() => setDraftsView(true)} style={{ background: "none", border: "none", fontSize: "13px", color: "#6b7280", cursor: "pointer", padding: "0", display: "inline-flex", alignItems: "center", gap: "4px" }}>← Builds</button>
+            {(brief || generated) && (
+              <button
+                onClick={async () => {
+                  setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]);
+                  setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({});
+                  setPreviewPage("home"); setPageOverrides({}); setCustomPages([]);
+                  { try { await kvStorageDel("spec-blueprint-draft"); } catch(e) {} }
+                }}
+                style={{ fontSize: "12px", color: "#6b7280", background: "none", border: "1px solid #dde0e6", borderRadius: "4px", padding: "5px 10px", cursor: "pointer" }}>
+                Clear draft
+              </button>
+            )}
+          </div>
 
           {/* STEP 1 */}
           <div style={{ marginBottom: "20px" }}>
