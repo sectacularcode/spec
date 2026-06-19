@@ -39,7 +39,18 @@ const Icon = ({ name, size = 16, color = "currentColor", strokeWidth = 1.75, sty
 const TONES = ["Editorial & Minimal", "Bold & Direct", "Friendly & Conversational", "Premium & Refined", "Professional", "Warm & Approachable", "Authoritative & Expert", "Playful & Creative", "Honest & Grounded", "Luxe & Aspirational", "Other"];
 const FOOTER_STYLES = ["Editorial", "Studio", "Agency", "Premium"];
 const HEADER_STYLES = ["Editorial", "Studio", "Agency", "Premium"];
-const FONT_OPTIONS = ["Yeseva One", "Playfair Display", "Cormorant Garamond", "Italiana", "Fraunces", "Spectral", "Libre Baskerville", "Merriweather", "Manrope", "Montserrat", "Raleway", "Oswald", "Lato", "Nunito", "Poppins", "Inter", "Roboto Slab", "Jost", "DM Sans", "Josefin Sans", "Work Sans", "Space Mono", "JetBrains Mono"];
+const FONT_OPTIONS = [
+  // Display & Serif
+  "Yeseva One", "Playfair Display", "Cormorant Garamond", "Italiana", "Fraunces", "Spectral",
+  "Libre Baskerville", "Merriweather", "Lora", "EB Garamond", "Crimson Text", "Roboto Slab",
+  "Cardo", "Abril Fatface", "Bodoni Moda", "DM Serif Display", "Castoro",
+  // Sans-serif & Modern
+  "Manrope", "Montserrat", "Raleway", "Oswald", "Lato", "Nunito", "Poppins", "Inter",
+  "Jost", "DM Sans", "Josefin Sans", "Work Sans", "Be Vietnam Pro", "Plus Jakarta Sans",
+  "Outfit", "Sora", "Figtree", "Urbanist", "Lexend", "Mulish", "Barlow",
+  // Monospace & Distinctive
+  "Space Mono", "JetBrains Mono", "Space Grotesk", "IBM Plex Mono",
+];
 
 // ──────────────────────────────────────────────────────────────────────────────
 // THEMES — curated, WCAG AA-tested color palettes.
@@ -1183,7 +1194,6 @@ const PREMIUM_ACCENTS = [
   { name: "Steel Blue", value: "#4a6fa5" },
   { name: "Ink Navy", value: "#1f2940" },
   { name: "Slate", value: "#4a5568" },
-  { name: "Electric Blue", value: "#3b82f6" },
   { name: "Lavender", value: "#7c6fa5" },
   { name: "Plum", value: "#5c3a6e" },
   { name: "Warm Stone", value: "#6b635c" },
@@ -3073,11 +3083,11 @@ function auditBrand(brand, pages) {
   const add = (category, msg, fix, target) => issues.push({ category, msg, fix, target });
 
   // ─── CRITICAL — page won't function well without these
-  if (!brand.logoUrl && !brand.logoText) add("critical", "No logo URL or text fallback", "Add a logo URL or a text-based logo in Logo & Identity.", { tab: "brand", section: "brand-logo" });
+  if (!brand.logoUrl && !brand.logoText) add("critical", "No logo URL or text fallback", "Add a logo URL or a text-based logo in Logo & Identity.", { tab: "positioning", section: "positioning-ctas" });
   if (!brand.tagline) add("critical", "Missing tagline", "Add a tagline in Business — it shows in hero and footer.", { tab: "brand", section: "brand-business" });
   if (!brand.primaryColor || !brand.accentColor) add("critical", "Primary or accent color missing", "Pick a Theme and Accent in the Brand tab.", { tab: "brand", section: "brand-theme" });
-  if (!brand.cta1) add("critical", "Primary CTA is empty", "Add a primary CTA in Logo & Identity (e.g. 'Book a call').", { tab: "brand", section: "brand-logo" });
-  if (!brand.contactEmail) add("critical", "No contact email", "Used in footer and contact forms — add in Logo & Identity.", { tab: "brand", section: "brand-logo" });
+  if (!brand.cta1) add("critical", "Primary CTA is empty", "Add a primary CTA in Logo & Identity (e.g. 'Book a call').", { tab: "positioning", section: "positioning-ctas" });
+  if (!brand.contactEmail) add("critical", "No contact email", "Used in footer and contact forms — add in Logo & Identity.", { tab: "positioning", section: "positioning-ctas" });
 
   // ─── CONTENT — sections turned on but empty
   pages.forEach(p => {
@@ -3161,7 +3171,7 @@ function auditBrand(brand, pages) {
       return true; // Awareness — any CTA is fine
     });
     if (!matchesAny) {
-      add("best", "Your CTA doesn't match any of your goals", `"${brand.cta1}" doesn't reflect ${activeGoals.join(" or ")}. Match the verb to what you want visitors to do.`, { tab: "brand", section: "brand-logo" });
+      add("best", "Your CTA doesn't match any of your goals", `"${brand.cta1}" doesn't reflect ${activeGoals.join(" or ")}. Match the verb to what you want visitors to do.`, { tab: "positioning", section: "positioning-ctas" });
     }
   }
 
@@ -5757,6 +5767,23 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 />
               </Section>
 
+                            <Section id="positioning-ctas" title="CTAs & Contact" icon="">
+                <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.6 }}>Your call-to-action labels and contact details. These feed into the AI draft copy — hero buttons, nav CTA, footer, and contact form.</p>
+                <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                  <div><label style={I.lbl}>Primary CTA</label><input style={I.inp} value={brand.cta1} onChange={e => updBrand("cta1", e.target.value)} placeholder="e.g. Book a call" /></div>
+                  <div><label style={I.lbl}>Secondary CTA</label><input style={I.inp} value={brand.cta2} onChange={e => updBrand("cta2", e.target.value)} placeholder="e.g. View our work" /></div>
+                </div>
+                <div>
+                  <label style={I.lbl}>Final CTA Heading</label>
+                  <input style={I.inp} value={page.ctaHeading} onChange={e => updPage("ctaHeading", e.target.value)} placeholder="e.g. Ready to get started?" />
+                  <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "4px" }}>The big conversion heading in the bottom CTA section before the footer. Each page can have a different one.</div>
+                </div>
+                <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                  <div><label style={I.lbl}>Contact Email</label><input style={I.inp} value={brand.contactEmail} onChange={e => updBrand("contactEmail", e.target.value)} placeholder="e.g. hello@yourbrand.com" /></div>
+                  <div><label style={I.lbl}>Phone</label><input style={I.inp} value={brand.contactPhone} onChange={e => updBrand("contactPhone", e.target.value)} placeholder="e.g. (555) 000-0000" /></div>
+                </div>
+              </Section>
+
                             <Section id="positioning-draft" title="Draft Starter Copy with AI" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
                   Generates hero copy, about text, and key messaging using everything in this tab. Fill in Goals, Desired Outcome, and Keywords first — the more context you give, the less generic the output.
@@ -6158,20 +6185,6 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   <div><label style={I.lbl}>Body Font</label><select style={I.inp} value={brand.bodyFont} onChange={e => updBrand("bodyFont", e.target.value)}>{FONT_OPTIONS.map(f => <option key={f}>{f}</option>)}</select></div>
                 </div>
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Pair a distinctive display font (heading) with a clean sans-serif (body). All fonts are Google Fonts and load automatically.</p>
-              </Section>
-
-              <Section id="brand-logo" title="Identity & CTAs" icon="">
-                <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                  <div><label style={I.lbl}>Primary CTA</label><input style={I.inp} value={brand.cta1} onChange={e => updBrand("cta1", e.target.value)} placeholder="e.g. Book a call" /></div>
-                  <div><label style={I.lbl}>Secondary CTA</label><input style={I.inp} value={brand.cta2} onChange={e => updBrand("cta2", e.target.value)} placeholder="e.g. View our work" /></div>
-                </div>
-                <div>
-                  <label style={I.lbl}>Final CTA Heading (used in the bottom CTA section before footer)</label>
-                  <input style={I.inp} value={page.ctaHeading} onChange={e => updPage("ctaHeading", e.target.value)} placeholder="e.g. Ready to get started?" />
-                  <div style={{ fontSize: "10px", color: "#09090b", marginTop: "4px" }}>This is the big conversion heading on the homepage's bottom CTA section. Each page can have a different one.</div>
-                </div>
-                <div><label style={I.lbl}>Contact Email</label><input style={I.inp} value={brand.contactEmail} onChange={e => updBrand("contactEmail", e.target.value)} /></div>
-                <div><label style={I.lbl}>Phone</label><input style={I.inp} value={brand.contactPhone} onChange={e => updBrand("contactPhone", e.target.value)} /></div>
               </Section>
 
               </div>
