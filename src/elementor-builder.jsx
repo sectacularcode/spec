@@ -5156,14 +5156,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               value={briefText}
               onChange={e => setBriefText(e.target.value)}
               placeholder="e.g. A modern fitness coaching site for women over 40. Warm but no-nonsense. Earthy palette."
-              style={{ width: "100%", minHeight: "80px", padding: "12px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.6, outline: "none" }}
+              style={{ width: "100%", minHeight: "80px", padding: "12px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.6, outline: "none", boxSizing: "border-box" }}
             />
           </div>
           <div style={{ marginBottom: "12px" }}>
             <select
               value={lockedTemplateId}
               onChange={e => setLockedTemplateId(e.target.value)}
-              style={{ width: "100%", padding: "10px 12px", background: "#ffffff", color: "#09090b", border: lockedTemplateId ? "1px solid #7c3aed" : "1px solid #dde0e6", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", cursor: "pointer", outline: "none" }}>
+              style={{ width: "100%", padding: "10px 12px", background: "#ffffff", color: "#09090b", border: lockedTemplateId ? "1px solid #7c3aed" : "1px solid #dde0e6", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", cursor: "pointer", outline: "none", boxSizing: "border-box" }}>
               <option value="">Already know which template? Pick one (optional)</option>
               {WEBSITE_TEMPLATES.map(t => (
                 <option key={t.id} value={t.id}>{t.name} — {t.industry.split(/[,—]/)[0].trim().slice(0, 40)}</option>
