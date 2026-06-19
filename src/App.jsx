@@ -64,7 +64,7 @@ export default function App() {
   return (
     <div style={{ width: "100%", minHeight: "100vh", fontFamily: "Inter, system-ui, sans-serif", boxSizing: "border-box" }}>
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: "#ffffff", borderBottom: "1px solid #e5e7eb", width: "100%", boxSizing: "border-box" }}>
-        <div style={{ width: "100%", display: "flex", alignItems: "center", padding: "0 24px", boxSizing: "border-box", position: "relative" }}>
+        <div style={{ width: "100%", display: "flex", alignItems: "center", padding: "0 48px", boxSizing: "border-box", position: "relative" }}>
           {/* spec + Beta — left anchor */}
           <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "16px 0", marginRight: "auto" }}>
             <div style={{ fontSize: "28px", fontWeight: 800, letterSpacing: "-0.04em", color: "#09090b", lineHeight: 1 }}>spec</div>
