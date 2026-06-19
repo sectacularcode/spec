@@ -6461,11 +6461,18 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {tab === "content" && (
             <>
               <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%", padding: "24px 24px 40px" }}>
-              {(page.services || page.process || page.testimonials || page.faq || page.portfolio) && (
+              {(!!(page.heroHeading || page.heroSubhead || page.aboutBody || page.services || page.process || page.testimonials || page.faq || page.portfolio || page.stats || page.pricing || page.blog || page.leaders)) && (
                 <div style={{ marginBottom: "16px", padding: "12px 16px", background: "#b45309", border: "none", borderRadius: "8px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
                   <div style={{ fontSize: "13px", color: "#ffffff" }}>This page has demo content from the template. Clear it to start fresh with your client's copy.</div>
                   <button onClick={() => {
-                    const clearFields = { services: "", process: "", testimonials: "", faq: "", portfolio: "", team: "", stats: "", pricing: "", blog: "" };
+                    const clearFields = {
+                      heroHeading: "", heroSubhead: "", heroImage: "",
+                      aboutHeading: "", aboutBody: "",
+                      services: "", portfolio: "", process: "",
+                      leaders: "", stats: "", testimonials: "",
+                      pricing: "", faq: "", blog: "", team: "",
+                      videoUrl: "", ctaHeading: "",
+                    };
                     setProjects(prev => prev.map(proj => {
                       if (proj.id !== activeId) return proj;
                       return { ...proj, pages: proj.pages.map((pg, idx) => idx !== pageIdx ? pg : { ...pg, ...clearFields }) };
