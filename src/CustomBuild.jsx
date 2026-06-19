@@ -2456,7 +2456,7 @@ var T = {
   input: { width: "100%", padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "14px", color: "#09090b", outline: "none", background: "#fff" },
   btnPrimary: { padding: "12px 24px", background: "#000", color: "#fff", border: "none", borderRadius: "6px", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px" },
   btnGhost: { padding: "10px 16px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" },
-  stepNum: function(active, done) { return { width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 700, background: done ? "#000" : active ? "#000" : "#f3f4f6", color: done || active ? "#fff" : "#9ca3af", flexShrink: 0 }; },
+  stepNum: function(active, done) { return { width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 700, background: done ? "#6b635c" : active ? "#6b635c" : "#eeedf1", color: done || active ? "#fff" : "#9ca3af", flexShrink: 0 }; },
 };
 
 // ─── Main Component ───────────────────────────────────────────────────────────
@@ -3394,7 +3394,7 @@ export default function CustomBuild() {
               {generated.pages.map(p => (
                 <button key={p.id}
                   onClick={() => setPreviewPage(p.id)}
-                  style={{ padding: "6px 14px", fontSize: "13px", fontWeight: 500, cursor: "pointer", border: previewPage === p.id ? "1px solid #000" : "1px solid #dde0e6", borderRadius: "20px", background: previewPage === p.id ? "#000" : "#fff", color: previewPage === p.id ? "#fff" : "#09090b" }}>
+                  style={{ padding: "6px 14px", fontSize: "13px", fontWeight: 500, cursor: "pointer", border: previewPage === p.id ? "1px solid #6b635c" : "1px solid #dde0e6", borderRadius: "20px", background: previewPage === p.id ? "#6b635c" : "#fff", color: previewPage === p.id ? "#fff" : "#09090b" }}>
                   {p.label}
                 </button>
               ))}
@@ -3402,7 +3402,7 @@ export default function CustomBuild() {
               {sectionLibrary.length > 0 && (
                 <button
                   onClick={() => { setSwapDrawer(previewPage); setSwapFilter(""); }}
-                  style={{ marginLeft: "8px", padding: "6px 14px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "20px", background: swapDrawer === previewPage ? "#09090b" : "#fff", color: swapDrawer === previewPage ? "#fff" : "#09090b" }}>
+                  style={{ marginLeft: "8px", padding: "6px 14px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "20px", background: swapDrawer === previewPage ? "#6b635c" : "#fff", color: swapDrawer === previewPage ? "#fff" : "#09090b" }}>
                   Swap sections
                 </button>
               )}
@@ -3411,13 +3411,13 @@ export default function CustomBuild() {
                 <button
                   onClick={() => setMobilePreview(false)}
                   title="Desktop preview"
-                  style={{ padding: "6px 12px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: !mobilePreview ? "#09090b" : "#fff", color: !mobilePreview ? "#fff" : "#6b7280", borderRight: "1px solid #dde0e6" }}>
+                  style={{ padding: "6px 12px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: !mobilePreview ? "#6b635c" : "#fff", color: !mobilePreview ? "#fff" : "#6b7280", borderRight: "1px solid #dde0e6" }}>
                   Desktop
                 </button>
                 <button
                   onClick={() => setMobilePreview(true)}
                   title="Mobile preview"
-                  style={{ padding: "6px 12px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: mobilePreview ? "#09090b" : "#fff", color: mobilePreview ? "#fff" : "#6b7280" }}>
+                  style={{ padding: "6px 12px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: mobilePreview ? "#6b635c" : "#fff", color: mobilePreview ? "#fff" : "#6b7280" }}>
                   Mobile
                 </button>
               </div>
@@ -3520,7 +3520,7 @@ export default function CustomBuild() {
               </div>
             )}
 
-            <div style={{ flex: 1, overflow: "auto", background: mobilePreview ? "#f4f4f5" : "#fff", display: "flex", justifyContent: mobilePreview ? "center" : "stretch", alignItems: mobilePreview ? "flex-start" : "stretch", padding: mobilePreview ? "24px 0" : "0" }}>
+            <div style={{ flex: 1, overflow: "auto", background: mobilePreview ? "#eeedf1" : "#fff", display: "flex", justifyContent: mobilePreview ? "center" : "stretch", alignItems: mobilePreview ? "flex-start" : "stretch", padding: mobilePreview ? "24px 0" : "0" }}>
               <iframe
                 srcDoc={buildPreviewHTML(brief, previewPage, layoutVariants[previewPage] || "A")}
                 style={{
