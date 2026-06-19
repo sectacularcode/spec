@@ -5362,6 +5362,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           .responsive-2col, .responsive-4col{grid-template-columns:1fr !important;}
           .tab-bar button{padding:8px 10px !important; font-size:11px !important;}
           .editor-padding{padding:0 12px 40px !important;}
+          .tab-panel-bg{background-image: radial-gradient(circle, #e2e0db 1px, transparent 1px); background-size: 24px 24px;}
         }
         /* Inputs and buttons always full-width on touch */
         @media(max-width:600px){
@@ -5565,7 +5566,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
       <div className="main-grid" style={{ display: "grid", gridTemplateColumns: "1fr", minHeight: "calc(100vh - 60px)" }}>
         {/* LEFT — FORM */}
-        <div style={{ padding: "24px", overflowY: "auto", maxHeight: "calc(100vh - 60px)", background: "#f5f5f4" }}>
+        <div className="tab-panel-bg" style={{ padding: "24px", overflowY: "auto", maxHeight: "calc(100vh - 60px)", background: "#f5f5f4" }}>
           {/* Page tabs */}
           <div style={{ display: "flex", gap: "6px", marginBottom: "16px", flexWrap: "wrap", alignItems: "center", position: "relative" }}>
             {project.pages.map((p, i) => (
@@ -5591,15 +5592,17 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           </div>
 
           {/* Tabs */}
-          <div className="tab-bar" style={{ borderBottom: "1px solid #e7e7e4", marginBottom: "20px", display: "flex", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
-            <TabBtn id="discovery" label="Discovery" />
-            <TabBtn id="positioning" label="Positioning" />
-            <TabBtn id="brand" label="Brand" />
-            <TabBtn id="page" label="Page" />
-            <TabBtn id="content" label="Content" />
-            <TabBtn id="social" label="Social" />
-            <TabBtn id="footer" label="Header & Footer" />
-            <TabBtn id="export" label="Export & Import" />
+          <div style={{ maxWidth: "960px", margin: "0 auto" }}>
+            <div className="tab-bar" style={{ borderBottom: "1px solid #e7e7e4", marginBottom: "20px", display: "flex", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+              <TabBtn id="discovery" label="Discovery" />
+              <TabBtn id="positioning" label="Positioning" />
+              <TabBtn id="brand" label="Brand" />
+              <TabBtn id="page" label="Page" />
+              <TabBtn id="content" label="Content" />
+              <TabBtn id="social" label="Social" />
+              <TabBtn id="footer" label="Header & Footer" />
+              <TabBtn id="export" label="Export & Import" />
+            </div>
           </div>
 
           {/* DISCOVERY TAB */}
