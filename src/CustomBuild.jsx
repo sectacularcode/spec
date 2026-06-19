@@ -2468,7 +2468,7 @@ export default function CustomBuild() {
   const [showIntake, setShowIntake]     = useState(false);
   const [showBriefReview, setShowBriefReview] = useState(false);
   const [parsedBriefDraft, setParsedBriefDraft] = useState(null);
-  const [draftsView, setDraftsView]     = useState(true); // show drafts list on load
+  const [draftsView, setDraftsView]     = useState(false); // start in build mode, not drafts list
   const [drafts, setDrafts]             = useState([]); // saved blueprint drafts
   const [inspoUrls, setInspoUrls]       = useState([""]);
   const [crawlResults, setCrawlResults] = useState({});  // keyed by URL
