@@ -1149,6 +1149,7 @@ const applyWebsiteTemplate = (template, brand, page) => {
 // navigation footer at the bottom of every tab so users feel a guided flow.
 const TAB_ORDER = [
   { id: "discovery", label: "Discovery" },
+  { id: "positioning", label: "Positioning" },
   { id: "brand", label: "Brand" },
   { id: "page", label: "Page" },
   { id: "content", label: "Content" },
@@ -3098,7 +3099,7 @@ function auditBrand(brand, pages) {
 
   const keywords = (brand.primaryKeywords || "").split(",").map(k => k.trim().toLowerCase()).filter(Boolean);
   if (!keywords.length) {
-    add("seo", "No primary keywords set", "Add 3–5 in the Brand Brief — these power SEO and AI search audits.", { tab: "brand", section: "brand-brief" });
+    add("seo", "No primary keywords set", "Add 3–5 in the Brand Brief — these power SEO and AI search audits.", { tab: "positioning", section: "positioning-goals" });
   } else {
     const heroBlob = (pages[0]?.heroHeading + " " + pages[0]?.heroSubhead + " " + (brand.tagline || "")).toLowerCase();
     const aboutBlob = ((pages[0]?.aboutBody || "") + " " + (brand.description || "")).toLowerCase();
@@ -3112,8 +3113,8 @@ function auditBrand(brand, pages) {
 
   // ─── AIO — AI search optimization
   const activeGoals = brand.goals && brand.goals.length ? brand.goals : (brand.goal ? [brand.goal] : []);
-  if (!activeGoals.length) add("aio", "No primary goal set", "Set at least one goal in Brand Brief — AI search relies on clear intent signals.", { tab: "brand", section: "brand-brief" });
-  if (!brand.outcome) add("aio", "No desired outcome specified", "Add an outcome sentence in Brand Brief — helps LLMs understand what your page is for.", { tab: "brand", section: "brand-brief" });
+  if (!activeGoals.length) add("aio", "No primary goal set", "Set at least one goal in Brand Brief — AI search relies on clear intent signals.", { tab: "positioning", section: "positioning-goals" });
+  if (!brand.outcome) add("aio", "No desired outcome specified", "Add an outcome sentence in Brand Brief — helps LLMs understand what your page is for.", { tab: "positioning", section: "positioning-goals" });
 
   const aboutWords = (pages[0]?.aboutBody || "").split(/\s+/).filter(Boolean).length;
   if (aboutWords > 0 && aboutWords < 60) add("aio", "About copy is too thin to be cited by AI search", "Aim for 80–150 words with specific facts — LLMs cite specific, factual passages.", { tab: "page", section: "page-about" });
@@ -5578,6 +5579,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* Tabs */}
           <div className="tab-bar" style={{ borderBottom: "1px solid #e7e7e4", marginBottom: "20px", display: "flex", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
             <TabBtn id="discovery" label="Discovery" />
+            <TabBtn id="positioning" label="Positioning" />
             <TabBtn id="brand" label="Brand" />
             <TabBtn id="page" label="Page" />
             <TabBtn id="content" label="Content" />
@@ -5630,49 +5632,6 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 </div>
               </Section>
 
-              <Section id="inspo-keywords" title="Keywords for Search & AI Discovery" icon="">
-                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
-                  Terms you want this site to rank for in Google AND get cited in AI search (ChatGPT, Perplexity, Gemini, and similar). These are also fed to the AI Draft Starter Copy so copy gets written around them naturally.
-                </p>
-                {(() => {
-                  const activeTpl = brand.templateId ? WEBSITE_TEMPLATES.find(t => t.id === brand.templateId) : null;
-                  if (!activeTpl) return null;
-                  const tplKeywords = (activeTpl.industry || "").split(/[,—]/).map(s => s.trim()).filter(Boolean).slice(0, 5);
-                  if (!tplKeywords.length) return null;
-                  const currentList = (brand.primaryKeywords || "").split(",").map(s => s.trim()).filter(Boolean);
-                  const missing = tplKeywords.filter(k => !currentList.some(c => c.toLowerCase() === k.toLowerCase()));
-                  if (!missing.length) return null;
-                  return (
-                    <div style={{ padding: "12px 14px", background: "#f5f5f4", border: "1px solid #e5e7eb", borderRadius: "6px" }}>
-                      <div style={{ fontSize: "12px", color: "#09090b", fontWeight: 700, marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Suggested from your {activeTpl.name} template</div>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-                        {missing.map(k => (
-                          <button key={k} onClick={() => {
-                            const next = currentList.concat(k).join(", ");
-                            updBrand("primaryKeywords", next);
-                          }} style={{ padding: "5px 10px", background: "#eeeeec", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "4px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>
-                            + {k}
-                          </button>
-                        ))}
-                      </div>
-                      <div style={{ fontSize: "10px", color: "#09090b", marginTop: "8px" }}>Click a chip to add it to your keywords below.</div>
-                    </div>
-                  );
-                })()}
-                <div>
-                  <label style={I.lbl}>Primary Keywords (comma-separated)</label>
-                  <textarea
-                    style={{ ...I.inp, resize: "vertical" }}
-                    rows={3}
-                    value={brand.primaryKeywords || ""}
-                    onChange={e => updBrand("primaryKeywords", e.target.value)}
-                    placeholder="freelance videographer, video production, cinematic video, music video, brand film"
-                  />
-                  <div style={{ fontSize: "10px", color: "#09090b", marginTop: "5px" }}>3–5 keywords ideal. Same field as Discovery → Brand Brief — edits sync.</div>
-                </div>
-              </Section>
-
-                            
               <Section id="founder" title="Founder" icon="">
                 <div><label style={I.lbl}>Founder Name</label><input style={I.inp} value={brand.founderName} onChange={e => updBrand("founderName", e.target.value)} placeholder="e.g. Alex Morgan" /></div>
                 <div><label style={I.lbl}>Founder Title</label><input style={I.inp} value={brand.founderTitle} onChange={e => updBrand("founderTitle", e.target.value)} placeholder="e.g. Founder & Creative Director" /></div>
@@ -5701,13 +5660,32 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div><label style={I.lbl}>Key Messages</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.keyMessages} onChange={e => updBrand("keyMessages", e.target.value)} placeholder="2–4 sentences. What you want every visitor to walk away knowing." /></div>
                 <div><label style={I.lbl}>Marquee Text (used by Marquee section)</label><input style={I.inp} value={brand.marqueeText || ""} onChange={e => updBrand("marqueeText", e.target.value)} placeholder="A short rotating message — e.g. 'We put story first'" /></div>
                 <div><label style={I.lbl}>Promo Banner Text (used by Promo Banner section)</label><input style={I.inp} value={brand.promoBanner || ""} onChange={e => updBrand("promoBanner", e.target.value)} placeholder="e.g. FREE SHIPPING ON ORDERS OVER $75  ·  EASY 30-DAY RETURNS" /></div>
+              </Section>
+
+            </div>
+          )}
+
+          {/* POSITIONING TAB */}
+          {tab === "positioning" && (
+            <div className="editor-padding" style={{ padding: "0 20px 40px", maxWidth: "1200px" }}>
+
+              <Section id="positioning-intro" title="Strategy & Positioning" icon="">
+                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
+                  Define the strategic foundation. This drives the audit's SEO and AI-search recommendations, powers Draft Starter Copy, and informs how copy gets written across every page.
+                </p>
+              </Section>
+
+              <Section id="positioning-tone" title="Tone & Voice" icon="">
                 <div><label style={I.lbl}>Tone</label><select style={I.inp} value={brand.tone} onChange={e => updBrand("tone", e.target.value)}>{TONES.map(t => <option key={t}>{t}</option>)}</select></div>
               </Section>
 
-              <Section id="brand-brief" title="Brand Brief — Goals & SEO" icon="">
-                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
-                  This drives the audit's SEO and AI-search recommendations, and powers the "Draft Starter Copy" button below. The more specific you are, the better the audit and the AI copy.
-                </p>
+              <Section id="positioning-audience" title="Target Audience" icon="">
+                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Who you're talking to. Be specific about role, company size, industry, or life stage.</p>
+                <div><label style={I.lbl}>Target Audience</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.targetAudience} onChange={e => updBrand("targetAudience", e.target.value)} placeholder="Who you're talking to. Be specific about role, company size, or life stage." /></div>
+                <div><label style={I.lbl}>Key Messages</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.keyMessages} onChange={e => updBrand("keyMessages", e.target.value)} placeholder="2–4 sentences. What you want every visitor to walk away knowing." /></div>
+              </Section>
+
+              <Section id="positioning-goals" title="Goals & Desired Outcome" icon="">
                 <div>
                   <label style={I.lbl}>Primary Goals — select all that apply</label>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "6px" }}>
@@ -5716,55 +5694,68 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                       const isSelected = currentGoals.includes(g);
                       return (
                         <label key={g} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 12px", background: isSelected ? "#eeeeec" : "#f5f5f4", border: `1px solid ${isSelected ? "#000000" : "#e7e7e4"}`, borderRadius: "6px", cursor: "pointer", fontSize: "13px", color: isSelected ? "#09090b" : "#09090b", userSelect: "none" }}>
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={e => {
-                              const next = e.target.checked ? [...currentGoals, g] : currentGoals.filter(x => x !== g);
-                              updBrand("goals", next);
-                              // Keep singular `goal` synced for backward compat (audit + AI prompt)
-                              updBrand("goal", next[0] || "");
-                            }}
-                            style={{ cursor: "pointer", accentColor: "#000000" }}
-                          />
+                          <input type="checkbox" checked={isSelected} onChange={e => { const next = e.target.checked ? [...currentGoals, g] : currentGoals.filter(x => x !== g); updBrand("goals", next); updBrand("goal", next[0] || ""); }} style={{ cursor: "pointer", accentColor: "#000000" }} />
                           {g}
                         </label>
                       );
                     })}
                   </div>
-                  <div style={{ fontSize: "10px", color: "#09090b", marginTop: "8px" }}>
-                    Pick everything the site should do. An e-commerce site is often Sales + Newsletter Growth. A coaching site is often Bookings + Lead Generation. A SaaS product is often Free Trial + Account Creation. A consultant is often Lead Generation + Resource Downloads.
-                  </div>
+                  <div style={{ fontSize: "10px", color: "#09090b", marginTop: "8px" }}>Pick everything the site should do. An e-commerce site is often Sales + Newsletter Growth. A coaching site is often Bookings + Lead Generation.</div>
                 </div>
                 <div>
                   <label style={I.lbl}>Desired Outcome (one sentence)</label>
                   <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.outcome || ""} onChange={e => updBrand("outcome", e.target.value)} placeholder="Example: Book 4-6 qualified strategy calls per month from B2B SaaS founders." />
                 </div>
+              </Section>
+
+              <Section id="positioning-keywords" title="Keywords for Search & AI Discovery" icon="">
+                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
+                  Terms you want this site to rank for in Google AND get cited in AI search (ChatGPT, Perplexity, Gemini). These are fed to Draft Starter Copy so copy gets written around them naturally.
+                </p>
+                {(() => {
+                  const activeTpl = brand.templateId ? WEBSITE_TEMPLATES.find(t => t.id === brand.templateId) : null;
+                  if (!activeTpl) return null;
+                  const tplKeywords = (activeTpl.industry || "").split(/[,—]/).map(s => s.trim()).filter(Boolean).slice(0, 5);
+                  if (!tplKeywords.length) return null;
+                  const currentList = (brand.primaryKeywords || "").split(",").map(s => s.trim()).filter(Boolean);
+                  const missing = tplKeywords.filter(k => !currentList.some(c => c.toLowerCase() === k.toLowerCase()));
+                  if (!missing.length) return null;
+                  return (
+                    <div style={{ padding: "12px 14px", background: "#f5f5f4", border: "1px solid #e5e7eb", borderRadius: "6px" }}>
+                      <div style={{ fontSize: "12px", color: "#09090b", fontWeight: 700, marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Suggested from your {activeTpl.name} template</div>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                        {missing.map(k => (<button key={k} onClick={() => { const next = currentList.concat(k).join(", "); updBrand("primaryKeywords", next); }} style={{ padding: "5px 10px", background: "#eeeeec", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "4px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>+ {k}</button>))}
+                      </div>
+                      <div style={{ fontSize: "10px", color: "#09090b", marginTop: "8px" }}>Click a chip to add it to your keywords below.</div>
+                    </div>
+                  );
+                })()}
                 <div>
                   <label style={I.lbl}>Primary Keywords (comma-separated)</label>
-                  <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.primaryKeywords || ""} onChange={e => updBrand("primaryKeywords", e.target.value)} placeholder="Example: executive coaching, business strategy, founder mentorship, scale without burnout" />
-                  <div style={{ fontSize: "12px", color: "#09090b", marginTop: "6px", lineHeight: 1.5 }}>
-                    The terms you want this page to rank for in Google AND get cited in AI search (ChatGPT, Perplexity, Gemini, and similar). Most pages should target 3–5 keywords.
-                  </div>
+                  <textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.primaryKeywords || ""} onChange={e => updBrand("primaryKeywords", e.target.value)} placeholder="freelance videographer, video production, cinematic video, music video, brand film" />
+                  <div style={{ fontSize: "10px", color: "#09090b", marginTop: "5px" }}>3–5 keywords ideal.</div>
                 </div>
+              </Section>
+
+              <Section id="positioning-seo" title="Page SEO — Meta Titles & Descriptions" icon="">
+                <p style={{ fontSize: "12px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.5 }}>These don't get embedded in the template — copy them into your SEO plugin (Yoast, Rank Math) after importing. Currently showing: <strong>{page.name}</strong></p>
+                <div><label style={I.lbl}>Meta Title</label><input style={I.inp} value={page.metaTitle || ""} onChange={e => updPage("metaTitle", e.target.value)} placeholder={`${brand.name} — ${page.name}`} /></div>
+                <div><label style={I.lbl}>Meta Description</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={page.metaDesc || ""} onChange={e => updPage("metaDesc", e.target.value)} placeholder="150-160 character description of this page for search engines." /></div>
+              </Section>
+
+              <Section id="positioning-draft" title="Draft Starter Copy with AI" icon="">
+                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
+                  Generates hero copy, about text, and key messaging using your positioning inputs above. Fill in Goals, Desired Outcome, and Keywords first for best results.
+                </p>
                 <button
                   onClick={() => generateStarterCopy()}
                   disabled={aiLoading || !brand.goal || !brand.outcome}
-                  style={{
-                    marginTop: "8px", padding: "14px 18px",
-                    background: "#000000",
-                    color: "#ffffff", border: "none", borderRadius: "8px",
-                    fontSize: "14px", fontWeight: 500, cursor: (aiLoading || !((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) ? "not-allowed" : "pointer",
-                    opacity: (aiLoading || !((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) ? 0.4 : 1,
-                    display: "inline-flex", alignItems: "center", gap: "8px",
-                  }}>
+                  style={{ marginTop: "8px", padding: "14px 18px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: (aiLoading || !((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) ? "not-allowed" : "pointer", opacity: (aiLoading || !((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) ? 0.4 : 1, display: "inline-flex", alignItems: "center", gap: "8px" }}>
                   <Icon name="sparkles" size={15} color="#ffffff" />
                   {aiLoading ? "Drafting starter copy…" : "Draft Starter Copy with AI"}
                 </button>
                 {(!((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) && (
-                  <div style={{ fontSize: "12px", color: "#09090b", marginTop: "-4px" }}>
-                    Pick at least one Goal and add a Desired Outcome to enable AI copy drafting.
-                  </div>
+                  <div style={{ fontSize: "12px", color: "#09090b", marginTop: "8px" }}>Pick at least one Goal and add a Desired Outcome to enable AI copy drafting.</div>
                 )}
                 {briefDirty && ((brand.goals && brand.goals.length) || brand.goal) && brand.outcome && (
                   <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#b45309", fontWeight: 500, marginTop: "4px" }}>
@@ -6263,11 +6254,6 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* CONTENT TAB */}
           {tab === "content" && (
             <>
-              <Section id="content-seo" title="SEO" icon="">
-                <p style={{ fontSize: "12px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.5 }}>These don't get embedded in the template — copy them into your SEO plugin (Yoast, Rank Math) after importing.</p>
-                <div><label style={I.lbl}>Meta Title</label><input style={I.inp} value={page.metaTitle || ""} onChange={e => updPage("metaTitle", e.target.value)} placeholder={`${brand.name} — ${page.name}`} /></div>
-                <div><label style={I.lbl}>Meta Description</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={page.metaDesc || ""} onChange={e => updPage("metaDesc", e.target.value)} placeholder="150-160 character description of this page for search engines." /></div>
-              </Section>
               <Section id="page-hero" title="Hero" icon="">
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.5, fontStyle: "italic" }}>Shows at the very top of the page — the first thing visitors see when they arrive.</p>
                 <div><label style={I.lbl}>Hero Heading</label><input style={I.inp} value={page.heroHeading} onChange={e => updPage("heroHeading", e.target.value)} /></div>
@@ -6513,6 +6499,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
     </div>
   );
 }
+
 
 
 
