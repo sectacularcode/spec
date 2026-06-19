@@ -3703,7 +3703,7 @@ function previewHTML(page, brand) {
     <style>
       *{box-sizing:border-box;margin:0;padding:0}
       body{background:${pc};color:${ts};font-family:'${bf}',sans-serif;}
-      @media(max-width:768px){.footer-grid{grid-template-columns:1fr !important;}.about-grid{grid-template-columns:1fr !important;gap:40px !important;}}
+      @media(max-width:768px){.footer-grid{grid-template-columns:1fr !important;}.about-grid{grid-template-columns:1fr !important;gap:40px !important;}.nav-links{display:none !important;}}
       /* Inline editing affordances */
       [data-edit]{position:relative;cursor:text;transition:outline 0.15s, background 0.15s;outline:1px dashed transparent;outline-offset:6px;border-radius:2px;}
       [data-edit]:hover{outline:1px dashed rgba(124,58,237,0.6);background:rgba(124,58,237,0.04);}
@@ -3715,7 +3715,7 @@ function previewHTML(page, brand) {
     </head><body>
     <nav style="position:sticky;top:0;background:${pc}f5;backdrop-filter:blur(10px);padding:20px clamp(24px,8vw,100px);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid ${bdr};z-index:100;">
       <a href="#" style="text-decoration:none;display:inline-flex;align-items:center;">${logoHTML(18, "left")}</a>
-      <div style="display:flex;align-items:center;">${navLinks}${navSocial}</div>
+      <div class="nav-links" style="display:flex;align-items:center;">${navLinks}${navSocial}</div>
     </nav>
     ${page.sections.map(section).join("")}
     ${footer}
