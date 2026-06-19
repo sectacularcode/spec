@@ -6691,7 +6691,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   ))}
                 </div>
                 {(() => {
-                  const pc = brand.cardBgColor || "#1a1a1a";
+                  const pc = brand.primaryColor || "#ffffff";
                   const ac = brand.accentColor || "#c9a86a";
                   const bf = brand.bodyFont || "Inter";
                   const hf = brand.headingFont || "Inter";
