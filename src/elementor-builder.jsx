@@ -5391,7 +5391,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
           {/* Left: All Projects + project info */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <button onClick={() => setView("projects")} style={{ padding: "7px 12px", background: "#ffffff", color: "#6b635c", border: "1px solid #6b635c", borderRadius: "4px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", cursor: "pointer" }}>
+            <button onClick={() => setView("projects")} style={{ padding: "7px 12px", background: "#ffffff", color: "#09090b", border: "1px solid #09090b", borderRadius: "4px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", cursor: "pointer" }}>
               <Icon name="arrowLeft" size={13} color="#09090b" /> All Projects
             </button>
             <div>
