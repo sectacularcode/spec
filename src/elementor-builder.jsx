@@ -6381,7 +6381,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               <Section id="social-links" title="Social Media Links" icon="">
                 {brand.socialLinks.map((s, i) => (
                   <div key={i} className="responsive-4col" style={{ display: "grid", gridTemplateColumns: "140px 1fr 1fr 30px", gap: "8px", alignItems: "end" }}>
-                    <select style={{ ...I.inp, textOverflow: "ellipsis", overflow: "hidden" }} value={s.key} onChange={e => updSocial(i, "key", e.target.value)}>
+                    <select style={{ width: "100%", padding: "11px 32px 11px 13px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", color: "#09090b", outline: "none", boxSizing: "border-box", appearance: "auto", WebkitAppearance: "auto" }} value={s.key} onChange={e => updSocial(i, "key", e.target.value)}>
                       {Object.keys(SVG).map(k => <option key={k}>{k}</option>)}
                     </select>
                     <input style={I.inp} value={s.label} onChange={e => updSocial(i, "label", e.target.value)} placeholder="Label" />
