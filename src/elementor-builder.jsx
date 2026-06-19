@@ -1163,8 +1163,8 @@ const TAB_ORDER = [
   { id: "positioning", label: "Positioning" },
   { id: "brand", label: "Brand" },
   { id: "content", label: "Content" },
-  { id: "page", label: "Page" },
   { id: "social", label: "Social" },
+  { id: "page", label: "Page" },
   { id: "footer", label: "Header & Footer" },
   { id: "export", label: "Export & Import" },
 ];
@@ -5588,8 +5588,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <TabBtn id="positioning" label="Positioning" />
                 <TabBtn id="brand" label="Brand" />
                 <TabBtn id="content" label="Content" />
-                <TabBtn id="page" label="Page" />
                 <TabBtn id="social" label="Social" />
+                <TabBtn id="page" label="Page" />
                 <TabBtn id="footer" label="Header & Footer" />
                 <TabBtn id="export" label="Export & Import" />
               </div>
@@ -6380,8 +6380,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%", padding: "24px 24px 40px" }}>
               <Section id="social-links" title="Social Media Links" icon="">
                 {brand.socialLinks.map((s, i) => (
-                  <div key={i} className="responsive-4col" style={{ display: "grid", gridTemplateColumns: "100px 1fr 1fr 30px", gap: "8px", alignItems: "end" }}>
-                    <select style={I.inp} value={s.key} onChange={e => updSocial(i, "key", e.target.value)}>
+                  <div key={i} className="responsive-4col" style={{ display: "grid", gridTemplateColumns: "140px 1fr 1fr 30px", gap: "8px", alignItems: "end" }}>
+                    <select style={{ ...I.inp, textOverflow: "ellipsis", overflow: "hidden" }} value={s.key} onChange={e => updSocial(i, "key", e.target.value)}>
                       {Object.keys(SVG).map(k => <option key={k}>{k}</option>)}
                     </select>
                     <input style={I.inp} value={s.label} onChange={e => updSocial(i, "label", e.target.value)} placeholder="Label" />
