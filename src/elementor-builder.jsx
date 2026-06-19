@@ -6351,6 +6351,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* FOOTER TAB */}
           {tab === "footer" && (
             <>
+              <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "24px 24px 40px" }}>
               <Section id="footer-header" title="Header Style" icon="">
                 <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "10px" }}>
                   {HEADER_STYLES.map(f => (
@@ -6383,6 +6384,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 </div>
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Download separately and import once in Elementor → Theme Builder → Footer. Set to display on all pages.</p>
               </Section>
+              </div>
             </>
           )}
 
