@@ -432,7 +432,7 @@ function IntakeForm({ onClose, onComplete }) {
             <label style={S.label}>Always included (in every package)</label>
             <textarea rows={3} style={S.textarea} value={form.alwaysIncluded} onChange={e => set("alwaysIncluded", e.target.value)} placeholder="A set number of revision rounds, agreed up front. Professional lighting and audio, color grading, and a licensed music track." />
           </div>
-          <div style={{ padding: "12px 14px", background: "#f4f4f5", borderRadius: "6px", fontSize: "12px", color: "#6b7280", lineHeight: 1.6 }}>
+          <div style={{ padding: "12px 14px", background: "#ffffff", borderRadius: "6px", fontSize: "12px", color: "#6b7280", lineHeight: 1.6 }}>
             Full service menu (Customer Story, Case Study Film, Founder Story, etc.) is pre-built in Spec from the Mile Marker brief. Add custom line items by editing the brief after generation.
           </div>
         </div>
@@ -2451,7 +2451,7 @@ function buildPreviewHTML(brief, activePage, variant) {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 var T = {
-  surface: { background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "10px", padding: "20px", boxSizing: "border-box" },
+  surface: { background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "10px", padding: "20px", boxSizing: "border-box", overflow: "hidden" },
   label: { fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "8px", display: "block" },
   input: { width: "100%", padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "14px", color: "#09090b", outline: "none", background: "#fff" },
   btnPrimary: { padding: "12px 24px", background: "#000", color: "#fff", border: "none", borderRadius: "6px", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px" },
@@ -3048,7 +3048,7 @@ export default function CustomBuild() {
                       </div>
                       <div style={{ display: "flex", gap: "4px", marginBottom: "14px", flexWrap: "wrap" }}>
                         {draft.pages.slice(0, 4).map(p => (
-                          <span key={p} style={{ fontSize: "11px", padding: "2px 8px", background: "#f4f4f5", borderRadius: "3px", color: "#6b7280" }}>{p}</span>
+                          <span key={p} style={{ fontSize: "11px", padding: "2px 8px", background: "#ffffff", borderRadius: "3px", color: "#6b7280" }}>{p}</span>
                         ))}
                         {draft.pages.length > 4 && <span style={{ fontSize: "11px", color: "#9ca3af" }}>+{draft.pages.length - 4}</span>}
                       </div>
@@ -3136,7 +3136,7 @@ export default function CustomBuild() {
                     style={{ width: "100%", padding: "12px", fontSize: "13px", fontWeight: 600, background: "#fff", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", color: "#09090b" }}>
                     Fill out intake form
                   </button>
-                  {parsing && <div style={{ marginTop: "12px", padding: "12px", background: "#f4f4f5", borderRadius: "6px", fontSize: "13px", color: "#09090b" }}>Reading brief — this takes a few seconds...</div>}
+                  {parsing && <div style={{ marginTop: "12px", padding: "12px", background: "#ffffff", borderRadius: "6px", fontSize: "13px", color: "#09090b" }}>Reading brief — this takes a few seconds...</div>}
                   {briefError && <div style={{ fontSize: "12px", color: "#dc2626", marginTop: "8px" }}>{briefError}</div>}
                 </>
               ) : (
@@ -3173,7 +3173,7 @@ export default function CustomBuild() {
               <span style={{ fontSize: "12px", color: "#6b7280", marginLeft: "auto" }}>Optional</span>
             </div>
             {Object.keys(storedPatterns).length > 0 && (
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", background: "#f4f4f5", borderRadius: "6px", marginBottom: "10px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "6px", marginBottom: "10px" }}>
                 <span style={{ fontSize: "12px", color: "#09090b" }}>
                   {Object.keys(storedPatterns).filter(k => k !== "site").length} page pattern{Object.keys(storedPatterns).filter(k => k !== "site").length !== 1 ? "s" : ""} learned from previous sessions
                 </span>
@@ -3206,18 +3206,18 @@ export default function CustomBuild() {
                   </div>
                   {/* Crawl status */}
                   {crawling[url.trim()] && (
-                    <div style={{ fontSize: "12px", color: "#6b7280", padding: "8px 12px", background: "#f4f4f5", borderRadius: "4px" }}>
+                    <div style={{ fontSize: "12px", color: "#6b7280", padding: "8px 12px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "6px" }}>
                       Scanning site pages...
                     </div>
                   )}
                   {crawlResults[url.trim()] && !crawlResults[url.trim()].error && (
-                    <div style={{ fontSize: "12px", background: "#f4f4f5", borderRadius: "4px", padding: "10px 12px" }}>
+                    <div style={{ fontSize: "12px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "6px", padding: "10px 12px" }}>
                       <div style={{ fontWeight: 600, color: "#09090b", marginBottom: "6px" }}>
                         {crawlResults[url.trim()].pageCount} page{crawlResults[url.trim()].pageCount !== 1 ? "s" : ""} found
                       </div>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
                         {(crawlResults[url.trim()].pages || []).map((p, pi) => (
-                          <span key={pi} style={{ fontSize: "11px", padding: "3px 8px", background: "#e4e4e7", borderRadius: "3px", color: "#09090b" }}>
+                          <span key={pi} style={{ fontSize: "11px", padding: "3px 8px", background: "#eeedf1", borderRadius: "3px", color: "#09090b" }}>
                             {p.pageType !== "other" ? p.pageType : p.path}
                           </span>
                         ))}
@@ -3333,7 +3333,7 @@ export default function CustomBuild() {
             <div style={{ marginTop: "24px", ...T.surface }}>
               {/* AI Drafted fields approval */}
               {draftedFields && Object.keys(draftedFields).length > 0 && (
-                <div style={{ marginBottom: "20px", padding: "16px", background: "#f4f4f5", borderRadius: "8px" }}>
+                <div style={{ marginBottom: "20px", padding: "16px", background: "#ffffff", borderRadius: "8px" }}>
                   <div style={{ fontSize: "12px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>
                     {Object.keys(draftedFields).length} field{Object.keys(draftedFields).length !== 1 ? "s" : ""} drafted in brand voice
                   </div>
@@ -3505,7 +3505,7 @@ export default function CustomBuild() {
                           <div style={{ fontSize: "11px", color: "#6b7280" }}>Section {s.sectionIndex + 1} · {s.date}</div>
                           <div style={{ display: "flex", gap: "4px", marginTop: "6px", flexWrap: "wrap" }}>
                             {(s.tags || []).slice(0, 3).map(t => (
-                              <span key={t} style={{ fontSize: "10px", padding: "2px 6px", background: "#f4f4f5", borderRadius: "3px", color: "#6b7280" }}>{t}</span>
+                              <span key={t} style={{ fontSize: "10px", padding: "2px 6px", background: "#ffffff", borderRadius: "3px", color: "#6b7280" }}>{t}</span>
                             ))}
                           </div>
                         </div>
