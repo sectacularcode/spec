@@ -68,7 +68,7 @@ function IntakeForm({ onClose, onComplete }) {
     primaryFont: "", accentFont: "", typographyNotes: "",
     buttonsLinks: "", componentMotif: "", layoutImagery: "",
     // Sitemap
-    pages: "Home · The hook, the difference, the niche, a taste of the work and the pricing.\nWork · The portfolio.\nServices & Pricing · Open pricing, the three tiers, and the full menu.\nAbout · The maker.\nProcess · How it gets made, start to finish.\nContact · A short form and a promise of a real reply.",
+    pages: ["Home", "Work / Portfolio", "Services & Pricing", "About", "Process", "Contact"],
     headerDescription: "", footerDescription: "",
     headerNav: "Work, Services, About, Process, Contact",
     headerCta: "Start a project",
@@ -304,9 +304,33 @@ function IntakeForm({ onClose, onComplete }) {
         <div style={S.section}>
           <div style={S.sectionTitle}>03 · Sitemap and Global Elements</div>
           <div style={S.field}>
-            <label style={S.label}>Pages</label>
-            <div style={S.hint}>Which pages get built, and the one-line purpose of each. One per line.</div>
-            <textarea rows={6} style={S.textarea} value={form.pages} onChange={e => set("pages", e.target.value)} />
+            <label style={S.label}>Pages to build</label>
+            <div style={S.hint}>Check every page this site needs. The build will only generate what is selected.</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "10px" }}>
+              {ALL_PAGES.concat(ADDITIONAL_PAGE_TYPES).map(p => {
+                const currentPages = Array.isArray(form.pages)
+                  ? form.pages
+                  : (form.pages || "").split("\n").map(l => l.split("·")[0].trim()).filter(Boolean);
+                const checked = currentPages.includes(p.label) || currentPages.includes(p.id);
+                return (
+                  <label key={p.id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 12px", background: checked ? "#f0eff3" : "#ffffff", border: `1px solid ${checked ? "#000000" : "#dde0e6"}`, borderRadius: "6px", cursor: "pointer", fontSize: "13px", color: "#09090b", userSelect: "none" }}>
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={e => {
+                        const next = e.target.checked
+                          ? [...currentPages.filter(x => x !== p.label && x !== p.id), p.label]
+                          : currentPages.filter(x => x !== p.label && x !== p.id);
+                        set("pages", next);
+                      }}
+                      style={{ cursor: "pointer", accentColor: "#6b635c", width: "14px", height: "14px", flexShrink: 0 }}
+                    />
+                    <span style={{ fontWeight: checked ? 600 : 400 }}>{p.label}</span>
+                    <span style={{ fontSize: "11px", color: "#6b7280", marginLeft: "auto" }}>{p.slug}</span>
+                  </label>
+                );
+              })}
+            </div>
           </div>
           <div style={S.field}>
             <label style={S.label}>Header nav links <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>(comma-separated)</span></label>
