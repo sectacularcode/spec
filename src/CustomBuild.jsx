@@ -198,7 +198,7 @@ function IntakeForm({ onClose, onComplete }) {
     label: { display: "block", fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "4px" },
     hint: { fontSize: "11px", color: "#9ca3af", marginBottom: "6px", lineHeight: 1.5 },
     input: { width: "100%", maxWidth: "100%", padding: "9px 12px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "13px", color: "#09090b", outline: "none", background: "#fff", boxSizing: "border-box" },
-    textarea: { width: "100%", maxWidth: "100%", padding: "9px 12px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "13px", color: "#09090b", outline: "none", background: "#fff", boxSizing: "border-box", resize: "vertical", fontFamily: "Inter, system-ui, sans-serif", lineHeight: 1.6 },
+    textarea: { width: "100%", maxWidth: "100%", padding: "9px 12px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "13px", color: "#09090b", outline: "none", background: "#fff", boxSizing: "border-box", resize: "vertical", fontFamily: "'Be Vietnam Pro', sans-serif", lineHeight: 1.6 },
     field: { marginBottom: "18px" },
     section: { marginBottom: "28px" },
     sectionTitle: { fontSize: "13px", fontWeight: 700, color: "#09090b", marginBottom: "14px", paddingBottom: "8px", borderBottom: "1px solid #dde0e6" },
@@ -562,7 +562,7 @@ function BriefReview({ parsed, onConfirm, onClose }) {
   const S = {
     label: { display: "block", fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "4px" },
     input: { width: "100%", padding: "8px 10px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", outline: "none", background: "#fff", boxSizing: "border-box" },
-    textarea: { width: "100%", padding: "8px 10px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", outline: "none", background: "#fff", boxSizing: "border-box", resize: "vertical", fontFamily: "Inter, system-ui, sans-serif", lineHeight: 1.5 },
+    textarea: { width: "100%", padding: "8px 10px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", outline: "none", background: "#fff", boxSizing: "border-box", resize: "vertical", fontFamily: "'Be Vietnam Pro', sans-serif", lineHeight: 1.5 },
     field: { marginBottom: "14px" },
     section: { marginBottom: "24px", paddingBottom: "20px", borderBottom: "1px solid #f4f4f5" },
     sectionTitle: { fontSize: "12px", fontWeight: 700, color: "#09090b", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "12px" },
@@ -2969,7 +2969,7 @@ export default function CustomBuild() {
   ];
 
   return (
-    <div style={{ minHeight: "100vh", width: "100%", background: "#eeedf1", fontFamily: "Inter, system-ui, sans-serif", boxSizing: "border-box" }}>
+    <div style={{ minHeight: "100vh", width: "100%", background: "#eeedf1", fontFamily: "'Be Vietnam Pro', sans-serif", boxSizing: "border-box" }}>
       {showBriefReview && parsedBriefDraft && (
         <BriefReview
           parsed={parsedBriefDraft}
@@ -3344,7 +3344,7 @@ export default function CustomBuild() {
                           value={value}
                           onChange={e => setDraftedFields(prev => ({ ...prev, [key]: e.target.value }))}
                           rows={2}
-                          style={{ width: "100%", padding: "8px 10px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", resize: "vertical", fontFamily: "Inter, system-ui, sans-serif", boxSizing: "border-box" }}
+                          style={{ width: "100%", padding: "8px 10px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", resize: "vertical", fontFamily: "'Be Vietnam Pro', sans-serif", boxSizing: "border-box" }}
                         />
                       </div>
                     ))}
