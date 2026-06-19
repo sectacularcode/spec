@@ -6001,13 +6001,15 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
                   Generates hero copy, about text, and key messaging using everything in this tab. Fill in Goals, Desired Outcome, and Keywords first — the more context you give, the less generic the output.
                 </p>
+                <div style={{ display: "flex", justifyContent: "center", marginTop: "8px" }}>
                 <button
                   onClick={() => generateStarterCopy()}
                   disabled={aiLoading || !brand.goal || !brand.outcome}
-                  style={{ marginTop: "8px", padding: "12px 20px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: (aiLoading || !((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) ? "not-allowed" : "pointer", opacity: (aiLoading || !((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) ? 0.4 : 1, display: "inline-flex", alignItems: "center", gap: "8px", whiteSpace: "nowrap" }}>
+                  style={{ padding: "12px 32px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: (aiLoading || !((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) ? "not-allowed" : "pointer", opacity: (aiLoading || !((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) ? 0.4 : 1, display: "inline-flex", alignItems: "center", gap: "8px", whiteSpace: "nowrap" }}>
                   <Icon name="sparkles" size={15} color="#ffffff" />
                   {aiLoading ? "Drafting starter copy…" : "Draft Starter Copy with AI"}
                 </button>
+                </div>
                 {(!((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) && (
                   <div style={{ fontSize: "12px", color: "#09090b", marginTop: "8px" }}>Pick at least one Goal and add a Desired Outcome to enable AI copy drafting.</div>
                 )}
