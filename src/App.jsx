@@ -68,7 +68,7 @@ export default function App() {
           {/* spec + Beta — left anchor */}
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginRight: "auto", marginLeft: "72px" }}>
             <div style={{ fontSize: "32px", fontWeight: 800, letterSpacing: "-0.04em", color: "#09090b", lineHeight: 1 }}>spec</div>
-            <div style={{ fontSize: "10px", color: "#09090b", padding: "3px 8px", background: "#f5f5f4", border: "1px solid #e8e6dd", borderRadius: "10px", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>Beta</div>
+            <div style={{ fontSize: "9px", color: "#6b7280", padding: "2px 6px", background: "#eeedf1", border: "1px solid #dde0e6", borderRadius: "6px", letterSpacing: "0.04em", fontWeight: 500, alignSelf: "flex-end", marginBottom: "3px" }}>beta</div>
           </div>
           {/* Centered tabs */}
           <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center" }}>
