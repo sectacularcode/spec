@@ -2451,7 +2451,7 @@ function buildPreviewHTML(brief, activePage, variant) {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 var T = {
-  surface: { background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "10px", padding: "20px", boxSizing: "border-box", overflow: "hidden" },
+  surface: { background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "10px", padding: "20px", boxSizing: "border-box", overflow: "hidden", width: "100%" },
   label: { fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "8px", display: "block" },
   input: { width: "100%", padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "14px", color: "#09090b", outline: "none", background: "#fff" },
   btnPrimary: { padding: "12px 24px", background: "#000", color: "#fff", border: "none", borderRadius: "6px", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px" },
@@ -3104,7 +3104,7 @@ export default function CustomBuild() {
       {!draftsView && (
       <div style={{ display: "grid", gridTemplateColumns: generated ? "520px 1fr" : "1fr", gap: "0", minHeight: "calc(100vh - 57px)" }}>
 
-        <div style={{ padding: "clamp(20px,3vw,40px) clamp(16px,3vw,40px)", borderRight: generated ? "1px solid #dde0e6" : "none", overflowY: "auto", flexShrink: 0 }}>
+        <div style={{ padding: "clamp(20px,3vw,40px) clamp(16px,3vw,40px)", borderRight: generated ? "1px solid #dde0e6" : "none", overflowY: "auto", flexShrink: 0, background: "#eeedf1" }}>
           <div style={{ maxWidth: generated ? "100%" : "1100px", margin: "0 auto" }}>
 
           {/* STEP 1 */}
@@ -3541,6 +3541,7 @@ export default function CustomBuild() {
     </div>
   );
 }
+
 
 
 
