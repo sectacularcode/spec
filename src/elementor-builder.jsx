@@ -6141,7 +6141,6 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </Section>
 
               <Section id="brand-logo" title="Logo, Identity & CTAs" icon="">
-                <div><label style={I.lbl}>Logo URL (WordPress media URL)</label><input style={I.inp} value={brand.logoUrl} onChange={e => updBrand("logoUrl", e.target.value)} placeholder="https://yoursite.com/wp-content/uploads/logo.png" /></div>
                 <div><label style={I.lbl}>Logo Text Fallback</label><input style={I.inp} value={brand.logoText} onChange={e => updBrand("logoText", e.target.value)} placeholder="Your business name" /></div>
                 <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                   <div><label style={I.lbl}>Primary CTA</label><input style={I.inp} value={brand.cta1} onChange={e => updBrand("cta1", e.target.value)} placeholder="e.g. Book a call" /></div>
