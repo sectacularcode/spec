@@ -1162,7 +1162,7 @@ const applyWebsiteTemplate = (template, brand, page) => {
 const TAB_ORDER = [
   { id: "discovery", label: "Discovery" },
   { id: "positioning", label: "Positioning" },
-  { id: "brand", label: "Brand" },
+  { id: "brand", label: "Visual" },
   { id: "content", label: "Content" },
   { id: "social", label: "Social" },
   { id: "page", label: "Page" },
