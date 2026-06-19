@@ -6004,7 +6004,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <button
                   onClick={() => generateStarterCopy()}
                   disabled={aiLoading || !brand.goal || !brand.outcome}
-                  style={{ marginTop: "8px", padding: "12px 20px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: (aiLoading || !((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) ? "not-allowed" : "pointer", opacity: (aiLoading || !((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) ? 0.4 : 1, display: "inline-flex", alignItems: "center", gap: "8px", whiteSpace: "nowrap" }}>
+                  style={{ marginTop: "8px", padding: "12px 20px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: (aiLoading || !((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) ? "not-allowed" : "pointer", opacity: (aiLoading || !((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) ? 0.4 : 1, display: "inline-flex", alignItems: "center", gap: "8px", whiteSpace: "nowrap" }}>
                   <Icon name="sparkles" size={15} color="#ffffff" />
                   {aiLoading ? "Drafting starter copy…" : "Draft Starter Copy with AI"}
                 </button>
