@@ -5938,8 +5938,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
 
 
-              <div style={{ border: "1px solid #e5e7eb", borderRadius: "10px", marginBottom: "16px", overflow: "hidden" }}>
-              <button onClick={() => setShowAdvancedColors(v => !v)} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", background: "#fafaf9", border: "none", cursor: "pointer", fontSize: "14px", fontWeight: 600, color: "#09090b" }}>
+              <div style={{ border: "1px solid #ebe9e2", borderRadius: "10px", marginBottom: "16px", overflow: "hidden" }}>
+              <button onClick={() => setShowAdvancedColors(v => !v)} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", background: "#ffffff", border: "none", cursor: "pointer", fontSize: "13px", fontWeight: 600, color: "#09090b" }}>
                 <span>Advanced — Custom Brand Colors</span>
                 <span style={{ fontSize: "12px", color: "#09090b" }}>{showAdvancedColors ? "▲ Hide" : "▼ Show"}</span>
               </button>
