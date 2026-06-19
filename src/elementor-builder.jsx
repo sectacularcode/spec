@@ -4591,8 +4591,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
     lbl: { display: "block", fontSize: "11px", color: "#6b7280", marginBottom: "6px", textTransform: "none", letterSpacing: "0", fontWeight: 600 },
     inp: { width: "100%", padding: "11px 13px", background: "#ffffff", border: "1px solid #e5e7eb", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5 },
     sel: { width: "100%", padding: "11px 36px 11px 13px", background: "#ffffff", border: "1px solid #e5e7eb", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5, appearance: "auto" },
-    btn: { padding: "10px 18px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "14px", fontWeight: 500, cursor: "pointer" },
-    btnGhost: { padding: "10px 18px", background: "#ffffff", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "14px", fontWeight: 500, cursor: "pointer" },
+    btn: { padding: "8px 16px", background: "#6b635c", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer" },
+    btnGhost: { padding: "8px 16px", background: "#ffffff", color: "#6b635c", border: "1px solid #6b635c", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer" },
   };
 
   const TabBtn = ({ id, label }) => (
@@ -5371,7 +5371,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
           {/* Left: All Projects + project info */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <button onClick={() => setView("projects")} style={{ ...I.btnGhost, padding: "7px 12px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px" }}>
+            <button onClick={() => setView("projects")} style={{ padding: "7px 12px", background: "#ffffff", color: "#6b635c", border: "1px solid #6b635c", borderRadius: "4px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", cursor: "pointer" }}>
               <Icon name="arrowLeft" size={13} color="#09090b" /> All Projects
             </button>
             <div>
@@ -5384,7 +5384,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             <button onClick={() => setShowAudit(!showAudit)} title={`Audit — ${audit.length} item${audit.length !== 1 ? "s" : ""}`} style={{ background: "none", border: "none", padding: "7px 8px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", color: audit.length ? "#b45309" : "#a1a1aa", fontSize: "12px", fontWeight: 600, borderRadius: "6px" }}>
               <Icon name="alertTriangle" size={14} color={audit.length ? "#b45309" : "#a1a1aa"} /> {audit.length}
             </button>
-            <button onClick={() => setView("preview")} style={{ padding: "7px 14px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}>
+            <button onClick={() => setView("preview")} style={{ padding: "7px 14px", background: "#6b635c", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}>
               <Icon name="eye" size={13} color="#ffffff" /> Preview
             </button>
           </div>
@@ -6400,19 +6400,19 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "20px", marginBottom: "16px" }}>
               <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>Download</div>
               <div style={{ display: "flex", gap: "6px", flexWrap: "nowrap", marginBottom: "16px", overflowX: "auto" }}>
-                <button onClick={downloadPage} style={{ padding: "9px 12px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
+                <button onClick={downloadPage} style={{ padding: "8px 14px", background: "#6b635c", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="download" size={14} color="#ffffff" /> Download Template
                 </button>
-                <button onClick={downloadHeader} style={{ padding: "9px 12px", background: "transparent", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
+                <button onClick={downloadHeader} style={{ padding: "8px 14px", background: "#ffffff", color: "#6b635c", border: "1px solid #6b635c", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="download" size={14} color="#09090b" /> Header Template
                 </button>
-                <button onClick={downloadFooter} style={{ padding: "9px 12px", background: "transparent", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
+                <button onClick={downloadFooter} style={{ padding: "8px 14px", background: "#ffffff", color: "#6b635c", border: "1px solid #6b635c", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="download" size={14} color="#09090b" /> Footer Template
                 </button>
-                <button onClick={exportBrief} style={{ padding: "9px 12px", background: "transparent", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
+                <button onClick={exportBrief} style={{ padding: "8px 14px", background: "#ffffff", color: "#6b635c", border: "1px solid #6b635c", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="file-text" size={14} color="#09090b" /> Export Brief
                 </button>
-                <button onClick={shareBrief} style={{ padding: "9px 12px", background: "transparent", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
+                <button onClick={shareBrief} style={{ padding: "8px 14px", background: "#ffffff", color: "#6b635c", border: "1px solid #6b635c", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="arrowRight" size={14} color="#09090b" /> Share Brief Link
                 </button>
                 {project.pages.length > 1 && (
@@ -6467,7 +6467,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               {prev ? (
                 <button
                   onClick={() => setTab(prev.id)}
-                  style={{ padding: "12px 18px", background: "#ffffff", color: "#000000", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
+                  style={{ padding: "8px 16px", background: "#ffffff", color: "#6b635c", border: "1px solid #6b635c", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "flex", alignItems: "center", gap: "7px" }}>
                   <Icon name="arrowLeft" size={14} color="#000000" /> Back to {prev.label}
                 </button>
               ) : <div />}
@@ -6477,7 +6477,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               {next ? (
                 <button
                   onClick={() => setTab(next.id)}
-                  style={{ padding: "12px 20px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
+                  style={{ padding: "8px 18px", background: "#6b635c", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "flex", alignItems: "center", gap: "7px" }}>
                   Next: {next.label} <Icon name="arrowRight" size={14} color="#ffffff" />
                 </button>
               ) : (
