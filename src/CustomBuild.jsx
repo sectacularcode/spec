@@ -3140,7 +3140,7 @@ export default function CustomBuild() {
                   {briefError && <div style={{ fontSize: "12px", color: "#dc2626", marginTop: "8px" }}>{briefError}</div>}
                 </>
               ) : (
-                <div>
+                <div style={{ width: "100%", boxSizing: "border-box", overflow: "hidden" }}>
                   <div style={{ fontSize: "13px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>{brief.brandName || "Brand loaded"}</div>
                   {brief.colors && (
                     <div style={{ display: "flex", gap: "6px", marginBottom: "12px", flexWrap: "wrap" }}>
@@ -3151,7 +3151,7 @@ export default function CustomBuild() {
                   )}
                   <label style={{ ...T.label, marginBottom: "6px", display: "block" }}>Export name</label>
                   <input
-                    style={{ ...T.input, marginBottom: "12px" }}
+                    style={{ ...T.input, marginBottom: "12px", width: "100%", maxWidth: "100%", boxSizing: "border-box" }}
                     value={clientName}
                     onChange={e => setClientName(e.target.value)}
                     placeholder="e.g. Mile Marker Films"
