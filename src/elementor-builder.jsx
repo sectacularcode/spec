@@ -6065,7 +6065,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                         onMouseOut={e => { if (!isActive) { e.currentTarget.style.borderColor = "#dde0e6"; } }}
                       >
                         {isActive && (
-                          <div style={{ position: "absolute", top: "12px", right: "12px", background: "#000000", color: "#ffffff", fontSize: "10px", fontWeight: 500, padding: "4px 10px", borderRadius: "10px", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                          <div style={{ position: "absolute", top: "12px", right: "12px", background: "#b45309", color: "#ffffff", fontSize: "10px", fontWeight: 500, padding: "4px 10px", borderRadius: "10px", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: "4px" }}>
                             <Icon name="check" size={11} color="#ffffff" /> Applied
                           </div>
                         )}
@@ -6116,7 +6116,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                         } : p));
                       }} style={{ padding: "18px 20px", background: "#ffffff", border: isOnDefault ? "2px solid #000000" : "1.5px dashed #dde0e6", borderRadius: "10px", cursor: "pointer", textAlign: "left", position: "relative", display: "flex", flexDirection: "column", minHeight: "180px" }}>
                         {isOnDefault && (
-                          <div style={{ position: "absolute", top: "12px", right: "12px", background: "#000000", color: "#ffffff", fontSize: "10px", fontWeight: 500, padding: "4px 10px", borderRadius: "10px", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: "4px", zIndex: 1 }}>
+                          <div style={{ position: "absolute", top: "12px", right: "12px", background: "#b45309", color: "#ffffff", fontSize: "10px", fontWeight: 500, padding: "4px 10px", borderRadius: "10px", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: "4px", zIndex: 1 }}>
                             <Icon name="check" size={11} color="#ffffff" /> Current
                           </div>
                         )}
@@ -6164,7 +6164,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           onMouseOver={e => { if (!active) e.currentTarget.style.borderColor = "#a3a39e"; }}
                           onMouseOut={e => { if (!active) e.currentTarget.style.borderColor = "#dde0e6"; }}>
                         {active && (
-                          <div style={{ position: "absolute", top: "12px", right: "12px", background: "#000000", color: "#ffffff", fontSize: "10px", fontWeight: 500, padding: "4px 10px", borderRadius: "10px", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: "4px", zIndex: 1 }}>
+                          <div style={{ position: "absolute", top: "12px", right: "12px", background: "#b45309", color: "#ffffff", fontSize: "10px", fontWeight: 500, padding: "4px 10px", borderRadius: "10px", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: "4px", zIndex: 1 }}>
                             <Icon name="check" size={11} color="#ffffff" /> Active
                           </div>
                         )}
@@ -6309,7 +6309,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   const tplTheme = THEMES.find(t => t.id === activeTpl.themeId);
                   return (
                     <div style={{ padding: "10px 14px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "12px", color: "#09090b", fontWeight: 500, display: "flex", alignItems: "center", gap: "8px" }}>
-                      <span style={{ background: "#000000", color: "#ffffff", padding: "3px 8px", borderRadius: "4px", fontSize: "9px", fontWeight: 600, letterSpacing: "0.05em" }}>TEMPLATE DEFAULT</span>
+                      <span style={{ background: "#b45309", color: "#ffffff", padding: "3px 8px", borderRadius: "4px", fontSize: "9px", fontWeight: 600, letterSpacing: "0.05em" }}>TEMPLATE DEFAULT</span>
                       <span>Using <strong style={{ color: "#000000" }}>{tplTheme?.name}</strong> from the {activeTpl.name} template. Pick a different theme below to override.</span>
                     </div>
                   );
@@ -6322,7 +6322,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           onMouseOver={e => { if (!active) e.currentTarget.style.borderColor = "#a3a39e"; }}
                           onMouseOut={e => { if (!active) e.currentTarget.style.borderColor = "#dde0e6"; }}>
                         {active && (
-                          <div style={{ position: "absolute", top: "10px", right: "10px", background: "#000000", color: "#ffffff", fontSize: "10px", fontWeight: 500, padding: "4px 10px", borderRadius: "10px", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: "4px", zIndex: 1 }}>
+                          <div style={{ position: "absolute", top: "10px", right: "10px", background: "#b45309", color: "#ffffff", fontSize: "10px", fontWeight: 500, padding: "4px 10px", borderRadius: "10px", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: "4px", zIndex: 1 }}>
                             <Icon name="check" size={11} color="#ffffff" /> Active
                           </div>
                         )}
