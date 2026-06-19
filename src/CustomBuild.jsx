@@ -3093,6 +3093,15 @@ export default function CustomBuild() {
               </button>
             )}
           </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "24px", flexWrap: "wrap" }}>
+            {steps.map(s => (
+              <div key={s.n} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <div style={T.stepNum(false, s.done)}>{s.done ? "✓" : s.n}</div>
+                <span style={{ fontSize: "12px", color: s.done ? "#09090b" : "#9ca3af", fontWeight: s.done ? 600 : 400 }}>{s.label}</span>
+                {s.n < 4 && <span style={{ color: "#dde0e6", margin: "0 4px" }}>›</span>}
+              </div>
+            ))}
+          </div>
 
           {/* STEP 1 */}
           <div style={{ marginBottom: "20px" }}>
