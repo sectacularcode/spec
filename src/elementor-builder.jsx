@@ -5565,7 +5565,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
       <div className="main-grid" style={{ display: "grid", gridTemplateColumns: "1fr", minHeight: "calc(100vh - 60px)" }}>
         {/* LEFT — FORM */}
-        <div style={{ padding: "24px", overflowY: "auto", maxHeight: "calc(100vh - 60px)" }}>
+        <div style={{ padding: "24px", overflowY: "auto", maxHeight: "calc(100vh - 60px)", background: "#ffffff" }}>
           {/* Page tabs */}
           <div style={{ display: "flex", gap: "6px", marginBottom: "16px", flexWrap: "wrap", alignItems: "center", position: "relative" }}>
             {project.pages.map((p, i) => (
@@ -5604,7 +5604,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
           {/* DISCOVERY TAB */}
           {tab === "discovery" && (
-            <div className="editor-padding" style={{ padding: "0 32px 40px", maxWidth: "760px", margin: "0 auto" }}>
+            <div className="editor-padding" style={{ padding: "0 20px 40px", maxWidth: "680px" }}>
 
               <Section id="discovery-voice" title="Tone &amp; Voice" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.6 }}>How the brand sounds. This shapes every word the AI drafts across the site.</p>
@@ -5652,7 +5652,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
           {/* POSITIONING TAB */}
           {tab === "positioning" && (
-            <div className="editor-padding" style={{ padding: "0 32px 40px", maxWidth: "760px", margin: "0 auto" }}>
+            <div className="editor-padding" style={{ padding: "0 20px 40px", maxWidth: "680px" }}>
 
               <Section id="positioning-intro" title="Strategy & Positioning" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
@@ -6379,7 +6379,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
         {/* EXPORT & IMPORT TAB */}
         {tab === "export" && (
-          <div className="editor-padding" style={{ padding: "0 32px 40px", maxWidth: "760px", margin: "0 auto" }}>
+          <div className="editor-padding" style={{ padding: "0 20px 40px", maxWidth: "680px" }}>
             <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "20px", marginBottom: "16px" }}>
               <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Active Page</div>
               <div style={{ fontSize: "18px", fontWeight: 600, color: "#09090b", marginBottom: "4px" }}>{page.name}</div>
