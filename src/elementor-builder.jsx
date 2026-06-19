@@ -4590,6 +4590,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   const I = {
     lbl: { display: "block", fontSize: "13px", color: "#000000", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700 },
     inp: { width: "100%", padding: "11px 13px", background: "#ffffff", border: "1px solid #e5e7eb", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5 },
+    sel: { width: "100%", padding: "11px 36px 11px 13px", background: "#ffffff", border: "1px solid #e5e7eb", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5, appearance: "auto" },
     btn: { padding: "10px 18px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "14px", fontWeight: 500, cursor: "pointer" },
     btnGhost: { padding: "10px 18px", background: "#ffffff", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "14px", fontWeight: 500, cursor: "pointer" },
   };
@@ -5607,7 +5608,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
               <Section id="discovery-voice" title="Tone &amp; Voice" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.6 }}>How the brand sounds. This shapes every word the AI drafts across the site.</p>
-                <div><label style={I.lbl}>Tone</label><select style={I.inp} value={TONES.includes(brand.tone) ? brand.tone : (brand.tone ? "Other" : brand.tone)} onChange={e => updBrand("tone", e.target.value)}>{TONES.map(t => <option key={t}>{t}</option>)}</select></div>
+                <div><label style={I.lbl}>Tone</label><select style={I.sel} value={TONES.includes(brand.tone) ? brand.tone : (brand.tone ? "Other" : brand.tone)} onChange={e => updBrand("tone", e.target.value)}>{TONES.map(t => <option key={t}>{t}</option>)}</select></div>
                 {(brand.tone === "Other" || (brand.tone && !TONES.slice(0, -1).includes(brand.tone))) && (
                   <div style={{ marginTop: "10px" }}>
                     <label style={I.lbl}>Describe the tone</label>
@@ -5660,21 +5661,24 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </Section>
 
               <Section id="positioning-audience" title="Target Audience" icon="">
-                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Who you're talking to. Be specific about role, company size, industry, or life stage.</p>
-                <div><label style={I.lbl}>Target Audience</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.targetAudience} onChange={e => updBrand("targetAudience", e.target.value)} placeholder="Who you're talking to. Be specific about role, company size, or life stage." /></div>
-                <div><label style={I.lbl}>Key Messages</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.keyMessages} onChange={e => updBrand("keyMessages", e.target.value)} placeholder="2–4 sentences. What you want every visitor to walk away knowing." /></div>
+                <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 10px", lineHeight: 1.6 }}>Who you're talking to — their role, company type, industry, or life stage. The AI uses this to write copy that speaks directly to the right person, not a generic visitor.</p>
+                <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.targetAudience} onChange={e => updBrand("targetAudience", e.target.value)} placeholder="e.g. Marketing directors at industrial and PE-backed companies with $5M–$50M in revenue" />
+                <div style={{ marginTop: "16px" }}>
+                  <label style={I.lbl}>Key Messages</label>
+                  <div style={{ fontSize: "12px", color: "#6b7280", margin: "4px 0 8px", lineHeight: 1.5 }}>The 2–4 things you want every visitor to walk away knowing. These show up across the hero, about section, and services — the AI weaves them in naturally when drafting copy.</div>
+                  <textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.keyMessages} onChange={e => updBrand("keyMessages", e.target.value)} placeholder="e.g. One maker, start to finish. Open pricing. Built for companies the big studios skip." />
+                </div>
               </Section>
 
               <Section id="positioning-goals" title="Goals & Desired Outcome" icon="">
                 <div>
-                  <label style={I.lbl}>Primary Goals — select all that apply</label>
                   <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "10px", lineHeight: 1.5 }}>What the site is supposed to do. Pick everything that applies — these drive the CTA language in your AI-drafted copy. A coaching site is typically Bookings + Lead Generation. A services site is Lead Generation + Awareness.</div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "6px" }}>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
                     {["Lead Generation", "Direct Sales / E-commerce", "Bookings & Reservations", "Free Trial / Demo Sign-ups", "Account Creation / Registration", "Resource Downloads / Lead Magnets", "Awareness & Brand Building", "Community & Newsletter Growth", "Applications & Sign-ups", "Donations & Fundraising"].map(g => {
                       const currentGoals = brand.goals || (brand.goal ? [brand.goal] : []);
                       const isSelected = currentGoals.includes(g);
                       return (
-                        <label key={g} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 12px", background: isSelected ? "#eeeeec" : "#f5f5f4", border: `1px solid ${isSelected ? "#000000" : "#e7e7e4"}`, borderRadius: "6px", cursor: "pointer", fontSize: "13px", color: isSelected ? "#09090b" : "#09090b", userSelect: "none" }}>
+                        <label key={g} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 12px", background: isSelected ? "#eeeeec" : "#f5f5f4", border: `1px solid ${isSelected ? "#000000" : "#e7e7e4"}`, borderRadius: "6px", cursor: "pointer", fontSize: "13px", color: "#09090b", userSelect: "none" }}>
                           <input type="checkbox" checked={isSelected} onChange={e => { const next = e.target.checked ? [...currentGoals, g] : currentGoals.filter(x => x !== g); updBrand("goals", next); updBrand("goal", next[0] || ""); }} style={{ cursor: "pointer", accentColor: "#000000" }} />
                           {g}
                         </label>
@@ -5682,10 +5686,10 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     })}
                   </div>
                 </div>
-                <div>
-                  <label style={I.lbl}>Desired Outcome (one sentence)</label>
-                  <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.outcome || ""} onChange={e => updBrand("outcome", e.target.value)} placeholder="e.g. Book 4–6 qualified strategy calls per month from B2B SaaS founders." />
-                  <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "4px" }}>Used by Draft Starter Copy — the more specific, the better the output.</div>
+                <div style={{ marginTop: "16px" }}>
+                  <label style={I.lbl}>Desired Outcome</label>
+                  <div style={{ fontSize: "12px", color: "#6b7280", margin: "4px 0 8px", lineHeight: 1.5 }}>One sentence — the specific result this site should drive. The more concrete, the better. The AI uses this to shape the tone and urgency of every drafted section.</div>
+                  <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.outcome || ""} onChange={e => updBrand("outcome", e.target.value)} placeholder="e.g. Book 4–6 qualified inquiries per month from PE-backed companies needing a brand film before a sale." />
                 </div>
               </Section>
 
