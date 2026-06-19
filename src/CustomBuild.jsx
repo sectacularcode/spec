@@ -3072,7 +3072,7 @@ export default function CustomBuild() {
                       </div>
                       <div style={{ display: "flex", gap: "4px", marginBottom: "14px", flexWrap: "wrap" }}>
                         {draft.pages.slice(0, 4).map(p => (
-                          <span key={p} style={{ fontSize: "9px", padding: "3px 8px", background: "#6b635c", color: "#ffffff", borderRadius: "10px", whiteSpace: "nowrap", fontWeight: 500, letterSpacing: "0.02em" }}>{(ALL_PAGES.find(pg => pg.id === p) || {}).label || p.replace(/-\d+$/, "").replace(/(^|-)(.)/g, (_, s, c) => (s ? " " : "") + c.toUpperCase())}</span>
+                          <span key={p} style={{ fontSize: "9px", padding: "3px 8px", background: "#b45309", color: "#ffffff", borderRadius: "10px", whiteSpace: "nowrap", fontWeight: 500, letterSpacing: "0.02em" }}>{(ALL_PAGES.find(pg => pg.id === p) || {}).label || p.replace(/-\d+$/, "").replace(/(^|-)(.)/g, (_, s, c) => (s ? " " : "") + c.toUpperCase())}</span>
                         ))}
                         {draft.pages.length > 4 && <span style={{ fontSize: "11px", color: "#9ca3af" }}>+{draft.pages.length - 4}</span>}
                       </div>
@@ -3223,7 +3223,7 @@ export default function CustomBuild() {
                       </div>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
                         {(crawlResults[url.trim()].pages || []).map((p, pi) => (
-                          <span key={pi} style={{ fontSize: "9px", padding: "3px 8px", background: "#6b635c", color: "#ffffff", borderRadius: "10px", whiteSpace: "nowrap", fontWeight: 500, letterSpacing: "0.02em" }}>
+                          <span key={pi} style={{ fontSize: "9px", padding: "3px 8px", background: "#b45309", color: "#ffffff", borderRadius: "10px", whiteSpace: "nowrap", fontWeight: 500, letterSpacing: "0.02em" }}>
                             {p.pageType !== "other" ? p.pageType : p.path}
                           </span>
                         ))}
@@ -3511,7 +3511,7 @@ export default function CustomBuild() {
                           <div style={{ fontSize: "11px", color: "#6b7280" }}>Section {s.sectionIndex + 1} · {s.date}</div>
                           <div style={{ display: "flex", gap: "4px", marginTop: "6px", flexWrap: "wrap" }}>
                             {(s.tags || []).slice(0, 3).map(t => (
-                              <span key={t} style={{ fontSize: "9px", padding: "3px 8px", background: "#6b635c", color: "#ffffff", borderRadius: "10px", whiteSpace: "nowrap", fontWeight: 500, letterSpacing: "0.02em" }}>{t}</span>
+                              <span key={t} style={{ fontSize: "9px", padding: "3px 8px", background: "#b45309", color: "#ffffff", borderRadius: "10px", whiteSpace: "nowrap", fontWeight: 500, letterSpacing: "0.02em" }}>{t}</span>
                             ))}
                           </div>
                         </div>
