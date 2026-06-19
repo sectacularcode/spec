@@ -6444,14 +6444,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {tab === "export" && (
             <div className="editor-padding" style={{ padding: "24px 20px 40px", maxWidth: "1080px", margin: "0 auto" }}>
             <div style={{ background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "8px", padding: "20px", marginBottom: "16px" }}>
-              <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Active Page</div>
-              <div style={{ fontSize: "18px", fontWeight: 600, color: "#09090b", marginBottom: "4px" }}>{page.name}</div>
-              <div style={{ fontSize: "14px", color: "#09090b" }}>{page.sections.length} section{page.sections.length !== 1 ? "s" : ""}</div>
-            </div>
-
-            <div style={{ background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "8px", padding: "20px", marginBottom: "16px" }}>
               <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>Download</div>
-              <div style={{ display: "flex", gap: "6px", flexWrap: "nowrap", marginBottom: "16px", overflowX: "auto" }}>
+              <div style={{ display: "flex", gap: "6px", flexWrap: "nowrap", marginBottom: "16px", overflowX: "auto", alignItems: "center" }}>
                 <button onClick={downloadPage} style={{ padding: "8px 14px", background: "#6b635c", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="download" size={14} color="#ffffff" /> Download Template
                 </button>
