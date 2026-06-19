@@ -36,7 +36,7 @@ async function kvStorageDel(key) {
 
 
 // ─── Intake Form Modal ────────────────────────────────────────────────────────
-const INTAKE_TABS = ["Brand", "Design", "Sitemap", "Copy", "Pricing", "Positioning"];
+const INTAKE_TABS = ["Brand", "Positioning", "Design", "Sitemap", "Copy", "Pricing"];
 
 const DEFAULT_COLORS = [
   { name: "Ink", hex: "", use: "Primary text, dark section backgrounds" },
@@ -246,7 +246,7 @@ function IntakeForm({ onClose, onComplete }) {
         </div>
       </div>
     ),
-    1: ( // Design
+    2: ( // Design
       <div>
         <div style={S.section}>
           <div style={S.sectionTitle}>02 · Design System</div>
@@ -299,7 +299,7 @@ function IntakeForm({ onClose, onComplete }) {
         </div>
       </div>
     ),
-    2: ( // Sitemap
+    3: ( // Sitemap
       <div>
         <div style={S.section}>
           <div style={S.sectionTitle}>03 · Sitemap and Global Elements</div>
@@ -329,7 +329,7 @@ function IntakeForm({ onClose, onComplete }) {
         </div>
       </div>
     ),
-    3: ( // Copy
+    4: ( // Copy
       <div>
         <div style={S.section}>
           <div style={S.sectionTitle}>04 · Home Page Copy</div>
@@ -412,7 +412,7 @@ function IntakeForm({ onClose, onComplete }) {
         </div>
       </div>
     ),
-    4: ( // Pricing
+    5: ( // Pricing
       <div>
         <div style={S.section}>
           <div style={S.sectionTitle}>05 · Pricing, Built Out</div>
@@ -438,7 +438,7 @@ function IntakeForm({ onClose, onComplete }) {
         </div>
       </div>
     ),
-    5: ( // Positioning & SEO
+    1: ( // Positioning
       <div>
         <div style={S.section}>
           <div style={S.sectionTitle}>Positioning & Messaging</div>
@@ -2823,7 +2823,17 @@ export default function CustomBuild() {
         const res = await fetch("/api/draft-copy", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ brief }),
+          body: JSON.stringify({ 
+            brief,
+            positioning: {
+              valueProposition: brief.valueProposition || "",
+              targetAudience: brief.targetAudience || "",
+              competitiveDifferentiator: brief.competitiveDifferentiator || "",
+              keyMessages: brief.keyMessages || [],
+              primaryKeywords: brief.primaryKeywords || [],
+              secondaryKeywords: brief.secondaryKeywords || [],
+            }
+          }),
         });
         if (res.ok) {
           const data = await res.json();
@@ -3529,6 +3539,7 @@ export default function CustomBuild() {
     </div>
   );
 }
+
 
 
 
