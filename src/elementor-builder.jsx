@@ -5406,16 +5406,13 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </div>
             )}
           </div>
-          {/* Right: Audit, Save Backup, Preview */}
-          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-            <button onClick={() => setShowAudit(!showAudit)} style={{ ...I.btnGhost, color: audit.length ? "#b45309" : "#09090b", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-              <Icon name="alertTriangle" size={14} color={audit.length ? "#b45309" : "#09090b"} /> Audit ({audit.length})
+          {/* Right: Audit, Preview */}
+          <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+            <button onClick={() => setShowAudit(!showAudit)} style={{ ...I.btnGhost, padding: "7px 10px", color: audit.length ? "#b45309" : "#09090b", display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "13px" }}>
+              <Icon name="alertTriangle" size={13} color={audit.length ? "#b45309" : "#09090b"} /> {audit.length}
             </button>
-            <button onClick={() => exportProjectFile(project)} style={{ ...I.btnGhost, display: "inline-flex", alignItems: "center", gap: "6px" }} title="Download this project as a JSON backup">
-              <Icon name="download" size={14} color="#09090b" /> Save Backup
-            </button>
-            <button onClick={() => setView("preview")} style={{ ...I.btn, background: "#000000", color: "#ffffff", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-              <Icon name="eye" size={14} color="#ffffff" /> Preview Page
+            <button onClick={() => setView("preview")} style={{ padding: "7px 12px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}>
+              <Icon name="eye" size={13} color="#ffffff" /> Preview
             </button>
           </div>
         </div>
