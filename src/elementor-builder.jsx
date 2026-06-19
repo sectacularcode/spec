@@ -5693,7 +5693,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div style={{ fontSize: "16px", fontWeight: 700, color: "#ef4444", marginBottom: "12px" }}>Couldn't draft copy</div>
                 <div style={{ fontSize: "14px", color: "#09090b", marginBottom: "20px", lineHeight: 1.6 }}>{aiError}</div>
                 <div style={{ display: "flex", gap: "10px" }}>
-                  <button onClick={() => { setAiError(""); generateStarterCopy(); }} style={{ padding: "10px 18px", background: "#000000", color: "#09090b", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}>Try again</button>
+                  <button onClick={() => { setAiError(""); generateStarterCopy(); }} style={{ padding: "10px 18px", background: "#6b635c", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}>Try again</button>
                   <button onClick={() => setAiError("")} style={{ padding: "10px 18px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}>Cancel</button>
                 </div>
               </>
@@ -5732,7 +5732,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   const value = aiDraft[key] || "";
                   const isRegenerating = aiFieldRegen === key;
                   return (
-                    <div key={key} style={{ marginBottom: "14px", background: "#ffffff", padding: "12px 14px", borderRadius: "6px", border: isRegenerating ? "1px solid #18181b" : "1px solid #dde0e6", position: "relative" }}>
+                    <div key={key} style={{ marginBottom: "14px", background: "#ffffff", padding: "12px 14px", borderRadius: "6px", border: isRegenerating ? "1px solid #b45309" : "1px solid #dde0e6", position: "relative" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
                         <div style={{ fontSize: "10px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>{label}</div>
                         <button
@@ -5740,7 +5740,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           disabled={!!aiFieldRegen}
                           title={`Regenerate just the ${label.toLowerCase()}`}
                           style={{
-                            background: isRegenerating ? "#000000" : "transparent",
+                            background: isRegenerating ? "#b45309" : "transparent",
                             color: isRegenerating ? "#ffffff" : "#09090b",
                             border: "1px solid #dde0e6",
                             borderRadius: "4px",
@@ -5753,7 +5753,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                             alignItems: "center",
                             gap: "4px",
                           }}>
-                          <Icon name="refresh" size={11} color={isRegenerating ? "#ffffff" : "#09090b"} />
+                          <Icon name="refresh" size={11} color={isRegenerating ? "#ffffff" : "#6b635c"} />
                           {isRegenerating ? "Regenerating…" : "Regenerate"}
                         </button>
                       </div>
@@ -5763,7 +5763,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           onChange={e => setAiDraft({ ...aiDraft, [key]: e.target.value })}
                           rows={rows || 3}
                           disabled={isRegenerating}
-                          style={{ width: "100%", padding: "8px 10px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.5, opacity: isRegenerating ? 0.5 : 1 }}
+                          style={{ width: "100%", padding: "8px 10px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.5, opacity: isRegenerating ? 0.5 : 1, boxSizing: "border-box" }}
                         />
                       ) : (
                         <input
@@ -5771,7 +5771,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           value={value}
                           onChange={e => setAiDraft({ ...aiDraft, [key]: e.target.value })}
                           disabled={isRegenerating}
-                          style={{ width: "100%", padding: "8px 10px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", opacity: isRegenerating ? 0.5 : 1 }}
+                          style={{ width: "100%", padding: "8px 10px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", opacity: isRegenerating ? 0.5 : 1, boxSizing: "border-box" }}
                         />
                       )}
                     </div>
@@ -5779,7 +5779,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 })}
 
                 <div style={{ display: "flex", gap: "10px", marginTop: "20px", flexWrap: "wrap" }}>
-                  <button onClick={applyAiDraft} disabled={!!aiFieldRegen || aiLoading} style={{ padding: "12px 20px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: (aiFieldRegen || aiLoading) ? "not-allowed" : "pointer", opacity: (aiFieldRegen || aiLoading) ? 0.5 : 1, display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <button onClick={applyAiDraft} disabled={!!aiFieldRegen || aiLoading} style={{ padding: "12px 20px", background: "#6b635c", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: (aiFieldRegen || aiLoading) ? "not-allowed" : "pointer", opacity: (aiFieldRegen || aiLoading) ? 0.5 : 1, display: "inline-flex", alignItems: "center", gap: "6px" }}>
                     <Icon name="check" size={14} color="#ffffff" /> Apply to brand & page
                   </button>
                   <button onClick={() => { setAiDraft(null); generateStarterCopy(); }} disabled={!!aiFieldRegen || aiLoading} style={{ padding: "12px 20px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: (aiFieldRegen || aiLoading) ? "not-allowed" : "pointer", opacity: (aiFieldRegen || aiLoading) ? 0.5 : 1, display: "inline-flex", alignItems: "center", gap: "6px" }}>
