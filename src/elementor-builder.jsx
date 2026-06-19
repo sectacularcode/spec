@@ -5428,7 +5428,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   <div key={cat} style={{ marginBottom: "16px" }}>
                     <div style={{ fontSize: "12px", color, fontWeight: 700, marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.08em" }}>{label} ({items.length})</div>
                     {items.map((a, i) => {
-                      const TABLABEL = { brand: "Brand", page: "Page", content: "Content", inspo: "Inspiration", social: "Social & Nav", footer: "Header & Footer", export: "Export" };
+                      const TABLABEL = { brand: "Visual", page: "Page", content: "Content", inspo: "Inspiration", social: "Social & Nav", footer: "Header & Footer", export: "Export" };
                       const target = a.target;
                       const clickable = target && target.section;
                       return (
@@ -5587,7 +5587,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               <div className="tab-bar" style={{ display: "flex", justifyContent: "center", overflowX: "auto", WebkitOverflowScrolling: "touch", paddingTop: "18px", paddingBottom: "16px" }}>
                 <TabBtn id="discovery" label="Discovery" />
                 <TabBtn id="positioning" label="Positioning" />
-                <TabBtn id="brand" label="Brand" />
+                <TabBtn id="brand" label="Visual" />
                 <TabBtn id="content" label="Content" />
                 <TabBtn id="social" label="Social" />
                 <TabBtn id="page" label="Page" />
