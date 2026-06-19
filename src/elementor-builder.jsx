@@ -36,7 +36,7 @@ const Icon = ({ name, size = 16, color = "currentColor", strokeWidth = 1.75, sty
     </svg>
   );
 };
-const TONES = ["Editorial & Minimal", "Bold & Direct", "Friendly & Conversational", "Premium & Refined", "Professional"];
+const TONES = ["Editorial & Minimal", "Bold & Direct", "Friendly & Conversational", "Premium & Refined", "Professional", "Warm & Approachable", "Authoritative & Expert", "Playful & Creative", "Honest & Grounded", "Luxe & Aspirational", "Other"];
 const FOOTER_STYLES = ["Editorial", "Studio", "Agency", "Premium"];
 const HEADER_STYLES = ["Editorial", "Studio", "Agency", "Premium"];
 const FONT_OPTIONS = ["Yeseva One", "Playfair Display", "Cormorant Garamond", "Italiana", "Fraunces", "Spectral", "Libre Baskerville", "Merriweather", "Manrope", "Montserrat", "Raleway", "Oswald", "Lato", "Nunito", "Poppins", "Inter", "Roboto Slab", "Jost", "DM Sans", "Josefin Sans", "Work Sans", "Space Mono", "JetBrains Mono"];
@@ -5607,7 +5607,19 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
               <Section id="discovery-voice" title="Tone &amp; Voice" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 12px", lineHeight: 1.6 }}>How the brand sounds. This shapes every word the AI drafts across the site.</p>
-                <div><label style={I.lbl}>Tone</label><select style={I.inp} value={brand.tone} onChange={e => updBrand("tone", e.target.value)}>{TONES.map(t => <option key={t}>{t}</option>)}</select></div>
+                <div><label style={I.lbl}>Tone</label><select style={I.inp} value={TONES.includes(brand.tone) ? brand.tone : (brand.tone ? "Other" : brand.tone)} onChange={e => updBrand("tone", e.target.value)}>{TONES.map(t => <option key={t}>{t}</option>)}</select></div>
+                {(brand.tone === "Other" || (brand.tone && !TONES.slice(0, -1).includes(brand.tone))) && (
+                  <div style={{ marginTop: "10px" }}>
+                    <label style={I.lbl}>Describe the tone</label>
+                    <input
+                      style={I.inp}
+                      value={TONES.includes(brand.tone) ? "" : brand.tone}
+                      onChange={e => updBrand("tone", e.target.value)}
+                      placeholder="e.g. Dry and witty, like a smart friend who happens to know everything"
+                      autoFocus
+                    />
+                  </div>
+                )}
               </Section>
 
               <Section id="discovery-differentiator" title="What Makes Them Different" icon="">
