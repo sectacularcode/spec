@@ -81,8 +81,10 @@ export default function App() {
           {/* Lock — right anchor */}
           <button
             onClick={() => { try { localStorage.removeItem(STORAGE_KEY); } catch(e) {} setAuthed(false); }}
-            style={{ marginLeft: "auto", fontSize: "12px", color: "#9ca3af", background: "none", border: "none", cursor: "pointer", padding: "8px" }}>
-            Lock
+            style={{ marginLeft: "auto", background: "none", border: "none", cursor: "pointer", padding: "8px", display: "flex", flexDirection: "column", alignItems: "center", gap: "2px", color: "#6b635c" }}
+            title="Sign out">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b635c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span style={{ fontSize: "9px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "#6b635c" }}>Sign out</span>
           </button>
         </div>
       </div>
@@ -91,4 +93,5 @@ export default function App() {
     </div>
   );
 }
+
 
