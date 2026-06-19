@@ -5455,7 +5455,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             {importMsg}
           </div>
         )}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: "14px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: "14px", overflow: "hidden" }}>
           {projects.map(p => {
             const hasTemplate = !!p.brand.templateId;
             const displayName = p.name || p.brand.name || "Untitled";
@@ -5903,7 +5903,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 </div>
                 <div>
                   <label style={I.lbl}>Final CTA Heading</label>
-                  <input style={I.inp} value={page.ctaHeading} onChange={e => updPage("ctaHeading", e.target.value)} placeholder="e.g. Ready to get started?" />
+                  <input style={I.inp} value={page.ctaHeading || ""} onChange={e => updPage("ctaHeading", e.target.value)} placeholder="e.g. Ready to get started?" />
                   <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "4px" }}>The big conversion heading in the bottom CTA section before the footer. Each page can have a different one.</div>
                 </div>
                 <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
@@ -6482,14 +6482,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               )}
               <Section id="page-hero" title="Hero Text" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>The first thing visitors see. Your main headline and supporting line.</p>
-                <div><label style={I.lbl}>Heading</label><input style={I.inp} value={page.heroHeading} onChange={e => updPage("heroHeading", e.target.value)} placeholder="e.g. Your main headline goes here." /></div>
-                <div><label style={I.lbl}>Subheading</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={page.heroSubhead} onChange={e => updPage("heroSubhead", e.target.value)} placeholder="e.g. A short supporting line under the headline." /></div>
-                <div><label style={I.lbl}>Hero Image</label><input style={I.inp} value={page.heroImage} onChange={e => updPage("heroImage", e.target.value)} placeholder="Paste your WordPress media URL — leave blank for a placeholder" /></div>
+                <div><label style={I.lbl}>Heading</label><input style={I.inp} value={page.heroHeading || ""} onChange={e => updPage("heroHeading", e.target.value)} placeholder="e.g. Your main headline goes here." /></div>
+                <div><label style={I.lbl}>Subheading</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={page.heroSubhead || ""} onChange={e => updPage("heroSubhead", e.target.value)} placeholder="e.g. A short supporting line under the headline." /></div>
+                <div><label style={I.lbl}>Hero Image</label><input style={I.inp} value={page.heroImage || ""} onChange={e => updPage("heroImage", e.target.value)} placeholder="Paste your WordPress media URL — leave blank for a placeholder" /></div>
               </Section>
               <Section id="page-about" title="About the Company" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>A short brand story — usually image and text side by side, just below the hero.</p>
-                <div><label style={I.lbl}>Heading</label><input style={I.inp} value={page.aboutHeading} onChange={e => updPage("aboutHeading", e.target.value)} placeholder="e.g. A short about heading." /></div>
-                <div><label style={I.lbl}>Body</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={4} value={page.aboutBody} onChange={e => updPage("aboutBody", e.target.value)} placeholder="Write your about copy here, or leave blank to pull from your brand description." /></div>
+                <div><label style={I.lbl}>Heading</label><input style={I.inp} value={page.aboutHeading || ""} onChange={e => updPage("aboutHeading", e.target.value)} placeholder="e.g. A short about heading." /></div>
+                <div><label style={I.lbl}>Body</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={4} value={page.aboutBody || ""} onChange={e => updPage("aboutBody", e.target.value)} placeholder="Write your about copy here, or leave blank to pull from your brand description." /></div>
               </Section>
               {page.sections.some(s => s === "Services" || s === "Service Cards") && <Section id="content-services" title="Services" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>What you offer. Each line becomes a card or list item on the page.</p>
@@ -6566,7 +6566,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </Section>}
               {page.sections.includes("Video") && <Section id="content-video" title="Video" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>A YouTube or Vimeo embed. Can sit anywhere on the page.</p>
-                <input style={I.inp} value={page.videoUrl} onChange={e => updPage("videoUrl", e.target.value)} placeholder="https://youtube.com/watch?v=... or https://vimeo.com/..." />
+                <input style={I.inp} value={page.videoUrl || ""} onChange={e => updPage("videoUrl", e.target.value)} placeholder="https://youtube.com/watch?v=... or https://vimeo.com/..." />
               </Section>}
               {page.sections.includes("Blog") && <Section id="content-blog" title="Blog Preview" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>Preview cards for recent posts — shown on the homepage or a blog index page. Write the actual posts inside WordPress.</p>
