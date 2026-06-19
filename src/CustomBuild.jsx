@@ -642,9 +642,9 @@ function BriefReview({ parsed, onConfirm, onClose }) {
                       {f.label} {isEmpty && <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>— blank</span>}
                     </label>
                     {f.type === "input" ? (
-                      <input style={{ ...S.input, borderColor: isEmpty ? "#fcd34d" : "#e5e7eb" }} value={displayVal} onChange={e => upd(f.key, e.target.value)} placeholder={isEmpty ? "Not found in brief — type here to add" : ""} />
+                      <input style={{ ...S.input, borderColor: isEmpty ? "#fcd34d" : "#dde0e6" }} value={displayVal} onChange={e => upd(f.key, e.target.value)} placeholder={isEmpty ? "Not found in brief — type here to add" : ""} />
                     ) : (
-                      <textarea rows={f.rows || 2} style={{ ...S.textarea, borderColor: isEmpty ? "#fcd34d" : "#e5e7eb" }} value={displayVal} onChange={e => upd(f.key, f.isArray ? e.target.value.split("\n").filter(Boolean) : e.target.value)} placeholder={isEmpty ? "Not found in brief — type here to add" : ""} />
+                      <textarea rows={f.rows || 2} style={{ ...S.textarea, borderColor: isEmpty ? "#fcd34d" : "#dde0e6" }} value={displayVal} onChange={e => upd(f.key, f.isArray ? e.target.value.split("\n").filter(Boolean) : e.target.value)} placeholder={isEmpty ? "Not found in brief — type here to add" : ""} />
                     )}
                   </div>
                 );
@@ -1043,7 +1043,7 @@ function buildHeaderJSON(C, brief, inspoContext) {
 
   var bgColor = isDark ? ink : isTransparent ? "rgba(0,0,0,0)" : "#ffffff";
   var textColor = isDark ? warmWhite : ink;
-  var borderColor = isDark ? "rgba(255,255,255,0.1)" : "#e5e7eb";
+  var borderColor = isDark ? "rgba(255,255,255,0.1)" : "#dde0e6";
 
   // Nav links from brief
   var navLinks = (brief.headerNav || ["Home", "Work", "Services", "About", "Process", "Contact"]);
@@ -3028,7 +3028,7 @@ export default function CustomBuild() {
                 onClick={() => setDraftsView(false)}
                 style={{ border: "2px dashed #e5e7eb", borderRadius: "10px", padding: "24px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "180px", gap: "8px" }}
                 onMouseOver={e => e.currentTarget.style.borderColor = "#09090b"}
-                onMouseOut={e => e.currentTarget.style.borderColor = "#e5e7eb"}>
+                onMouseOut={e => e.currentTarget.style.borderColor = "#dde0e6"}>
                 <div style={{ fontSize: "24px", color: "#6b7280" }}>+</div>
                 <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>New build</div>
               </div>
@@ -3039,7 +3039,7 @@ export default function CustomBuild() {
                 return (
                   <div key={draft.id} style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: "10px", overflow: "hidden" }}>
                     {/* Color preview */}
-                    <div style={{ height: "6px", background: colorValues.length > 0 ? `linear-gradient(to right, ${colorValues.slice(0,4).join(", ")})` : "#e5e7eb" }} />
+                    <div style={{ height: "6px", background: colorValues.length > 0 ? `linear-gradient(to right, ${colorValues.slice(0,4).join(", ")})` : "#dde0e6" }} />
                     <div style={{ padding: "18px" }}>
                       <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>{draft.clientName}</div>
                       <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>
@@ -3094,7 +3094,7 @@ export default function CustomBuild() {
             <div key={s.n} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <div style={T.stepNum(false, s.done)}>{s.done ? "✓" : s.n}</div>
               <span style={{ fontSize: "12px", color: s.done ? "#09090b" : "#9ca3af", fontWeight: s.done ? 600 : 400 }}>{s.label}</span>
-              {s.n < 4 && <span style={{ color: "#e5e7eb", margin: "0 4px" }}>›</span>}
+              {s.n < 4 && <span style={{ color: "#dde0e6", margin: "0 4px" }}>›</span>}
             </div>
           ))}
         </div>
@@ -3123,7 +3123,7 @@ export default function CustomBuild() {
                     onDrop={e => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); }}
                     style={{ border: "2px dashed #e5e7eb", borderRadius: "6px", padding: "32px", textAlign: "center", cursor: "pointer" }}
                     onMouseOver={e => e.currentTarget.style.borderColor = "#000"}
-                    onMouseOut={e => e.currentTarget.style.borderColor = "#e5e7eb"}
+                    onMouseOut={e => e.currentTarget.style.borderColor = "#dde0e6"}
                   >
                     <div style={{ fontSize: "24px", marginBottom: "8px" }}>↑</div>
                     <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "4px" }}>Upload Brand Brief</div>
@@ -3370,7 +3370,7 @@ export default function CustomBuild() {
                 {generated.pages.length > 1 && (
                   <button onClick={downloadAll} style={{ ...T.btnPrimary, justifyContent: "center", marginTop: "4px" }}>Download All Pages</button>
                 )}
-                <div style={{ height: "1px", background: "#e5e7eb", margin: "8px 0" }} />
+                <div style={{ height: "1px", background: "#dde0e6", margin: "8px 0" }} />
                 <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "4px" }}>Global Templates</div>
                 <button onClick={downloadHeader} style={{ ...T.btnGhost, textAlign: "left", display: "flex", justifyContent: "space-between" }}>
                   <span>Header</span><span style={{ color: "#9ca3af" }}>↓ .json</span>
@@ -3496,7 +3496,7 @@ export default function CustomBuild() {
                           }}
                           style={{ padding: "12px", border: "1px solid #e5e7eb", borderRadius: "8px", marginBottom: "8px", cursor: "pointer", transition: "border-color 0.15s" }}
                           onMouseOver={e => e.currentTarget.style.borderColor = "#000"}
-                          onMouseOut={e => e.currentTarget.style.borderColor = "#e5e7eb"}>
+                          onMouseOut={e => e.currentTarget.style.borderColor = "#dde0e6"}>
                           {/* Color preview bar */}
                           <div style={{ height: "6px", borderRadius: "3px", background: "linear-gradient(to right, " + ink + " 0%, " + ink + " 40%, " + brass + " 40%, " + brass + " 60%, " + bone + " 60%)", marginBottom: "8px" }} />
                           <div style={{ fontSize: "12px", fontWeight: 600, color: "#09090b", marginBottom: "2px" }}>
