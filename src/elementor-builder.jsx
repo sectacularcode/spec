@@ -4596,7 +4596,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   };
 
   const TabBtn = ({ id, label }) => (
-    <button onClick={() => setTab(id)} style={{ padding: "8px 14px", background: tab === id ? "#ffffff" : "transparent", color: tab === id ? "#09090b" : "#6b7280", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: tab === id ? 700 : 500, cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.07em", margin: "4px 2px", boxShadow: tab === id ? "0 1px 3px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s", whiteSpace: "nowrap" }}>{label}</button>
+    <button onClick={() => setTab(id)} style={{ padding: "6px 12px", background: tab === id ? "rgba(255,255,255,0.18)" : "transparent", color: "#ffffff", border: "none", borderRadius: "7px", fontSize: "11px", fontWeight: tab === id ? 700 : 500, cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.06em", margin: "2px", whiteSpace: "nowrap" }}>{label}</button>
   );
 
   // Builder format toggle — applies to both Page and Footer downloads
@@ -4930,7 +4930,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
   // ── PROJECTS VIEW ──────────────────────────────────────────────────────────
   if (effectiveView === "projects") return (
-    <div style={{ minHeight: "100vh", background: "#f5f5f4", color: "#09090b", padding: "clamp(20px,5vw,40px) clamp(12px,3vw,24px)", fontFamily: "'Be Vietnam Pro', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#f3f1ed", color: "#09090b", padding: "clamp(20px,5vw,40px) clamp(12px,3vw,24px)", fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Yeseva+One&family=Manrope:wght@400;500;700&family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Oswald:wght@500;700&family=Space+Mono&family=Inter:wght@500;700&display=swap');
         * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; box-sizing: border-box; }
@@ -4957,14 +4957,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               value={briefText}
               onChange={e => setBriefText(e.target.value)}
               placeholder="e.g. A modern fitness coaching site for women over 40. Warm but no-nonsense. Earthy palette."
-              style={{ width: "100%", minHeight: "80px", padding: "12px 14px", background: "#f5f5f4", color: "#09090b", border: "1px solid #ebe9e2", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.6, outline: "none" }}
+              style={{ width: "100%", minHeight: "80px", padding: "12px 14px", background: "#f3f1ed", color: "#09090b", border: "1px solid #ebe9e2", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.6, outline: "none" }}
             />
           </div>
           <div style={{ marginBottom: "12px" }}>
             <select
               value={lockedTemplateId}
               onChange={e => setLockedTemplateId(e.target.value)}
-              style={{ width: "100%", padding: "10px 12px", background: "#f5f5f4", color: "#09090b", border: lockedTemplateId ? "1px solid #7c3aed" : "1px solid #ebe9e2", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", cursor: "pointer", outline: "none" }}>
+              style={{ width: "100%", padding: "10px 12px", background: "#f3f1ed", color: "#09090b", border: lockedTemplateId ? "1px solid #7c3aed" : "1px solid #ebe9e2", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", cursor: "pointer", outline: "none" }}>
               <option value="">Already know which template? Pick one (optional)</option>
               {WEBSITE_TEMPLATES.map(t => (
                 <option key={t.id} value={t.id}>{t.name} — {t.industry.split(/[,—]/)[0].trim().slice(0, 40)}</option>
@@ -4991,7 +4991,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             {briefLoading && <span style={{ fontSize: "12px", color: "#000000", fontWeight: 500 }}>Picking template, layout, colors, fonts… usually 5–10 seconds.</span>}
           </div>
           {briefLoading && (
-            <div style={{ marginTop: "14px", padding: "10px 14px", background: "#f5f5f4", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px", color: "#09090b", lineHeight: 1.6 }}>
+            <div style={{ marginTop: "14px", padding: "10px 14px", background: "#f3f1ed", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px", color: "#09090b", lineHeight: 1.6 }}>
               <div style={{ marginBottom: "4px", color: "#000000", fontWeight: 500 }}></div>
               
             </div>
@@ -5279,7 +5279,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                       </span>
                     </div>
                   ) : (
-                    <div style={{ fontSize: "10px", color: "#09090b", fontStyle: "italic", padding: "6px 10px", background: "#f5f5f4", border: "1px dashed #d4d2c8", borderRadius: "4px", display: "inline-block" }}>
+                    <div style={{ fontSize: "10px", color: "#09090b", fontStyle: "italic", padding: "6px 10px", background: "#f3f1ed", border: "1px dashed #d4d2c8", borderRadius: "4px", display: "inline-block" }}>
                       No template applied yet
                     </div>
                   )}
@@ -5291,7 +5291,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     onChange={e => setProjects(ps => ps.map(proj => proj.id === p.id ? { ...proj, brand: { ...proj.brand, inspoUrls: e.target.value } } : proj))}
                     placeholder={"https://example.com\nhttps://another.com"}
                     rows={2}
-                    style={{ width: "100%", padding: "8px 10px", background: "#f5f5f4", color: "#09090b", border: "1px solid #ebe9e2", borderRadius: "6px", fontSize: "12px", fontFamily: "monospace", resize: "vertical", lineHeight: 1.5, outline: "none", boxSizing: "border-box" }}
+                    style={{ width: "100%", padding: "8px 10px", background: "#f3f1ed", color: "#09090b", border: "1px solid #ebe9e2", borderRadius: "6px", fontSize: "12px", fontFamily: "monospace", resize: "vertical", lineHeight: 1.5, outline: "none", boxSizing: "border-box" }}
                   />
                   <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "3px" }}>Feeds AI copy drafting — one URL per line</div>
                 </div>
@@ -5339,7 +5339,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
   // ── EDITOR VIEW ────────────────────────────────────────────────────────────
   return (
-    <div style={{ minHeight: "100vh", background: "#f5f5f4", color: "#09090b", fontFamily: "'Be Vietnam Pro', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#f3f1ed", color: "#09090b", fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Yeseva+One&family=Manrope:wght@400;500;700&family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Oswald:wght@500;700&family=Space+Mono&family=Inter:wght@500;700&display=swap');
         * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; box-sizing: border-box; }
@@ -5420,7 +5420,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                             display: "block", width: "100%", textAlign: "left",
                             fontSize: "13px", color: "#09090b", padding: "8px 12px",
                             lineHeight: 1.5, borderLeft: `2px solid ${color}`,
-                            background: "#f5f5f4", border: `1px solid #f4f4f5`, borderLeftWidth: "3px", borderLeftColor: color,
+                            background: "#f3f1ed", border: `1px solid #f4f4f5`, borderLeftWidth: "3px", borderLeftColor: color,
                             borderRadius: "4px", marginBottom: "6px",
                             cursor: clickable ? "pointer" : "default",
                             transition: "background 0.15s",
@@ -5527,7 +5527,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           onChange={e => setAiDraft({ ...aiDraft, [key]: e.target.value })}
                           rows={rows || 3}
                           disabled={isRegenerating}
-                          style={{ width: "100%", padding: "8px 10px", background: "#f5f5f4", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.5, opacity: isRegenerating ? 0.5 : 1 }}
+                          style={{ width: "100%", padding: "8px 10px", background: "#f3f1ed", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.5, opacity: isRegenerating ? 0.5 : 1 }}
                         />
                       ) : (
                         <input
@@ -5535,7 +5535,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           value={value}
                           onChange={e => setAiDraft({ ...aiDraft, [key]: e.target.value })}
                           disabled={isRegenerating}
-                          style={{ width: "100%", padding: "8px 10px", background: "#f5f5f4", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", opacity: isRegenerating ? 0.5 : 1 }}
+                          style={{ width: "100%", padding: "8px 10px", background: "#f3f1ed", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "4px", fontSize: "14px", fontFamily: "inherit", opacity: isRegenerating ? 0.5 : 1 }}
                         />
                       )}
                     </div>
@@ -5559,12 +5559,12 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
       <div className="main-grid" style={{ display: "grid", gridTemplateColumns: "1fr", minHeight: "calc(100vh - 60px)" }}>
         {/* LEFT — FORM */}
-        <div className="tab-panel-bg" style={{ padding: "0", overflowY: "auto", maxHeight: "calc(100vh - 60px)", background: "#f5f5f4" }}>
+        <div className="tab-panel-bg" style={{ padding: "0", overflowY: "auto", maxHeight: "calc(100vh - 60px)", background: "#f3f1ed" }}>
 
           {/* Tabs */}
           <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px" }}>
             {/* Tab nav zone — subtle inset card */}
-            <div style={{ background: "#f5f5f4", borderRadius: "12px", padding: "4px 8px 0", marginBottom: "16px", marginTop: "16px" }}>
+            <div style={{ background: "#f3f1ed", borderRadius: "12px", padding: "4px 8px 0", marginBottom: "16px", marginTop: "16px" }}>
               <div className="tab-bar" style={{ display: "flex", justifyContent: "center", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
                 <TabBtn id="discovery" label="Discovery" />
                 <TabBtn id="positioning" label="Positioning" />
@@ -5581,14 +5581,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               <div style={{ flex: 1, display: "flex", justifyContent: "center", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
                 {project.pages.map((p, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: "3px" }}>
-                    <button onClick={() => setPageIdx(i)} style={{ padding: "5px 14px", background: i === pageIdx ? "#09090b" : "transparent", color: i === pageIdx ? "#ffffff" : "#6b7280", border: `1px solid ${i === pageIdx ? "#09090b" : "#e5e7eb"}`, borderRadius: "999px", fontSize: "12px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap" }}>{p.name}</button>
-                    {project.pages.length > 1 && <button onClick={() => delPage(i)} style={{ background: "transparent", border: "none", color: "#a1a1aa", cursor: "pointer", fontSize: "13px", lineHeight: 1, padding: "0 1px" }}>×</button>}
+                    <button onClick={() => setPageIdx(i)} style={{ padding: "4px 14px", background: i === pageIdx ? "#ffffff" : "transparent", color: i === pageIdx ? "#09090b" : "rgba(255,255,255,0.55)", border: `0.5px solid ${i === pageIdx ? "#ffffff" : "rgba(255,255,255,0.25)"}`, borderRadius: "999px", fontSize: "12px", fontWeight: i === pageIdx ? 600 : 400, cursor: "pointer", whiteSpace: "nowrap" }}>{p.name}</button>
+                    {project.pages.length > 1 && <button onClick={() => delPage(i)} style={{ background: "transparent", border: "none", color: "rgba(255,255,255,0.4)", cursor: "pointer", fontSize: "13px", lineHeight: 1, padding: "0 1px" }}>×</button>}
                   </div>
                 ))}
               </div>
               <div style={{ position: "relative" }}>
-                <button onClick={() => setShowAddPage(!showAddPage)} style={{ ...I.btnGhost, padding: "5px 12px", display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "12px", borderRadius: "999px" }}>
-                  <Icon name="plus" size={11} color="#09090b" /> Add Page
+                <button onClick={() => setShowAddPage(!showAddPage)} style={{ padding: "4px 12px", background: "transparent", color: "rgba(255,255,255,0.5)", border: "0.5px solid rgba(255,255,255,0.2)", borderRadius: "999px", fontSize: "12px", fontWeight: 400, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                  <Icon name="plus" size={11} color="rgba(255,255,255,0.5)" /> Add Page
                 </button>
                 {showAddPage && (
                   <div style={{ position: "absolute", top: "36px", right: "0", background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "12px", zIndex: 30, minWidth: "280px", maxHeight: "420px", overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,0.08)" }}>
@@ -5709,7 +5709,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   const missing = tplKeywords.filter(k => !currentList.some(c => c.toLowerCase() === k.toLowerCase()));
                   if (!missing.length) return null;
                   return (
-                    <div style={{ padding: "12px 14px", background: "#f5f5f4", border: "1px solid #e5e7eb", borderRadius: "6px", marginBottom: "12px" }}>
+                    <div style={{ padding: "12px 14px", background: "#f3f1ed", border: "1px solid #e5e7eb", borderRadius: "6px", marginBottom: "12px" }}>
                       <div style={{ fontSize: "12px", color: "#09090b", fontWeight: 700, marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Suggested from your {activeTpl.name} template</div>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                         {missing.map(k => (<button key={k} onClick={() => { const next = currentList.concat(k).join(", "); updBrand("primaryKeywords", next); }} style={{ padding: "5px 10px", background: "#eeeeec", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "4px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>+ {k}</button>))}
@@ -5966,7 +5966,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                             type="color"
                             value={val || "#000000"}
                             onChange={e => updBrand("brandColors", { ...bc, [key]: e.target.value })}
-                            style={{ width: "36px", height: "36px", padding: "2px", border: "1px solid #e5e7eb", borderRadius: "6px", background: "#f5f5f4", cursor: "pointer" }}
+                            style={{ width: "36px", height: "36px", padding: "2px", border: "1px solid #e5e7eb", borderRadius: "6px", background: "#f3f1ed", cursor: "pointer" }}
                           />
                           <input
                             style={{ ...I.inp, fontFamily: "monospace", textTransform: "lowercase" }}
@@ -5985,7 +5985,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   const filled = ["background", "accent", "text", "card"].filter(k => bc[k] && /^#[0-9a-f]{6}$/i.test(bc[k]));
                   const canApply = filled.includes("background") && filled.includes("accent");
                   if (!canApply) return (
-                    <div style={{ fontSize: "12px", color: "#09090b", padding: "10px 12px", background: "#f5f5f4", border: "1px solid #e5e7eb", borderRadius: "6px", lineHeight: 1.5 }}>
+                    <div style={{ fontSize: "12px", color: "#09090b", padding: "10px 12px", background: "#f3f1ed", border: "1px solid #e5e7eb", borderRadius: "6px", lineHeight: 1.5 }}>
                       Add valid hex codes for at least Background and Accent to enable the custom palette.
                     </div>
                   );
@@ -6049,7 +6049,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   if (!activeTpl || activeTpl.themeId !== brand.themeId) return null;
                   const tplTheme = THEMES.find(t => t.id === activeTpl.themeId);
                   return (
-                    <div style={{ padding: "10px 14px", background: "#f5f5f4", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px", color: "#09090b", fontWeight: 500, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <div style={{ padding: "10px 14px", background: "#f3f1ed", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "12px", color: "#09090b", fontWeight: 500, display: "flex", alignItems: "center", gap: "8px" }}>
                       <span style={{ background: "#000000", color: "#ffffff", padding: "3px 8px", borderRadius: "4px", fontSize: "9px", fontWeight: 600, letterSpacing: "0.05em" }}>TEMPLATE DEFAULT</span>
                       <span>Using <strong style={{ color: "#000000" }}>{tplTheme?.name}</strong> from the {activeTpl.name} template. Pick a different theme below to override.</span>
                     </div>
@@ -6195,7 +6195,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     Page Outline {page.sections.length > 0 && <span style={{ color: "#a3a39e" }}>· {page.sections.length} {page.sections.length === 1 ? "section" : "sections"}</span>}
                   </div>
                   {page.sections.length === 0 ? (
-                    <div style={{ padding: "20px 16px", background: "#f5f5f4", border: "1px dashed #d6d6d2", borderRadius: "8px", textAlign: "center", fontSize: "13px", color: "#09090b", marginBottom: "24px" }}>
+                    <div style={{ padding: "20px 16px", background: "#f3f1ed", border: "1px dashed #d6d6d2", borderRadius: "8px", textAlign: "center", fontSize: "13px", color: "#09090b", marginBottom: "24px" }}>
                       No sections added yet. Tap a section from the library below to start composing this page.
                     </div>
                   ) : (
