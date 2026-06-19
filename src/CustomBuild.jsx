@@ -3044,23 +3044,23 @@ export default function CustomBuild() {
                       <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>{draft.clientName}</div>
                       <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>
                         {draft.date} · {draft.pages.length} page{draft.pages.length !== 1 ? "s" : ""}
-                        {draft.hasGenerated && <span style={{ marginLeft: "8px", fontSize: "11px", background: "#f0fdf4", color: "#15803d", padding: "2px 6px", borderRadius: "3px", fontWeight: 600 }}>Generated</span>}
+                        {draft.hasGenerated && <span style={{ marginLeft: "8px", fontSize: "11px", background: "#fffbeb", color: "#b45309", padding: "2px 6px", borderRadius: "3px", fontWeight: 600 }}>Generated</span>}
                       </div>
                       <div style={{ display: "flex", gap: "4px", marginBottom: "14px", flexWrap: "wrap" }}>
                         {draft.pages.slice(0, 4).map(p => (
-                          <span key={p} style={{ fontSize: "9px", padding: "3px 8px", background: "#09090b", color: "#ffffff", borderRadius: "10px", whiteSpace: "nowrap", fontWeight: 500, letterSpacing: "0.02em" }}>{p}</span>
+                          <span key={p} style={{ fontSize: "9px", padding: "3px 8px", background: "#09090b", color: "#ffffff", borderRadius: "10px", whiteSpace: "nowrap", fontWeight: 500, letterSpacing: "0.02em" }}>{(ALL_PAGES.find(pg => pg.id === p) || {}).label || p.replace(/-\d+$/, "").replace(/(^|-)(.)/g, (_, s, c) => (s ? " " : "") + c.toUpperCase())}</span>
                         ))}
                         {draft.pages.length > 4 && <span style={{ fontSize: "11px", color: "#9ca3af" }}>+{draft.pages.length - 4}</span>}
                       </div>
                       <div style={{ display: "flex", gap: "8px" }}>
                         <button
                           onClick={() => resumeDraft(draft)}
-                          style={{ flex: 1, padding: "8px 0", fontSize: "12px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
+                          style={{ flex: 1, padding: "8px 0", fontSize: "12px", fontWeight: 600, background: "#6b635c", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" }}>
                           Resume
                         </button>
                         <button
                           onClick={() => deleteDraft(draft.id)}
-                          style={{ padding: "8px 12px", fontSize: "12px", background: "#fff", color: "#6b7280", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
+                          style={{ padding: "8px 12px", fontSize: "12px", background: "#fff", color: "#6b7280", border: "1px solid #dde0e6", borderRadius: "4px", cursor: "pointer" }}>
                           Delete
                         </button>
                       </div>
