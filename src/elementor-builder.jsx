@@ -4596,7 +4596,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   };
 
   const TabBtn = ({ id, label }) => (
-    <button onClick={() => setTab(id)} style={{ padding: "10px 16px", background: tab === id ? "#eeeeec" : "transparent", color: tab === id ? "#09090b" : "#09090b", border: "none", borderBottom: tab === id ? "2px solid #18181b" : "2px solid transparent", fontSize: "14px", fontWeight: 600, cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</button>
+    <button onClick={() => setTab(id)} style={{ padding: "8px 14px", background: tab === id ? "#ffffff" : "transparent", color: tab === id ? "#09090b" : "#6b7280", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: tab === id ? 700 : 500, cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.07em", margin: "4px 2px", boxShadow: tab === id ? "0 1px 3px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s", whiteSpace: "nowrap" }}>{label}</button>
   );
 
   // Builder format toggle — applies to both Page and Footer downloads
@@ -5562,16 +5562,19 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         <div className="tab-panel-bg" style={{ padding: "0", overflowY: "auto", maxHeight: "calc(100vh - 60px)", background: "#f5f5f4" }}>
 
           {/* Tabs */}
-          <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "20px 24px 0" }}>
-            <div className="tab-bar" style={{ borderBottom: "1px solid #e7e7e4", marginBottom: "16px", display: "flex", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
-              <TabBtn id="discovery" label="Discovery" />
-              <TabBtn id="positioning" label="Positioning" />
-              <TabBtn id="brand" label="Brand" />
-              <TabBtn id="page" label="Page" />
-              <TabBtn id="content" label="Content" />
-              <TabBtn id="social" label="Social" />
-              <TabBtn id="footer" label="Header & Footer" />
-              <TabBtn id="export" label="Export & Import" />
+          <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px" }}>
+            {/* Tab nav zone — subtle inset card */}
+            <div style={{ background: "#f5f5f4", borderRadius: "12px", padding: "4px 8px 0", marginBottom: "16px", marginTop: "16px" }}>
+              <div className="tab-bar" style={{ display: "flex", justifyContent: "center", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+                <TabBtn id="discovery" label="Discovery" />
+                <TabBtn id="positioning" label="Positioning" />
+                <TabBtn id="brand" label="Brand" />
+                <TabBtn id="page" label="Page" />
+                <TabBtn id="content" label="Content" />
+                <TabBtn id="social" label="Social" />
+                <TabBtn id="footer" label="Header & Footer" />
+                <TabBtn id="export" label="Export & Import" />
+              </div>
             </div>
             {/* Page switcher row — pills centered, Add Page right */}
             <div style={{ display: "flex", alignItems: "center", marginBottom: "16px", position: "relative" }}>
