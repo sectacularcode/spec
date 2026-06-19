@@ -5561,11 +5561,10 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         {/* LEFT — FORM */}
         <div className="tab-panel-bg" style={{ padding: "0", overflowY: "auto", maxHeight: "calc(100vh - 60px)", background: "#f3f1ed" }}>
 
-          {/* Tabs */}
-          <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px" }}>
-            {/* Tab nav zone — subtle inset card */}
-            <div style={{ background: "#f3f1ed", borderRadius: "12px", padding: "4px 8px 0", marginBottom: "16px", marginTop: "16px" }}>
-              <div className="tab-bar" style={{ display: "flex", justifyContent: "center", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+          {/* Tabs — full width warm stone bar */}
+          <div style={{ background: "#6b635c", width: "100%" }}>
+            <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px" }}>
+              <div className="tab-bar" style={{ display: "flex", justifyContent: "center", overflowX: "auto", WebkitOverflowScrolling: "touch", paddingTop: "10px" }}>
                 <TabBtn id="discovery" label="Discovery" />
                 <TabBtn id="positioning" label="Positioning" />
                 <TabBtn id="brand" label="Brand" />
@@ -5575,9 +5574,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <TabBtn id="footer" label="Header & Footer" />
                 <TabBtn id="export" label="Export & Import" />
               </div>
-            </div>
             {/* Page switcher row — pills centered, Add Page right */}
-            <div style={{ display: "flex", alignItems: "center", marginBottom: "16px", position: "relative" }}>
+            <div style={{ display: "flex", alignItems: "center", padding: "8px 0 10px", position: "relative" }}>
               <div style={{ flex: 1, display: "flex", justifyContent: "center", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
                 {project.pages.map((p, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: "3px" }}>
@@ -5602,6 +5600,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   </div>
                 )}
               </div>
+            </div>
             </div>
           </div>
 
