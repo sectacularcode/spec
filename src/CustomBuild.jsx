@@ -197,11 +197,11 @@ function IntakeForm({ onClose, onComplete }) {
   const S = { // field styles
     label: { display: "block", fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "4px" },
     hint: { fontSize: "11px", color: "#9ca3af", marginBottom: "6px", lineHeight: 1.5 },
-    input: { width: "100%", padding: "9px 12px", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "14px", color: "#09090b", outline: "none", background: "#fff", boxSizing: "border-box" },
-    textarea: { width: "100%", padding: "9px 12px", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "14px", color: "#09090b", outline: "none", background: "#fff", boxSizing: "border-box", resize: "vertical", fontFamily: "Inter, system-ui, sans-serif", lineHeight: 1.6 },
+    input: { width: "100%", maxWidth: "100%", padding: "9px 12px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "13px", color: "#09090b", outline: "none", background: "#fff", boxSizing: "border-box" },
+    textarea: { width: "100%", maxWidth: "100%", padding: "9px 12px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "13px", color: "#09090b", outline: "none", background: "#fff", boxSizing: "border-box", resize: "vertical", fontFamily: "Inter, system-ui, sans-serif", lineHeight: 1.6 },
     field: { marginBottom: "18px" },
     section: { marginBottom: "28px" },
-    sectionTitle: { fontSize: "13px", fontWeight: 700, color: "#09090b", marginBottom: "14px", paddingBottom: "8px", borderBottom: "1px solid #e5e7eb" },
+    sectionTitle: { fontSize: "13px", fontWeight: 700, color: "#09090b", marginBottom: "14px", paddingBottom: "8px", borderBottom: "1px solid #dde0e6" },
   };
 
   const tabs = {
@@ -258,7 +258,7 @@ function IntakeForm({ onClose, onComplete }) {
                 <div key={i} style={{ display: "grid", gridTemplateColumns: "120px 110px 1fr", gap: "8px", alignItems: "center" }}>
                   <input style={{ ...S.input, fontSize: "13px" }} value={c.name} onChange={e => setColor(i, "name", e.target.value)} placeholder="Color name" />
                   <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <input type="color" value={c.hex || "#ffffff"} onChange={e => setColor(i, "hex", e.target.value)} style={{ width: "32px", height: "32px", border: "1px solid #e5e7eb", borderRadius: "4px", cursor: "pointer", padding: "2px" }} />
+                    <input type="color" value={c.hex || "#ffffff"} onChange={e => setColor(i, "hex", e.target.value)} style={{ width: "32px", height: "32px", border: "1px solid #dde0e6", borderRadius: "4px", cursor: "pointer", padding: "2px" }} />
                     <input style={{ ...S.input, fontSize: "12px", fontFamily: "monospace" }} value={c.hex} onChange={e => setColor(i, "hex", e.target.value)} placeholder="#000000" />
                   </div>
                   <input style={{ ...S.input, fontSize: "12px", color: "#6b7280" }} value={c.use} onChange={e => setColor(i, "use", e.target.value)} placeholder="Use…" />
@@ -418,7 +418,7 @@ function IntakeForm({ onClose, onComplete }) {
           <div style={S.sectionTitle}>05 · Pricing, Built Out</div>
           <div style={{ fontSize: "12px", fontWeight: 600, color: "#6b7280", marginBottom: "12px" }}>The three tiers</div>
           {form.tiers.map((tier, i) => (
-            <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: "8px", padding: "14px", marginBottom: "12px" }}>
+            <div key={i} style={{ border: "1px solid #dde0e6", borderRadius: "8px", padding: "14px", marginBottom: "12px" }}>
               <div style={{ fontSize: "12px", fontWeight: 700, color: "#09090b", marginBottom: "10px" }}>Tier {i + 1}</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "8px" }}>
                 <input style={{ ...S.input, fontSize: "13px" }} value={tier.name} onChange={e => setTier(i, "name", e.target.value)} placeholder="Name e.g. Front Door" />
@@ -490,7 +490,7 @@ function IntakeForm({ onClose, onComplete }) {
           <div style={S.sectionTitle}>Page Titles & Meta Descriptions</div>
           <div style={S.hint} style={{ marginBottom: "16px", fontSize: "12px", color: "#6b7280" }}>Used in the SEO audit and exported as a reference sheet for your SEO plugin (Yoast, RankMath, etc.).</div>
           {form.seoPageTitles.map((s, i) => (
-            <div key={i} style={{ marginBottom: "18px", padding: "14px", border: "1px solid #e5e7eb", borderRadius: "8px" }}>
+            <div key={i} style={{ marginBottom: "18px", padding: "14px", border: "1px solid #dde0e6", borderRadius: "8px" }}>
               <div style={{ fontSize: "12px", fontWeight: 700, color: "#09090b", marginBottom: "10px" }}>{s.page}</div>
               <div style={S.field}>
                 <label style={S.label}>Title <span style={{ fontWeight: 400, color: s.title.length > 60 ? "#dc2626" : "#9ca3af" }}>{s.title.length}/60</span></label>
@@ -511,7 +511,7 @@ function IntakeForm({ onClose, onComplete }) {
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
       <div style={{ background: "#fff", borderRadius: "12px", width: "100%", maxWidth: "760px", maxHeight: "90vh", display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" }}>
         {/* Header */}
-        <div style={{ padding: "18px 24px", borderBottom: "1px solid #e5e7eb", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+        <div style={{ padding: "18px 24px", borderBottom: "1px solid #dde0e6", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
           <div>
             <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b" }}>Client intake form</div>
             <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "2px" }}>Fill out each section — this replaces uploading a brief doc</div>
@@ -519,7 +519,7 @@ function IntakeForm({ onClose, onComplete }) {
           <button onClick={onClose} style={{ background: "none", border: "none", fontSize: "20px", cursor: "pointer", color: "#6b7280", padding: "4px 8px" }}>×</button>
         </div>
         {/* Tab bar */}
-        <div style={{ display: "flex", borderBottom: "1px solid #e5e7eb", flexShrink: 0, overflowX: "auto" }}>
+        <div style={{ display: "flex", borderBottom: "1px solid #dde0e6", flexShrink: 0, overflowX: "auto" }}>
           {INTAKE_TABS.map((t, i) => (
             <button key={i} onClick={() => setTab(i)} style={{ padding: "10px 18px", fontSize: "13px", fontWeight: tab === i ? 600 : 400, color: tab === i ? "#09090b" : "#6b7280", background: "transparent", border: "none", cursor: "pointer", borderBottom: tab === i ? "2px solid #09090b" : "2px solid transparent", whiteSpace: "nowrap" }}>
               {t}
@@ -531,9 +531,9 @@ function IntakeForm({ onClose, onComplete }) {
           {tabs[tab]}
         </div>
         {/* Footer */}
-        <div style={{ padding: "14px 24px", borderTop: "1px solid #e5e7eb", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+        <div style={{ padding: "14px 24px", borderTop: "1px solid #dde0e6", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
           <div style={{ display: "flex", gap: "8px" }}>
-            {tab > 0 && <button onClick={() => setTab(tab - 1)} style={{ padding: "8px 16px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px", background: "#fff", cursor: "pointer" }}>← {INTAKE_TABS[tab - 1]}</button>}
+            {tab > 0 && <button onClick={() => setTab(tab - 1)} style={{ padding: "8px 16px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", cursor: "pointer" }}>← {INTAKE_TABS[tab - 1]}</button>}
           </div>
           <div style={{ display: "flex", gap: "8px" }}>
             {tab < INTAKE_TABS.length - 1 ? (
@@ -561,8 +561,8 @@ function BriefReview({ parsed, onConfirm, onClose }) {
 
   const S = {
     label: { display: "block", fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "4px" },
-    input: { width: "100%", padding: "8px 10px", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", color: "#09090b", outline: "none", background: "#fff", boxSizing: "border-box" },
-    textarea: { width: "100%", padding: "8px 10px", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", color: "#09090b", outline: "none", background: "#fff", boxSizing: "border-box", resize: "vertical", fontFamily: "Inter, system-ui, sans-serif", lineHeight: 1.5 },
+    input: { width: "100%", padding: "8px 10px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", outline: "none", background: "#fff", boxSizing: "border-box" },
+    textarea: { width: "100%", padding: "8px 10px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", outline: "none", background: "#fff", boxSizing: "border-box", resize: "vertical", fontFamily: "Inter, system-ui, sans-serif", lineHeight: 1.5 },
     field: { marginBottom: "14px" },
     section: { marginBottom: "24px", paddingBottom: "20px", borderBottom: "1px solid #f4f4f5" },
     sectionTitle: { fontSize: "12px", fontWeight: 700, color: "#09090b", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "12px" },
@@ -605,7 +605,7 @@ function BriefReview({ parsed, onConfirm, onClose }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
       <div style={{ background: "#fff", borderRadius: "12px", width: "100%", maxWidth: "680px", maxHeight: "90vh", display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" }}>
-        <div style={{ padding: "18px 24px", borderBottom: "1px solid #e5e7eb", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+        <div style={{ padding: "18px 24px", borderBottom: "1px solid #dde0e6", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
           <div>
             <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b" }}>Review parsed brief</div>
             <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "2px" }}>
@@ -652,8 +652,8 @@ function BriefReview({ parsed, onConfirm, onClose }) {
             </div>
           ))}
         </div>
-        <div style={{ padding: "14px 24px", borderTop: "1px solid #e5e7eb", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-          <button onClick={onClose} style={{ padding: "8px 16px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px", background: "#fff", cursor: "pointer", color: "#6b7280" }}>Cancel</button>
+        <div style={{ padding: "14px 24px", borderTop: "1px solid #dde0e6", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+          <button onClick={onClose} style={{ padding: "8px 16px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", cursor: "pointer", color: "#6b7280" }}>Cancel</button>
           <button onClick={() => onConfirm(draft)} style={{ padding: "8px 24px", fontSize: "13px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
             Looks good — use this brief →
           </button>
@@ -2451,11 +2451,11 @@ function buildPreviewHTML(brief, activePage, variant) {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 var T = {
-  surface: { background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "20px" },
+  surface: { background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "10px", padding: "20px", boxSizing: "border-box" },
   label: { fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "8px", display: "block" },
-  input: { width: "100%", padding: "10px 12px", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "14px", color: "#09090b", outline: "none", background: "#fff" },
+  input: { width: "100%", padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "14px", color: "#09090b", outline: "none", background: "#fff" },
   btnPrimary: { padding: "12px 24px", background: "#000", color: "#fff", border: "none", borderRadius: "6px", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px" },
-  btnGhost: { padding: "10px 16px", background: "transparent", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" },
+  btnGhost: { padding: "10px 16px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" },
   stepNum: function(active, done) { return { width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 700, background: done ? "#000" : active ? "#000" : "#f3f4f6", color: done || active ? "#fff" : "#9ca3af", flexShrink: 0 }; },
 };
 
@@ -3013,12 +3013,12 @@ export default function CustomBuild() {
           </div>
 
           {drafts.length === 0 ? (
-            <div style={{ border: "2px dashed #e5e7eb", borderRadius: "12px", padding: "64px", textAlign: "center" }}>
+            <div style={{ border: "2px dashed #dde0e6", borderRadius: "12px", padding: "64px", textAlign: "center" }}>
               <div style={{ fontSize: "15px", fontWeight: 600, color: "#09090b", marginBottom: "8px" }}>No saved builds yet</div>
               <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "24px" }}>Upload a brief or fill out the intake form to get started.</div>
               <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
                 <button onClick={() => setDraftsView(false)} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>Start a build</button>
-                <button onClick={() => { setShowIntake(true); setDraftsView(false); }} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 500, background: "#fff", color: "#09090b", border: "1px solid #e5e7eb", borderRadius: "6px", cursor: "pointer" }}>Fill out intake form</button>
+                <button onClick={() => { setShowIntake(true); setDraftsView(false); }} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 500, background: "#fff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>Fill out intake form</button>
               </div>
             </div>
           ) : (
@@ -3026,7 +3026,7 @@ export default function CustomBuild() {
               {/* New build card */}
               <div
                 onClick={() => setDraftsView(false)}
-                style={{ border: "2px dashed #e5e7eb", borderRadius: "10px", padding: "24px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "180px", gap: "8px" }}
+                style={{ border: "2px dashed #dde0e6", borderRadius: "10px", padding: "24px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "180px", gap: "8px" }}
                 onMouseOver={e => e.currentTarget.style.borderColor = "#09090b"}
                 onMouseOut={e => e.currentTarget.style.borderColor = "#dde0e6"}>
                 <div style={{ fontSize: "24px", color: "#6b7280" }}>+</div>
@@ -3037,7 +3037,7 @@ export default function CustomBuild() {
                 const colors = draft.colors || {};
                 const colorValues = Object.values(colors).filter(Boolean);
                 return (
-                  <div key={draft.id} style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: "10px", overflow: "hidden" }}>
+                  <div key={draft.id} style={{ background: "#fff", border: "1px solid #dde0e6", borderRadius: "10px", overflow: "hidden" }}>
                     {/* Color preview */}
                     <div style={{ height: "6px", background: colorValues.length > 0 ? `linear-gradient(to right, ${colorValues.slice(0,4).join(", ")})` : "#dde0e6" }} />
                     <div style={{ padding: "18px" }}>
@@ -3060,7 +3060,7 @@ export default function CustomBuild() {
                         </button>
                         <button
                           onClick={() => deleteDraft(draft.id)}
-                          style={{ padding: "8px 12px", fontSize: "12px", background: "#fff", color: "#6b7280", border: "1px solid #e5e7eb", borderRadius: "6px", cursor: "pointer" }}>
+                          style={{ padding: "8px 12px", fontSize: "12px", background: "#fff", color: "#6b7280", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
                           Delete
                         </button>
                       </div>
@@ -3074,7 +3074,7 @@ export default function CustomBuild() {
       )}
 
       {!draftsView && (
-      <div style={{ borderBottom: "1px solid #e5e7eb", background: "#fff", padding: "16px 24px", display: "flex", alignItems: "center", gap: "16px", width: "100%", boxSizing: "border-box" }}>
+      <div style={{ borderBottom: "1px solid #dde0e6", background: "#fff", padding: "16px 24px", display: "flex", alignItems: "center", gap: "16px", width: "100%", boxSizing: "border-box" }}>
         <button onClick={() => setDraftsView(true)} style={{ background: "none", border: "none", fontSize: "13px", color: "#6b7280", cursor: "pointer", padding: "0", marginRight: "4px" }}>← Builds</button>
         <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b" }}>Brief to Blueprint</div>
         <div style={{ marginLeft: "auto", display: "flex", gap: "8px", alignItems: "center" }}>
@@ -3086,7 +3086,7 @@ export default function CustomBuild() {
                 setPreviewPage("home"); setPageOverrides({}); setCustomPages([]);
                 { try { await kvStorageDel("spec-blueprint-draft"); } catch(e) {} }
               }}
-              style={{ fontSize: "12px", color: "#6b7280", background: "none", border: "1px solid #e5e7eb", borderRadius: "6px", padding: "6px 12px", cursor: "pointer" }}>
+              style={{ fontSize: "12px", color: "#6b7280", background: "none", border: "1px solid #dde0e6", borderRadius: "6px", padding: "6px 12px", cursor: "pointer" }}>
               Clear draft
             </button>
           )}
@@ -3104,7 +3104,7 @@ export default function CustomBuild() {
       {!draftsView && (
       <div style={{ display: "grid", gridTemplateColumns: generated ? "520px 1fr" : "1fr", gap: "0", minHeight: "calc(100vh - 57px)" }}>
 
-        <div style={{ padding: "clamp(20px,3vw,40px) clamp(16px,3vw,40px)", borderRight: generated ? "1px solid #e5e7eb" : "none", overflowY: "auto", flexShrink: 0 }}>
+        <div style={{ padding: "clamp(20px,3vw,40px) clamp(16px,3vw,40px)", borderRight: generated ? "1px solid #dde0e6" : "none", overflowY: "auto", flexShrink: 0 }}>
           <div style={{ maxWidth: generated ? "100%" : "1100px", margin: "0 auto" }}>
 
           {/* STEP 1 */}
@@ -3114,14 +3114,14 @@ export default function CustomBuild() {
               <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Brand Brief</div>
               {brief && <span style={{ fontSize: "12px", color: "#09090b", marginLeft: "auto" }}>✓ {briefName}</span>}
             </div>
-            <div style={{ ...T.surface, border: brief ? "1px solid #e5e7eb" : "1px solid #e5e7eb" }}>
+            <div style={{ ...T.surface, border: brief ? "1px solid #dde0e6" : "1px solid #dde0e6" }}>
               {!brief ? (
                 <>
                   <div
                     onClick={() => fileRef.current?.click()}
                     onDragOver={e => e.preventDefault()}
                     onDrop={e => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); }}
-                    style={{ border: "2px dashed #e5e7eb", borderRadius: "6px", padding: "32px", textAlign: "center", cursor: "pointer" }}
+                    style={{ border: "2px dashed #dde0e6", borderRadius: "6px", padding: "32px", textAlign: "center", cursor: "pointer" }}
                     onMouseOver={e => e.currentTarget.style.borderColor = "#000"}
                     onMouseOut={e => e.currentTarget.style.borderColor = "#dde0e6"}
                   >
@@ -3133,7 +3133,7 @@ export default function CustomBuild() {
                   <div style={{ textAlign: "center", margin: "12px 0", fontSize: "12px", color: "#9ca3af" }}>or</div>
                   <button
                     onClick={() => setShowIntake(true)}
-                    style={{ width: "100%", padding: "12px", fontSize: "13px", fontWeight: 600, background: "#fff", border: "1px solid #e5e7eb", borderRadius: "6px", cursor: "pointer", color: "#09090b" }}>
+                    style={{ width: "100%", padding: "12px", fontSize: "13px", fontWeight: 600, background: "#fff", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", color: "#09090b" }}>
                     Fill out intake form
                   </button>
                   {parsing && <div style={{ marginTop: "12px", padding: "12px", background: "#f4f4f5", borderRadius: "6px", fontSize: "13px", color: "#09090b" }}>Reading brief — this takes a few seconds...</div>}
@@ -3250,13 +3250,13 @@ export default function CustomBuild() {
               <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>Only checked pages are included in the export.</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                 {ALL_PAGES.map(p => (
-                  <label key={p.id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px", border: selectedPages.includes(p.id) ? "1px solid #000" : "1px solid #e5e7eb", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: 500, color: "#09090b" }}>
+                  <label key={p.id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px", border: selectedPages.includes(p.id) ? "1px solid #000" : "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: 500, color: "#09090b" }}>
                     <input type="checkbox" checked={selectedPages.includes(p.id)} onChange={() => togglePage(p.id)} style={{ accentColor: "#000", width: "15px", height: "15px" }} />
                     <span>{p.label}</span>
                   </label>
                 ))}
                 {customPages.map(p => (
-                  <label key={p.id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px", border: selectedPages.includes(p.id) ? "1px solid #000" : "1px solid #e5e7eb", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: 500, color: "#09090b" }}>
+                  <label key={p.id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px", border: selectedPages.includes(p.id) ? "1px solid #000" : "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: 500, color: "#09090b" }}>
                     <input type="checkbox" checked={selectedPages.includes(p.id)} onChange={() => togglePage(p.id)} style={{ accentColor: "#000", width: "15px", height: "15px" }} />
                     <span style={{ flex: 1 }}>{p.label}</span>
                     <button
@@ -3274,7 +3274,7 @@ export default function CustomBuild() {
                   + Add page
                 </button>
                 {showAddPage && (
-                  <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px", boxShadow: "0 4px 16px rgba(0,0,0,0.1)", zIndex: 50, maxHeight: "240px", overflowY: "auto" }}>
+                  <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff", border: "1px solid #dde0e6", borderRadius: "8px", boxShadow: "0 4px 16px rgba(0,0,0,0.1)", zIndex: 50, maxHeight: "240px", overflowY: "auto" }}>
                     {ADDITIONAL_PAGE_TYPES.filter(p => !customPages.find(cp => cp.id === p.id)).map(p => (
                       <button
                         key={p.id}
@@ -3307,12 +3307,12 @@ export default function CustomBuild() {
             <div style={T.surface}>
               <div style={{ fontSize: "13px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>Use copy from brand brief only?</div>
               <div style={{ display: "flex", gap: "10px" }}>
-                <label style={{ flex: 1, padding: "14px", border: copyBriefOnly ? "2px solid #000" : "1px solid #e5e7eb", borderRadius: "6px", cursor: "pointer", textAlign: "center" }}>
+                <label style={{ flex: 1, padding: "14px", border: copyBriefOnly ? "2px solid #000" : "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", textAlign: "center" }}>
                   <input type="radio" name="copy" checked={copyBriefOnly} onChange={() => setCopy(true)} style={{ display: "none" }} />
                   <div style={{ fontSize: "14px", fontWeight: 700, color: "#09090b" }}>Yes</div>
                   <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>Brief copy used verbatim. Nothing is changed or generated by AI.</div>
                 </label>
-                <label style={{ flex: 1, padding: "14px", border: !copyBriefOnly ? "2px solid #000" : "1px solid #e5e7eb", borderRadius: "6px", cursor: "pointer", textAlign: "center" }}>
+                <label style={{ flex: 1, padding: "14px", border: !copyBriefOnly ? "2px solid #000" : "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", textAlign: "center" }}>
                   <input type="radio" name="copy" checked={!copyBriefOnly} onChange={() => setCopy(false)} style={{ display: "none" }} />
                   <div style={{ fontSize: "14px", fontWeight: 700, color: "#09090b" }}>No</div>
                   <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>AI may draft blank fields in the brand voice. You approve before export.</div>
@@ -3348,7 +3348,7 @@ export default function CustomBuild() {
                           value={value}
                           onChange={e => setDraftedFields(prev => ({ ...prev, [key]: e.target.value }))}
                           rows={2}
-                          style={{ width: "100%", padding: "8px 10px", fontSize: "13px", border: "1px solid #e5e7eb", borderRadius: "6px", resize: "vertical", fontFamily: "Inter, system-ui, sans-serif", boxSizing: "border-box" }}
+                          style={{ width: "100%", padding: "8px 10px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", resize: "vertical", fontFamily: "Inter, system-ui, sans-serif", boxSizing: "border-box" }}
                         />
                       </div>
                     ))}
@@ -3389,12 +3389,12 @@ export default function CustomBuild() {
 
         {generated && (
           <div style={{ display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
-            <div style={{ padding: "12px 16px", borderBottom: "1px solid #e5e7eb", background: "#fff", display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+            <div style={{ padding: "12px 16px", borderBottom: "1px solid #dde0e6", background: "#fff", display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
               <span style={{ fontSize: "12px", color: "#6b7280", fontWeight: 600, marginRight: "4px" }}>PREVIEW</span>
               {generated.pages.map(p => (
                 <button key={p.id}
                   onClick={() => setPreviewPage(p.id)}
-                  style={{ padding: "6px 14px", fontSize: "13px", fontWeight: 500, cursor: "pointer", border: previewPage === p.id ? "1px solid #000" : "1px solid #e5e7eb", borderRadius: "20px", background: previewPage === p.id ? "#000" : "#fff", color: previewPage === p.id ? "#fff" : "#09090b" }}>
+                  style={{ padding: "6px 14px", fontSize: "13px", fontWeight: 500, cursor: "pointer", border: previewPage === p.id ? "1px solid #000" : "1px solid #dde0e6", borderRadius: "20px", background: previewPage === p.id ? "#000" : "#fff", color: previewPage === p.id ? "#fff" : "#09090b" }}>
                   {p.label}
                 </button>
               ))}
@@ -3402,16 +3402,16 @@ export default function CustomBuild() {
               {sectionLibrary.length > 0 && (
                 <button
                   onClick={() => { setSwapDrawer(previewPage); setSwapFilter(""); }}
-                  style={{ marginLeft: "8px", padding: "6px 14px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "1px solid #e5e7eb", borderRadius: "20px", background: swapDrawer === previewPage ? "#09090b" : "#fff", color: swapDrawer === previewPage ? "#fff" : "#09090b" }}>
+                  style={{ marginLeft: "8px", padding: "6px 14px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "20px", background: swapDrawer === previewPage ? "#09090b" : "#fff", color: swapDrawer === previewPage ? "#fff" : "#09090b" }}>
                   Swap sections
                 </button>
               )}
               {/* Desktop / Mobile toggle */}
-              <div style={{ marginLeft: "auto", display: "flex", border: "1px solid #e5e7eb", borderRadius: "6px", overflow: "hidden" }}>
+              <div style={{ marginLeft: "auto", display: "flex", border: "1px solid #dde0e6", borderRadius: "6px", overflow: "hidden" }}>
                 <button
                   onClick={() => setMobilePreview(false)}
                   title="Desktop preview"
-                  style={{ padding: "6px 12px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: !mobilePreview ? "#09090b" : "#fff", color: !mobilePreview ? "#fff" : "#6b7280", borderRight: "1px solid #e5e7eb" }}>
+                  style={{ padding: "6px 12px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: !mobilePreview ? "#09090b" : "#fff", color: !mobilePreview ? "#fff" : "#6b7280", borderRight: "1px solid #dde0e6" }}>
                   Desktop
                 </button>
                 <button
@@ -3431,7 +3431,7 @@ export default function CustomBuild() {
                         onClick={() => setLayoutVariants(prev => ({ ...prev, [p.id]: v }))}
                         style={{
                           padding: "5px 14px", fontSize: "12px", fontWeight: 600, cursor: "pointer",
-                          border: (layoutVariants[p.id] || p.recommended) === v ? "1px solid #000" : "1px solid #e5e7eb",
+                          border: (layoutVariants[p.id] || p.recommended) === v ? "1px solid #000" : "1px solid #dde0e6",
                           borderRadius: "4px",
                           background: (layoutVariants[p.id] || p.recommended) === v ? "#000" : "#fff",
                           color: (layoutVariants[p.id] || p.recommended) === v ? "#fff" : "#6b7280",
@@ -3455,8 +3455,8 @@ export default function CustomBuild() {
 
             {/* Swap drawer */}
             {swapDrawer && (
-              <div style={{ position: "absolute", top: "57px", right: 0, width: "360px", height: "calc(100% - 57px)", background: "#fff", borderLeft: "1px solid #e5e7eb", zIndex: 10, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-                <div style={{ padding: "16px", borderBottom: "1px solid #e5e7eb", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ position: "absolute", top: "57px", right: 0, width: "360px", height: "calc(100% - 57px)", background: "#fff", borderLeft: "1px solid #dde0e6", zIndex: 10, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                <div style={{ padding: "16px", borderBottom: "1px solid #dde0e6", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <div>
                     <div style={{ fontSize: "14px", fontWeight: 700, color: "#09090b" }}>Swap a section</div>
                     <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "2px" }}>From past builds — click to swap into this page</div>
@@ -3464,11 +3464,11 @@ export default function CustomBuild() {
                   <button onClick={() => setSwapDrawer(null)} style={{ background: "none", border: "none", fontSize: "18px", cursor: "pointer", color: "#6b7280", padding: "4px 8px" }}>×</button>
                 </div>
                 {/* Filter by page type */}
-                <div style={{ padding: "10px 16px", borderBottom: "1px solid #e5e7eb", display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                <div style={{ padding: "10px 16px", borderBottom: "1px solid #dde0e6", display: "flex", gap: "6px", flexWrap: "wrap" }}>
                   {["", "home", "work", "services", "about", "process", "contact"].map(f => (
                     <button key={f}
                       onClick={() => setSwapFilter(f)}
-                      style={{ padding: "4px 10px", fontSize: "11px", fontWeight: 600, cursor: "pointer", border: swapFilter === f ? "1px solid #000" : "1px solid #e5e7eb", borderRadius: "12px", background: swapFilter === f ? "#000" : "#fff", color: swapFilter === f ? "#fff" : "#6b7280" }}>
+                      style={{ padding: "4px 10px", fontSize: "11px", fontWeight: 600, cursor: "pointer", border: swapFilter === f ? "1px solid #000" : "1px solid #dde0e6", borderRadius: "12px", background: swapFilter === f ? "#000" : "#fff", color: swapFilter === f ? "#fff" : "#6b7280" }}>
                       {f || "All"}
                     </button>
                   ))}
@@ -3494,7 +3494,7 @@ export default function CustomBuild() {
                             });
                             setSwapDrawer(null);
                           }}
-                          style={{ padding: "12px", border: "1px solid #e5e7eb", borderRadius: "8px", marginBottom: "8px", cursor: "pointer", transition: "border-color 0.15s" }}
+                          style={{ padding: "12px", border: "1px solid #dde0e6", borderRadius: "8px", marginBottom: "8px", cursor: "pointer", transition: "border-color 0.15s" }}
                           onMouseOver={e => e.currentTarget.style.borderColor = "#000"}
                           onMouseOut={e => e.currentTarget.style.borderColor = "#dde0e6"}>
                           {/* Color preview bar */}
@@ -3524,7 +3524,7 @@ export default function CustomBuild() {
               <iframe
                 srcDoc={buildPreviewHTML(brief, previewPage, layoutVariants[previewPage] || "A")}
                 style={{
-                  border: mobilePreview ? "1px solid #e5e7eb" : "none",
+                  border: mobilePreview ? "1px solid #dde0e6" : "none",
                   borderRadius: mobilePreview ? "12px" : "0",
                   width: mobilePreview ? "390px" : "100%",
                   minHeight: mobilePreview ? "844px" : "calc(100vh - 100px)",
@@ -3541,6 +3541,7 @@ export default function CustomBuild() {
     </div>
   );
 }
+
 
 
 
