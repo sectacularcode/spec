@@ -5,34 +5,31 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const { brief } = req.body || {};
+  const { brief, positioning } = req.body || {};
   if (!brief) return res.status(400).json({ error: "No brief provided" });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "ANTHROPIC_API_KEY not set" });
 
-  // Fields that AI can draft — only if blank or placeholder
   const DRAFTABLE_FIELDS = [
-    { key: "heroHeadline", label: "Hero headline", hint: "A short, punchy headline for the hero section. 5-10 words max." },
-    { key: "heroSubhead", label: "Hero subheadline", hint: "A single sentence expanding on the headline. Plain, specific." },
+    { key: "heroHeadline", label: "Hero headline", hint: "A short, punchy headline for the hero section. 5-10 words max. Should include or allude to a primary keyword if possible." },
+    { key: "heroSubhead", label: "Hero subheadline", hint: "A single sentence expanding on the headline. Plain, specific, speaks directly to the target audience." },
     { key: "hookStatement", label: "Honest hook", hint: "One or two sentences that call out the problem and position this brand as the solution. No buzzwords." },
-    { key: "differenceH2", label: "Difference headline", hint: "A short H2 headline that names the key differentiator. 4-8 words." },
-    { key: "differenceBody", label: "Difference body copy", hint: "2-3 sentences explaining what makes this brand different. Specific, not generic." },
+    { key: "differenceH2", label: "Difference headline", hint: "A short H2 that names the key differentiator. 4-8 words. Should reflect the competitive differentiator." },
+    { key: "differenceBody", label: "Difference body copy", hint: "2-3 sentences explaining what makes this brand different. Specific, not generic. Reference the competitive differentiator." },
     { key: "whoH2", label: "Who it is for headline", hint: "A short H2 that names the target audience. 3-6 words." },
-    { key: "whoBody", label: "Who it is for body", hint: "2-3 sentences describing the ideal client. Be specific about who they are and their problem." },
-    { key: "aboutStory", label: "About story paragraph 1", hint: "The first paragraph of the founder/company story. When it started, what drove it." },
-    { key: "aboutStory2", label: "About story paragraph 2", hint: "Second paragraph. What they noticed, why they built this." },
-    { key: "whyOneMaker", label: "Why this approach body", hint: "2-3 sentences explaining the approach and why it works for clients." },
-    { key: "calloutBody", label: "Process callout body", hint: "1-2 sentences about what to expect — timeline and delivery. Calm and specific." },
-    { key: "contactIntro", label: "Contact intro", hint: "2-3 sentences inviting the visitor to get in touch. Warm but direct." },
-    { key: "contactReassurance", label: "Contact reassurance line", hint: "One short sentence under the form. No sales team, real reply, specific promise." },
+    { key: "whoBody", label: "Who it is for body", hint: "2-3 sentences describing the ideal client using the target audience definition. Be specific." },
+    { key: "aboutStory", label: "About story", hint: "The founder or company story. When it started, what drove it, who it serves." },
+    { key: "whyOneMaker", label: "Why this approach", hint: "2-3 sentences on the approach and why it works for clients. Reference the competitive differentiator." },
+    { key: "processIntro", label: "Process intro", hint: "One sentence about what to expect — calm, specific, no jargon." },
+    { key: "contactIntro", label: "Contact intro", hint: "2-3 sentences inviting the visitor to get in touch. Warm but direct. Reference the key CTA." },
+    { key: "contactReassurance", label: "Contact reassurance", hint: "One short sentence under the form. Specific promise, no sales team language." },
   ];
 
-  // Find which fields are blank or placeholder
   const blankFields = DRAFTABLE_FIELDS.filter(f => {
     const val = brief[f.key];
     if (!val || val.trim() === "") return true;
-    if (val.includes("[") && val.includes("]")) return false; // brackets = human must fill
+    if (val.includes("[") && val.includes("]")) return false;
     return false;
   });
 
@@ -40,43 +37,55 @@ export default async function handler(req, res) {
     return res.status(200).json({ drafts: {}, message: "No blank fields to draft" });
   }
 
-  // Build brand voice context
   const voiceRules = (brief.voiceRules || []).join("\n- ");
-  const brandContext = [
-    brief.brandName ? `Brand: ${brief.brandName}` : "",
-    brief.tagline ? `Tagline: ${brief.tagline}` : "",
-    brief.hookStatement ? `Hook: ${brief.hookStatement}` : "",
-    brief.whoBody ? `Audience: ${brief.whoBody}` : "",
-    brief.aboutStory ? `Story: ${brief.aboutStory}` : "",
+
+  // Build positioning context if available
+  const pos = positioning || {};
+  const positioningContext = [
+    pos.valueProposition ? "Value proposition: " + pos.valueProposition : "",
+    pos.targetAudience ? "Target audience: " + pos.targetAudience : "",
+    pos.competitiveDifferentiator ? "Key differentiator: " + pos.competitiveDifferentiator : "",
+    pos.keyMessages && pos.keyMessages.length > 0 ? "Key messages:\n- " + pos.keyMessages.join("\n- ") : "",
+    pos.primaryKeywords && pos.primaryKeywords.length > 0 ? "Primary keywords to weave in naturally: " + pos.primaryKeywords.join(", ") : "",
+    pos.secondaryKeywords && pos.secondaryKeywords.length > 0 ? "Secondary keywords: " + pos.secondaryKeywords.join(", ") : "",
   ].filter(Boolean).join("\n");
 
-  const fieldsPrompt = blankFields.map(f =>
-    `"${f.key}": ${f.hint}`
-  ).join("\n");
+  const brandContext = [
+    brief.brandName ? "Brand: " + brief.brandName : "",
+    brief.tagline ? "Tagline: " + brief.tagline : "",
+    brief.hookStatement ? "Hook: " + brief.hookStatement : "",
+    brief.whoBody ? "Audience: " + brief.whoBody : "",
+    brief.aboutStory ? "Story: " + brief.aboutStory : "",
+  ].filter(Boolean).join("\n");
 
-  const prompt = `You are writing copy for a website. Follow the brand voice rules exactly.
+  const fieldsPrompt = blankFields.map(f => '"' + f.key + '": ' + f.hint).join("\n");
+
+  const prompt = `You are writing website copy for a brand. Follow the voice rules and positioning exactly.
 
 BRAND CONTEXT:
 ${brandContext}
 
+${positioningContext ? "POSITIONING & STRATEGY:\n" + positioningContext : ""}
+
 VOICE RULES:
 - ${voiceRules || "Plain words. Short sentences. Specific beats grand. No buzzwords."}
 
-Draft copy for these blank fields. Return ONLY valid JSON with the field keys and drafted values.
-Never add markdown, never explain, never use placeholder brackets.
-Write as if you are the brand — in first person where appropriate.
-Keep every field SHORT unless the hint says otherwise.
+INSTRUCTIONS:
+- Write copy that reflects the positioning and key messages above
+- Weave in primary keywords naturally — never force them
+- Stay in brand voice at all times
+- Never use generic filler — every sentence must be specific to this brand
+- Return ONLY valid JSON, no markdown, no explanation
 
 FIELDS TO DRAFT:
 ${fieldsPrompt}
 
 Return format:
 {
-  "heroHeadline": "drafted copy here",
-  "differenceBody": "drafted copy here"
+  "fieldKey": "drafted copy here"
 }
 
-Only include keys for fields listed above. Never invent fields.`;
+Only include keys for the fields listed above.`;
 
   try {
     const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -89,14 +98,12 @@ Only include keys for fields listed above. Never invent fields.`;
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
         max_tokens: 2000,
-        system: "You are a brand copywriter. Return ONLY valid JSON with no markdown, no code fences, no explanation.",
+        system: "You are a brand strategist and copywriter. Return ONLY valid JSON with no markdown, no code fences, no explanation.",
         messages: [{ role: "user", content: prompt }],
       }),
     });
 
-    if (!response.ok) {
-      return res.status(500).json({ error: "API error", drafts: {} });
-    }
+    if (!response.ok) return res.status(500).json({ error: "API error", drafts: {} });
 
     const data = await response.json();
     const raw = data.content?.[0]?.text || "";
