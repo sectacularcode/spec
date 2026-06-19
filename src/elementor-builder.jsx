@@ -6545,7 +6545,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 {(page.testimonials || "||\n||\n||").split("\n").slice(0, 3).map((line, i) => {
                   const parts = line.split("|");
                   return (
-                    <div key={i} style={{ background: "#f5f5f7", border: "1px solid #dde0e6", borderRadius: "8px", padding: "14px 16px", marginBottom: "10px" }}>
+                    <div key={i} style={{ background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "8px", padding: "14px 16px", marginBottom: "10px" }}>
                       <div style={{ fontSize: "10px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>Testimonial {i + 1}</div>
                       <div style={{ marginBottom: "8px" }}>
                         <label style={I.lbl}>Quote</label>
@@ -6569,7 +6569,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 {(page.faq || "||\n||\n||\n||").split("\n").slice(0, 4).map((line, i) => {
                   const parts = line.split("|");
                   return (
-                    <div key={i} style={{ background: "#f5f5f7", border: "1px solid #dde0e6", borderRadius: "8px", padding: "14px 16px", marginBottom: "10px" }}>
+                    <div key={i} style={{ background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "8px", padding: "14px 16px", marginBottom: "10px" }}>
                       <div style={{ fontSize: "10px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>FAQ {i + 1}</div>
                       <div style={{ marginBottom: "8px" }}>
                         <label style={I.lbl}>Question</label>
