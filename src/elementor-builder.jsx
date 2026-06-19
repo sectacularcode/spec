@@ -5575,7 +5575,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <TabBtn id="export" label="Export & Import" />
               </div>
             {/* Page switcher row — pills centered, Add Page right */}
-            <div style={{ display: "flex", alignItems: "center", padding: "10px 0 12px", position: "relative" }}>
+            <div style={{ display: "flex", alignItems: "center", padding: "14px 0 16px", position: "relative" }}>
               <div style={{ flex: 1, display: "flex", justifyContent: "center", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
                 {project.pages.map((p, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: "3px" }}>
