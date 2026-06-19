@@ -3099,7 +3099,9 @@ export default function CustomBuild() {
           ))}
         </div>
       </div>
+      )}
 
+      {!draftsView && (
       <div style={{ display: "grid", gridTemplateColumns: generated ? "520px 1fr" : "1fr", gap: "0", minHeight: "calc(100vh - 57px)" }}>
 
         <div style={{ padding: "clamp(20px,3vw,40px) clamp(16px,3vw,40px)", borderRight: generated ? "1px solid #e5e7eb" : "none", overflowY: "auto", flexShrink: 0 }}>
@@ -3535,10 +3537,11 @@ export default function CustomBuild() {
           </div>
         )}
       </div>
-      )} {/* end !draftsView */}
+      )} {/* end !draftsView grid */}
     </div>
   );
 }
+
 
 
 
