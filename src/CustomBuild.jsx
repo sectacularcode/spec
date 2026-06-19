@@ -3074,7 +3074,7 @@ export default function CustomBuild() {
       )}
 
       {!draftsView && (
-      <div style={{ borderBottom: "1px solid #dde0e6", background: "#fff", padding: "16px 24px", display: "flex", alignItems: "center", gap: "16px", width: "100%", boxSizing: "border-box" }}>
+      <div style={{ borderBottom: "1px solid #dde0e6", background: "#fff", padding: "10px 24px", display: "flex", alignItems: "center", gap: "16px", width: "100%", boxSizing: "border-box" }}>
         <button onClick={() => setDraftsView(true)} style={{ background: "none", border: "none", fontSize: "13px", color: "#6b7280", cursor: "pointer", padding: "0", marginRight: "4px" }}>← Builds</button>
         <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b" }}>Brief to Blueprint</div>
         <div style={{ marginLeft: "auto", display: "flex", gap: "8px", alignItems: "center" }}>
