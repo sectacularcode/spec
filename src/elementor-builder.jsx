@@ -6598,6 +6598,41 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     </button>
                   ))}
                 </div>
+                {(() => {
+                  const pc = brand.cardBgColor || "#1a1a1a";
+                  const ac = brand.accentColor || "#c9a86a";
+                  const bf = brand.bodyFont || "Inter";
+                  const hf = brand.headingFont || "Inter";
+                  const theme = THEMES.find(t => t.id === brand.themeId);
+                  const isDark = (brand.themeMode || (theme && theme.mode)) === "dark";
+                  const hc = (theme && theme.headingColor) || (isDark ? "#ffffff" : "#0a0a0a");
+                  const tc = brand.bodyTextColor || (isDark ? "#888" : "#666");
+                  const logoEl = brand.logoUrl
+                    ? `<img src="${brand.logoUrl}" style="height:24px;width:auto;" />`
+                    : `<span style="font-family:'${hf}',sans-serif;font-size:18px;font-weight:700;color:${hc};">${brand.logoText || brand.name || "Brand"}</span>`;
+                  const navLinks = (brand.primaryMenu || "Home, About, Services, Contact").split(",").map(l =>
+                    `<a href="#" style="font-family:'${bf}',sans-serif;font-size:12px;color:${tc};text-decoration:none;margin:0 10px;">${l.trim()}</a>`).join("");
+                  const tagline = brand.tagline ? `<p style="font-family:'${bf}',sans-serif;font-size:12px;color:${tc};margin:8px 0 0;">${brand.tagline}</p>` : "";
+                  const email = brand.contactEmail ? `<p style="font-family:'${bf}',sans-serif;font-size:12px;color:${tc};margin:6px 0 0;">${brand.contactEmail}</p>` : "";
+                  const copy = `<p style="font-family:'${bf}',sans-serif;font-size:11px;color:${tc};margin:16px 0 0;opacity:0.7;">© ${new Date().getFullYear()} ${brand.name || "Brand"}. All rights reserved.</p>`;
+                  const fs = brand.footerStyle || "Editorial";
+                  let footerHTML = "";
+                  if (fs === "Editorial") {
+                    footerHTML = `<div style="text-align:center;padding:48px 40px 32px;background:${pc};">${logoEl}${tagline}<div style="margin:16px 0;">${navLinks}</div>${copy}</div>`;
+                  } else if (fs === "Studio") {
+                    footerHTML = `<div style="text-align:center;padding:48px 40px 32px;background:${pc};">${logoEl}<div style="margin:16px 0;">${navLinks}</div>${copy}</div>`;
+                  } else if (fs === "Agency") {
+                    footerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px;padding:48px 40px 32px;background:${pc};">${logoEl}${tagline}<div><p style="font-size:10px;color:${ac};letter-spacing:0.12em;text-transform:uppercase;margin:0 0 12px;font-family:'${bf}',sans-serif;">Pages</p>${(brand.primaryMenu||"").split(",").map(l=>`<div style="font-size:12px;color:${tc};margin-bottom:6px;font-family:'${bf}',sans-serif;">${l.trim()}</div>`).join("")}</div><div><p style="font-size:10px;color:${ac};letter-spacing:0.12em;text-transform:uppercase;margin:0 0 12px;font-family:'${bf}',sans-serif;">Contact</p>${email}</div></div>`;
+                  } else {
+                    footerHTML = `<div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:32px;padding:48px 40px 32px;background:${pc};"><div>${logoEl}${tagline}${email}</div><div><p style="font-size:10px;color:${ac};letter-spacing:0.12em;text-transform:uppercase;margin:0 0 12px;font-family:'${bf}',sans-serif;">Pages</p>${(brand.primaryMenu||"").split(",").map(l=>`<div style="font-size:12px;color:${tc};margin-bottom:6px;font-family:'${bf}',sans-serif;">${l.trim()}</div>`).join("")}</div><div><p style="font-size:10px;color:${ac};letter-spacing:0.12em;text-transform:uppercase;margin:0 0 12px;font-family:'${bf}',sans-serif;">Legal</p>${(brand.utilityMenu||"Privacy, Terms").split(",").map(l=>`<div style="font-size:12px;color:${tc};margin-bottom:6px;font-family:'${bf}',sans-serif;">${l.trim()}</div>`).join("")}</div></div>`;
+                  }
+                  return (
+                    <div style={{ marginTop: "12px", border: "1px solid #dde0e6", borderRadius: "8px", overflow: "hidden" }}>
+                      <div style={{ fontSize: "10px", color: "#6b7280", padding: "6px 12px", background: "#f5f5f7", borderBottom: "1px solid #dde0e6", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>Footer Preview — {brand.footerStyle || "Editorial"}</div>
+                      <div dangerouslySetInnerHTML={{ __html: footerHTML }} />
+                    </div>
+                  );
+                })()}
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Download separately and import once in Elementor → Theme Builder → Footer. Set to display on all pages.</p>
               </Section>
               </div>
