@@ -3767,7 +3767,7 @@ function previewHTML(page, brand) {
 // Accepts id so the audit can scroll to and flash-highlight a specific section.
 const Section = ({ title, icon, id, children }) => (
   <div id={id} style={{ marginBottom: "16px", padding: "20px 24px", borderRadius: "10px", background: "#ffffff", border: "1px solid #ebe9e2", transition: "box-shadow 0.2s" }}>
-    <div style={{ fontSize: "11px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.14em", fontWeight: 700, marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid #f0eee6" }}>
+    <div style={{ fontSize: "13px", color: "#09090b", textTransform: "none", letterSpacing: "0", fontWeight: 700, marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid #f0eee6" }}>
       {title}
     </div>
     <div style={{ display: "grid", gap: "16px" }}>{children}</div>
@@ -4588,7 +4588,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
   // ── Styles ─────────────────────────────────────────────────────────────────
   const I = {
-    lbl: { display: "block", fontSize: "13px", color: "#000000", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700 },
+    lbl: { display: "block", fontSize: "11px", color: "#6b7280", marginBottom: "6px", textTransform: "none", letterSpacing: "0", fontWeight: 600 },
     inp: { width: "100%", padding: "11px 13px", background: "#ffffff", border: "1px solid #e5e7eb", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5 },
     sel: { width: "100%", padding: "11px 36px 11px 13px", background: "#ffffff", border: "1px solid #e5e7eb", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5, appearance: "auto" },
     btn: { padding: "10px 18px", background: "#000000", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "14px", fontWeight: 500, cursor: "pointer" },
@@ -5393,12 +5393,12 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
       {/* Audit drawer — categorized */}
       {showAudit && (
-        <div style={{ background: "#ffffff", borderBottom: "1px solid #e5e7eb", padding: "20px 24px", maxHeight: "420px", overflowY: "auto" }}>
+        <div style={{ background: "#eeedf1", borderBottom: "1px solid #e5e7eb", padding: "20px 24px", maxHeight: "420px", overflowY: "auto" }}>
           {audit.length === 0 ? (
             <div style={{ fontSize: "14px", color: "#000000", fontWeight: 600 }}>Everything looks good. Ready to build.</div>
           ) : (
             <>
-              <div style={{ fontSize: "13px", fontWeight: 700, color: "#09090b", marginBottom: "14px", textTransform: "uppercase", letterSpacing: "0.08em" }}>Build Audit — {audit.length} item{audit.length !== 1 ? "s" : ""}</div>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "#09090b", marginBottom: "14px" }}>Build Audit — {audit.length} item{audit.length !== 1 ? "s" : ""}</div>
               {["critical", "content", "seo", "aio", "best"].map(cat => {
                 const items = audit.filter(a => a.category === cat);
                 if (!items.length) return null;
@@ -6491,6 +6491,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
     </div>
   );
 }
+
 
 
 
