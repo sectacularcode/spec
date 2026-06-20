@@ -1300,12 +1300,12 @@ function buildHomePage(C, brief, inspoHint) {
       mkButton(brief.heroCta1 || "See the work", brass, ink),
       mkButton(brief.heroCta2 || "See pricing", "rgba(0,0,0,0)", warmWhite),
     ], null, { direction: "row", gap: "16", padY: "0", center: true, isInner: true, buttonRow: true }),
-  ], ink, { padY: "120", minH: 90, center: true });
+  ], ink, { padY: "80", minH: 0, center: true });
 
   var hook = mkContainer([
     mkHeading(brief.hookStatement || "Your honest hook statement.", ink, "h2",
       { font: "Inter", weight: 700, px: 36, align: "center" }),
-  ], bone, { padY: "100", center: true });
+  ], bone, { padY: "60", center: true });
 
   var cards = (function() {
     var cds = (brief.serviceCards || [
@@ -2146,7 +2146,7 @@ function buildPreviewHTML(brief, activePage, variant) {
 
   var sections = {
     home:
-      "<section style='background:" + ink + ";min-height:90vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;'>" +
+      "<section style='background:" + ink + ";display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;'>" +
         "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:24px;'>" + (brief.brandName || "Brand Name") + "</div>" +
         "<h1 style='font-family:Fraunces,serif;font-weight:300;font-size:clamp(48px,7vw,80px);line-height:1.06;color:" + warmWhite + ";max-width:900px;margin:0 0 28px;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
         "<p style='font-size:18px;color:" + warmWhite + ";opacity:.8;max-width:560px;margin:0 0 40px;'>" + (brief.heroSubhead || "Your subheadline here.") + "</p>" +
@@ -2181,7 +2181,7 @@ function buildPreviewHTML(brief, activePage, variant) {
         "<p style='color:" + stone + ";max-width:480px;margin:0 auto 40px;'>" + (brief.pricingSubhead || "Pick a package or build a plan, with real numbers in the open.") + "</p>" +
         "<a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>" + (brief.pricingCta || "See packages") + "</a>" +
       "</section>" +
-      "<section style='background:" + ink + ";min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 40px;text-align:center;'>" +
+      "<section style='background:" + ink + ";display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;'>" +
         "<h2 style='font-family:Fraunces,serif;font-weight:300;font-style:italic;font-size:clamp(36px,5vw,68px);color:" + warmWhite + ";max-width:800px;margin:0 0 48px;line-height:1.1;'>" + (brief.tagline || "The stories that move a company forward.") + "</h2>" +
         "<a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>" + (brief.closingCta || "Start a project") + "</a>" +
       "</section>",
