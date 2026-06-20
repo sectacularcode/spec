@@ -2142,13 +2142,13 @@ function buildPreviewHTML(brief, activePage, variant) {
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", asphalt = C.asphalt || "#2B2823",
       text = C.text || "#2A2722";
-  var fontUrl = "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300&family=Inter:wght@400;600;700;800&display=swap";
+  var fontUrl = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap";
 
   var sections = {
     home:
       "<section style='background:" + ink + ";display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;'>" +
         "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:24px;'>" + (brief.brandName || "Brand Name") + "</div>" +
-        "<h1 style='font-family:Fraunces,serif;font-weight:300;font-size:clamp(48px,7vw,80px);line-height:1.06;color:" + warmWhite + ";max-width:900px;margin:0 0 28px;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
+        "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(48px,7vw,80px);line-height:1.06;color:" + warmWhite + ";max-width:900px;margin:0 0 28px;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
         "<p style='font-size:18px;color:" + warmWhite + ";opacity:.8;max-width:560px;margin:0 0 40px;'>" + (brief.heroSubhead || "Your subheadline here.") + "</p>" +
         "<div style='display:flex;gap:16px;flex-wrap:wrap;justify-content:center;'>" +
           "<a style='padding:14px 32px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>" + (brief.heroCta1 || "See the work") + "</a>" +
@@ -2182,7 +2182,7 @@ function buildPreviewHTML(brief, activePage, variant) {
         "<a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>" + (brief.pricingCta || "See packages") + "</a>" +
       "</section>" +
       "<section style='background:" + ink + ";display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;'>" +
-        "<h2 style='font-family:Fraunces,serif;font-weight:300;font-style:italic;font-size:clamp(36px,5vw,68px);color:" + warmWhite + ";max-width:800px;margin:0 0 48px;line-height:1.1;'>" + (brief.tagline || "The stories that move a company forward.") + "</h2>" +
+        "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-style:italic;font-size:clamp(36px,5vw,68px);color:" + warmWhite + ";max-width:800px;margin:0 0 48px;line-height:1.1;'>" + (brief.tagline || "The stories that move a company forward.") + "</h2>" +
         "<a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>" + (brief.closingCta || "Start a project") + "</a>" +
       "</section>",
 
@@ -2386,7 +2386,7 @@ function buildPreviewHTML(brief, activePage, variant) {
             "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;max-width:1160px;margin:0 auto;'>" +
               steps.map(function(step) {
                 return "<div style='background:#fff;padding:40px 32px;border-top:3px solid " + brass + ";'>" +
-                  "<div style='font-family:Fraunces,serif;font-size:52px;font-weight:300;color:" + brass + ";line-height:1;margin-bottom:20px;'>" + step[0] + "</div>" +
+                  "<div style='font-family:Inter,sans-serif;font-size:52px;font-weight:300;color:" + brass + ";line-height:1;margin-bottom:20px;'>" + step[0] + "</div>" +
                   "<div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:10px;'>" + step[1] + "</div>" +
                   "<p style='font-size:14px;color:" + text + ";line-height:1.65;'>" + step[2] + "</p>" +
                 "</div>";
@@ -2402,7 +2402,7 @@ function buildPreviewHTML(brief, activePage, variant) {
           "<div style='display:grid;grid-template-columns:1fr 1fr;max-width:1160px;margin:0 auto;'>" +
             steps.map(function(step, i) {
               return "<div style='padding:56px 40px;background:" + (i%2===0?bone:"#fff") + ";border:1px solid #E2DBCC;'>" +
-                "<div style='font-family:Fraunces,serif;font-size:72px;font-weight:300;color:" + brass + ";line-height:1;margin-bottom:24px;'>" + step[0] + "</div>" +
+                "<div style='font-family:Inter,sans-serif;font-size:72px;font-weight:300;color:" + brass + ";line-height:1;margin-bottom:24px;'>" + step[0] + "</div>" +
                 "<div style='height:1px;background:" + brass + ";width:34px;margin-bottom:24px;'></div>" +
                 "<div style='font-size:20px;font-weight:700;color:" + ink + ";margin-bottom:12px;'>" + step[1] + "</div>" +
                 "<p style='font-size:16px;color:" + text + ";line-height:1.65;'>" + step[2] + "</p>" +
@@ -2419,7 +2419,7 @@ function buildPreviewHTML(brief, activePage, variant) {
         "<p style='font-size:12px;color:" + stone + ";margin-top:12px;font-style:italic;'>Connect a forms plugin and replace this with the live shortcode.</p>" +
       "</div>";
       var contactClose = "<section style='background:" + ink + ";padding:96px 40px;text-align:center;'>" +
-        "<h2 style='font-family:Fraunces,serif;font-weight:300;font-style:italic;font-size:clamp(32px,4.5vw,52px);color:" + warmWhite + ";max-width:720px;margin:0 auto 32px;line-height:1.1;'>" + (brief.tagline||"Ready to get started?") + "</h2>" +
+        "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-style:italic;font-size:clamp(32px,4.5vw,52px);color:" + warmWhite + ";max-width:720px;margin:0 auto 32px;line-height:1.1;'>" + (brief.tagline||"Ready to get started?") + "</h2>" +
         "<div style='font-size:14px;color:" + stone + ";letter-spacing:2px;text-transform:uppercase;'>" + (brief.signatureLine||"") + "</div>" +
       "</section>";
 
@@ -2429,7 +2429,7 @@ function buildPreviewHTML(brief, activePage, variant) {
           "<div style='display:grid;grid-template-columns:1fr 1fr;gap:80px;max-width:1160px;margin:0 auto;align-items:start;'>" +
             "<div>" +
               "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:24px;'>" + (brief.contactEyebrow||"Contact") + "</div>" +
-              "<h2 style='font-family:Fraunces,serif;font-weight:300;font-size:clamp(36px,4.5vw,56px);color:" + ink + ";margin:0 0 32px;line-height:1.06;'>" + (brief.contactH1||"Tell us about your project.") + "</h2>" +
+              "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,4.5vw,56px);color:" + ink + ";margin:0 0 32px;line-height:1.06;'>" + (brief.contactH1||"Tell us about your project.") + "</h2>" +
               "<p style='font-size:17px;color:" + text + ";line-height:1.65;margin-bottom:24px;'>" + (brief.contactIntro||"A quick note about what you need.") + "</p>" +
               "<p style='font-size:14px;color:" + stone + ";'>" + (brief.contactReassurance||"No sales team. A real reply from a real person.") + "</p>" +
             "</div>" +
@@ -2466,7 +2466,7 @@ function buildPreviewHTML(brief, activePage, variant) {
     // ── LANDING PAGE ──
     landing: (function() {
       return "<section style='background:" + ink + ";min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 40px;text-align:center;'>" +
-        "<h1 style='font-family:Fraunces,serif;font-weight:300;font-size:clamp(40px,7vw,72px);line-height:1.06;color:" + warmWhite + ";max-width:800px;margin:0 0 24px;'>" + (brief.heroHeadline || "Your offer, front and center.") + "</h1>" +
+        "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,6vw,64px);line-height:1.08;color:" + warmWhite + ";max-width:800px;margin:0 0 24px;'>" + (brief.heroHeadline || "Your offer, front and center.") + "</h1>" +
         "<p style='font-size:18px;color:" + warmWhite + ";opacity:.8;max-width:520px;margin:0 0 40px;line-height:1.7;'>" + (brief.heroSubhead || "One clear message. One clear action.") + "</p>" +
         "<a style='padding:16px 48px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
       "</section>" +
@@ -2544,7 +2544,7 @@ function buildPreviewHTML(brief, activePage, variant) {
     "</section>" +
     "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:32px;max-width:1160px;margin:0 auto;'>" +
       ["This changed everything for our business.", "Professional, efficient, and genuinely cared about the outcome.", "We saw results within the first month."].map(function(q) {
-        return "<div style='background:#fff;border-left:3px solid " + brass + ";padding:32px;'><p style='font-family:Fraunces,serif;font-style:italic;font-size:18px;color:" + ink + ";line-height:1.5;margin:0 0 20px;'>" + q + "</p><div style='font-size:14px;font-weight:600;color:" + ink + ";'>Client Name</div><div style='font-size:13px;color:" + stone + ";'>Role, Company</div></div>";
+        return "<div style='background:#fff;border-left:3px solid " + brass + ";padding:32px;'><p style='font-family:Inter,sans-serif;font-style:italic;font-size:18px;color:" + ink + ";line-height:1.5;margin:0 0 20px;'>" + q + "</p><div style='font-size:14px;font-weight:600;color:" + ink + ";'>Client Name</div><div style='font-size:13px;color:" + stone + ";'>Role, Company</div></div>";
       }).join("") +
     "</div></section>",
 
@@ -2607,7 +2607,7 @@ function buildPreviewHTML(brief, activePage, variant) {
 
     // ── 404 ──
     "404": "<section style='background:" + bone + ";min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;'>" +
-      "<div style='font-family:Fraunces,serif;font-size:clamp(80px,15vw,160px);font-weight:300;color:" + brass + ";line-height:1;margin-bottom:16px;'>404</div>" +
+      "<div style='font-family:Inter,sans-serif;font-size:clamp(80px,15vw,160px);font-weight:300;color:" + brass + ";line-height:1;margin-bottom:16px;'>404</div>" +
       "<h1 style='font-size:clamp(24px,4vw,36px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>Page not found.</h1>" +
       "<p style='font-size:17px;color:" + text + ";max-width:400px;margin:0 auto 32px;'>The page you are looking for does not exist or has been moved.</p>" +
       "<a href='/' style='padding:14px 32px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;display:inline-block;'>Back to homepage</a>" +
@@ -2641,8 +2641,21 @@ function buildPreviewHTML(brief, activePage, variant) {
   return "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>" +
     "<title>" + (brief.brandName || "Preview") + "</title>" +
     "<link href='" + fontUrl + "' rel='stylesheet'>" +
-    "<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Inter',system-ui,sans-serif;font-size:17px;line-height:1.65;background:" + bone + ";color:" + text + ";}img{max-width:100%;}section{width:100%;}" + "@media(max-width:768px){" + "section{padding-left:24px !important;padding-right:24px !important;}" + "section [style*='grid-template-columns:1fr 1fr']{grid-template-columns:1fr !important;gap:32px !important;}" + "section [style*='grid-template-columns: 1fr 1fr']{grid-template-columns:1fr !important;gap:32px !important;}" + "section [style*='grid-template-columns:repeat']{grid-template-columns:1fr !important;}" + "section [style*='grid-template-columns: repeat']{grid-template-columns:1fr !important;}" + "h1{font-size:clamp(28px,8vw,48px) !important;}" + "h2{font-size:clamp(22px,6vw,36px) !important;}" + "a[style*='display:inline-block'],a[style*='display: inline-block']{text-align:center !important;width:100% !important;box-sizing:border-box !important;}" + "div[style*='display:flex'][style*='gap:16px']{flex-direction:column !important;align-items:stretch !important;}" + "div[style*='display:flex'][style*='gap: 16px']{flex-direction:column !important;align-items:stretch !important;}" + "}" + "</style>" +
-    "</head><body>" + body + "</body></html>";
+    "<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Inter',system-ui,sans-serif;font-size:17px;line-height:1.65;background:" + bone + ";color:" + text + ";}img{max-width:100%;}section{width:100%;}" + "@media(max-width:768px){" + "nav>div:last-child{display:none !important;}" + "section{padding-left:24px !important;padding-right:24px !important;}" + "section [style*='grid-template-columns:1fr 1fr']{grid-template-columns:1fr !important;gap:32px !important;}" + "section [style*='grid-template-columns: 1fr 1fr']{grid-template-columns:1fr !important;gap:32px !important;}" + "section [style*='grid-template-columns:repeat']{grid-template-columns:1fr !important;}" + "section [style*='grid-template-columns: repeat']{grid-template-columns:1fr !important;}" + "h1{font-size:clamp(28px,8vw,48px) !important;}" + "h2{font-size:clamp(22px,6vw,36px) !important;}" + "a[style*='display:inline-block'],a[style*='display: inline-block']{text-align:center !important;width:100% !important;box-sizing:border-box !important;}" + "div[style*='display:flex'][style*='gap:16px']{flex-direction:column !important;align-items:stretch !important;}" + "div[style*='display:flex'][style*='gap: 16px']{flex-direction:column !important;align-items:stretch !important;}" + "}" + "</style>" +
+    "</head><body>" +
+    "<nav style='background:" + ink + ";padding:16px clamp(24px,5vw,60px);display:flex;justify-content:space-between;align-items:center;'>" +
+      "<div style='font-family:Inter,sans-serif;font-weight:800;font-size:18px;color:" + warmWhite + ";'>" + (brief.brandName || "Brand") + "</div>" +
+      "<div style='display:flex;gap:24px;align-items:center;'>" + (brief.pages || ['Home','About','Services','Contact']).map(function(p) { return typeof p === 'string' ? p : (p.label || p.name || p); }).slice(0,6).map(function(l) { return "<a style='color:" + warmWhite + ";text-decoration:none;font-size:14px;font-weight:500;'>" + l + "</a>"; }).join('') + "</div>" +
+    "</nav>" +
+    body +
+    "<footer style='background:" + ink + ";padding:48px clamp(24px,5vw,60px);'>" +
+      "<div style='display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;'>" +
+        "<div><div style='font-family:Inter,sans-serif;font-weight:800;font-size:18px;color:" + warmWhite + ";margin-bottom:8px;'>" + (brief.brandName || "Brand") + "</div>" +
+        "<div style='font-size:13px;color:" + stone + ";'>" + (brief.tagline || "") + "</div></div>" +
+        "<div style='font-size:13px;color:" + stone + ";'>" + (brief.contactEmail || "") + "</div>" +
+      "</div>" +
+    "</footer>" +
+    "</body></html>";
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
