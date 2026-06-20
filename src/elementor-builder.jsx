@@ -3385,8 +3385,22 @@ function previewHTML(page, brand) {
       const heading = page.heroHeading || brand.tagline;
       const subhead = page.heroSubhead || (brand.keyMessages || "").split(".")[0];
       const v = layout.heroVariant || "left-standard";
-      const eyebrow = eyebrowText(layout.eyebrowStyle, page.heroEyebrow || "Welcome");
+      const eyebrow = eyebrowText(layout.eyebrowStyle, page.heroEyebrow || page.pageType || "Welcome");
       const btnTxtColor = luminance(ac) > 0.6 ? "#0a0a0a" : "#ffffff";
+
+      // INTERIOR PAGE HEADER — clean text-only header for non-homepage pages
+      const interiorTypes = ["About / Studio", "Services", "Work / Portfolio", "Case Study", "Blog Index", "Blog Post", "Blog Post — Recipe", "Pricing", "Press / Awards", "Careers", "Contact", "Leadership / Founder"];
+      if (interiorTypes.includes(page.pageType)) {
+        const darkHeader = ["Case Study", "Leadership / Founder", "Landing Page"].includes(page.pageType);
+        const headerBg = darkHeader ? (isDark ? pc : "#0a0a0a") : pc;
+        const headerText = darkHeader ? "#ffffff" : headingColor;
+        const headerSub = darkHeader ? "rgba(255,255,255,0.7)" : ts;
+        return `<section style="background:${headerBg};padding:clamp(60px,8vw,100px) clamp(24px,8vw,100px) clamp(40px,5vw,60px);">
+          <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 20px;">${eyebrow}</p>
+          <h1 data-edit="page.heroHeading" style="font-family:'${hf}',sans-serif;font-size:clamp(36px,5vw,${layout.heroHeading || 64}px);color:${headerText};margin:0 0 16px;font-weight:700;line-height:1.1;letter-spacing:-0.02em;">${heading}</h1>
+          ${subhead ? `<p data-edit="page.heroSubhead" style="font-family:'${bf}',sans-serif;font-size:clamp(15px,1.4vw,18px);color:${headerSub};margin:0;line-height:1.7;max-width:640px;">${subhead}</p>` : ""}
+        </section>`;
+      }
 
       // SPLIT IMAGE — text left 55%, image card right 40% (Agency, Production templates)
       if (v === "split-image" || v === "split-image-rounded") {
