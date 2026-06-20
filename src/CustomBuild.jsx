@@ -2443,8 +2443,22 @@ function selectPatterns(brief, inspoContext) {
   return result;
 }
 
+// Escape HTML special characters — prevents XSS when inserting user input into preview HTML strings
+function he(str) {
+  return String(str || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+
 function buildPreviewHTML(brief, activePage, variant, inspoContext) {
   variant = variant || "A";
+
+  // Sanitize all string fields up-front so every downstream insertion is XSS-safe
+  var safe = {};
+  Object.keys(brief || {}).forEach(function(k) {
+    var v = (brief || {})[k];
+    safe[k] = typeof v === "string" ? he(v) : v;
+  });
+  brief = safe;
+
   var patterns = selectPatterns(brief, inspoContext || "");
 
   // Apply A/B variant overrides so the toggle actually changes the preview
@@ -4012,6 +4026,11 @@ export default function CustomBuild() {
   function handleFile(file) {
     if (!file) return;
     setBriefError("");
+    // 20MB max — prevents browser freeze on huge files
+    if (file.size > 20 * 1024 * 1024) {
+      setBriefError("File is too large. Maximum size is 20MB.");
+      return;
+    }
     const ext = file.name.split(".").pop().toLowerCase();
 
     if (ext === "json") {
@@ -4166,6 +4185,8 @@ export default function CustomBuild() {
   async function crawlUrl(url) {
     const trimmed = url.trim();
     if (!trimmed || crawlResults[trimmed] || crawling[trimmed]) return;
+    // Only allow http/https — reject javascript:, file://, ftp://, etc.
+    if (!/^https?:\/\//i.test(trimmed)) return;
     setCrawling(c => ({ ...c, [trimmed]: true }));
     try {
       const res = await fetch("/api/crawl-inspo", {
@@ -4909,6 +4930,7 @@ export default function CustomBuild() {
             <div style={{ flex: 1, overflow: "auto", background: mobilePreview ? "#eeedf1" : "#fff", display: "flex", justifyContent: mobilePreview ? "center" : "stretch", alignItems: mobilePreview ? "flex-start" : "stretch", padding: mobilePreview ? "24px 0" : "0" }}>
               <iframe
                 srcDoc={buildPreviewHTML(brief, previewPage, layoutVariants[previewPage] || "A", generated?.inspoContext || "")}
+                sandbox="allow-scripts"
                 style={{
                   border: mobilePreview ? "1px solid #dde0e6" : "none",
                   borderRadius: mobilePreview ? "12px" : "0",
