@@ -1714,6 +1714,62 @@ function buildServicesPage(C, brief, inspoHint) {
     content: [header, tiersSection, menuSection, pricingNoteSection, closing] };
 }
 
+// Variant B — light background tiers with horizontal card layout
+function buildServicesPageLight(C, brief, inspoHint) {
+  var ink = C.ink, brass = C.brass, bone = C.bone,
+      warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
+      brassDp = C["brass-deep"] || "#9C7E3A", asphalt = C.asphalt || "#2B2823", text = C.text;
+
+  var header = mkContainer([
+    mkHeading(brief.servicesEyebrow || "Services & pricing", brassDp, "h6", { eyebrow: true }),
+    mkSpacer(16),
+    mkHeading(brief.servicesH1 || "Every way to put your company on film.", ink, "h1", { weight: 800, px: 56 }),
+    mkSpacer(20),
+    mkText("Real prices, in the open. Pick a package, or build a plan.", text),
+  ], bone, { padY: "88" });
+
+  var tiers = (brief.pricingTiers || [
+    ["Front Door", "CASH FLOW & TRUST", "Productized story and testimonial packages with set scope and open pricing.", "From 2.5K per film"],
+    ["Premium", "MARGIN & CRAFT", "Brand films, founder stories, and exit work. Built around your story and priced to the project.", "From 12K per film"],
+    ["Partner Plan", "RECURRING", "An embedded video partner. Predictable monthly output, no constant re-quoting.", "From 4K per month"],
+  ]).map(function(tier, i) {
+    var featured = i === 1;
+    var card = mkContainer([
+      mkHeading(tier[1] || "", brassDp, "h6", { eyebrow: true }),
+      mkSpacer(12),
+      mkHeading(tier[0], featured ? warmWhite : ink, "h3", { weight: 700, px: 24 }),
+      mkSpacer(16),
+      mkDivider(featured ? "rgba(255,255,255,.2)" : "#E2DBCC"),
+      mkSpacer(16),
+      mkText(tier[2] || "", featured ? warmWhite : text),
+      mkSpacer(20),
+      mkHeading(tier[3] || "", featured ? brass : brassDp, "h4", { weight: 700, px: 28 }),
+      mkSpacer(24),
+      mkButton("Learn more", featured ? brassDp : "transparent", featured ? "#ffffff" : brassDp),
+    ], featured ? asphalt : "#ffffff", { padY: "44", padX: "36", isInner: true });
+    card.settings._flex_grow = 1;
+    if (!featured) {
+      card.settings.border_border = "solid";
+      card.settings.border_width = { unit: "px", top: "1", right: "1", bottom: "1", left: "1", isLinked: true };
+      card.settings.border_color = "#E2DBCC";
+    }
+    return card;
+  });
+
+  var tiersRow = mkContainer(tiers, null, { direction: "row", gap: "20", padY: "0", isInner: true });
+  tiersRow.settings.flex_wrap = "wrap";
+  var tiersSection = mkContainer([tiersRow], bone, { padY: "64" });
+
+  var closing = mkContainer([
+    mkText("Not sure where to start? Tell us about the company.", stone, "center"),
+    mkSpacer(24),
+    mkButton(brief.headerCta || "Start a project", brassDp, "#ffffff"),
+  ], bone, { padY: "80", center: true });
+
+  return { version: "0.4", title: "Services & Pricing", type: "page", page_settings: {},
+    content: [header, tiersSection, closing] };
+}
+
 function buildAboutPage(C, brief, inspoHint, patterns) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
@@ -2162,8 +2218,10 @@ function generatePages(brief, selectedPages, inspoContext, aiRecs, customPagesAr
       return { id: pid, label: label, data: homeData, variantA: homeA, variantB: homeB, recommended: homeRec, hasVariants: true };
     }
     if (pid === "services") {
-      var data = buildServicesPage(colors, brief, inspoContext);
-      return { id: pid, label: label, data: data, variantA: data, variantB: null, recommended: "A", hasVariants: false };
+      var svcA = buildServicesPage(colors, brief, inspoContext);
+      var svcB = buildServicesPageLight(colors, brief, inspoContext);
+      var svcRec = (patterns.pricing === "simple-list" || patterns.pricing === "two-tier") ? "B" : "A";
+      return { id: pid, label: label, data: svcRec === "B" ? svcB : svcA, variantA: svcA, variantB: svcB, recommended: svcRec, hasVariants: true };
     }
     if (pid === "work")    result = buildWorkPage(colors, brief, inspoContext);
     if (pid === "about")   result = buildAboutPage(colors, brief, inspoContext, patterns);
@@ -2391,6 +2449,9 @@ function buildPreviewHTML(brief, activePage, variant, inspoContext) {
   var patterns = selectPatterns(brief, inspoContext || "");
 
   // Apply A/B variant overrides so the toggle actually changes the preview
+  if (activePage === "services") {
+    patterns.pricing = (variant === "B") ? "two-tier" : "three-tier";
+  }
   if (activePage === "home") {
     patterns.hero = (variant === "B") ? "split-left" : "centered-bold";
   }
