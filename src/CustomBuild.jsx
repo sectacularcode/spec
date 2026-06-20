@@ -2077,7 +2077,7 @@ function buildInspoContext(crawlResults, storedPatterns) {
   return allNotes.join(" | ");
 }
 
-function buildGenericPage(colors, brief, pageDef, inspoContext) {
+function buildGenericPage(colors, brief, pageDef, inspoContext, variant) {
   var ink = colors.ink || "#1C1A17";
   var bone = colors.bone || "#EDE7DB";
   var brass = colors.brass || "#C2A35B";
@@ -2088,15 +2088,15 @@ function buildGenericPage(colors, brief, pageDef, inspoContext) {
   var asphalt = colors.asphalt || "#2B2823";
   var label = pageDef.label;
   var pid = pageDef.id;
+  var isDark = (variant === "B");
+
+  // Hero — Variant A: light bone bg, Variant B: dark ink bg
+  var heroEyebrow = mkHeading(brief.brandName || "", isDark ? brass : brass, "h6", { eyebrow: true, align: isDark ? "left" : "left" });
+  var heroH1 = mkHeading(label, isDark ? warmWhite : ink, "h1", { font: (brief.fonts && brief.fonts[1]) || "Inter", weight: 800, px: 52 });
+  var heroContainer = mkContainer([heroEyebrow, mkSpacer(16), heroH1], isDark ? ink : bone, { padY: "80", minH: 50, center: true });
 
   // Page-type specific sections
   var sections = [];
-
-  // Hero section for every page
-  var heroEyebrow = mkHeading(brief.brandName || "", brass, "h6", { eyebrow: true });
-  var heroH1 = mkHeading(label, warmWhite, "h1", { font: (brief.fonts && brief.fonts[1]) || "Inter", weight: 800, px: 52 });
-  var heroContainer = mkContainer([heroEyebrow, mkSpacer(16), heroH1], ink, { padY: "80", minH: 50, center: true });
-
   sections.push(heroContainer);
 
   // Page-specific content
@@ -2230,8 +2230,29 @@ function generatePages(brief, selectedPages, inspoContext, aiRecs, customPagesAr
 
     // Additional and custom page types
     if (!result) {
-      var genericData = buildGenericPage(colors, brief, pageDef, inspoContext);
-      return { id: pid, label: label, data: genericData, variantA: genericData, variantB: null, recommended: "A", hasVariants: false };
+      // Utility pages — no meaningful A/B variation
+      var utilityPages = ["thank-you", "privacy", "terms", "404", "blog-post", "event-single"];
+      if (utilityPages.includes(pid)) {
+        var gd = buildGenericPage(colors, brief, pageDef, inspoContext, "A");
+        return { id: pid, label: label, data: gd, variantA: gd, variantB: null, recommended: "A", hasVariants: false };
+      }
+      // Standalone pricing page — reuse services builders
+      if (pid === "pricing") {
+        var pA = buildServicesPage(colors, brief, inspoContext);
+        var pB = buildServicesPageLight(colors, brief, inspoContext);
+        var pRec = (patterns.pricing === "simple-list" || patterns.pricing === "two-tier") ? "B" : "A";
+        return { id: pid, label: label, data: pRec === "B" ? pB : pA, variantA: pA, variantB: pB, recommended: pRec, hasVariants: true };
+      }
+      // Standalone portfolio page — reuse work builders
+      if (pid === "portfolio") {
+        var portResult = buildWorkPage(colors, brief, inspoContext);
+        var portRec = portResult.recommended || "A";
+        return { id: pid, label: label, data: portRec === "B" ? portResult.variantB : portResult.variantA, variantA: portResult.variantA, variantB: portResult.variantB, recommended: portRec, hasVariants: true };
+      }
+      // All other pattern-driven pages — A = light hero, B = dark hero
+      var gA = buildGenericPage(colors, brief, pageDef, inspoContext, "A");
+      var gB = buildGenericPage(colors, brief, pageDef, inspoContext, "B");
+      return { id: pid, label: label, data: gA, variantA: gA, variantB: gB, recommended: "A", hasVariants: true };
     }
 
     var recommended = (recs[pid] && recs[pid].variant) ? recs[pid].variant : result.recommended;
@@ -2466,6 +2487,36 @@ function buildPreviewHTML(brief, activePage, variant, inspoContext) {
   }
   if (activePage === "work") {
     patterns.portfolio = (variant === "B") ? "case-study-cards" : "masonry-grid";
+  }
+  if (activePage === "landing") {
+    patterns.landing = (variant === "B") ? "split-light" : "centered-dark";
+  }
+  if (activePage === "team") {
+    patterns.team = (variant === "B") ? "featured-founder" : "photo-grid";
+  }
+  if (activePage === "blog") {
+    patterns.blog = (variant === "B") ? "featured-plus-grid" : "grid-3col";
+  }
+  if (activePage === "testimonials") {
+    patterns.testimonials = (variant === "B") ? "single-feature" : "card-grid";
+  }
+  if (activePage === "events") {
+    patterns.events = (variant === "B") ? "event-cards" : "date-list";
+  }
+  if (activePage === "careers") {
+    patterns.careers = (variant === "B") ? "values-first" : "job-list";
+  }
+  if (activePage === "case-study") {
+    patterns["case-study"] = (variant === "B") ? "editorial-light" : "dark-hero-metrics";
+  }
+  if (activePage === "faq") {
+    patterns.faq = (variant === "B") ? "two-column" : "accordion";
+  }
+  if (activePage === "pricing") {
+    patterns.pricing = (variant === "B") ? "two-tier" : "three-tier";
+  }
+  if (activePage === "portfolio") {
+    patterns.portfolio = (variant === "B") ? "full-width-stacked" : "masonry-grid";
   }
   var C = brief.colors || {
     ink: "#1C1A17", brass: "#C2A35B", "brass-deep": "#9C7E3A",
@@ -3587,6 +3638,19 @@ function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "var open=nav.classList.toggle('open');" +
         "ham.style.display=open?'none':'block';" +
         "cls.style.display=open?'block':'none';" +
+      "}" +
+      // Mobile padding catch-all — fires after render, catches clamp() values CSS can't target
+      "if(window.innerWidth<=768){" +
+        "document.querySelectorAll('section').forEach(function(el){" +
+          "el.style.paddingTop='44px';" +
+          "el.style.paddingBottom='44px';" +
+          "el.style.paddingLeft='20px';" +
+          "el.style.paddingRight='20px';" +
+        "});" +
+        "document.querySelectorAll('section > div').forEach(function(el){" +
+          "el.style.paddingLeft='0';" +
+          "el.style.paddingRight='0';" +
+        "});" +
       "}" +
     "</script>" +
     "</body></html>";
