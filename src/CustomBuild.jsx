@@ -3446,27 +3446,45 @@ function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         ".nav-links{display:none !important;}" +
         ".hamburger{display:flex !important;}" +
         "#mobile-nav.open{display:block !important;}" +
-        "section{padding-left:20px !important;padding-right:20px !important;padding-top:48px !important;padding-bottom:48px !important;}" +
+        // Section padding — catch all patterns including clamp() values
+        "section{padding:44px 20px !important;}" +
+        // Kill inner div horizontal padding so content isn't double-indented
         "section > div{padding-left:0 !important;padding-right:0 !important;}" +
-        "[style*='grid-template-columns:1fr 1fr'],[style*='grid-template-columns: 1fr 1fr']{grid-template-columns:1fr !important;gap:24px !important;}" +
-        "[style*='grid-template-columns:repeat'],[style*='grid-template-columns: repeat']{grid-template-columns:1fr !important;gap:20px !important;}" +
-        "[style*='grid-template-columns:100px'],[style*='grid-template-columns: 100px']{grid-template-columns:1fr !important;}" +
-        "[style*='display:grid'][style*='grid-template-columns']{grid-template-columns:1fr !important;}" +
-        "[style*='display:flex'][style*='gap:48px'],[style*='display:flex'][style*='gap:64px'],[style*='display:flex'][style*='gap:80px']{flex-direction:column !important;gap:24px !important;}" +
-        "h1{font-size:clamp(26px,7vw,40px) !important;line-height:1.15 !important;}" +
-        "h2{font-size:clamp(22px,6vw,32px) !important;}" +
-        "h3{font-size:18px !important;}" +
-        "p,div{font-size:15px;}" +
-        "a[style*='padding:14px']{padding:12px 20px !important;width:100%;text-align:center !important;display:block !important;}" +
-        "a[style*='padding:16px']{padding:14px 20px !important;width:100%;text-align:center !important;display:block !important;}" +
-        "[style*='min-height:80vh'],[style*='min-height: 80vh']{min-height:60vh !important;padding-top:48px !important;padding-bottom:48px !important;}" +
-        "[style*='padding:100px']{padding:56px 20px !important;}" +
-        "[style*='padding:88px']{padding:56px 20px !important;}" +
-        "[style*='padding:80px']{padding:48px 20px !important;}" +
-        "[style*='padding:96px']{padding:56px 20px !important;}" +
-        "[style*='padding:120px']{padding:64px 20px !important;}" +
-        "footer{padding:40px 20px !important;}" +
-        "footer > div{flex-direction:column !important;gap:20px !important;}" +
+        // Grid: force single column
+        "[style*='grid-template-columns']{grid-template-columns:1fr !important;gap:16px !important;}" +
+        // Flex rows that should stack
+        "[style*='display:flex'][style*='gap:48px'],[style*='display:flex'][style*='gap:64px'],[style*='display:flex'][style*='gap:80px']{flex-direction:column !important;gap:20px !important;}" +
+        "[style*='display:flex'][style*='gap:40px']{flex-direction:column !important;gap:16px !important;}" +
+        // Image placeholders — cap height so they don't eat the whole screen
+        "[style*='aspect-ratio:16/9']{aspect-ratio:unset !important;height:180px !important;}" +
+        "[style*='aspect-ratio:4/3']{aspect-ratio:unset !important;height:180px !important;}" +
+        "[style*='aspect-ratio:3/4']{aspect-ratio:unset !important;height:200px !important;}" +
+        "[style*='aspect-ratio:1']{aspect-ratio:unset !important;height:160px !important;}" +
+        // Spacers — halve them all
+        "div[style='height:120px']{height:40px !important;}" +
+        "div[style='height:112px']{height:36px !important;}" +
+        "div[style='height:96px']{height:32px !important;}" +
+        "div[style='height:88px']{height:28px !important;}" +
+        "div[style='height:80px']{height:28px !important;}" +
+        "div[style='height:72px']{height:24px !important;}" +
+        "div[style='height:64px']{height:20px !important;}" +
+        "div[style='height:56px']{height:16px !important;}" +
+        "div[style='height:48px']{height:16px !important;}" +
+        "div[style='height:40px']{height:14px !important;}" +
+        "div[style='height:32px']{height:12px !important;}" +
+        "div[style='height:28px']{height:10px !important;}" +
+        "div[style='height:24px']{height:8px !important;}" +
+        // Headings
+        "h1{font-size:clamp(26px,7vw,38px) !important;line-height:1.15 !important;}" +
+        "h2{font-size:clamp(22px,6vw,30px) !important;}" +
+        "h3{font-size:17px !important;}" +
+        // Buttons full width on mobile
+        "a[style*='padding:14px'],a[style*='padding:16px']{display:block !important;text-align:center !important;width:100% !important;box-sizing:border-box !important;}" +
+        // Min-height sections (heroes) — less tall on mobile
+        "[style*='min-height:80vh'],[style*='min-height:70vh']{min-height:50vh !important;}" +
+        // Footer
+        "footer{padding:32px 20px !important;}" +
+        "footer > div{flex-direction:column !important;gap:16px !important;}" +
       "}" +
     "</style>" +
     "</head><body>" +
