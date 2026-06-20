@@ -3214,7 +3214,7 @@ export default function CustomBuild() {
               <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "24px" }}>Upload a brief or fill out the intake form to get started.</div>
               <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
                 <button onClick={() => setDraftsView(false)} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>Start a build</button>
-                <button onClick={() => { setShowIntake(true); setDraftsView(false); }} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 500, background: "#fff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>Fill out intake form</button>
+                <button onClick={() => { setShowIntake(true); setDraftsView(false); }} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#ffffff", border: "none", borderRadius: "6px", cursor: "pointer" }}>Fill out intake form</button>
               </div>
             </div>
           ) : (
@@ -3323,11 +3323,13 @@ export default function CustomBuild() {
                     <input ref={fileRef} type="file" accept=".json,.pdf,.txt,.docx" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
                   </div>
                   <div style={{ textAlign: "center", margin: "12px 0", fontSize: "12px", color: "#9ca3af" }}>or</div>
+                  <div style={{ display: "flex", justifyContent: "center" }}>
                   <button
                     onClick={() => setShowIntake(true)}
-                    style={{ width: "100%", padding: "12px", fontSize: "13px", fontWeight: 600, background: "#fff", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", color: "#09090b" }}>
+                    style={{ padding: "12px 32px", fontSize: "13px", fontWeight: 600, background: "#b45309", border: "none", borderRadius: "8px", cursor: "pointer", color: "#ffffff" }}>
                     Fill out intake form
                   </button>
+                  </div>
                   {parsing && <div style={{ marginTop: "12px", padding: "12px", background: "#ffffff", borderRadius: "6px", fontSize: "13px", color: "#09090b" }}>Reading brief — this takes a few seconds...</div>}
                   {briefError && <div style={{ fontSize: "12px", color: "#dc2626", marginTop: "8px" }}>{briefError}</div>}
                 </>
