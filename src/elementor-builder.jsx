@@ -3977,6 +3977,7 @@ export default function App() {
   const [projects, setProjects] = useState([]);
   const [activeId, setActiveId] = useState(function(){try{return localStorage.getItem("spec_activeId")||"";}catch(e){return "";}});
   const [view, setView] = useState(function(){try{return localStorage.getItem("spec_view")||"projects";}catch(e){return "projects";}});
+  React.useEffect(() => { const h = () => setView("projects"); window.addEventListener("spec-go-projects", h); return () => window.removeEventListener("spec-go-projects", h); }, []);
   const [mobilePreviewTS, setMobilePreviewTS] = useState(false);
   const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_tab")||"discovery";}catch(e){return "discovery";}});
   const [pageIdx, setPageIdx] = useState(function(){try{return parseInt(localStorage.getItem("spec_pageIdx")||"0",10);}catch(e){return 0;}});
@@ -5602,7 +5603,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
           {/* Left: All Projects + project info */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <button onClick={() => setView("projects")} style={{ padding: "7px 12px", background: "#ffffff", color: "#09090b", border: "1px solid #09090b", borderRadius: "4px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", cursor: "pointer" }}>
+            <button onClick={() => setView("projects")} style={{ padding: "7px 12px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", cursor: "pointer" }}>
               <Icon name="arrowLeft" size={13} color="#09090b" /> All Projects
             </button>
             <div>
@@ -5855,6 +5856,11 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div><label style={I.lbl}>Founder Name</label><input style={I.inp} value={brand.founderName} onChange={e => updBrand("founderName", e.target.value)} placeholder="e.g. Alex Morgan" /></div>
                 <div><label style={I.lbl}>Founder Title</label><input style={I.inp} value={brand.founderTitle} onChange={e => updBrand("founderTitle", e.target.value)} placeholder="e.g. Founder & Creative Director" /></div>
                 <div><label style={I.lbl}>Founder Bio</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.founderBio} onChange={e => updBrand("founderBio", e.target.value)} /></div>
+                <div>
+                  <label style={I.lbl}>Brand Description</label>
+                  <textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.description || ""} onChange={e => updBrand("description", e.target.value)} placeholder="What does this business do? 2-3 sentences. This is the elevator pitch the AI uses when drafting copy across the site." />
+                  <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "4px" }}>The AI reads this before writing anything — the more specific, the less generic the output.</div>
+                </div>
               </Section>
 
               <Section id="client-logos" title="Brands Worked With" icon="">
@@ -5897,11 +5903,6 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               <Section id="positioning-audience" title="Target Audience" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 10px", lineHeight: 1.6 }}>Who you're talking to — their role, company type, industry, or life stage. The AI uses this to write copy that speaks directly to the right person, not a generic visitor.</p>
                 <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.targetAudience} onChange={e => updBrand("targetAudience", e.target.value)} placeholder="e.g. Small business owners looking for a premium online presence without the agency price tag." />
-                <div style={{ marginTop: "16px" }}>
-                  <label style={I.lbl}>Key Messages</label>
-                  <div style={{ fontSize: "12px", color: "#6b7280", margin: "4px 0 8px", lineHeight: 1.5 }}>The 2–4 things you want every visitor to walk away knowing. These show up across the hero, about section, and services — the AI weaves them in naturally when drafting copy.</div>
-                  <textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.keyMessages} onChange={e => updBrand("keyMessages", e.target.value)} placeholder="e.g. The core messages visitors should walk away with after seeing this site." />
-                </div>
               </Section>
 
               <Section id="positioning-goals" title="Goals & What Success Looks Like" icon="">
@@ -5924,6 +5925,11 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   <label style={I.lbl}>What does a win look like?</label>
                   <div style={{ fontSize: "12px", color: "#6b7280", margin: "4px 0 8px", lineHeight: 1.5 }}>One sentence — the specific result this site should drive. The more concrete, the better. The AI uses this to shape the tone and urgency of every drafted section.</div>
                   <textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={brand.outcome || ""} onChange={e => updBrand("outcome", e.target.value)} placeholder="e.g. Book 4–6 qualified leads per month through the website contact form." />
+                </div>
+                <div>
+                  <label style={I.lbl}>Key Messages</label>
+                  <div style={{ fontSize: "12px", color: "#6b7280", margin: "4px 0 8px", lineHeight: 1.5 }}>The 2–4 things you want every visitor to walk away knowing. The AI weaves these into the hero, about section, and services naturally.</div>
+                  <textarea style={{ ...I.inp, resize: "vertical" }} rows={3} value={brand.keyMessages} onChange={e => updBrand("keyMessages", e.target.value)} placeholder="e.g. 10 years in business. 100+ clients served. Full-service partner from strategy to delivery." />
                 </div>
               </Section>
 
@@ -6011,7 +6017,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 </button>
                 </div>
                 {(!((brand.goals && brand.goals.length) || brand.goal) || !brand.outcome) && (
-                  <div style={{ fontSize: "12px", color: "#09090b", marginTop: "8px" }}>Pick at least one Goal and add a Desired Outcome to enable AI copy drafting.</div>
+                  <div style={{ fontSize: "12px", color: "#09090b", marginTop: "8px" }}>Pick at least one Goal and fill in "What does a win look like?" to enable AI copy drafting.</div>
                 )}
                 {briefDirty && ((brand.goals && brand.goals.length) || brand.goal) && brand.outcome && (
                   <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#b45309", fontWeight: 500, marginTop: "4px" }}>
@@ -6206,7 +6212,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <span style={{ fontSize: "12px", color: "#09090b" }}>{showAdvancedColors ? "▲ Hide" : "▼ Show"}</span>
               </button>
               {showAdvancedColors && <div style={{ padding: "16px" }}>
-              <Section id="brand-colors" title="" icon="">
+              <Section id="brand-colors" title="Quick Accent Swap" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
                   Drop in your actual brand hex codes. Once you have at least 2 colors (Background + Accent), an <strong style={{ color: "#09090b" }}>"Apply Custom Brand Palette"</strong> button appears that swaps the live theme to use them.
                 </p>
@@ -6488,17 +6494,17 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   })()}
                 </div>
               </Section>
-              <Section id="page-hero" title="Hero Text" icon="">
+              {page.sections.includes("Hero") && <Section id="page-hero" title="Hero Text" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>The first thing visitors see. Your main headline and supporting line.</p>
                 <div><label style={I.lbl}>Heading</label><input style={I.inp} value={page.heroHeading || ""} onChange={e => updPage("heroHeading", e.target.value)} placeholder="e.g. Your main headline goes here." /></div>
                 <div><label style={I.lbl}>Subheading</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={2} value={page.heroSubhead || ""} onChange={e => updPage("heroSubhead", e.target.value)} placeholder="e.g. A short supporting line under the headline." /></div>
                 <div><label style={I.lbl}>Hero Image</label><input style={I.inp} value={page.heroImage || ""} onChange={e => updPage("heroImage", e.target.value)} placeholder="Paste your WordPress media URL — leave blank for a placeholder" /></div>
-              </Section>
-              <Section id="page-about" title="About the Company" icon="">
+              </Section>}
+              {page.sections.includes("About") && <Section id="page-about" title="About the Company" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>A short brand story — usually image and text side by side, just below the hero.</p>
                 <div><label style={I.lbl}>Heading</label><input style={I.inp} value={page.aboutHeading || ""} onChange={e => updPage("aboutHeading", e.target.value)} placeholder="e.g. A short about heading." /></div>
                 <div><label style={I.lbl}>Body</label><textarea style={{ ...I.inp, resize: "vertical" }} rows={4} value={page.aboutBody || ""} onChange={e => updPage("aboutBody", e.target.value)} placeholder="Write your about copy here, or leave blank to pull from your brand description." /></div>
-              </Section>
+              </Section>}
               {page.sections.some(s => s === "Services" || s === "Service Cards") && <Section id="content-services" title="Services" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 8px", lineHeight: 1.5 }}>What you offer. Each line becomes a card or list item on the page.</p>
                 <textarea style={{ ...I.inp, resize: "vertical", fontFamily: "monospace", fontSize: "13px", maxWidth: "560px" }} rows={5} value={page.services || ""} onChange={e => updPage("services", e.target.value)} placeholder={"Service Name|What it includes or who it's for\nService Name|What it includes or who it's for"} />
@@ -6691,6 +6697,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {tab === "footer" && (
             <>
               <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "24px 24px 40px" }}>
+              <Section id="nav-logo" title="Logo & Brand" icon="">
+                <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <div><label style={I.lbl}>Logo Text</label><input style={I.inp} value={brand.logoText || ""} onChange={e => updBrand("logoText", e.target.value)} placeholder={brand.name || "Brand Name"} />
+                  <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "4px" }}>Displayed in the header and footer. Upload your actual logo in Elementor after import.</div></div>
+                  <div><label style={I.lbl}>Tagline</label><input style={I.inp} value={brand.tagline || ""} onChange={e => updBrand("tagline", e.target.value)} placeholder="e.g. Building brands that last." />
+                  <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "4px" }}>Shown in the footer beneath the logo.</div></div>
+                </div>
+              </Section>
               <Section id="nav-menus" title="Navigation Menus" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 4px", lineHeight: 1.5 }}>Menu items for your header and footer. Create matching menus in WP → Appearance → Menus.</p>
                 <div><label style={I.lbl}>Primary Menu (comma-separated)</label><input style={I.inp} value={brand.primaryMenu} onChange={e => updBrand("primaryMenu", e.target.value)} placeholder="Home, About, Services, Work, Contact" /></div>
@@ -6745,7 +6759,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     </div>
                   );
                 })()}
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Download separately and import once in Elementor → Theme Builder → Header. Set display conditions to "Entire Site".</p>
+
               </Section>
               <Section id="footer-footer" title="Footer Style" icon="">
                 <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "10px" }}>
@@ -6806,7 +6820,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     </div>
                   );
                 })()}
-                <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Download separately and import once in Elementor → Theme Builder → Footer. Set to display on all pages.</p>
+
               </Section>
               </div>
             </>
@@ -6821,20 +6835,20 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <button onClick={downloadPage} style={{ padding: "8px 14px", background: "#6b635c", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="download" size={14} color="#ffffff" /> Download Template
                 </button>
-                <button onClick={downloadHeader} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #09090b", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
+                <button onClick={downloadHeader} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="download" size={14} color="#09090b" /> Header Template
                 </button>
-                <button onClick={downloadFooter} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #09090b", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
+                <button onClick={downloadFooter} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="download" size={14} color="#09090b" /> Footer Template
                 </button>
-                <button onClick={exportBrief} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #09090b", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
+                <button onClick={exportBrief} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="file-text" size={14} color="#09090b" /> Export Brief
                 </button>
-                <button onClick={shareBrief} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #09090b", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
+                <button onClick={shareBrief} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="arrowRight" size={14} color="#09090b" /> Share Brief Link
                 </button>
                 {project.pages.length > 1 && (
-                  <button onClick={downloadAll} style={{ padding: "10px 16px", background: "#18181b", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "14px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <button onClick={downloadAll} style={{ padding: "10px 16px", background: "#6b635c", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "14px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
                     <Icon name="download" size={14} color="#ffffff" /> Download All Pages (.zip)
                   </button>
                 )}
