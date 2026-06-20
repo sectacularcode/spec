@@ -6603,7 +6603,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* SOCIAL TAB */}
           {tab === "social" && (
             <>
-              <div style={{ maxWidth: "1400px", margin: "0 auto", width: "100%", padding: "24px 24px 40px", display: "grid", gridTemplateColumns: "1fr 320px", gap: "20px", alignItems: "start" }}>
+              <div style={{ maxWidth: "1400px", margin: "0 auto", width: "100%", padding: "24px 24px 40px", display: "grid", gridTemplateColumns: "1fr 420px", gap: "20px", alignItems: "start" }}>
               <div>
               <Section id="social-links" title="Social Media Links" icon="">
                 <div style={{ marginBottom: "4px" }}>
