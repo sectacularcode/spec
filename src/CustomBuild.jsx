@@ -3419,13 +3419,13 @@ export default function CustomBuild() {
                 <button
                   onClick={() => setMobilePreview(false)}
                   title="Desktop preview"
-                  style={{ padding: "6px 12px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: !mobilePreview ? "#6b635c" : "#fff", color: !mobilePreview ? "#fff" : "#6b7280", borderRight: "1px solid #dde0e6" }}>
+                  style={{ padding: "6px 12px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: !mobilePreview ? "#b45309" : "#fff", color: !mobilePreview ? "#fff" : "#6b7280", borderRight: "1px solid #dde0e6" }}>
                   Desktop
                 </button>
                 <button
                   onClick={() => setMobilePreview(true)}
                   title="Mobile preview"
-                  style={{ padding: "6px 12px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: mobilePreview ? "#6b635c" : "#fff", color: mobilePreview ? "#fff" : "#6b7280" }}>
+                  style={{ padding: "6px 12px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: mobilePreview ? "#b45309" : "#fff", color: mobilePreview ? "#fff" : "#6b7280" }}>
                   Mobile
                 </button>
               </div>
