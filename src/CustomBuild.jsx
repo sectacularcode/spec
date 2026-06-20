@@ -3451,7 +3451,7 @@ export default function CustomBuild() {
               <div style={{ fontSize: "14px", color: "#6b7280" }}>Resume a saved build or start a new one.</div>
             </div>
             <button
-              onClick={() => setDraftsView(false)}
+              onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setDraftsView(false); }}
               style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
               + New build
               </button>
@@ -3465,7 +3465,7 @@ export default function CustomBuild() {
               <div style={{ fontSize: "15px", fontWeight: 600, color: "#09090b", marginBottom: "8px" }}>No saved builds yet</div>
               <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "24px" }}>Upload a brief or fill out the intake form to get started.</div>
               <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
-                <button onClick={() => setDraftsView(false)} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>Start a build</button>
+                <button onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setDraftsView(false); }} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>Start a build</button>
                 <button onClick={() => { setShowIntake(true); setDraftsView(false); }} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#ffffff", border: "none", borderRadius: "6px", cursor: "pointer" }}>Fill out intake form</button>
               </div>
             </div>
@@ -3473,7 +3473,7 @@ export default function CustomBuild() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px" }}>
               {/* New build card */}
               <div
-                onClick={() => setDraftsView(false)}
+                onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setDraftsView(false); }}
                 style={{ border: "2px dashed #dde0e6", borderRadius: "10px", padding: "24px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "180px", gap: "8px" }}
                 onMouseOver={e => e.currentTarget.style.borderColor = "#b45309"}
                 onMouseOut={e => e.currentTarget.style.borderColor = "#dde0e6"}>
