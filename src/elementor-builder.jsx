@@ -6621,7 +6621,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                       s.key === "threads" ? "https://threads.net/@yourbrand" :
                       "https://example.com/yourbrand"
                     } />
-                    <button onClick={() => delSocial(i)} style={{ ...I.btnGhost, padding: "8px" }}>×</button>
+                    <button onClick={() => delSocial(i)} style={{ ...I.btnGhost, padding: "8px", color: "#b45309", borderColor: "#b45309" }}>×</button>
                   </div>
                 ))}
                 <div style={{ marginTop: "4px" }}>
