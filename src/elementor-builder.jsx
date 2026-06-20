@@ -6603,8 +6603,10 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {/* SOCIAL TAB */}
           {tab === "social" && (
             <>
-              <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%", padding: "24px 24px 40px" }}>
+              <div style={{ maxWidth: "1400px", margin: "0 auto", width: "100%", padding: "24px 24px 40px" }}>
               <Section id="social-links" title="Social Media Links" icon="">
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "24px", alignItems: "start" }}>
+                <div>
                 <div style={{ marginBottom: "4px" }}>
                   <div style={{ fontSize: "10px", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600, marginBottom: "8px" }}>Quick add</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", justifyContent: "center" }}>
@@ -6662,33 +6664,39 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInPage} onChange={e => updBrand("showSocialInPage", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Show as a section while scrolling (requires "Social" section enabled)</label>
                   <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInFooter} onChange={e => updBrand("showSocialInFooter", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Show in footer</label>
                 </div>
-                {brand.socialLinks.length > 0 && (() => {
-                  const theme = THEMES.find(t => t.id === brand.themeId);
-                  const isDark = (brand.themeMode || (theme && theme.mode)) === "dark";
-                  const pc = brand.primaryColor || "#ffffff";
-                  const hc = (theme && theme.headingColor) || (isDark ? "#ffffff" : "#0a0a0a");
-                  const tc = brand.bodyTextColor || (isDark ? "#888" : "#666");
-                  const iconHTML = brand.socialLinks.map(s => SVG[s.key] ? SVG[s.key](hc, 22) : "").filter(Boolean).join('<span style="display:inline-block;width:16px;"></span>');
-                  return (
-                    <div>
-                      <div style={{ fontSize: "10px", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600, marginBottom: "10px" }}>Preview</div>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px" }}>
+                </div>
+                <div>
+                  <div style={{ fontSize: "10px", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600, marginBottom: "10px" }}>Preview</div>
+                  {brand.socialLinks.length > 0 ? (() => {
+                    const theme = THEMES.find(t => t.id === brand.themeId);
+                    const isDark = (brand.themeMode || (theme && theme.mode)) === "dark";
+                    const pc = brand.primaryColor || "#ffffff";
+                    const hc = (theme && theme.headingColor) || (isDark ? "#ffffff" : "#0a0a0a");
+                    const tc = brand.bodyTextColor || (isDark ? "#888" : "#666");
+                    const iconHTML = brand.socialLinks.map(s => SVG[s.key] ? SVG[s.key](hc, 20) : "").filter(Boolean).join('<span style="display:inline-block;width:12px;"></span>');
+                    return (
+                      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                         <div style={{ padding: "20px 16px", background: pc, borderRadius: "8px", border: "1px solid #dde0e6", textAlign: "center" }}>
-                          <div style={{ fontSize: "9px", color: tc, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "14px", fontWeight: 600 }}>Brand</div>
+                          <div style={{ fontSize: "9px", color: tc, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "12px", fontWeight: 600 }}>Brand</div>
                           <div dangerouslySetInnerHTML={{ __html: iconHTML }} />
                         </div>
                         <div style={{ padding: "20px 16px", background: "#ffffff", borderRadius: "8px", border: "1px solid #dde0e6", textAlign: "center" }}>
-                          <div style={{ fontSize: "9px", color: "#666", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "14px", fontWeight: 600 }}>White</div>
-                          <div dangerouslySetInnerHTML={{ __html: brand.socialLinks.map(s => SVG[s.key] ? SVG[s.key]("#09090b", 22) : "").filter(Boolean).join('<span style="display:inline-block;width:16px;"></span>') }} />
+                          <div style={{ fontSize: "9px", color: "#666", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "12px", fontWeight: 600 }}>White</div>
+                          <div dangerouslySetInnerHTML={{ __html: brand.socialLinks.map(s => SVG[s.key] ? SVG[s.key]("#09090b", 20) : "").filter(Boolean).join('<span style="display:inline-block;width:12px;"></span>') }} />
                         </div>
                         <div style={{ padding: "20px 16px", background: "#0a0a0a", borderRadius: "8px", border: "1px solid #dde0e6", textAlign: "center" }}>
-                          <div style={{ fontSize: "9px", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "14px", fontWeight: 600 }}>Dark</div>
-                          <div dangerouslySetInnerHTML={{ __html: brand.socialLinks.map(s => SVG[s.key] ? SVG[s.key]("#ffffff", 22) : "").filter(Boolean).join('<span style="display:inline-block;width:16px;"></span>') }} />
+                          <div style={{ fontSize: "9px", color: "#888", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "12px", fontWeight: 600 }}>Dark</div>
+                          <div dangerouslySetInnerHTML={{ __html: brand.socialLinks.map(s => SVG[s.key] ? SVG[s.key]("#ffffff", 20) : "").filter(Boolean).join('<span style="display:inline-block;width:12px;"></span>') }} />
                         </div>
                       </div>
+                    );
+                  })() : (
+                    <div style={{ textAlign: "center", padding: "40px 16px", color: "#a3a39e", fontSize: "12px", background: "#f5f5f7", borderRadius: "8px" }}>
+                      Add a channel to preview
                     </div>
-                  );
-                })()}
+                  )}
+                </div>
+                </div>
               </Section>
               </div>
             </>
