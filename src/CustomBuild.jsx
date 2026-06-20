@@ -1109,7 +1109,7 @@ function buildHeaderJSON(C, brief, inspoContext) {
   };
 
   // CTA button
-  var ctaBtn = mkButton(brief.headerCta || "Start a project", brass, ink);
+  var ctaBtn = mkButton(brief.headerCta || "Start a project", brass, "#ffffff");
   ctaBtn.settings.padding = { unit: "px", top: "12", right: "24", bottom: "12", left: "24", isLinked: false };
 
   // Nav menu widget — single widget for all links
@@ -1297,7 +1297,7 @@ function buildHomePage(C, brief, inspoHint) {
     mkText(brief.heroSubhead || "Your subheadline here.", warmWhite, "center"),
     mkSpacer(40),
     mkContainer([
-      mkButton(brief.heroCta1 || "See the work", brass, ink),
+      mkButton(brief.heroCta1 || "See the work", brass, "#ffffff"),
       mkButton(brief.heroCta2 || "See pricing", "rgba(0,0,0,0)", warmWhite),
     ], null, { direction: "row", gap: "16", padY: "0", center: true, isInner: true, buttonRow: true }),
   ], ink, { padY: "80", minH: 0, center: true });
@@ -1375,7 +1375,7 @@ function buildHomePage(C, brief, inspoHint) {
     mkSpacer(24),
     mkText(brief.pricingSubhead || "Pick a package or build a plan, with real numbers in the open.", stone, "center"),
     mkSpacer(40),
-    mkContainer([mkButton(brief.pricingCta || "See packages", brass, ink)],
+    mkContainer([mkButton(brief.pricingCta || "See packages", brass, "#ffffff")],
       null, { padY: "0", center: true, isInner: true }),
   ], bone, { padY: "112", center: true });
 
@@ -1383,7 +1383,7 @@ function buildHomePage(C, brief, inspoHint) {
     mkHeading(brief.tagline || "The stories that move a company forward.", warmWhite, "h1",
       { font: "Fraunces", weight: 300, px: 64, italic: true, align: "center" }),
     mkSpacer(48),
-    mkContainer([mkButton(brief.closingCta || "Start a project", brass, ink)],
+    mkContainer([mkButton(brief.closingCta || "Start a project", brass, "#ffffff")],
       null, { padY: "0", center: true, isInner: true }),
   ], ink, { padY: "120", minH: 70, center: true });
 
@@ -1404,7 +1404,7 @@ function buildWorkPage(C, brief, inspoHint) {
     mkText(brief.workIntro || "A look at the stories so far. Customer and team films, brand work, and the films that help a company show what it has become.", text),
   ], bone, { padY: "88" });
 
-  var closing = mkContainer([mkButton("Start a project", brass, ink)], bone, { padY: "80", center: true });
+  var closing = mkContainer([mkButton("Start a project", brass, "#ffffff")], bone, { padY: "80", center: true });
 
   // ── Variant A: Standard grid with filter row ──────────────────────────────
   var filterCategories = brief.workCategories || ["All", "Stories & testimonials", "People & culture", "Brand & leadership", "Exit"];
@@ -1476,7 +1476,7 @@ function buildWorkPage(C, brief, inspoHint) {
       mkSpacer(12),
       mkText("[Add a one paragraph description of this project when publishing.]", text),
       mkSpacer(24),
-      mkButton("View project", brass, ink),
+      mkButton("View project", brass, "#ffffff"),
     ], null, { padY: "48", grow: 1, isInner: true }),
   ], "#ffffff", { direction: "row", gap: "0", padY: "0" });
   featuredTile.settings.border_border = "solid";
@@ -1654,7 +1654,7 @@ function buildServicesPage(C, brief, inspoHint) {
   var closing = mkContainer([
     mkText("Not sure where to start? Tell me about the company.", stone, "center"),
     mkSpacer(24),
-    mkButton("Start a project", brass, ink),
+    mkButton("Start a project", brass, "#ffffff"),
   ], bone, { padY: "80", center: true });
 
   return { version: "0.4", title: "Services & Pricing", type: "page", page_settings: {},
@@ -1672,7 +1672,7 @@ function buildAboutPage(C, brief, inspoHint) {
     mkHeading(brief.aboutH1 || "One person. Every frame.", ink, "h1", { weight: 800, px: 64 }),
   ], bone, { padY: "88" });
 
-  var closing = mkContainer([mkButton("Start a project", brass, ink)], bone, { padY: "80", center: true });
+  var closing = mkContainer([mkButton("Start a project", brass, "#ffffff")], bone, { padY: "80", center: true });
 
   // ── Variant A: Story + portrait split ─────────────────────────────────────
   var storyLeft = mkContainer([
@@ -1754,7 +1754,7 @@ function buildAboutPage(C, brief, inspoHint) {
       mkSpacer(16),
       mkText(brief.whyOneMaker || "[Why this approach — pulled from brief.]", text),
       mkSpacer(32),
-      mkButton("Start a project", brass, ink),
+      mkButton("Start a project", brass, "#ffffff"),
     ], null, { padY: "0", grow: 1, isInner: true }),
   ], bone, { direction: "row", gap: "64", padY: "80" });
 
@@ -1795,7 +1795,7 @@ function buildProcessPage(C, brief, inspoHint) {
     mkText(brief.calloutBody || "[What to expect — timeline and delivery details. Fill in from client brief.]", warmWhite),
   ], ink, { padY: "80" });
 
-  var closing = mkContainer([mkButton("Start a project", brass, ink)], bone, { padY: "80", center: true });
+  var closing = mkContainer([mkButton("Start a project", brass, "#ffffff")], bone, { padY: "80", center: true });
 
   // ── Variant A: Two-column numbered grid ───────────────────────────────────
   var gridSteps = steps.map(function(step, i) {
@@ -1885,7 +1885,7 @@ function buildContactPage(C, brief, inspoHint) {
   var formSectionA = mkContainer([
     formPlaceholder,
     mkSpacer(32),
-    mkContainer([mkButton(brief.contactCta || "Send it over", brass, ink)], null, { padY: "0", isInner: true }),
+    mkContainer([mkButton(brief.contactCta || "Send it over", brass, "#ffffff")], null, { padY: "0", isInner: true }),
     mkSpacer(24),
     mkText(brief.contactReassurance || "No sales team. No automated funnel. A real reply from a real person.", stone),
   ], bone, { padY: "64" });
@@ -1922,7 +1922,7 @@ function buildContactPage(C, brief, inspoHint) {
   var formRight = mkContainer([
     formPlaceholder,
     mkSpacer(24),
-    mkButton(brief.contactCta || "Send it over", brass, ink),
+    mkButton(brief.contactCta || "Send it over", brass, "#ffffff"),
   ], null, { padY: "0", grow: 1, isInner: true });
 
   var splitRow = mkContainer([statementLeft, formRight], null, { direction: "row", gap: "80", padY: "0", isInner: true });
@@ -2038,7 +2038,7 @@ function buildGenericPage(colors, brief, pageDef, inspoContext) {
       mkSpacer(16),
       mkText(brief.hookStatement || "[Landing page subheadline — specific and direct]", stone),
       mkSpacer(24),
-      mkButton(brief.heroCta1 || "Get started", brass, ink),
+      mkButton(brief.heroCta1 || "Get started", brass, "#ffffff"),
     ], bone, { padY: "80", center: true }));
   } else if (pid === "thank-you") {
     sections.push(mkContainer([
@@ -2060,7 +2060,7 @@ function buildGenericPage(colors, brief, pageDef, inspoContext) {
       mkSpacer(16),
       mkText("The page you're looking for doesn't exist or has moved.", stone),
       mkSpacer(24),
-      mkButton("Go home", brass, ink),
+      mkButton("Go home", brass, "#ffffff"),
     ], bone, { padY: "80", center: true }));
   } else {
     // Generic fallback
@@ -2075,7 +2075,7 @@ function buildGenericPage(colors, brief, pageDef, inspoContext) {
   sections.push(mkContainer([
     mkHeading(brief.tagline || brief.closingCta || "Ready to get started?", warmWhite, "h2", { font: (brief.fonts && brief.fonts[1]) || "Inter", weight: 400, px: 40 }),
     mkSpacer(24),
-    mkButton(brief.headerCta || "Start a project", brass, ink),
+    mkButton(brief.headerCta || "Start a project", brass, "#ffffff"),
   ], asphalt, { padY: "80", center: true }));
 
   return { version: "0.4", title: (brief.brandName || "Site") + " — " + label, type: "page", page_settings: {}, content: sections };
@@ -2182,7 +2182,7 @@ function buildPreviewHTML(brief, activePage, variant) {
         "<a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>" + (brief.pricingCta || "See packages") + "</a>" +
       "</section>" +
       "<section style='background:" + ink + ";display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;'>" +
-        "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-style:italic;font-size:clamp(36px,5vw,68px);color:" + warmWhite + ";max-width:800px;margin:0 0 48px;line-height:1.1;'>" + (brief.tagline || "The stories that move a company forward.") + "</h2>" +
+        "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,5vw,68px);color:" + warmWhite + ";max-width:800px;margin:0 0 48px;line-height:1.1;'>" + (brief.tagline || "The stories that move a company forward.") + "</h2>" +
         "<a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>" + (brief.closingCta || "Start a project") + "</a>" +
       "</section>",
 
@@ -2416,10 +2416,10 @@ function buildPreviewHTML(brief, activePage, variant) {
     contact: (function() {
       var formBox = "<div style='background:#fff;border:1px solid #E2DBCC;padding:32px;margin-bottom:24px;'>" +
         "<p style='font-size:14px;color:" + stone + ";line-height:1.8;'>Form fields: Name · Company · Email · What do you need? · Budget range (optional) · Message</p>" +
-        "<p style='font-size:12px;color:" + stone + ";margin-top:12px;font-style:italic;'>Connect a forms plugin and replace this with the live shortcode.</p>" +
+        "<p style='font-size:12px;color:" + stone + ";margin-top:12px;'>Connect a forms plugin and replace this with the live shortcode.</p>" +
       "</div>";
       var contactClose = "<section style='background:" + ink + ";padding:96px 40px;text-align:center;'>" +
-        "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-style:italic;font-size:clamp(32px,4.5vw,52px);color:" + warmWhite + ";max-width:720px;margin:0 auto 32px;line-height:1.1;'>" + (brief.tagline||"Ready to get started?") + "</h2>" +
+        "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(32px,4.5vw,52px);color:" + warmWhite + ";max-width:720px;margin:0 auto 32px;line-height:1.1;'>" + (brief.tagline||"Ready to get started?") + "</h2>" +
         "<div style='font-size:14px;color:" + stone + ";letter-spacing:2px;text-transform:uppercase;'>" + (brief.signatureLine||"") + "</div>" +
       "</section>";
 
@@ -2468,7 +2468,7 @@ function buildPreviewHTML(brief, activePage, variant) {
       return "<section style='background:" + ink + ";min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 40px;text-align:center;'>" +
         "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,6vw,64px);line-height:1.08;color:" + warmWhite + ";max-width:800px;margin:0 0 24px;'>" + (brief.heroHeadline || "Your offer, front and center.") + "</h1>" +
         "<p style='font-size:18px;color:" + warmWhite + ";opacity:.8;max-width:520px;margin:0 0 40px;line-height:1.7;'>" + (brief.heroSubhead || "One clear message. One clear action.") + "</p>" +
-        "<a style='padding:16px 48px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+        "<a style='padding:16px 48px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
       "</section>" +
       "<section style='background:" + bone + ";padding:80px 40px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:32px;max-width:1000px;margin:0 auto;text-align:center;'>" +
         "<div style='padding:32px;'><div style='font-size:32px;color:" + brass + ";margin-bottom:12px;font-weight:800;'>01</div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin-bottom:8px;'>Benefit one</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;'>Explain the first key benefit clearly.</p></div>" +
@@ -2477,7 +2477,7 @@ function buildPreviewHTML(brief, activePage, variant) {
       "</div></section>" +
       "<section style='background:" + ink + ";padding:80px 40px;text-align:center;'>" +
         "<h2 style='font-size:clamp(28px,4vw,44px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>Ready?</h2>" +
-        "<a style='padding:16px 48px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+        "<a style='padding:16px 48px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
       "</section>";
     })(),
 
@@ -2510,7 +2510,7 @@ function buildPreviewHTML(brief, activePage, variant) {
       "<h1 style='font-size:clamp(32px,5vw,48px);font-weight:800;color:" + ink + ";margin:0 0 16px;line-height:1.15;'>Article Title Goes Here</h1>" +
       "<p style='font-size:15px;color:" + stone + ";margin-bottom:32px;'>Published on [Date] · 5 min read</p>" +
       "<div style='background:#e0ddd7;aspect-ratio:16/9;margin-bottom:40px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Featured image</div>" +
-      "<div style='font-size:17px;color:" + text + ";line-height:1.8;'><p style='margin-bottom:24px;'>Opening paragraph of the article. This is where you hook the reader and set up the premise.</p><h2 style='font-size:24px;font-weight:700;color:" + ink + ";margin:40px 0 16px;'>Section heading</h2><p style='margin-bottom:24px;'>Body copy continues here with supporting details, examples, and insights.</p><blockquote style='border-left:3px solid " + brass + ";padding:16px 24px;margin:32px 0;font-style:italic;color:" + ink + ";font-size:18px;'>A pull quote that highlights a key insight from the article.</blockquote><p>Concluding thoughts that tie everything together and lead to a call to action.</p></div>" +
+      "<div style='font-size:17px;color:" + text + ";line-height:1.8;'><p style='margin-bottom:24px;'>Opening paragraph of the article. This is where you hook the reader and set up the premise.</p><h2 style='font-size:24px;font-weight:700;color:" + ink + ";margin:40px 0 16px;'>Section heading</h2><p style='margin-bottom:24px;'>Body copy continues here with supporting details, examples, and insights.</p><blockquote style='border-left:3px solid " + brass + ";padding:16px 24px;margin:32px 0;color:" + ink + ";font-size:18px;'>A pull quote that highlights a key insight from the article.</blockquote><p>Concluding thoughts that tie everything together and lead to a call to action.</p></div>" +
     "</section>",
 
     // ── FAQ ──
@@ -2533,7 +2533,7 @@ function buildPreviewHTML(brief, activePage, variant) {
     "</section>" +
     "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;max-width:1000px;margin:0 auto;'>" +
       [["Starter","$500","For small projects"],["Professional","$1,500","For growing businesses"],["Enterprise","Custom","For large-scale needs"]].map(function(t) {
-        return "<div style='background:" + (t[0]==="Professional" ? asphalt : "#fff") + ";border:1px solid #E2DBCC;padding:40px 32px;text-align:center;'><div style='font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + (t[0]==="Professional" ? brass : brassDp) + ";margin-bottom:16px;'>" + t[0] + "</div><div style='font-size:clamp(32px,4vw,48px);font-weight:800;color:" + (t[0]==="Professional" ? warmWhite : ink) + ";margin-bottom:8px;'>" + t[1] + "</div><p style='font-size:14px;color:" + (t[0]==="Professional" ? stone : stone) + ";margin-bottom:32px;'>" + t[2] + "</p><a style='display:inline-block;padding:14px 32px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;'>Get started</a></div>";
+        return "<div style='background:" + (t[0]==="Professional" ? asphalt : "#fff") + ";border:1px solid #E2DBCC;padding:40px 32px;text-align:center;'><div style='font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + (t[0]==="Professional" ? brass : brassDp) + ";margin-bottom:16px;'>" + t[0] + "</div><div style='font-size:clamp(32px,4vw,48px);font-weight:800;color:" + (t[0]==="Professional" ? warmWhite : ink) + ";margin-bottom:8px;'>" + t[1] + "</div><p style='font-size:14px;color:" + (t[0]==="Professional" ? stone : stone) + ";margin-bottom:32px;'>" + t[2] + "</p><a style='display:inline-block;padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;'>Get started</a></div>";
       }).join("") +
     "</div></section>",
 
@@ -2544,7 +2544,7 @@ function buildPreviewHTML(brief, activePage, variant) {
     "</section>" +
     "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:32px;max-width:1160px;margin:0 auto;'>" +
       ["This changed everything for our business.", "Professional, efficient, and genuinely cared about the outcome.", "We saw results within the first month."].map(function(q) {
-        return "<div style='background:#fff;border-left:3px solid " + brass + ";padding:32px;'><p style='font-family:Inter,sans-serif;font-style:italic;font-size:18px;color:" + ink + ";line-height:1.5;margin:0 0 20px;'>" + q + "</p><div style='font-size:14px;font-weight:600;color:" + ink + ";'>Client Name</div><div style='font-size:13px;color:" + stone + ";'>Role, Company</div></div>";
+        return "<div style='background:#fff;border-left:3px solid " + brass + ";padding:32px;'><p style='font-family:Inter,sans-serif;font-size:18px;color:" + ink + ";line-height:1.5;margin:0 0 20px;'>" + q + "</p><div style='font-size:14px;font-weight:600;color:" + ink + ";'>Client Name</div><div style='font-size:13px;color:" + stone + ";'>Role, Company</div></div>";
       }).join("") +
     "</div></section>",
 
@@ -2610,7 +2610,7 @@ function buildPreviewHTML(brief, activePage, variant) {
       "<div style='font-family:Inter,sans-serif;font-size:clamp(80px,15vw,160px);font-weight:300;color:" + brass + ";line-height:1;margin-bottom:16px;'>404</div>" +
       "<h1 style='font-size:clamp(24px,4vw,36px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>Page not found.</h1>" +
       "<p style='font-size:17px;color:" + text + ";max-width:400px;margin:0 auto 32px;'>The page you are looking for does not exist or has been moved.</p>" +
-      "<a href='/' style='padding:14px 32px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;display:inline-block;'>Back to homepage</a>" +
+      "<a href='/' style='padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;display:inline-block;'>Back to homepage</a>" +
     "</section>",
 
     // ── PORTFOLIO SINGLE ──
@@ -2636,7 +2636,10 @@ function buildPreviewHTML(brief, activePage, variant) {
     "</section>",
   };
 
-  var body = sections[activePage] || sections.home;
+  var body = sections[activePage] 
+    || sections[activePage.replace(/-\d+$/, "")] 
+    || sections[activePage.split("-")[0]] 
+    || sections.home;
 
   return "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>" +
     "<title>" + (brief.brandName || "Preview") + "</title>" +
