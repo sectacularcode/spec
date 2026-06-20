@@ -5139,8 +5139,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             <span style={{ marginLeft: "12px", fontSize: "12px", color: "#a3a39e", fontWeight: 400 }}>Click any heading or paragraph to edit inline</span>
           </div>
           <div style={{ display: "flex", border: "1px solid #3f3f46", borderRadius: "6px", overflow: "hidden", flexShrink: 0 }}>
-            <button onClick={() => setMobilePreviewTS(false)} style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: !mobilePreviewTS ? "#ffffff" : "transparent", color: !mobilePreviewTS ? "#09090b" : "#a3a39e", borderRight: "1px solid #3f3f46" }}>Desktop</button>
-            <button onClick={() => setMobilePreviewTS(true)} style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: mobilePreviewTS ? "#ffffff" : "transparent", color: mobilePreviewTS ? "#09090b" : "#a3a39e" }}>Mobile</button>
+            <button onClick={() => setMobilePreviewTS(false)} style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: !mobilePreviewTS ? "#b45309" : "transparent", color: !mobilePreviewTS ? "#ffffff" : "#a3a39e", borderRight: "1px solid rgba(255,255,255,0.15)" }}>Desktop</button>
+            <button onClick={() => setMobilePreviewTS(true)} style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: mobilePreviewTS ? "#b45309" : "transparent", color: mobilePreviewTS ? "#ffffff" : "#a3a39e" }}>Mobile</button>
           </div>
         </div>
         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
