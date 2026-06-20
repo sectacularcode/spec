@@ -1109,7 +1109,7 @@ function buildHeaderJSON(C, brief, inspoContext) {
   };
 
   // CTA button
-  var ctaBtn = mkButton(brief.headerCta || "Start a project", brass, "#ffffff");
+  var ctaBtn = mkButton(brief.headerCta || "Start a project", brassDp, "#ffffff");
   ctaBtn.settings.padding = { unit: "px", top: "12", right: "24", bottom: "12", left: "24", isLinked: false };
 
   // Nav menu widget — single widget for all links
@@ -1297,7 +1297,7 @@ function buildHomePage(C, brief, inspoHint) {
     mkText(brief.heroSubhead || "Your subheadline here.", warmWhite, "center"),
     mkSpacer(40),
     mkContainer([
-      mkButton(brief.heroCta1 || "See the work", brass, "#ffffff"),
+      mkButton(brief.heroCta1 || "See the work", brassDp, "#ffffff"),
       mkButton(brief.heroCta2 || "See pricing", "rgba(0,0,0,0)", warmWhite),
     ], null, { direction: "row", gap: "16", padY: "0", center: true, isInner: true, buttonRow: true }),
   ], ink, { padY: "80", minH: 0, center: true });
@@ -1375,7 +1375,7 @@ function buildHomePage(C, brief, inspoHint) {
     mkSpacer(24),
     mkText(brief.pricingSubhead || "Pick a package or build a plan, with real numbers in the open.", stone, "center"),
     mkSpacer(40),
-    mkContainer([mkButton(brief.pricingCta || "See packages", brass, "#ffffff")],
+    mkContainer([mkButton(brief.pricingCta || "See packages", brassDp, "#ffffff")],
       null, { padY: "0", center: true, isInner: true }),
   ], bone, { padY: "112", center: true });
 
@@ -1383,7 +1383,7 @@ function buildHomePage(C, brief, inspoHint) {
     mkHeading(brief.tagline || "The stories that move a company forward.", warmWhite, "h1",
       { font: "Fraunces", weight: 300, px: 64, italic: true, align: "center" }),
     mkSpacer(48),
-    mkContainer([mkButton(brief.closingCta || "Start a project", brass, "#ffffff")],
+    mkContainer([mkButton(brief.closingCta || "Start a project", brassDp, "#ffffff")],
       null, { padY: "0", center: true, isInner: true }),
   ], ink, { padY: "120", minH: 70, center: true });
 
@@ -1404,7 +1404,7 @@ function buildWorkPage(C, brief, inspoHint) {
     mkText(brief.workIntro || "A look at the stories so far. Customer and team films, brand work, and the films that help a company show what it has become.", text),
   ], bone, { padY: "88" });
 
-  var closing = mkContainer([mkButton("Start a project", brass, "#ffffff")], bone, { padY: "80", center: true });
+  var closing = mkContainer([mkButton("Start a project", brassDp, "#ffffff")], bone, { padY: "80", center: true });
 
   // ── Variant A: Standard grid with filter row ──────────────────────────────
   var filterCategories = brief.workCategories || ["All", "Stories & testimonials", "People & culture", "Brand & leadership", "Exit"];
@@ -1476,7 +1476,7 @@ function buildWorkPage(C, brief, inspoHint) {
       mkSpacer(12),
       mkText("[Add a one paragraph description of this project when publishing.]", text),
       mkSpacer(24),
-      mkButton("View project", brass, "#ffffff"),
+      mkButton("View project", brassDp, "#ffffff"),
     ], null, { padY: "48", grow: 1, isInner: true }),
   ], "#ffffff", { direction: "row", gap: "0", padY: "0" });
   featuredTile.settings.border_border = "solid";
@@ -1654,7 +1654,7 @@ function buildServicesPage(C, brief, inspoHint) {
   var closing = mkContainer([
     mkText("Not sure where to start? Tell me about the company.", stone, "center"),
     mkSpacer(24),
-    mkButton("Start a project", brass, "#ffffff"),
+    mkButton("Start a project", brassDp, "#ffffff"),
   ], bone, { padY: "80", center: true });
 
   return { version: "0.4", title: "Services & Pricing", type: "page", page_settings: {},
@@ -1672,7 +1672,7 @@ function buildAboutPage(C, brief, inspoHint) {
     mkHeading(brief.aboutH1 || "One person. Every frame.", ink, "h1", { weight: 800, px: 64 }),
   ], bone, { padY: "88" });
 
-  var closing = mkContainer([mkButton("Start a project", brass, "#ffffff")], bone, { padY: "80", center: true });
+  var closing = mkContainer([mkButton("Start a project", brassDp, "#ffffff")], bone, { padY: "80", center: true });
 
   // ── Variant A: Story + portrait split ─────────────────────────────────────
   var storyLeft = mkContainer([
@@ -1754,7 +1754,7 @@ function buildAboutPage(C, brief, inspoHint) {
       mkSpacer(16),
       mkText(brief.whyOneMaker || "[Why this approach — pulled from brief.]", text),
       mkSpacer(32),
-      mkButton("Start a project", brass, "#ffffff"),
+      mkButton("Start a project", brassDp, "#ffffff"),
     ], null, { padY: "0", grow: 1, isInner: true }),
   ], bone, { direction: "row", gap: "64", padY: "80" });
 
@@ -1795,7 +1795,7 @@ function buildProcessPage(C, brief, inspoHint) {
     mkText(brief.calloutBody || "[What to expect — timeline and delivery details. Fill in from client brief.]", warmWhite),
   ], ink, { padY: "80" });
 
-  var closing = mkContainer([mkButton("Start a project", brass, "#ffffff")], bone, { padY: "80", center: true });
+  var closing = mkContainer([mkButton("Start a project", brassDp, "#ffffff")], bone, { padY: "80", center: true });
 
   // ── Variant A: Two-column numbered grid ───────────────────────────────────
   var gridSteps = steps.map(function(step, i) {
@@ -1885,7 +1885,7 @@ function buildContactPage(C, brief, inspoHint) {
   var formSectionA = mkContainer([
     formPlaceholder,
     mkSpacer(32),
-    mkContainer([mkButton(brief.contactCta || "Send it over", brass, "#ffffff")], null, { padY: "0", isInner: true }),
+    mkContainer([mkButton(brief.contactCta || "Send it over", brassDp, "#ffffff")], null, { padY: "0", isInner: true }),
     mkSpacer(24),
     mkText(brief.contactReassurance || "No sales team. No automated funnel. A real reply from a real person.", stone),
   ], bone, { padY: "64" });
@@ -1922,7 +1922,7 @@ function buildContactPage(C, brief, inspoHint) {
   var formRight = mkContainer([
     formPlaceholder,
     mkSpacer(24),
-    mkButton(brief.contactCta || "Send it over", brass, "#ffffff"),
+    mkButton(brief.contactCta || "Send it over", brassDp, "#ffffff"),
   ], null, { padY: "0", grow: 1, isInner: true });
 
   var splitRow = mkContainer([statementLeft, formRight], null, { direction: "row", gap: "80", padY: "0", isInner: true });
@@ -2038,7 +2038,7 @@ function buildGenericPage(colors, brief, pageDef, inspoContext) {
       mkSpacer(16),
       mkText(brief.hookStatement || "[Landing page subheadline — specific and direct]", stone),
       mkSpacer(24),
-      mkButton(brief.heroCta1 || "Get started", brass, "#ffffff"),
+      mkButton(brief.heroCta1 || "Get started", brassDp, "#ffffff"),
     ], bone, { padY: "80", center: true }));
   } else if (pid === "thank-you") {
     sections.push(mkContainer([
@@ -2060,7 +2060,7 @@ function buildGenericPage(colors, brief, pageDef, inspoContext) {
       mkSpacer(16),
       mkText("The page you're looking for doesn't exist or has moved.", stone),
       mkSpacer(24),
-      mkButton("Go home", brass, "#ffffff"),
+      mkButton("Go home", brassDp, "#ffffff"),
     ], bone, { padY: "80", center: true }));
   } else {
     // Generic fallback
@@ -2075,7 +2075,7 @@ function buildGenericPage(colors, brief, pageDef, inspoContext) {
   sections.push(mkContainer([
     mkHeading(brief.tagline || brief.closingCta || "Ready to get started?", warmWhite, "h2", { font: (brief.fonts && brief.fonts[1]) || "Inter", weight: 400, px: 40 }),
     mkSpacer(24),
-    mkButton(brief.headerCta || "Start a project", brass, "#ffffff"),
+    mkButton(brief.headerCta || "Start a project", brassDp, "#ffffff"),
   ], asphalt, { padY: "80", center: true }));
 
   return { version: "0.4", title: (brief.brandName || "Site") + " — " + label, type: "page", page_settings: {}, content: sections };
@@ -2255,7 +2255,7 @@ function buildPreviewHTML(brief, activePage, variant) {
               "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:20px;'>" + (brief.brandName || "Brand") + "</div>" +
               "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(32px,5vw,56px);color:" + warmWhite + ";margin:0 0 20px;line-height:1.1;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
               "<p style='font-size:17px;color:" + warmWhite + ";opacity:.8;margin:0 0 32px;line-height:1.7;'>" + (brief.heroSubhead || "Subheadline goes here.") + "</p>" +
-              "<a style='padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+              "<a style='padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
             "</div>" +
           "</div>" +
         "</section>";
@@ -2266,7 +2266,7 @@ function buildPreviewHTML(brief, activePage, variant) {
             "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,6vw,72px);color:" + warmWhite + ";margin:0 0 24px;line-height:1.05;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
             "<p style='font-size:18px;color:" + warmWhite + ";opacity:.8;margin:0 auto 40px;line-height:1.7;max-width:560px;'>" + (brief.heroSubhead || "Subheadline goes here.") + "</p>" +
             "<div style='display:flex;gap:12px;justify-content:center;flex-wrap:wrap;'>" +
-              "<a style='padding:14px 40px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+              "<a style='padding:14px 40px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
               "<a style='padding:14px 40px;background:transparent;color:" + warmWhite + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border:1px solid rgba(255,255,255,0.3);border-radius:4px;display:inline-block;'>" + (brief.heroCta2 || "Learn more") + "</a>" +
             "</div>" +
           "</div>" +
@@ -2277,7 +2277,7 @@ function buildPreviewHTML(brief, activePage, variant) {
           "<div style='position:relative;max-width:700px;margin:0 auto;'>" +
             "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,6vw,64px);color:" + warmWhite + ";margin:0 0 20px;line-height:1.08;text-shadow:0 2px 20px rgba(0,0,0,0.3);'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
             "<p style='font-size:18px;color:" + warmWhite + ";margin:0 0 36px;line-height:1.7;'>" + (brief.heroSubhead || "Subheadline goes here.") + "</p>" +
-            "<a style='padding:16px 48px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+            "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
           "</div>" +
         "</section>";
       } else if (hp === "minimal") {
@@ -2296,7 +2296,7 @@ function buildPreviewHTML(brief, activePage, variant) {
               "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(32px,5vw,56px);color:" + warmWhite + ";margin:0 0 20px;line-height:1.1;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
               "<p style='font-size:17px;color:" + warmWhite + ";opacity:.8;margin:0 0 32px;line-height:1.7;max-width:480px;'>" + (brief.heroSubhead || "Subheadline goes here.") + "</p>" +
               "<div style='display:flex;gap:12px;flex-wrap:wrap;'>" +
-                "<a style='padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+                "<a style='padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
                 "<a style='padding:14px 32px;background:transparent;color:" + warmWhite + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border:1px solid rgba(255,255,255,0.3);border-radius:4px;display:inline-block;'>" + (brief.heroCta2 || "Learn more") + "</a>" +
               "</div>" +
             "</div>" +
@@ -2392,7 +2392,7 @@ function buildPreviewHTML(brief, activePage, variant) {
       if (cp === "split-cta") {
         ctaHTML = "<section style='background:" + ink + ";padding:60px clamp(24px,8vw,80px);'><div style='display:flex;justify-content:space-between;align-items:center;max-width:1160px;margin:0 auto;flex-wrap:wrap;gap:24px;'>" +
           "<h2 style='font-weight:800;font-size:clamp(20px,3vw,32px);color:" + warmWhite + ";margin:0;'>" + (brief.tagline || "Ready to get started?") + "</h2>" +
-          "<a style='padding:14px 40px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>Start a project</a>" +
+          "<a style='padding:14px 40px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>Start a project</a>" +
         "</div></section>";
       } else if (cp === "minimal-line") {
         ctaHTML = "<section style='background:" + bone + ";padding:60px clamp(24px,8vw,80px);text-align:center;border-top:1px solid #E2DBCC;'>" +
@@ -2402,7 +2402,7 @@ function buildPreviewHTML(brief, activePage, variant) {
         ctaHTML = "<section style='background:" + ink + ";padding:80px clamp(24px,8vw,80px);text-align:center;'>" +
           "<h2 style='font-weight:800;font-size:clamp(24px,4vw,44px);color:" + warmWhite + ";margin:0 0 12px;'>" + (brief.tagline || "Ready to get started?") + "</h2>" +
           "<p style='font-size:14px;color:" + stone + ";letter-spacing:2px;text-transform:uppercase;margin:0 0 32px;'>" + (brief.signatureLine || "") + "</p>" +
-          "<a style='padding:14px 40px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>Start a project</a>" +
+          "<a style='padding:14px 40px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>Start a project</a>" +
         "</section>";
       }
 
@@ -2416,7 +2416,7 @@ function buildPreviewHTML(brief, activePage, variant) {
       var pricingHTML = "<section style='background:#ffffff;padding:80px clamp(24px,8vw,80px);text-align:center;'><div style='max-width:720px;margin:0 auto;'>" +
         "<h2 style='font-weight:800;font-size:clamp(24px,4vw,40px);color:" + ink + ";margin:0 0 16px;'>Clear pricing. No surprises.</h2>" +
         "<p style='font-size:17px;color:" + text + ";line-height:1.7;margin:0 0 32px;'>See what it costs before you book a call.</p>" +
-        "<a style='padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>See pricing</a>" +
+        "<a style='padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>See pricing</a>" +
       "</div></section>";
 
       return heroHTML + hookHTML + servicesHTML + aboutHTML + testimonialsHTML + pricingHTML + ctaHTML;
@@ -2573,7 +2573,7 @@ function buildPreviewHTML(brief, activePage, variant) {
             ["Name", "Email", "Message"].map(function(f) {
               return "<div style='margin-bottom:16px;'><div style='font-size:13px;font-weight:600;color:" + ink + ";margin-bottom:6px;'>" + f + "</div><div style='background:#f9f9f9;border:1px solid #E2DBCC;padding:12px;border-radius:4px;color:" + stone + ";font-size:14px;'>Enter " + f.toLowerCase() + "</div></div>";
             }).join("") +
-            "<a style='display:block;padding:14px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;text-align:center;'>" + (brief.contactButton || "Send it over") + "</a>" +
+            "<a style='display:block;padding:14px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;text-align:center;'>" + (brief.contactButton || "Send it over") + "</a>" +
           "</div></div></section>";
       } else {
         return "<section style='background:" + bone + ";padding:88px 40px;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:60px;max-width:1160px;margin:0 auto;'>" +
@@ -2587,7 +2587,7 @@ function buildPreviewHTML(brief, activePage, variant) {
             ["Name", "Email", "Company", "What do you need?", "Message"].map(function(f) {
               return "<div style='margin-bottom:16px;'><div style='font-size:13px;font-weight:600;color:" + ink + ";margin-bottom:6px;'>" + f + "</div><div style='background:#f9f9f9;border:1px solid #E2DBCC;padding:12px;border-radius:4px;color:" + stone + ";font-size:14px;'></div></div>";
             }).join("") +
-            "<a style='display:block;padding:14px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;text-align:center;'>" + (brief.contactButton || "Send it over") + "</a>" +
+            "<a style='display:block;padding:14px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;text-align:center;'>" + (brief.contactButton || "Send it over") + "</a>" +
           "</div>" +
         "</div></section>";
       }
@@ -2597,7 +2597,7 @@ function buildPreviewHTML(brief, activePage, variant) {
       return "<section style='background:" + ink + ";min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 40px;text-align:center;'>" +
         "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,6vw,64px);line-height:1.08;color:" + warmWhite + ";max-width:800px;margin:0 0 24px;'>" + (brief.heroHeadline || "Your offer, front and center.") + "</h1>" +
         "<p style='font-size:18px;color:" + warmWhite + ";opacity:.8;max-width:520px;margin:0 0 40px;line-height:1.7;'>" + (brief.heroSubhead || "One clear message. One clear action.") + "</p>" +
-        "<a style='padding:16px 48px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+        "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
       "</section>" +
       "<section style='background:" + bone + ";padding:80px 40px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:32px;max-width:1000px;margin:0 auto;text-align:center;'>" +
         "<div style='padding:32px;'><div style='font-size:32px;color:" + brass + ";margin-bottom:12px;font-weight:800;'>01</div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin-bottom:8px;'>Benefit one</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;'>Explain the first key benefit clearly.</p></div>" +
@@ -2606,7 +2606,7 @@ function buildPreviewHTML(brief, activePage, variant) {
       "</div></section>" +
       "<section style='background:" + ink + ";padding:80px 40px;text-align:center;'>" +
         "<h2 style='font-size:clamp(28px,4vw,44px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>Ready?</h2>" +
-        "<a style='padding:16px 48px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+        "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
       "</section>";
     })(),
 
@@ -2717,7 +2717,7 @@ function buildPreviewHTML(brief, activePage, variant) {
               "<div style='font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + (featured ? brass : brassDp) + ";margin-bottom:16px;'>" + t[0] + "</div>" +
               "<div style='font-size:clamp(36px,5vw,52px);font-weight:800;color:" + (featured ? warmWhite : ink) + ";margin-bottom:8px;'>" + t[1] + "</div>" +
               "<p style='font-size:15px;color:" + stone + ";margin-bottom:32px;'>" + t[2] + "</p>" +
-              "<a style='display:inline-block;padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Get started</a></div>";
+              "<a style='display:inline-block;padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Get started</a></div>";
           }).join("") + "</div></section>";
       } else {
         return header + "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;max-width:1000px;margin:0 auto;'>" +
@@ -2727,7 +2727,7 @@ function buildPreviewHTML(brief, activePage, variant) {
               "<div style='font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + (featured ? brass : brassDp) + ";margin-bottom:16px;'>" + t[0] + "</div>" +
               "<div style='font-size:clamp(32px,4vw,48px);font-weight:800;color:" + (featured ? warmWhite : ink) + ";margin-bottom:8px;'>" + t[1] + "</div>" +
               "<p style='font-size:14px;color:" + stone + ";margin-bottom:32px;'>" + t[2] + "</p>" +
-              "<a style='display:inline-block;padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Get started</a></div>";
+              "<a style='display:inline-block;padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Get started</a></div>";
           }).join("") + "</div></section>";
       }
     })(),
@@ -2749,7 +2749,7 @@ function buildPreviewHTML(brief, activePage, variant) {
     "</section>" +
     "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:900px;margin:0 auto;'>" +
       [["JAN 15","Workshop: Brand Strategy Fundamentals","10:00 AM — 2:00 PM · Virtual"],["FEB 22","Networking Mixer","6:00 PM — 9:00 PM · Downtown Studio"],["MAR 10","Annual Conference","All Day · Convention Center"]].map(function(e) {
-        return "<div style='display:grid;grid-template-columns:100px 1fr auto;gap:24px;padding:28px 0;border-bottom:1px solid #E2DBCC;align-items:center;'><div style='font-size:14px;font-weight:800;color:" + brass + ";letter-spacing:1px;'>" + e[0] + "</div><div><div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + e[1] + "</div><div style='font-size:14px;color:" + stone + ";'>" + e[2] + "</div></div><a style='padding:10px 24px;border:1px solid " + brass + ";color:" + ink + ";font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;white-space:nowrap;'>Register</a></div>";
+        return "<div style='display:grid;grid-template-columns:100px 1fr auto;gap:24px;padding:28px 0;border-bottom:1px solid #E2DBCC;align-items:center;'><div style='font-size:14px;font-weight:800;color:" + brass + ";letter-spacing:1px;'>" + e[0] + "</div><div><div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + e[1] + "</div><div style='font-size:14px;color:" + stone + ";'>" + e[2] + "</div></div><a style='padding:10px 24px;border:1px solid " + brass + ";color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;white-space:nowrap;'>Register</a></div>";
       }).join("") +
     "</div></section>",
 
@@ -2761,7 +2761,7 @@ function buildPreviewHTML(brief, activePage, variant) {
     "</section>" +
     "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:800px;margin:0 auto;'>" +
       [["Senior Designer","Full-time · Remote"],["Project Manager","Full-time · Hybrid"],["Content Strategist","Contract · Remote"]].map(function(j) {
-        return "<div style='display:flex;justify-content:space-between;align-items:center;padding:24px 0;border-bottom:1px solid #E2DBCC;'><div><div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + j[0] + "</div><div style='font-size:14px;color:" + stone + ";'>" + j[1] + "</div></div><a style='padding:10px 24px;background:" + brass + ";color:" + ink + ";font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;'>Apply</a></div>";
+        return "<div style='display:flex;justify-content:space-between;align-items:center;padding:24px 0;border-bottom:1px solid #E2DBCC;'><div><div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + j[0] + "</div><div style='font-size:14px;color:" + stone + ";'>" + j[1] + "</div></div><a style='padding:10px 24px;background:" + brassDp + ";color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;'>Apply</a></div>";
       }).join("") +
     "</div></section>",
 
@@ -2804,7 +2804,7 @@ function buildPreviewHTML(brief, activePage, variant) {
       "<div style='font-family:Inter,sans-serif;font-size:clamp(80px,15vw,160px);font-weight:300;color:" + brass + ";line-height:1;margin-bottom:16px;'>404</div>" +
       "<h1 style='font-size:clamp(24px,4vw,36px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>Page not found.</h1>" +
       "<p style='font-size:17px;color:" + text + ";max-width:400px;margin:0 auto 32px;'>The page you are looking for does not exist or has been moved.</p>" +
-      "<a href='/' style='padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;display:inline-block;'>Back to homepage</a>" +
+      "<a href='/' style='padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;display:inline-block;'>Back to homepage</a>" +
     "</section>",
 
     // ── PORTFOLIO SINGLE ──
