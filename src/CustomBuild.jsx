@@ -2480,7 +2480,7 @@ var T = {
   input: { width: "100%", padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "14px", color: "#09090b", outline: "none", background: "#fff" },
   btnPrimary: { padding: "12px 24px", background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px" },
   btnGhost: { padding: "10px 16px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" },
-  stepNum: function(active, done) { return { width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 700, background: done ? "#6b635c" : active ? "#6b635c" : "#eeedf1", color: done || active ? "#fff" : "#9ca3af", flexShrink: 0 }; },
+  stepNum: function(active, done) { return { width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 700, background: done ? "#b45309" : active ? "#b45309" : "#eeedf1", color: done || active ? "#fff" : "#9ca3af", flexShrink: 0 }; },
 };
 
 // ─── Main Component ───────────────────────────────────────────────────────────
@@ -3031,7 +3031,7 @@ export default function CustomBuild() {
             </div>
             <button
               onClick={() => setDraftsView(false)}
-              style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
+              style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
               + New build
             </button>
           </div>
@@ -3041,7 +3041,7 @@ export default function CustomBuild() {
               <div style={{ fontSize: "15px", fontWeight: 600, color: "#09090b", marginBottom: "8px" }}>No saved builds yet</div>
               <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "24px" }}>Upload a brief or fill out the intake form to get started.</div>
               <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
-                <button onClick={() => setDraftsView(false)} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>Start a build</button>
+                <button onClick={() => setDraftsView(false)} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>Start a build</button>
                 <button onClick={() => { setShowIntake(true); setDraftsView(false); }} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 500, background: "#fff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>Fill out intake form</button>
               </div>
             </div>
@@ -3051,7 +3051,7 @@ export default function CustomBuild() {
               <div
                 onClick={() => setDraftsView(false)}
                 style={{ border: "2px dashed #dde0e6", borderRadius: "10px", padding: "24px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "180px", gap: "8px" }}
-                onMouseOver={e => e.currentTarget.style.borderColor = "#09090b"}
+                onMouseOver={e => e.currentTarget.style.borderColor = "#b45309"}
                 onMouseOut={e => e.currentTarget.style.borderColor = "#dde0e6"}>
                 <div style={{ fontSize: "24px", color: "#6b7280" }}>+</div>
                 <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>New build</div>
@@ -3128,7 +3128,7 @@ export default function CustomBuild() {
           </div>
 
           {/* STEP 1 */}
-          <div style={{ marginBottom: "20px" }}>
+          <div style={{ marginBottom: "32px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
               <div style={T.stepNum(true, !!brief)}>1</div>
               <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Brand Brief</div>
@@ -3186,7 +3186,7 @@ export default function CustomBuild() {
           </div>
 
           {/* STEP 2 */}
-          <div style={{ marginBottom: "20px" }}>
+          <div style={{ marginBottom: "32px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
               <div style={T.stepNum(true, inspoUrls.some(u => u.trim()))}>2</div>
               <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Inspo URLs</div>
@@ -3247,7 +3247,7 @@ export default function CustomBuild() {
           </div>
 
           {/* STEP 3 */}
-          <div style={{ marginBottom: "20px" }}>
+          <div style={{ marginBottom: "32px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
               <div style={T.stepNum(true, selectedPages.length > 0)}>3</div>
               <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Pages to Build</div>
