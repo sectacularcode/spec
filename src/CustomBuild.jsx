@@ -2647,7 +2647,7 @@ function buildPreviewHTML(brief, activePage, variant) {
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 var T = {
-  surface: { background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "10px", padding: "20px", boxSizing: "border-box", overflow: "hidden", width: "100%" },
+  surface: { background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "10px", padding: "20px", boxSizing: "border-box", overflow: "visible", width: "100%" },
   label: { fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "8px", display: "block" },
   input: { width: "100%", padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "14px", color: "#09090b", outline: "none", background: "#fff" },
   btnPrimary: { padding: "12px 24px", background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px" },
@@ -3469,7 +3469,7 @@ export default function CustomBuild() {
                   + Add page
                 </button>
                 {showAddPage && (
-                  <div style={{ position: "absolute", bottom: "100%", left: 0, width: "100%", marginBottom: "4px", background: "#fff", border: "1px solid #dde0e6", borderRadius: "8px", boxShadow: "0 4px 24px rgba(0,0,0,0.15)", zIndex: 999, maxHeight: "280px", overflowY: "auto" }}>
+                  <div style={{ position: "absolute", top: "100%", left: 0, width: "100%", marginTop: "4px", background: "#fff", border: "1px solid #dde0e6", borderRadius: "8px", boxShadow: "0 8px 32px rgba(0,0,0,0.15)", zIndex: 9999, maxHeight: "320px", overflowY: "auto" }}>
                     {ADDITIONAL_PAGE_TYPES.filter(p => !customPages.find(cp => cp.id === p.id)).map(p => (
                       <button
                         key={p.id}
