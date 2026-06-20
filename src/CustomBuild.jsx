@@ -2194,6 +2194,36 @@ const LAYOUT_PATTERNS = {
     { id: "two-column", label: "Two-column Q&A", industries: ["enterprise", "consulting"] },
     { id: "categorized", label: "Categorized sections", industries: ["saas", "complex"] },
   ],
+  landing: [
+    { id: "centered-dark", label: "Dark centered hero + numbered benefits", industries: ["saas", "startup", "agency"] },
+    { id: "split-light", label: "Light split hero + alternating benefits", industries: ["consulting", "services", "creative"] },
+    { id: "social-proof", label: "Light hero + logo strip + feature cards", industries: ["saas", "enterprise", "b2b"] },
+  ],
+  team: [
+    { id: "photo-grid", label: "Equal photo grid with name and role", industries: ["agency", "consulting", "law"] },
+    { id: "featured-founder", label: "Featured founder large + supporting team", industries: ["founder", "studio", "startup"] },
+    { id: "horizontal-list", label: "Horizontal list with bio text", industries: ["enterprise", "finance", "healthcare"] },
+  ],
+  testimonials: [
+    { id: "card-grid", label: "3-column quote cards", industries: ["agency", "saas", "consulting"] },
+    { id: "single-feature", label: "Single large dark feature quote", industries: ["luxury", "studio", "architecture"] },
+    { id: "alternating-quotes", label: "Alternating left-right with avatar", industries: ["creative", "personal-brand", "services"] },
+  ],
+  events: [
+    { id: "date-list", label: "Date-anchored list with register button", industries: ["all"] },
+    { id: "event-cards", label: "Card grid with image and date badge", industries: ["hospitality", "creative", "entertainment"] },
+    { id: "featured-next", label: "Featured next event hero + list", industries: ["enterprise", "conference", "education"] },
+  ],
+  careers: [
+    { id: "job-list", label: "Clean job list with apply buttons", industries: ["all"] },
+    { id: "values-first", label: "Culture and values section + job list", industries: ["startup", "agency", "creative"] },
+    { id: "split-layout", label: "Culture copy left, open roles right", industries: ["enterprise", "saas", "consulting"] },
+  ],
+  "case-study": [
+    { id: "dark-hero-metrics", label: "Dark hero + challenge/solution/result", industries: ["agency", "consulting", "creative"] },
+    { id: "editorial-light", label: "Light editorial with large image and pull quote", industries: ["design", "photography", "brand"] },
+    { id: "numbers-first", label: "Big stat numbers lead + narrative", industries: ["saas", "enterprise", "b2b"] },
+  ],
 };
 
 // Parse inspo crawl text and return a boost map: { patternId: boostScore }
@@ -2661,33 +2691,155 @@ function buildPreviewHTML(brief, activePage, variant, inspoContext) {
     })(),
 
     landing: (function() {
-      return "<section style='background:" + ink + ";min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 40px;text-align:center;'>" +
-        "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,6vw,64px);line-height:1.08;color:" + warmWhite + ";max-width:800px;margin:0 0 24px;'>" + (brief.heroHeadline || "Your offer, front and center.") + "</h1>" +
-        "<p style='font-size:18px;color:" + warmWhite + ";opacity:.8;max-width:520px;margin:0 0 40px;line-height:1.7;'>" + (brief.heroSubhead || "One clear message. One clear action.") + "</p>" +
-        "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
-      "</section>" +
-      "<section style='background:" + bone + ";padding:80px 40px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:32px;max-width:1000px;margin:0 auto;text-align:center;'>" +
-        "<div style='padding:32px;'><div style='font-size:32px;color:" + brass + ";margin-bottom:12px;font-weight:800;'>01</div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin-bottom:8px;'>Benefit one</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;'>Explain the first key benefit clearly.</p></div>" +
-        "<div style='padding:32px;'><div style='font-size:32px;color:" + brass + ";margin-bottom:12px;font-weight:800;'>02</div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin-bottom:8px;'>Benefit two</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;'>What makes this worth their time.</p></div>" +
-        "<div style='padding:32px;'><div style='font-size:32px;color:" + brass + ";margin-bottom:12px;font-weight:800;'>03</div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin-bottom:8px;'>Benefit three</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;'>The final push to convert.</p></div>" +
-      "</div></section>" +
-      "<section style='background:" + ink + ";padding:80px 40px;text-align:center;'>" +
-        "<h2 style='font-size:clamp(28px,4vw,44px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>Ready?</h2>" +
-        "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
-      "</section>";
+      var lp = patterns.landing || "centered-dark";
+      var benefits = [
+        { num: "01", title: "Benefit one", body: "Explain the first key benefit clearly." },
+        { num: "02", title: "Benefit two", body: "What makes this worth their time." },
+        { num: "03", title: "Benefit three", body: "The final push to convert." },
+      ];
+      if (lp === "split-light") {
+        return "<section style='background:" + bone + ";padding:clamp(60px,10vw,100px) clamp(24px,8vw,80px);'>" +
+          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;max-width:1160px;margin:0 auto;'>" +
+            "<div>" +
+              "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:20px;'>" + (brief.brandName || "Brand") + "</div>" +
+              "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(32px,5vw,56px);color:" + ink + ";margin:0 0 20px;line-height:1.1;'>" + (brief.heroHeadline || "Your offer, front and center.") + "</h1>" +
+              "<p style='font-size:17px;color:" + text + ";margin:0 0 36px;line-height:1.7;'>" + (brief.heroSubhead || "One clear message. One clear action.") + "</p>" +
+              "<div style='display:flex;gap:16px;flex-wrap:wrap;'>" +
+                "<a style='padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+                "<a style='padding:14px 32px;background:transparent;color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border:1px solid " + ink + ";border-radius:4px;'>" + (brief.heroCta2 || "Learn more") + "</a>" +
+              "</div>" +
+            "</div>" +
+            "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:8px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Hero image</div>" +
+          "</div>" +
+        "</section>" +
+        "<section style='background:#ffffff;padding:80px clamp(24px,8vw,80px);'>" +
+          "<div style='max-width:1160px;margin:0 auto;'>" +
+            benefits.map(function(b) {
+              return "<div style='display:grid;grid-template-columns:80px 1fr;gap:32px;padding:40px 0;border-bottom:1px solid #E2DBCC;align-items:start;'>" +
+                "<div style='font-size:28px;font-weight:800;color:" + brass + ";'>" + b.num + "</div>" +
+                "<div><h3 style='font-size:19px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + b.title + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.65;margin:0;'>" + b.body + "</p></div>" +
+              "</div>";
+            }).join("") +
+          "</div>" +
+        "</section>" +
+        "<section style='background:" + bone + ";padding:80px 40px;text-align:center;'>" +
+          "<h2 style='font-size:clamp(28px,4vw,40px);font-weight:800;color:" + ink + ";margin:0 0 24px;'>" + (brief.heroHeadline || "Ready to get started?") + "</h2>" +
+          "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+        "</section>";
+      } else if (lp === "social-proof") {
+        var logos = ["Partner A", "Partner B", "Partner C", "Partner D", "Partner E"];
+        return "<section style='background:" + bone + ";padding:clamp(60px,10vw,100px) clamp(24px,8vw,80px);text-align:center;'>" +
+          "<div style='max-width:800px;margin:0 auto;'>" +
+            "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:20px;'>" + (brief.brandName || "Brand") + "</div>" +
+            "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(32px,5vw,56px);color:" + ink + ";margin:0 0 20px;line-height:1.1;'>" + (brief.heroHeadline || "Your offer, front and center.") + "</h1>" +
+            "<p style='font-size:18px;color:" + text + ";margin:0 0 40px;line-height:1.7;'>" + (brief.heroSubhead || "One clear message. One clear action.") + "</p>" +
+            "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+          "</div>" +
+        "</section>" +
+        "<section style='background:#ffffff;padding:40px;border-top:1px solid #E2DBCC;border-bottom:1px solid #E2DBCC;'>" +
+          "<div style='max-width:900px;margin:0 auto;text-align:center;'>" +
+            "<p style='font-size:12px;color:" + stone + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:24px;'>Trusted by teams at</p>" +
+            "<div style='display:flex;gap:40px;justify-content:center;flex-wrap:wrap;align-items:center;'>" +
+              logos.map(function(l) {
+                return "<div style='font-size:15px;font-weight:700;color:" + stone + ";opacity:.5;'>" + l + "</div>";
+              }).join("") +
+            "</div>" +
+          "</div>" +
+        "</section>" +
+        "<section style='background:" + bone + ";padding:80px 40px;'>" +
+          "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:32px;max-width:1060px;margin:0 auto;'>" +
+            benefits.map(function(b) {
+              return "<div style='background:#ffffff;border:1px solid #E2DBCC;padding:36px 28px;border-radius:6px;'>" +
+                "<div style='font-size:28px;color:" + brass + ";margin-bottom:16px;font-weight:800;'>" + b.num + "</div>" +
+                "<h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 10px;'>" + b.title + "</h3>" +
+                "<p style='font-size:15px;color:" + stone + ";line-height:1.65;margin:0;'>" + b.body + "</p>" +
+              "</div>";
+            }).join("") +
+          "</div>" +
+        "</section>" +
+        "<section style='background:" + ink + ";padding:80px 40px;text-align:center;'>" +
+          "<h2 style='font-size:clamp(28px,4vw,40px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>Ready?</h2>" +
+          "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+        "</section>";
+      } else {
+        // centered-dark (default)
+        return "<section style='background:" + ink + ";min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 40px;text-align:center;'>" +
+          "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,6vw,64px);line-height:1.08;color:" + warmWhite + ";max-width:800px;margin:0 0 24px;'>" + (brief.heroHeadline || "Your offer, front and center.") + "</h1>" +
+          "<p style='font-size:18px;color:" + warmWhite + ";opacity:.8;max-width:520px;margin:0 0 40px;line-height:1.7;'>" + (brief.heroSubhead || "One clear message. One clear action.") + "</p>" +
+          "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+        "</section>" +
+        "<section style='background:" + bone + ";padding:80px 40px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:32px;max-width:1000px;margin:0 auto;text-align:center;'>" +
+          benefits.map(function(b) {
+            return "<div style='padding:32px;'><div style='font-size:32px;color:" + brass + ";margin-bottom:12px;font-weight:800;'>" + b.num + "</div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin-bottom:8px;'>" + b.title + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;'>" + b.body + "</p></div>";
+          }).join("") +
+        "</div></section>" +
+        "<section style='background:" + ink + ";padding:80px 40px;text-align:center;'>" +
+          "<h2 style='font-size:clamp(28px,4vw,44px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>Ready?</h2>" +
+          "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+        "</section>";
+      }
     })(),
 
     // ── TEAM ──
-    team: "<section style='background:" + bone + ";padding:88px 40px;'>" +
-      "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>The Team</div>" +
-      "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>The people behind the work.</h1>" +
-      "<p style='font-size:17px;color:" + text + ";max-width:560px;margin-bottom:48px;line-height:1.65;'>Every person here chose to be here.</p>" +
-    "</section>" +
-    "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:32px;max-width:1160px;margin:0 auto;'>" +
-      ["Founder", "Lead Designer", "Strategist", "Developer"].map(function(role) {
-        return "<div style='text-align:center;'><div style='background:#e0ddd7;aspect-ratio:1;margin-bottom:16px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Photo</div><div style='font-size:16px;font-weight:700;color:" + ink + ";'>[Name]</div><div style='font-size:14px;color:" + stone + ";margin-top:4px;'>" + role + "</div></div>";
-      }).join("") +
-    "</div></section>",
+    team: (function() {
+      var tp = patterns.team || "photo-grid";
+      var members = [
+        { role: "Founder & CEO", name: "[Name]" },
+        { role: "Lead Designer", name: "[Name]" },
+        { role: "Strategist", name: "[Name]" },
+        { role: "Developer", name: "[Name]" },
+      ];
+      var header = "<section style='background:" + bone + ";padding:88px 40px 56px;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>The Team</div>" +
+        "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>The people behind the work.</h1>" +
+        "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0;line-height:1.65;'>Every person here chose to be here.</p>" +
+      "</section>";
+      if (tp === "featured-founder") {
+        return header +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:1160px;margin:0 auto;'>" +
+            "<div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-bottom:56px;padding-bottom:56px;border-bottom:1px solid #E2DBCC;'>" +
+              "<div style='background:#e0ddd7;aspect-ratio:3/4;border-radius:6px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Founder photo</div>" +
+              "<div>" +
+                "<div style='font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + brass + ";margin-bottom:12px;'>Founder</div>" +
+                "<h2 style='font-size:clamp(24px,3vw,36px);font-weight:800;color:" + ink + ";margin:0 0 8px;'>[Founder Name]</h2>" +
+                "<p style='font-size:15px;color:" + stone + ";margin-bottom:20px;'>Founder & CEO</p>" +
+                "<p style='font-size:16px;color:" + text + ";line-height:1.7;'>A short founder bio that establishes credibility and voice. Who they are, where they came from, and why they started this.</p>" +
+              "</div>" +
+            "</div>" +
+            "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px;'>" +
+              members.slice(1).map(function(m) {
+                return "<div style='text-align:center;'>" +
+                  "<div style='background:#e0ddd7;aspect-ratio:1;margin-bottom:14px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Photo</div>" +
+                  "<div style='font-size:15px;font-weight:700;color:" + ink + ";'>" + m.name + "</div>" +
+                  "<div style='font-size:13px;color:" + stone + ";margin-top:4px;'>" + m.role + "</div>" +
+                "</div>";
+              }).join("") +
+            "</div>" +
+          "</div></section>";
+      } else if (tp === "horizontal-list") {
+        return header +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:900px;margin:0 auto;'>" +
+            members.map(function(m) {
+              return "<div style='display:grid;grid-template-columns:100px 1fr;gap:28px;padding:32px 0;border-bottom:1px solid #E2DBCC;align-items:center;'>" +
+                "<div style='background:#e0ddd7;aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:11px;'>Photo</div>" +
+                "<div>" +
+                  "<div style='font-size:16px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + m.name + "</div>" +
+                  "<div style='font-size:13px;color:" + brass + ";font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;'>" + m.role + "</div>" +
+                  "<p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>Short bio for this team member — background, focus, and what they bring.</p>" +
+                "</div>" +
+              "</div>";
+            }).join("") +
+          "</div></section>";
+      } else {
+        // photo-grid (default)
+        return header +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:32px;max-width:1160px;margin:0 auto;'>" +
+            members.map(function(m) {
+              return "<div style='text-align:center;'><div style='background:#e0ddd7;aspect-ratio:1;margin-bottom:16px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Photo</div><div style='font-size:16px;font-weight:700;color:" + ink + ";'>" + m.name + "</div><div style='font-size:14px;color:" + stone + ";margin-top:4px;'>" + m.role + "</div></div>";
+            }).join("") +
+          "</div></section>";
+      }
+    })(),
 
     // ── BLOG ──
     blog: (function() {
@@ -2799,53 +2951,252 @@ function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       }
     })(),
 
-    testimonials: "<section style='background:" + bone + ";padding:88px 40px;'>" +
-      "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Testimonials</div>" +
-      "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 48px;'>What our clients say.</h1>" +
-    "</section>" +
-    "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:32px;max-width:1160px;margin:0 auto;'>" +
-      ["This changed everything for our business.", "Professional, efficient, and genuinely cared about the outcome.", "We saw results within the first month."].map(function(q) {
-        return "<div style='background:#fff;border-left:3px solid " + brass + ";padding:32px;'><p style='font-family:Inter,sans-serif;font-size:18px;color:" + ink + ";line-height:1.5;margin:0 0 20px;'>" + q + "</p><div style='font-size:14px;font-weight:600;color:" + ink + ";'>Client Name</div><div style='font-size:13px;color:" + stone + ";'>Role, Company</div></div>";
-      }).join("") +
-    "</div></section>",
+    testimonials: (function() {
+      var tp = patterns.testimonials || "card-grid";
+      var quotes = [
+        { q: "This changed everything for our business.", name: "Client Name", role: "Role, Company" },
+        { q: "Professional, efficient, and genuinely cared about the outcome.", name: "Client Name", role: "Role, Company" },
+        { q: "We saw results within the first month.", name: "Client Name", role: "Role, Company" },
+      ];
+      var header = "<section style='background:" + bone + ";padding:88px 40px 48px;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Testimonials</div>" +
+        "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 48px;'>What our clients say.</h1>" +
+      "</section>";
+      if (tp === "single-feature") {
+        return "<section style='background:" + ink + ";padding:120px 40px;text-align:center;'>" +
+          "<div style='max-width:800px;margin:0 auto;'>" +
+            "<div style='font-size:60px;color:" + brass + ";line-height:1;margin-bottom:24px;'>\u201c</div>" +
+            "<p style='font-size:clamp(22px,3vw,32px);color:" + warmWhite + ";line-height:1.5;font-weight:300;margin:0 0 40px;'>" + quotes[0].q + "</p>" +
+            "<div style='width:40px;height:2px;background:" + brass + ";margin:0 auto 24px;'></div>" +
+            "<div style='font-size:15px;font-weight:700;color:" + warmWhite + ";'>" + quotes[0].name + "</div>" +
+            "<div style='font-size:13px;color:" + stone + ";margin-top:6px;'>" + quotes[0].role + "</div>" +
+          "</div>" +
+        "</section>" +
+        "<section style='background:" + bone + ";padding:80px 40px 96px;'>" +
+          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:32px;max-width:900px;margin:0 auto;'>" +
+            quotes.slice(1).map(function(qt) {
+              return "<div style='background:#ffffff;border:1px solid #E2DBCC;padding:32px;border-radius:4px;'>" +
+                "<p style='font-size:16px;color:" + ink + ";line-height:1.6;margin:0 0 20px;'>" + qt.q + "</p>" +
+                "<div style='font-size:14px;font-weight:600;color:" + ink + ";'>" + qt.name + "</div>" +
+                "<div style='font-size:13px;color:" + stone + ";'>" + qt.role + "</div>" +
+              "</div>";
+            }).join("") +
+          "</div>" +
+        "</section>";
+      } else if (tp === "alternating-quotes") {
+        return header +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:960px;margin:0 auto;'>" +
+            quotes.map(function(qt, i) {
+              var isRight = i % 2 === 1;
+              return "<div style='display:grid;grid-template-columns:72px 1fr;gap:24px;padding:40px 0;border-bottom:1px solid #E2DBCC;align-items:start;" + (isRight ? "direction:rtl;" : "") + "'>" +
+                "<div style='background:#e0ddd7;width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:11px;" + (isRight ? "direction:ltr;" : "") + "'>Photo</div>" +
+                "<div style='" + (isRight ? "direction:ltr;text-align:right;" : "") + "'>" +
+                  "<p style='font-size:18px;color:" + ink + ";line-height:1.6;margin:0 0 16px;font-style:italic;'>\u201c" + qt.q + "\u201d</p>" +
+                  "<div style='font-size:14px;font-weight:700;color:" + ink + ";'>" + qt.name + "</div>" +
+                  "<div style='font-size:13px;color:" + stone + ";'>" + qt.role + "</div>" +
+                "</div>" +
+              "</div>";
+            }).join("") +
+          "</div></section>";
+      } else {
+        // card-grid (default)
+        return header +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:32px;max-width:1160px;margin:0 auto;'>" +
+            quotes.map(function(qt) {
+              return "<div style='background:#fff;border-left:3px solid " + brass + ";padding:32px;'><p style='font-family:Inter,sans-serif;font-size:18px;color:" + ink + ";line-height:1.5;margin:0 0 20px;'>" + qt.q + "</p><div style='font-size:14px;font-weight:600;color:" + ink + ";'>" + qt.name + "</div><div style='font-size:13px;color:" + stone + ";'>" + qt.role + "</div></div>";
+            }).join("") +
+          "</div></section>";
+      }
+    })(),
 
     // ── EVENTS ──
-    events: "<section style='background:" + bone + ";padding:88px 40px;'>" +
-      "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Events</div>" +
-      "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 48px;'>Upcoming events.</h1>" +
-    "</section>" +
-    "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:900px;margin:0 auto;'>" +
-      [["JAN 15","Workshop: Brand Strategy Fundamentals","10:00 AM — 2:00 PM · Virtual"],["FEB 22","Networking Mixer","6:00 PM — 9:00 PM · Downtown Studio"],["MAR 10","Annual Conference","All Day · Convention Center"]].map(function(e) {
-        return "<div style='display:grid;grid-template-columns:100px 1fr auto;gap:24px;padding:28px 0;border-bottom:1px solid #E2DBCC;align-items:center;'><div style='font-size:14px;font-weight:800;color:" + brass + ";letter-spacing:1px;'>" + e[0] + "</div><div><div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + e[1] + "</div><div style='font-size:14px;color:" + stone + ";'>" + e[2] + "</div></div><a style='padding:10px 24px;border:1px solid " + brass + ";color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;white-space:nowrap;'>Register</a></div>";
-      }).join("") +
-    "</div></section>",
+    events: (function() {
+      var ep = patterns.events || "date-list";
+      var evts = [
+        { date: "JAN 15", title: "Workshop: Brand Strategy Fundamentals", meta: "10:00 AM — 2:00 PM · Virtual" },
+        { date: "FEB 22", title: "Networking Mixer", meta: "6:00 PM — 9:00 PM · Downtown Studio" },
+        { date: "MAR 10", title: "Annual Conference", meta: "All Day · Convention Center" },
+      ];
+      var header = "<section style='background:" + bone + ";padding:88px 40px 56px;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Events</div>" +
+        "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 48px;'>Upcoming events.</h1>" +
+      "</section>";
+      if (ep === "event-cards") {
+        return header +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'>" +
+            "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:28px;max-width:1160px;margin:0 auto;'>" +
+              evts.map(function(e) {
+                return "<div style='background:#ffffff;border:1px solid #E2DBCC;border-radius:6px;overflow:hidden;'>" +
+                  "<div style='background:#e0ddd7;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Event image</div>" +
+                  "<div style='padding:24px;'>" +
+                    "<div style='font-size:12px;font-weight:800;color:" + brass + ";letter-spacing:1px;margin-bottom:10px;'>" + e.date + "</div>" +
+                    "<h3 style='font-size:17px;font-weight:700;color:" + ink + ";margin:0 0 8px;line-height:1.3;'>" + e.title + "</h3>" +
+                    "<p style='font-size:13px;color:" + stone + ";margin:0 0 20px;'>" + e.meta + "</p>" +
+                    "<a style='display:inline-block;padding:10px 24px;background:" + brassDp + ";color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Register</a>" +
+                  "</div>" +
+                "</div>";
+              }).join("") +
+            "</div>" +
+          "</section>";
+      } else if (ep === "featured-next") {
+        var next = evts[0];
+        return "<section style='background:" + ink + ";padding:96px 40px;'>" +
+          "<div style='max-width:1160px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;'>" +
+            "<div>" +
+              "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:16px;'>Next Event</div>" +
+              "<div style='font-size:14px;font-weight:800;color:" + brass + ";letter-spacing:2px;margin-bottom:16px;'>" + next.date + "</div>" +
+              "<h2 style='font-size:clamp(28px,4vw,44px);font-weight:800;color:" + warmWhite + ";margin:0 0 16px;line-height:1.15;'>" + next.title + "</h2>" +
+              "<p style='font-size:16px;color:" + warmWhite + ";opacity:.7;margin:0 0 32px;'>" + next.meta + "</p>" +
+              "<a style='display:inline-block;padding:14px 36px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Register now</a>" +
+            "</div>" +
+            "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:6px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Event image</div>" +
+          "</div>" +
+        "</section>" +
+        header +
+        "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:900px;margin:0 auto;'>" +
+          evts.slice(1).map(function(e) {
+            return "<div style='display:grid;grid-template-columns:100px 1fr auto;gap:24px;padding:28px 0;border-bottom:1px solid #E2DBCC;align-items:center;'>" +
+              "<div style='font-size:14px;font-weight:800;color:" + brass + ";letter-spacing:1px;'>" + e.date + "</div>" +
+              "<div><div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + e.title + "</div><div style='font-size:14px;color:" + stone + ";'>" + e.meta + "</div></div>" +
+              "<a style='padding:10px 24px;background:" + brassDp + ";color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;white-space:nowrap;border-radius:4px;'>Register</a>" +
+            "</div>";
+          }).join("") +
+        "</div></section>";
+      } else {
+        // date-list (default)
+        return header +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:900px;margin:0 auto;'>" +
+            evts.map(function(e) {
+              return "<div style='display:grid;grid-template-columns:100px 1fr auto;gap:24px;padding:28px 0;border-bottom:1px solid #E2DBCC;align-items:center;'><div style='font-size:14px;font-weight:800;color:" + brass + ";letter-spacing:1px;'>" + e.date + "</div><div><div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + e.title + "</div><div style='font-size:14px;color:" + stone + ";'>" + e.meta + "</div></div><a style='padding:10px 24px;border:1px solid " + brass + ";color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;white-space:nowrap;'>Register</a></div>";
+            }).join("") +
+          "</div></section>";
+      }
+    })(),
 
     // ── CAREERS ──
-    careers: "<section style='background:" + bone + ";padding:88px 40px;'>" +
-      "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Careers</div>" +
-      "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>Work with us.</h1>" +
-      "<p style='font-size:17px;color:" + text + ";max-width:560px;margin-bottom:48px;'>We are always looking for talented people who care about the craft.</p>" +
-    "</section>" +
-    "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:800px;margin:0 auto;'>" +
-      [["Senior Designer","Full-time · Remote"],["Project Manager","Full-time · Hybrid"],["Content Strategist","Contract · Remote"]].map(function(j) {
-        return "<div style='display:flex;justify-content:space-between;align-items:center;padding:24px 0;border-bottom:1px solid #E2DBCC;'><div><div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + j[0] + "</div><div style='font-size:14px;color:" + stone + ";'>" + j[1] + "</div></div><a style='padding:10px 24px;background:" + brassDp + ";color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;'>Apply</a></div>";
-      }).join("") +
-    "</div></section>",
+    careers: (function() {
+      var cp = patterns.careers || "job-list";
+      var jobs = [
+        { title: "Senior Designer", meta: "Full-time · Remote" },
+        { title: "Project Manager", meta: "Full-time · Hybrid" },
+        { title: "Content Strategist", meta: "Contract · Remote" },
+      ];
+      var values = ["Ownership", "Craft", "Clarity", "Speed", "Honesty"];
+      var header = "<section style='background:" + bone + ";padding:88px 40px 56px;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Careers</div>" +
+        "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>Work with us.</h1>" +
+        "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0;line-height:1.65;'>We are always looking for talented people who care about the craft.</p>" +
+      "</section>";
+      var jobList = "<div style='max-width:800px;margin:0 auto;'>" +
+        jobs.map(function(j) {
+          return "<div style='display:flex;justify-content:space-between;align-items:center;padding:24px 0;border-bottom:1px solid #E2DBCC;'><div><div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + j.title + "</div><div style='font-size:14px;color:" + stone + ";'>" + j.meta + "</div></div><a style='padding:10px 24px;background:" + brassDp + ";color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Apply</a></div>";
+        }).join("") +
+      "</div>";
+      if (cp === "values-first") {
+        return "<section style='background:" + ink + ";padding:80px 40px;'>" +
+          "<div style='max-width:1060px;margin:0 auto;'>" +
+            "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:24px;'>Our values</div>" +
+            "<div style='display:flex;gap:24px;flex-wrap:wrap;'>" +
+              values.map(function(v) {
+                return "<div style='padding:14px 24px;border:1px solid rgba(255,255,255,.15);color:" + warmWhite + ";font-size:14px;font-weight:600;border-radius:4px;'>" + v + "</div>";
+              }).join("") +
+            "</div>" +
+          "</div>" +
+        "</section>" +
+        header +
+        "<section style='background:" + bone + ";padding:0 40px 96px;'>" + jobList + "</section>";
+      } else if (cp === "split-layout") {
+        return header +
+          "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:64px;max-width:1160px;margin:0 auto;'>" +
+            "<div>" +
+              "<h2 style='font-size:24px;font-weight:800;color:" + ink + ";margin:0 0 16px;'>Why join us</h2>" +
+              "<p style='font-size:16px;color:" + text + ";line-height:1.7;margin-bottom:28px;'>We move fast, care about craft, and give people room to own their work. No bureaucracy. No bottlenecks.</p>" +
+              "<div style='display:flex;flex-direction:column;gap:12px;'>" +
+                values.map(function(v) {
+                  return "<div style='display:flex;align-items:center;gap:12px;'><div style='width:6px;height:6px;background:" + brass + ";border-radius:50%;flex-shrink:0;'></div><span style='font-size:15px;font-weight:600;color:" + ink + ";'>" + v + "</span></div>";
+                }).join("") +
+              "</div>" +
+            "</div>" +
+            "<div>" +
+              "<h2 style='font-size:24px;font-weight:800;color:" + ink + ";margin:0 0 24px;'>Open roles</h2>" +
+              jobs.map(function(j) {
+                return "<div style='display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid #E2DBCC;'><div><div style='font-size:16px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + j.title + "</div><div style='font-size:13px;color:" + stone + ";'>" + j.meta + "</div></div><a style='padding:8px 20px;background:" + brassDp + ";color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Apply</a></div>";
+              }).join("") +
+            "</div>" +
+          "</div></section>";
+      } else {
+        // job-list (default)
+        return header +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'>" + jobList + "</section>";
+      }
+    })(),
 
     // ── CASE STUDY ──
-    "case-study": "<section style='background:" + ink + ";padding:100px 40px;'>" +
-      "<div style='max-width:800px;'>" +
-        "<div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:24px;'>Case Study</div>" +
-        "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;line-height:1.1;'>Client Name: Project Title</h1>" +
-        "<p style='font-size:18px;color:" + warmWhite + ";opacity:.8;line-height:1.7;'>Brief overview of the challenge and the outcome.</p>" +
-      "</div>" +
-    "</section>" +
-    "<section style='background:" + bone + ";padding:80px 40px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:40px;max-width:900px;margin:0 auto 48px;text-align:center;'>" +
-      [["Challenge","What the client was facing"],["Solution","How we approached it"],["Result","The measurable outcome"]].map(function(c) {
-        return "<div><div style='font-size:13px;color:" + brass + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;font-weight:600;'>" + c[0] + "</div><p style='font-size:16px;color:" + text + ";line-height:1.6;'>" + c[1] + "</p></div>";
-      }).join("") +
-    "</div></section>" +
-    "<section style='background:" + bone + ";padding:0 40px 80px;max-width:760px;margin:0 auto;'><div style='font-size:17px;color:" + text + ";line-height:1.8;'><p>The full case study narrative goes here — context, approach, execution, and results with real numbers.</p></div></section>",
+    "case-study": (function() {
+      var csp = patterns["case-study"] || "dark-hero-metrics";
+      var metrics = [
+        { label: "Challenge", body: "What the client was facing" },
+        { label: "Solution", body: "How we approached it" },
+        { label: "Result", body: "The measurable outcome" },
+      ];
+      if (csp === "editorial-light") {
+        return "<section style='background:" + bone + ";padding:100px 40px 60px;'><div style='max-width:800px;margin:0 auto;'>" +
+          "<div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;font-weight:600;'>Case Study</div>" +
+          "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 20px;line-height:1.1;'>Client Name: Project Title</h1>" +
+          "<p style='font-size:18px;color:" + text + ";line-height:1.7;margin:0;'>Brief overview of the challenge and what was delivered.</p>" +
+        "</div></section>" +
+        "<section style='background:" + bone + ";padding:0 40px;'><div style='max-width:800px;margin:0 auto;'>" +
+          "<div style='background:#e0ddd7;aspect-ratio:16/9;border-radius:6px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;margin-bottom:56px;'>Project hero image</div>" +
+        "</div></section>" +
+        "<section style='background:" + bone + ";padding:0 40px 56px;'><div style='max-width:800px;margin:0 auto;'>" +
+          "<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:32px;padding:40px 0;border-top:1px solid #E2DBCC;border-bottom:1px solid #E2DBCC;margin-bottom:48px;'>" +
+            metrics.map(function(m) {
+              return "<div><div style='font-size:11px;color:" + brass + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;font-weight:600;'>" + m.label + "</div><p style='font-size:15px;color:" + text + ";line-height:1.6;margin:0;'>" + m.body + "</p></div>";
+            }).join("") +
+          "</div>" +
+          "<div style='font-size:17px;color:" + text + ";line-height:1.8;'>" +
+            "<p style='margin-bottom:24px;'>The full editorial narrative goes here. Context, approach, execution, and results written for a reader who wants the story, not a slide deck.</p>" +
+            "<blockquote style='border-left:3px solid " + brass + ";padding:16px 24px;margin:32px 0;font-size:20px;color:" + ink + ";font-style:italic;line-height:1.5;'>A pull quote that highlights a key moment or result from the project.</blockquote>" +
+            "<p>Concluding section with results and what came next.</p>" +
+          "</div>" +
+        "</div></section>";
+      } else if (csp === "numbers-first") {
+        var stats = [["3x", "Revenue growth"], ["6mo", "Time to results"], ["98%", "Client retention"]];
+        return "<section style='background:" + bone + ";padding:100px 40px 60px;'><div style='max-width:800px;'>" +
+          "<div style='font-size:12px;color:" + brassDp + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;font-weight:600;'>Case Study</div>" +
+          "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 20px;line-height:1.1;'>Client Name: Project Title</h1>" +
+          "<p style='font-size:18px;color:" + text + ";line-height:1.7;margin:0;'>Brief overview of the challenge and the outcome.</p>" +
+        "</div></section>" +
+        "<section style='background:" + ink + ";padding:80px 40px;'>" +
+          "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:40px;max-width:900px;margin:0 auto;text-align:center;'>" +
+            stats.map(function(s) {
+              return "<div><div style='font-size:clamp(48px,6vw,72px);font-weight:800;color:" + brass + ";line-height:1;margin-bottom:8px;'>" + s[0] + "</div><div style='font-size:14px;color:" + warmWhite + ";opacity:.7;text-transform:uppercase;letter-spacing:1px;'>" + s[1] + "</div></div>";
+            }).join("") +
+          "</div>" +
+        "</section>" +
+        "<section style='background:" + bone + ";padding:80px 40px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:40px;max-width:900px;margin:0 auto;'>" +
+          metrics.map(function(m) {
+            return "<div><div style='font-size:13px;color:" + brass + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;font-weight:600;'>" + m.label + "</div><p style='font-size:16px;color:" + text + ";line-height:1.6;'>" + m.body + "</p></div>";
+          }).join("") +
+        "</div></section>" +
+        "<section style='background:" + bone + ";padding:0 40px 80px;max-width:760px;margin:0 auto;'><div style='font-size:17px;color:" + text + ";line-height:1.8;'><p>The full narrative goes here — context, approach, execution, and the story behind the numbers.</p></div></section>";
+      } else {
+        // dark-hero-metrics (default)
+        return "<section style='background:" + ink + ";padding:100px 40px;'>" +
+          "<div style='max-width:800px;'>" +
+            "<div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:24px;'>Case Study</div>" +
+            "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;line-height:1.1;'>Client Name: Project Title</h1>" +
+            "<p style='font-size:18px;color:" + warmWhite + ";opacity:.8;line-height:1.7;'>Brief overview of the challenge and the outcome.</p>" +
+          "</div>" +
+        "</section>" +
+        "<section style='background:" + bone + ";padding:80px 40px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:40px;max-width:900px;margin:0 auto 48px;text-align:center;'>" +
+          metrics.map(function(m) {
+            return "<div><div style='font-size:13px;color:" + brass + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;font-weight:600;'>" + m.label + "</div><p style='font-size:16px;color:" + text + ";line-height:1.6;'>" + m.body + "</p></div>";
+          }).join("") +
+        "</div></section>" +
+        "<section style='background:" + bone + ";padding:0 40px 80px;max-width:760px;margin:0 auto;'><div style='font-size:17px;color:" + text + ";line-height:1.8;'><p>The full case study narrative goes here — context, approach, execution, and results with real numbers.</p></div></section>";
+      }
+    })(),
 
     // ── THANK YOU ──
     "thank-you": "<section style='background:" + bone + ";min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;'>" +
