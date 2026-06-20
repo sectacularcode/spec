@@ -3907,8 +3907,8 @@ function previewHTML(page, brand) {
       [data-edit]{position:relative;cursor:text;transition:outline 0.15s, background 0.15s;outline:1px dashed transparent;outline-offset:6px;border-radius:2px;}
       [data-edit]:hover{outline:1px dashed rgba(124,58,237,0.6);background:rgba(124,58,237,0.04);}
       [data-edit]:focus{outline:2px solid rgba(124,58,237,0.9);background:rgba(124,58,237,0.06);}
-      [data-edit]:focus::before{content:attr(data-edit);position:absolute;top:-22px;left:0;background:#7c3aed;color:#fff;font-family:system-ui,sans-serif;font-size:9px;padding:3px 7px;border-radius:3px;letter-spacing:0.05em;text-transform:uppercase;font-weight:600;font-style:normal;pointer-events:none;}
-      [data-edit-toast]{position:fixed;bottom:20px;right:20px;background:#0a0a14;color:#fff;padding:10px 16px;border-radius:6px;font-family:system-ui,sans-serif;font-size:12px;border:1px solid #7c3aed;box-shadow:0 4px 16px rgba(0,0,0,0.4);z-index:9999;opacity:0;transition:opacity 0.2s;pointer-events:none;}
+      [data-edit]:focus::before{content:attr(data-edit);position:absolute;top:-22px;left:0;background:#b45309;color:#fff;font-family:system-ui,sans-serif;font-size:9px;padding:3px 7px;border-radius:3px;letter-spacing:0.05em;text-transform:uppercase;font-weight:600;font-style:normal;pointer-events:none;}
+      [data-edit-toast]{position:fixed;bottom:20px;right:20px;background:#0a0a14;color:#fff;padding:10px 16px;border-radius:6px;font-family:system-ui,sans-serif;font-size:12px;border:1px solid #b45309;box-shadow:0 4px 16px rgba(0,0,0,0.4);z-index:9999;opacity:0;transition:opacity 0.2s;pointer-events:none;}
       [data-edit-toast].show{opacity:1;}
     </style>
     </head><body>
@@ -5197,7 +5197,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             <select
               value={lockedTemplateId}
               onChange={e => setLockedTemplateId(e.target.value)}
-              style={{ width: "100%", padding: "10px 40px 10px 12px", background: "#ffffff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\") no-repeat right 14px center", color: "#09090b", border: lockedTemplateId ? "1px solid #7c3aed" : "1px solid #dde0e6", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", cursor: "pointer", outline: "none", boxSizing: "border-box", appearance: "none", WebkitAppearance: "none" }}>
+              style={{ width: "100%", padding: "10px 40px 10px 12px", background: "#ffffff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\") no-repeat right 14px center", color: "#09090b", border: lockedTemplateId ? "1px solid #b45309" : "1px solid #dde0e6", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", cursor: "pointer", outline: "none", boxSizing: "border-box", appearance: "none", WebkitAppearance: "none" }}>
               <option value="">Already know which template? Pick one (optional)</option>
               {WEBSITE_TEMPLATES.map(t => (
                 <option key={t.id} value={t.id}>{t.name} — {t.industry.split(/[,—]/)[0].trim().slice(0, 40)}</option>
