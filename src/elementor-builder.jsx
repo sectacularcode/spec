@@ -6667,6 +6667,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               </div>
 
               <div style={{ position: "sticky", top: "120px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "10px", padding: "20px" }}>
+                <div style={{ fontSize: "13px", color: "#09090b", fontWeight: 700, marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid #dde0e6" }}>Preview</div>
               {brand.socialLinks.length > 0 ? (() => {
                 const theme = THEMES.find(t => t.id === brand.themeId);
                 const isDark = (brand.themeMode || (theme && theme.mode)) === "dark";
