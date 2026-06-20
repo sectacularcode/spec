@@ -6606,7 +6606,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
               <div style={{ maxWidth: "1200px", margin: "0 auto", width: "100%", padding: "24px 24px 40px" }}>
               <Section id="social-links" title="Social Media Links" icon="">
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: "0px", alignItems: "start" }}>
-                <div style={{ display: "grid", gap: "10px", paddingRight: "20px" }}>
+                <div style={{ display: "grid", gap: "10px", paddingRight: "32px" }}>
                 {brand.socialLinks.map((s, i) => (
                   <div key={i} className="responsive-4col" style={{ display: "grid", gridTemplateColumns: "140px 120px 1fr 30px", gap: "8px", alignItems: "end" }}>
                     <select style={{ width: "100%", padding: "11px 40px 11px 13px", background: "#ffffff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\") no-repeat right 14px center", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", color: "#09090b", outline: "none", boxSizing: "border-box", appearance: "none", WebkitAppearance: "none" }} value={s.key} onChange={e => updSocial(i, "key", e.target.value)}>
@@ -6632,7 +6632,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInFooter} onChange={e => updBrand("showSocialInFooter", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Show in footer</label>
                 </div>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "16px", paddingLeft: "24px", borderLeft: "1px solid #dde0e6" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "16px", paddingLeft: "24px", borderLeft: "1px solid #dde0e6", marginTop: "-4px" }}>
                   <div>
                     <div style={{ fontSize: "10px", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600, marginBottom: "10px" }}>Quick add</div>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
