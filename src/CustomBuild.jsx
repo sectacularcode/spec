@@ -2091,7 +2091,7 @@ function generatePages(brief, selectedPages, inspoContext, aiRecs, customPagesAr
   var allPageDefs = ALL_PAGES.concat(ADDITIONAL_PAGE_TYPES).concat(customPagesArg || []);
 
   return selectedPages.map(function(pid) {
-    var pageDef = allPageDefs.find(function(p) { return p.id === pid; }) || { id: pid, label: pid, slug: "/" + pid };
+    var pageDef = allPageDefs.find(function(p) { return p.id === pid; }) || { id: pid, label: pid.replace(/-\d+$/, "").replace(/(^|-)(.)/g, function(_, s, c) { return (s ? " " : "") + c.toUpperCase(); }), slug: "/" + pid.replace(/-\d+$/, "") };
     var label = pageDef.label;
     var result = null;
 
@@ -3240,7 +3240,7 @@ export default function CustomBuild() {
                       <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>{draft.clientName}</div>
                       <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>
                         {draft.date} · {draft.pages.length} page{draft.pages.length !== 1 ? "s" : ""}
-                        {draft.hasGenerated && <span style={{ marginLeft: "8px", fontSize: "11px", background: "#fffbeb", color: "#b45309", padding: "2px 6px", borderRadius: "3px", fontWeight: 600 }}>Generated</span>}
+                        {draft.hasGenerated && <span style={{ marginLeft: "8px", fontSize: "11px", background: "#b45309", color: "#ffffff", padding: "2px 6px", borderRadius: "3px", fontWeight: 600 }}>Generated</span>}
                       </div>
                       <div style={{ display: "flex", gap: "4px", marginBottom: "14px", flexWrap: "wrap" }}>
                         {draft.pages.slice(0, 4).map(p => (
