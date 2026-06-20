@@ -3276,11 +3276,11 @@ export default function CustomBuild() {
               <div style={{ marginTop: "10px", position: "relative" }}>
                 <button
                   onClick={() => setShowAddPage(!showAddPage)}
-                  style={{ fontSize: "12px", color: "#b45309", background: "rgba(180, 83, 9, 0.06)", border: "1px dashed rgba(180, 83, 9, 0.3)", borderRadius: "6px", padding: "8px 14px", cursor: "pointer", width: "100%" }}>
+                  style={{ fontSize: "12px", color: "#6b7280", background: "#ffffff", border: "1px dashed #dde0e6", borderRadius: "6px", padding: "8px 14px", cursor: "pointer", width: "100%" }}>
                   + Add page
                 </button>
                 {showAddPage && (
-                  <div style={{ position: "fixed", top: "auto", left: "auto", width: "280px", background: "#fff", border: "1px solid #dde0e6", borderRadius: "8px", boxShadow: "0 4px 24px rgba(0,0,0,0.15)", zIndex: 999, maxHeight: "320px", overflowY: "auto" }}>
+                  <div style={{ position: "absolute", bottom: "100%", left: 0, width: "100%", marginBottom: "4px", background: "#fff", border: "1px solid #dde0e6", borderRadius: "8px", boxShadow: "0 4px 24px rgba(0,0,0,0.15)", zIndex: 999, maxHeight: "280px", overflowY: "auto" }}>
                     {ADDITIONAL_PAGE_TYPES.filter(p => !customPages.find(cp => cp.id === p.id)).map(p => (
                       <button
                         key={p.id}
