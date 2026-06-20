@@ -3354,98 +3354,81 @@ export default function CustomBuild() {
   async function generate() {
     if (!canGenerate) return;
     setGenerating(true);
-    try {
-
-    // Step 1: build shared inspo pool
-    const inspoContext = buildInspoContext(crawlResults, storedPatterns);
-
-    // Step 2: if "No" copy setting, draft blank fields in brand voice first
-    let workingBrief = { ...brief };
-    if (!copyBriefOnly) {
-      setGeneratingStatus("Drafting blank fields in brand voice...");
-      try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 5000);
-        const res = await fetch("/api/draft-copy", {
-          signal: controller.signal,
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            brief,
-            positioning: {
-              valueProposition: brief.valueProposition || "",
-              targetAudience: brief.targetAudience || "",
-              competitiveDifferentiator: brief.competitiveDifferentiator || "",
-              keyMessages: brief.keyMessages || [],
-              primaryKeywords: brief.primaryKeywords || [],
-              secondaryKeywords: brief.secondaryKeywords || [],
-            }
-          }),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.drafts && Object.keys(data.drafts).length > 0) {
-            // Merge drafts into brief — only fill truly blank fields
-            Object.keys(data.drafts).forEach(key => {
-              if (!workingBrief[key] || workingBrief[key].trim() === "") {
-                workingBrief[key] = data.drafts[key];
-              }
-            });
-            setDraftedFields(data.drafts);
-          }
-        }
-      } catch(e) {
-        // Silent fallback — continue with original brief
-      }
-    }
-
-    // Step 3: if we have patterns and inspo URLs, ask AI for recommendations
-    let aiRecs = {};
-    const hasInspo = inspoContext && inspoContext.length > 20;
-    const variantPages = selectedPages.filter(p => p !== "home" && p !== "services");
-
-    if (hasInspo && variantPages.length > 0) {
-      setGeneratingStatus("Analyzing inspo patterns...");
-      try {
-        const controller2 = new AbortController();
-        const timeout2 = setTimeout(() => controller2.abort(), 5000);
-        const res = await fetch("/api/analyze-inspo", {
-          signal: controller2.signal,
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            patterns: inspoContext,
-            pages: variantPages,
-            brandVoice: [
-              workingBrief.brandName,
-              (workingBrief.voiceRules || []).join(". "),
-              workingBrief.tagline,
-            ].filter(Boolean).join(" — "),
-          }),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          aiRecs = data.recommendations || {};
-        }
-      } catch (e) {}
-    }
-
-    // Step 4: build pages
     setGeneratingStatus("Building pages...");
-    await new Promise(r => setTimeout(r, 300));
+    
+    try {
+      // Step 1: build shared inspo pool
+      const inspoContext = buildInspoContext(crawlResults, storedPatterns);
+      let workingBrief = { ...brief };
+      let aiRecs = {};
 
-    const pages = generatePages(workingBrief, selectedPages, inspoContext, aiRecs, customPages);
-    const variants = {};
-    pages.forEach(p => { variants[p.id] = p.recommended || "A"; });
-    setLayoutVariants(variants);
-    setGenerated({ pages, inspoContext, aiRecs });
-    setPreviewPage(selectedPages[0] || "home");
-    setDraftsView(false);
-    // Save to drafts list
-    saveDraftToList({ brief: workingBrief, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants: variants, generated: { pages, inspoContext, aiRecs }, previewPage: selectedPages[0] || "home", crawlResults });
+      // Step 2: draft copy (skip if brief-only or no API)
+      if (!copyBriefOnly) {
+        setGeneratingStatus("Preparing content...");
+        try {
+          const controller = new AbortController();
+          setTimeout(() => controller.abort(), 4000);
+          const res = await fetch("/api/draft-copy", {
+            signal: controller.signal,
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ brief, positioning: { valueProposition: brief.valueProposition || "", targetAudience: brief.targetAudience || "" } }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.drafts) {
+              Object.keys(data.drafts).forEach(key => {
+                if (!workingBrief[key] || workingBrief[key].trim() === "") workingBrief[key] = data.drafts[key];
+              });
+            }
+          }
+        } catch(e) { /* API not available — continue */ }
+      }
+
+      // Step 3: analyze inspo (skip if no inspo or no API)
+      const hasInspo = inspoContext && inspoContext.length > 20;
+      if (hasInspo) {
+        setGeneratingStatus("Analyzing inspo patterns...");
+        try {
+          const controller2 = new AbortController();
+          setTimeout(() => controller2.abort(), 4000);
+          const res = await fetch("/api/analyze-inspo", {
+            signal: controller2.signal,
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ patterns: inspoContext, pages: selectedPages }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            aiRecs = data.recommendations || {};
+          }
+        } catch(e) { /* API not available — continue */ }
+      }
+
+      // Step 4: build pages — this is all client-side, always works
+      setGeneratingStatus("Building pages...");
+      await new Promise(r => setTimeout(r, 200));
+
+      const pages = generatePages(workingBrief, selectedPages, inspoContext, aiRecs, customPages);
+      const variants = {};
+      pages.forEach(p => { variants[p.id] = p.recommended || "A"; });
+      setLayoutVariants(variants);
+      setGenerated({ pages, inspoContext, aiRecs });
+      setPreviewPage(selectedPages[0] || "home");
+      setDraftsView(false);
+
+      // Save draft
+      saveDraftToList({ brief: workingBrief, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants: variants, generated: { pages, inspoContext, aiRecs }, previewPage: selectedPages[0] || "home", crawlResults });
 
     } catch(genErr) {
       console.error("Generate error:", genErr);
+      // Even if something fails, try to build basic pages
+      try {
+        const pages = generatePages(brief, selectedPages, "", {}, customPages);
+        setGenerated({ pages, inspoContext: "", aiRecs: {} });
+        setPreviewPage(selectedPages[0] || "home");
+        setDraftsView(false);
+      } catch(e2) { console.error("Fallback generate error:", e2); }
     } finally {
       setGenerating(false);
       setGeneratingStatus("");
