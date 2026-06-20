@@ -2840,17 +2840,19 @@ function buildPreviewHTML(brief, activePage, variant) {
   return "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>" +
     "<title>" + (brief.brandName || "Preview") + "</title>" +
     "<link href='" + fontUrl + "' rel='stylesheet'>" +
-    "<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Inter',system-ui,sans-serif;font-size:17px;line-height:1.65;background:" + bone + ";color:" + text + ";}img{max-width:100%;}section{width:100%;}" + "@media(max-width:768px){" + "nav>div:last-child{display:none !important;}" + "section{padding-left:24px !important;padding-right:24px !important;}" + "section [style*='grid-template-columns:1fr 1fr']{grid-template-columns:1fr !important;gap:32px !important;}" + "section [style*='grid-template-columns: 1fr 1fr']{grid-template-columns:1fr !important;gap:32px !important;}" + "section [style*='grid-template-columns:repeat']{grid-template-columns:1fr !important;}" + "section [style*='grid-template-columns: repeat']{grid-template-columns:1fr !important;}" + "h1{font-size:clamp(28px,8vw,48px) !important;}" + "h2{font-size:clamp(22px,6vw,36px) !important;}" + "a[style*='display:inline-block'],a[style*='display: inline-block']{text-align:center !important;width:100% !important;box-sizing:border-box !important;}" + "div[style*='display:flex'][style*='gap:16px']{flex-direction:column !important;align-items:stretch !important;}" + "div[style*='display:flex'][style*='gap: 16px']{flex-direction:column !important;align-items:stretch !important;}" + "}" + "</style>" +
+    "<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Inter',system-ui,sans-serif;font-size:17px;line-height:1.65;background:" + bone + ";color:" + text + ";}img{max-width:100%;}section{width:100%;}" + "@media(max-width:768px){" + "nav .nav-links{display:none !important;}" + "nav .hamburger{display:flex !important;}" + "section{padding-left:24px !important;padding-right:24px !important;}" + "section [style*='grid-template-columns:1fr 1fr']{grid-template-columns:1fr !important;gap:32px !important;}" + "section [style*='grid-template-columns: 1fr 1fr']{grid-template-columns:1fr !important;gap:32px !important;}" + "section [style*='grid-template-columns:repeat']{grid-template-columns:1fr !important;}" + "section [style*='grid-template-columns: repeat']{grid-template-columns:1fr !important;}" + "h1{font-size:clamp(28px,8vw,48px) !important;}" + "h2{font-size:clamp(22px,6vw,36px) !important;}" + "a[style*='display:inline-block'],a[style*='display: inline-block']{text-align:center !important;width:100% !important;box-sizing:border-box !important;}" + "div[style*='display:flex'][style*='gap:16px']{flex-direction:column !important;align-items:stretch !important;}" + "div[style*='display:flex'][style*='gap: 16px']{flex-direction:column !important;align-items:stretch !important;}" + "}" + "</style>" +
     "</head><body>" +
     "<nav style='background:" + ink + ";padding:16px clamp(24px,5vw,60px);display:flex;justify-content:space-between;align-items:center;'>" +
       "<div style='font-family:Inter,sans-serif;font-weight:800;font-size:18px;color:" + warmWhite + ";'>" + (brief.brandName || "Brand") + "</div>" +
-      "<div style='display:flex;gap:24px;align-items:center;'>" + (brief.pages || ['Home','About','Services','Contact']).map(function(p) { return typeof p === 'string' ? p : (p.label || p.name || p); }).slice(0,6).map(function(l) { return "<a style='color:" + warmWhite + ";text-decoration:none;font-size:14px;font-weight:500;'>" + l + "</a>"; }).join('') + "</div>" +
+      "<div class='nav-links' style='display:flex;gap:24px;align-items:center;'>" + (brief.pages || ["Home","About","Services","Contact"]).map(function(p) { return typeof p === "string" ? p : (p.label || p.name || p); }).slice(0,6).map(function(l) { return "<a style='color:" + warmWhite + ";text-decoration:none;font-size:14px;font-weight:500;'>" + l + "</a>"; }).join("") + "</div>" +
+      "<div class='hamburger' style='display:none;cursor:pointer;'><svg width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='" + warmWhite + "' stroke-width='2' stroke-linecap='round'><line x1='3' y1='6' x2='21' y2='6'/><line x1='3' y1='12' x2='21' y2='12'/><line x1='3' y1='18' x2='21' y2='18'/></svg></div>" +
     "</nav>" +
     body +
     "<footer style='background:" + ink + ";padding:48px clamp(24px,5vw,60px);'>" +
-      "<div style='display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;'>" +
+      "<div style='display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:32px;'>" +
         "<div><div style='font-family:Inter,sans-serif;font-weight:800;font-size:18px;color:" + warmWhite + ";margin-bottom:8px;'>" + (brief.brandName || "Brand") + "</div>" +
         "<div style='font-size:13px;color:" + stone + ";'>" + (brief.tagline || "") + "</div></div>" +
+        "<div style='display:flex;gap:20px;flex-wrap:wrap;'>" + (brief.pages || ["Home","About","Services","Contact"]).map(function(p) { return typeof p === "string" ? p : (p.label || p.name || p); }).slice(0,6).map(function(l) { return "<a style='color:" + stone + ";text-decoration:none;font-size:13px;'>" + l + "</a>"; }).join("") + "</div>" +
         "<div style='font-size:13px;color:" + stone + ";'>" + (brief.contactEmail || "") + "</div>" +
       "</div>" +
     "</footer>" +
@@ -3184,7 +3186,30 @@ export default function CustomBuild() {
         pricingTiers: (raw.pricing?.tiers||[]).map(t=>[t.name,t.subtitle||"",t.desc,t.price]),
       };
     }
-    return { brandName: raw.brandName||raw.name||"", colors: raw.colors||{}, ...raw };
+    // Extract colors from text-based briefs (DOCX/TXT)
+    var textColors = {};
+    var rawStr = typeof raw === "string" ? raw : JSON.stringify(raw);
+    var hexMatches = rawStr.match(/#[0-9A-Fa-f]{6}/g) || [];
+    if (hexMatches.length > 0) {
+      // Map common color roles by order of appearance in intake form
+      var colorNames = ["ink", "accent", "brass-deep", "bone", "asphalt", "stone", "warm-white", "text"];
+      hexMatches.slice(0, 8).forEach(function(hex, i) {
+        if (i < colorNames.length) textColors[colorNames[i]] = hex;
+      });
+      // Also try to detect by context
+      var lowerStr = rawStr.toLowerCase();
+      hexMatches.forEach(function(hex) {
+        var idx = lowerStr.indexOf(hex.toLowerCase());
+        var context = lowerStr.substring(Math.max(0, idx - 60), idx).toLowerCase();
+        if (context.indexOf("amber") !== -1 || context.indexOf("accent") !== -1 || context.indexOf("primary accent") !== -1) textColors.brass = hex;
+        if (context.indexOf("charcoal") !== -1 || context.indexOf("primary text") !== -1 || context.indexOf("ink") !== -1) textColors.ink = hex;
+        if (context.indexOf("canvas") !== -1 || context.indexOf("background") !== -1 || context.indexOf("bone") !== -1) textColors.bone = hex;
+        if (context.indexOf("stone") !== -1 || context.indexOf("secondary") !== -1 || context.indexOf("warm stone") !== -1) textColors.stone = hex;
+        if (context.indexOf("border") !== -1 || context.indexOf("divider") !== -1) textColors.border = hex;
+        if (context.indexOf("white") !== -1 || context.indexOf("clean") !== -1) textColors["warm-white"] = hex;
+      });
+    }
+    return { brandName: raw.brandName||raw.name||"", colors: Object.keys(textColors).length > 0 ? textColors : (raw.colors||{}), ...raw };
   }
 
   function addUrl() { setInspoUrls(u => [...u, ""]); }
