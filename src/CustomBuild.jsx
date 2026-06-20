@@ -2146,46 +2146,91 @@ function buildPreviewHTML(brief, activePage, variant) {
 
   var sections = {
     home:
-      "<section style='background:" + ink + ";display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;'>" +
-        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:24px;'>" + (brief.brandName || "Brand Name") + "</div>" +
-        "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(48px,7vw,80px);line-height:1.06;color:" + warmWhite + ";max-width:900px;margin:0 0 28px;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
-        "<p style='font-size:18px;color:" + warmWhite + ";opacity:.8;max-width:560px;margin:0 0 40px;'>" + (brief.heroSubhead || "Your subheadline here.") + "</p>" +
-        "<div style='display:flex;gap:16px;flex-wrap:wrap;justify-content:center;'>" +
-          "<a style='padding:14px 32px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>" + (brief.heroCta1 || "See the work") + "</a>" +
-          "<a style='padding:14px 32px;border:1px solid " + brass + ";color:" + warmWhite + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>" + (brief.heroCta2 || "See pricing") + "</a>" +
+      // ── HERO ──
+      "<section style='background:" + ink + ";padding:clamp(60px,10vw,100px) clamp(24px,8vw,80px);'>" +
+        "<div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;max-width:1160px;margin:0 auto;'>" +
+          "<div>" +
+            "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:20px;'>" + (brief.brandName || "Brand") + "</div>" +
+            "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(32px,5vw,56px);color:" + warmWhite + ";margin:0 0 20px;line-height:1.1;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
+            "<p style='font-size:17px;color:" + warmWhite + ";opacity:.8;margin:0 0 32px;line-height:1.7;max-width:480px;'>" + (brief.heroSubhead || "Your subheadline goes here.") + "</p>" +
+            "<div style='display:flex;gap:12px;flex-wrap:wrap;'>" +
+              "<a style='padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+              "<a style='padding:14px 32px;background:transparent;color:" + warmWhite + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border:1px solid rgba(255,255,255,0.3);border-radius:4px;display:inline-block;'>" + (brief.heroCta2 || "Learn more") + "</a>" +
+            "</div>" +
+          "</div>" +
+          "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:8px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Hero image</div>" +
         "</div>" +
       "</section>" +
-      "<section style='background:" + bone + ";padding:100px 40px;text-align:center;'>" +
-        "<h2 style='font-size:clamp(24px,3.5vw,40px);font-weight:700;color:" + ink + ";max-width:800px;margin:0 auto;'>" + (brief.hookStatement || "Your honest hook statement.") + "</h2>" +
-      "</section>" +
-      "<section style='background:" + bone + ";padding:80px 40px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;max-width:1160px;margin:0 auto;'>" +
-        (brief.serviceCards || [["Proof","Testimonials and case studies."],["People","Recruiting and culture films."],["Brand","Founder stories, vision."],["Exit","The story before the sale."]]).map(function(pair) {
-          return "<div style='background:#fff;border-left:3px solid " + brass + ";padding:28px;'><div style='font-size:16px;font-weight:700;color:" + ink + ";margin-bottom:8px;'>" + pair[0] + "</div><div style='font-size:14px;color:" + stone + ";line-height:1.6;'>" + pair[1] + "</div></div>";
-        }).join("") +
-      "</div></section>" +
-      "<section style='background:" + bone + ";padding:96px 40px;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:80px;max-width:1160px;margin:0 auto;align-items:center;'>" +
-        "<div><div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>" + (brief.differenceEyebrow || "Why one maker") + "</div>" +
-        "<h2 style='font-size:clamp(32px,4vw,52px);font-weight:800;color:" + ink + ";line-height:1.1;margin:0;'>" + (brief.differenceH2 || "One person. The whole film.") + "</h2></div>" +
-        "<div style='font-size:17px;color:" + text + ";line-height:1.65;'>" + (brief.differenceBody || "Supporting body copy goes here.") + "</div>" +
-      "</div></section>" +
-      "<section style='background:" + bone + ";padding:80px 40px;'>" +
-        "<h2 style='font-size:clamp(28px,3.5vw,44px);font-weight:800;color:" + ink + ";margin:0 0 48px;'>" + (brief.workH2 || "Recent work.") + "</h2>" +
-        "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;max-width:1160px;'>" +
-          (brief.workItems || ["Film 1","Film 2","Film 3"]).map(function(w) {
-            return "<div><div style='background:#e0ddd7;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>" + w + "</div><div style='font-size:14px;color:" + stone + ";margin-top:12px;font-weight:600;'>" + w + "</div></div>";
-          }).join("") +
-        "</div>" +
-      "</section>" +
-      "<section style='background:" + bone + ";padding:112px 40px;text-align:center;'>" +
-        "<h2 style='font-size:clamp(28px,3.5vw,48px);font-weight:800;color:" + ink + ";max-width:640px;margin:0 auto 24px;'>" + (brief.pricingH2 || "Clear prices. No discovery-call maze.") + "</h2>" +
-        "<p style='color:" + stone + ";max-width:480px;margin:0 auto 40px;'>" + (brief.pricingSubhead || "Pick a package or build a plan, with real numbers in the open.") + "</p>" +
-        "<a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>" + (brief.pricingCta || "See packages") + "</a>" +
-      "</section>" +
-      "<section style='background:" + ink + ";display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;'>" +
-        "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,5vw,68px);color:" + warmWhite + ";max-width:800px;margin:0 0 48px;line-height:1.1;'>" + (brief.tagline || "The stories that move a company forward.") + "</h2>" +
-        "<a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>" + (brief.closingCta || "Start a project") + "</a>" +
-      "</section>",
 
+      // ── HOOK / PROBLEM ──
+      "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);text-align:center;'>" +
+        "<div style='max-width:720px;margin:0 auto;'>" +
+          "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(24px,4vw,40px);color:" + ink + ";margin:0 0 16px;line-height:1.15;'>" + (brief.hookStatement || "The problem you solve, stated clearly.") + "</h2>" +
+          "<p style='font-size:17px;color:" + text + ";line-height:1.7;margin:0;'>" + (brief.hookBody || "A supporting sentence that builds on the hook.") + "</p>" +
+        "</div>" +
+      "</section>" +
+
+      // ── SERVICES / WHAT WE DO — 3 CARDS ──
+      "<section style='background:" + bone + ";padding:0 clamp(24px,8vw,80px) 80px;'>" +
+        "<div style='max-width:1160px;margin:0 auto;'>" +
+          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>What we do</div>" +
+          "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 40px;'>" + (brief.servicesHeading || "Our services") + "</h2>" +
+          "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;'>" +
+            (brief.serviceCards || [["Service One","Description of this service."],["Service Two","Description of this service."],["Service Three","Description of this service."]]).map(function(pair) {
+              return "<div style='background:#ffffff;border:1px solid #E2DBCC;padding:32px;border-radius:4px;'>" +
+                "<div style='width:40px;height:3px;background:" + brass + ";margin-bottom:20px;'></div>" +
+                "<h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + pair[0] + "</h3>" +
+                "<p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>" + pair[1] + "</p>" +
+              "</div>";
+            }).join("") +
+          "</div>" +
+        "</div>" +
+      "</section>" +
+
+      // ── ABOUT SPLIT ──
+      "<section style='background:#ffffff;padding:80px clamp(24px,8vw,80px);'>" +
+        "<div style='display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1160px;margin:0 auto;'>" +
+          "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>About image</div>" +
+          "<div>" +
+            "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>About</div>" +
+            "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 16px;line-height:1.15;'>" + (brief.aboutHeading || "About the company") + "</h2>" +
+            "<p style='font-size:16px;color:" + text + ";line-height:1.7;margin:0;'>" + (brief.aboutBody || "A short paragraph about who you are and why you do what you do.") + "</p>" +
+          "</div>" +
+        "</div>" +
+      "</section>" +
+
+      // ── SOCIAL PROOF / TESTIMONIALS ──
+      "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);'>" +
+        "<div style='max-width:1160px;margin:0 auto;'>" +
+          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Kind words</div>" +
+          "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 40px;'>What our clients say</h2>" +
+          "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;'>" +
+            ["This changed everything for our business. Highly recommend.", "Professional, efficient, and genuinely cared about the outcome.", "We saw results within the first month of working together."].map(function(q) {
+              return "<div style='background:#ffffff;border-left:3px solid " + brass + ";padding:28px;'>" +
+                "<p style='font-size:17px;color:" + ink + ";line-height:1.5;margin:0 0 16px;font-style:italic;'>" + q + "</p>" +
+                "<div style='font-size:14px;font-weight:600;color:" + ink + ";'>Client Name</div>" +
+                "<div style='font-size:13px;color:" + stone + ";'>Role, Company</div>" +
+              "</div>";
+            }).join("") +
+          "</div>" +
+        "</div>" +
+      "</section>" +
+
+      // ── PRICING TEASER ──
+      "<section style='background:#ffffff;padding:80px clamp(24px,8vw,80px);text-align:center;'>" +
+        "<div style='max-width:720px;margin:0 auto;'>" +
+          "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(24px,4vw,40px);color:" + ink + ";margin:0 0 16px;'>Clear pricing. No surprises.</h2>" +
+          "<p style='font-size:17px;color:" + text + ";line-height:1.7;margin:0 0 32px;'>See what it costs before you ever book a call.</p>" +
+          "<a style='padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "See pricing") + "</a>" +
+        "</div>" +
+      "</section>" +
+
+      // ── CTA FOOTER ──
+      "<section style='background:" + ink + ";padding:80px clamp(24px,8vw,80px);text-align:center;'>" +
+        "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(24px,4vw,44px);color:" + warmWhite + ";margin:0 0 12px;'>" + (brief.tagline || "Ready to get started?") + "</h2>" +
+        "<p style='font-size:14px;color:" + stone + ";letter-spacing:2px;text-transform:uppercase;margin:0 0 32px;'>" + (brief.signatureLine || "") + "</p>" +
+        "<a style='padding:14px 40px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>Start a project</a>" +
+      "</section>",
 
     work: (function() {
       var items = brief.workItems || ["Project 1","Project 2","Project 3","Project 4","Project 5","Project 6"];
