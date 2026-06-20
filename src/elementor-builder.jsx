@@ -4628,7 +4628,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   };
   const delPage = (i) => { if (project.pages.length <= 1) return; setProjects(ps => ps.map(p => p.id === activeId ? { ...p, pages: p.pages.filter((_, x) => x !== i) } : p)); setPageIdx(0); };
 
-  const addSocial = () => updBrand("socialLinks", [...(brand.socialLinks || []), { key: "instagram", label: "Instagram", url: "" }]);
+  const addSocial = () => updBrand("socialLinks", [...(brand.socialLinks || []), { key: "instagram", label: "", url: "" }]);
   const updSocial = (i, k, v) => updBrand("socialLinks", brand.socialLinks.map((s, x) => x === i ? { ...s, [k]: v } : s));
   const delSocial = (i) => updBrand("socialLinks", brand.socialLinks.filter((_, x) => x !== i));
 
@@ -6641,7 +6641,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                         return (
                           <button
                             key={platform}
-                            onClick={() => { if (!alreadyAdded) updBrand("socialLinks", [...(brand.socialLinks || []), { key: platform, label: platform.charAt(0).toUpperCase() + platform.slice(1), url: "" }]); }}
+                            onClick={() => { if (!alreadyAdded) updBrand("socialLinks", [...(brand.socialLinks || []), { key: platform, label: "", url: "" }]); }}
                             disabled={alreadyAdded}
                             style={{
                               padding: "6px 10px",
