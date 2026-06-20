@@ -3103,7 +3103,7 @@ export default function CustomBuild() {
         <div style={{ padding: "clamp(20px,3vw,40px) clamp(16px,3vw,40px)", borderRight: generated ? "1px solid #dde0e6" : "none", overflowY: "auto", flexShrink: 0, background: "#eeedf1" }}>
           <div style={{ maxWidth: generated ? "100%" : "1100px", margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
-            <button onClick={() => setDraftsView(true)} style={{ background: "none", border: "none", fontSize: "13px", color: "#6b7280", cursor: "pointer", padding: "0", display: "inline-flex", alignItems: "center", gap: "4px" }}>← Builds</button>
+            <button onClick={() => setDraftsView(true)} style={{ padding: "7px 14px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "6px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", cursor: "pointer" }}>← Saved Builds</button>
             {(brief || generated) && (
               <button
                 onClick={async () => {
