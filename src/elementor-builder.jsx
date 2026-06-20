@@ -1576,6 +1576,9 @@ const BLANK_BRAND = {
   utilityMenu: "Privacy, Terms",
   socialHandle: "",
   socialLinks: [],
+  buttonRadius: "subtle",
+  spacingDensity: "balanced",
+  imageRadius: "subtle",
   showSocialInNav: true,
   showSocialInPage: true,
   showSocialInFooter: true,
@@ -6497,12 +6500,48 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Pair a distinctive display font (heading) with a clean sans-serif (body). All fonts are Google Fonts and load automatically.</p>
               </Section>
 
+              <Section id="brand-details" title="Design Details" icon="">
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px" }}>
+                  <div>
+                    <label style={I.lbl}>Button Corners</label>
+                    <div style={{ display: "flex", gap: "6px" }}>
+                      {[{ id: "sharp", label: "Sharp", radius: "0" }, { id: "subtle", label: "Subtle", radius: "4px" }, { id: "pill", label: "Pill", radius: "999px" }].map(opt => (
+                        <button key={opt.id} onClick={() => updBrand("buttonRadius", opt.id)} style={{ flex: 1, padding: "10px 6px", background: (brand.buttonRadius || "subtle") === opt.id ? "#b45309" : "#ffffff", color: (brand.buttonRadius || "subtle") === opt.id ? "#ffffff" : "#09090b", border: (brand.buttonRadius || "subtle") === opt.id ? "none" : "1px solid #dde0e6", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer", textAlign: "center" }}>
+                          <div style={{ width: "100%", height: "24px", background: (brand.buttonRadius || "subtle") === opt.id ? "rgba(255,255,255,0.3)" : "#dde0e6", borderRadius: opt.radius, marginBottom: "6px" }} />
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label style={I.lbl}>Spacing</label>
+                    <div style={{ display: "flex", gap: "6px" }}>
+                      {[{ id: "tight", label: "Tight" }, { id: "balanced", label: "Balanced" }, { id: "generous", label: "Generous" }].map(opt => (
+                        <button key={opt.id} onClick={() => updBrand("spacingDensity", opt.id)} style={{ flex: 1, padding: "10px 6px", background: (brand.spacingDensity || "balanced") === opt.id ? "#b45309" : "#ffffff", color: (brand.spacingDensity || "balanced") === opt.id ? "#ffffff" : "#09090b", border: (brand.spacingDensity || "balanced") === opt.id ? "none" : "1px solid #dde0e6", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer", textAlign: "center" }}>
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label style={I.lbl}>Image Corners</label>
+                    <div style={{ display: "flex", gap: "6px" }}>
+                      {[{ id: "sharp", label: "Sharp", radius: "0" }, { id: "subtle", label: "Subtle", radius: "8px" }, { id: "round", label: "Round", radius: "16px" }].map(opt => (
+                        <button key={opt.id} onClick={() => updBrand("imageRadius", opt.id)} style={{ flex: 1, padding: "10px 6px", background: (brand.imageRadius || "subtle") === opt.id ? "#b45309" : "#ffffff", color: (brand.imageRadius || "subtle") === opt.id ? "#ffffff" : "#09090b", border: (brand.imageRadius || "subtle") === opt.id ? "none" : "1px solid #dde0e6", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer", textAlign: "center" }}>
+                          <div style={{ width: "100%", height: "24px", background: (brand.imageRadius || "subtle") === opt.id ? "rgba(255,255,255,0.3)" : "#dde0e6", borderRadius: opt.radius, marginBottom: "6px" }} />
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </Section>
+
               </div>
 
             </>
           )}
 
-          {/* PAGE TAB */}
           {/* CONTENT TAB */}
           {tab === "content" && (
             <>
