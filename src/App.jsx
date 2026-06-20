@@ -1,23 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ElementorBuilder from "./elementor-builder";
 import CustomBuild from "./CustomBuild";
 
-const PASS = "Spec#21?5!";
-const STORAGE_KEY = "spec_auth";
-
 function LoginScreen({ onAuth }) {
-  const [val, setVal] = useState("");
-  const [error, setError] = useState(false);
+  const [val, setVal]       = useState("");
+  const [error, setError]   = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  function attempt() {
-    if (val === PASS) {
-      try { localStorage.setItem(STORAGE_KEY, "1"); } catch(e) {}
-      onAuth();
-    } else {
+  async function attempt() {
+    if (!val || loading) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: val }),
+      });
+      if (res.ok) {
+        onAuth();
+      } else {
+        setError(true);
+        setVal("");
+        setTimeout(() => setError(false), 2000);
+      }
+    } catch {
       setError(true);
       setVal("");
       setTimeout(() => setError(false), 2000);
     }
+    setLoading(false);
   }
 
   return (
@@ -37,8 +48,9 @@ function LoginScreen({ onAuth }) {
         {error && <div style={{ fontSize: "12px", color: "#dc2626", marginBottom: "10px" }}>Incorrect password.</div>}
         <button
           onClick={attempt}
-          style={{ width: "100%", padding: "10px", fontSize: "13px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
-          Continue
+          disabled={loading}
+          style={{ width: "100%", padding: "10px", fontSize: "13px", fontWeight: 600, background: loading ? "#6b7280" : "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: loading ? "not-allowed" : "pointer" }}>
+          {loading ? "Checking…" : "Continue"}
         </button>
       </div>
     </div>
@@ -46,17 +58,38 @@ function LoginScreen({ onAuth }) {
 }
 
 export default function App() {
-  const [authed, setAuthed] = useState(function() {
-    try { return localStorage.getItem(STORAGE_KEY) === "1"; } catch(e) { return false; }
-  });
+  const [authed, setAuthed]   = useState(false);
+  const [checking, setChecking] = useState(true);
 
   const [mode, setMode] = useState(function() {
     try { return localStorage.getItem("spec_tab_mode") || "spec"; } catch(e) { return "spec"; }
   });
 
+  // Check server-side session on mount
+  useEffect(() => {
+    fetch("/api/me")
+      .then(r => r.json())
+      .then(d => { if (d.authed) setAuthed(true); })
+      .catch(() => {})
+      .finally(() => setChecking(false));
+  }, []);
+
+  async function signOut() {
+    try { await fetch("/api/signout", { method: "POST" }); } catch {}
+    setAuthed(false);
+  }
+
   function switchMode(m) {
     setMode(m);
     try { localStorage.setItem("spec_tab_mode", m); } catch(e) {}
+  }
+
+  if (checking) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#fafafa", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Inter, system-ui, sans-serif" }}>
+        <div style={{ fontSize: "13px", color: "#6b7280" }}>Loading…</div>
+      </div>
+    );
   }
 
   if (!authed) return <LoginScreen onAuth={() => setAuthed(true)} />;
@@ -72,7 +105,7 @@ export default function App() {
           </div>
           {/* Centered tabs */}
           <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center" }}>
-                        {[{ id: "spec", label: "Template Studio" }, { id: "custom", label: "Brief to Blueprint" }].map(tab => (
+            {[{ id: "spec", label: "Template Studio" }, { id: "custom", label: "Brief to Blueprint" }].map(tab => (
               <button key={tab.id} onClick={() => { switchMode(tab.id); if (tab.id === "spec") window.dispatchEvent(new Event("spec-go-projects")); }} style={{ padding: "18px 16px", fontSize: "13px", fontWeight: mode === tab.id ? 700 : 500, color: mode === tab.id ? "#09090b" : "#6b7280", background: "transparent", border: "none", cursor: "pointer", borderBottom: mode === tab.id ? "2px solid #09090b" : "2px solid transparent", whiteSpace: "nowrap" }}>
                 {tab.label}
               </button>
@@ -80,7 +113,7 @@ export default function App() {
           </div>
           {/* Lock — right anchor */}
           <button
-            onClick={() => { try { localStorage.removeItem(STORAGE_KEY); } catch(e) {} setAuthed(false); }}
+            onClick={signOut}
             style={{ marginLeft: "auto", background: "none", border: "none", cursor: "pointer", padding: "8px", display: "flex", flexDirection: "column", alignItems: "center", gap: "2px", color: "#6b635c" }}
             title="Sign out">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b635c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
