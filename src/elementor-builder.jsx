@@ -5953,7 +5953,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                       const currentGoals = brand.goals || (brand.goal ? [brand.goal] : []);
                       const isSelected = currentGoals.includes(g);
                       return (
-                        <label key={g} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 12px", background: isSelected ? "rgba(180, 83, 9, 0.1)" : "#f5f5f7", border: `1px solid ${isSelected ? "#b45309" : "#dde0e6"}`, borderRadius: "6px", cursor: "pointer", fontSize: "13px", color: isSelected ? "#b45309" : "#09090b", userSelect: "none" }}>
+                        <label key={g} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 12px", background: isSelected ? "rgba(180, 83, 9, 0.1)" : "#ffffff", border: `1px solid ${isSelected ? "#b45309" : "#dde0e6"}`, borderRadius: "6px", cursor: "pointer", fontSize: "13px", color: isSelected ? "#b45309" : "#09090b", userSelect: "none" }}>
                           <input type="checkbox" checked={isSelected} onChange={e => { const next = e.target.checked ? [...currentGoals, g] : currentGoals.filter(x => x !== g); updBrand("goals", next); updBrand("goal", next[0] || ""); }} style={{ cursor: "pointer", accentColor: "#b45309" }} />
                           {g}
                         </label>
