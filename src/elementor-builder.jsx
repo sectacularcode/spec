@@ -3934,23 +3934,42 @@ function previewHTML(page, brand) {
     <style>
       *{box-sizing:border-box;margin:0;padding:0}
       body{background:${pc};color:${ts};font-family:'${bf}',sans-serif;}
+      #mobile-nav{display:none;}
       @media(max-width:768px){
-        .footer-grid{grid-template-columns:1fr !important;gap:24px !important;}
-        .about-grid{grid-template-columns:1fr !important;gap:32px !important;}
+        .footer-grid{grid-template-columns:1fr !important;gap:20px !important;}
+        .about-grid{grid-template-columns:1fr !important;gap:24px !important;}
         .nav-links{display:none !important;}
         .hamburger{display:flex !important;}
-        .hero-split{grid-template-columns:1fr !important;gap:32px !important;}
-        .hero-split>div:last-child{aspect-ratio:16/9 !important;width:100% !important;border-radius:8px !important;}
-        section [style*="grid-template-columns: repeat"]{grid-template-columns:1fr !important;}
-        section [style*="grid-template-columns:repeat"]{grid-template-columns:1fr !important;}
-        section [style*="grid-template-columns: 80px"]{grid-template-columns:1fr !important;gap:12px !important;}
-        section [style*="grid-template-columns:80px"]{grid-template-columns:1fr !important;gap:12px !important;}
-        section{padding-left:24px !important;padding-right:24px !important;}
-        h1{font-size:clamp(28px,8vw,48px) !important;}
-        h2{font-size:clamp(22px,6vw,36px) !important;}
+        #mobile-nav.open{display:block !important;}
+        .hero-split{grid-template-columns:1fr !important;gap:24px !important;}
+        .hero-split>div:last-child{height:200px !important;width:100% !important;border-radius:8px !important;}
+        section [style*="grid-template-columns: repeat"],section [style*="grid-template-columns:repeat"]{grid-template-columns:1fr !important;gap:16px !important;}
+        section [style*="grid-template-columns: 80px"],section [style*="grid-template-columns:80px"]{grid-template-columns:1fr !important;gap:12px !important;}
+        section [style*="grid-template-columns: 1fr 1fr"],section [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr !important;gap:20px !important;}
+        [style*="display:flex"][style*="gap:48px"],[style*="display:flex"][style*="gap:64px"],[style*="display:flex"][style*="gap:80px"]{flex-direction:column !important;gap:20px !important;}
+        section{padding:44px 20px !important;}
+        section > div{padding-left:0 !important;padding-right:0 !important;}
+        [style*="aspect-ratio:16/9"],[style*="aspect-ratio: 16/9"]{aspect-ratio:unset !important;height:180px !important;}
+        [style*="aspect-ratio:4/3"],[style*="aspect-ratio: 4/3"]{aspect-ratio:unset !important;height:180px !important;}
+        [style*="aspect-ratio:3/4"],[style*="aspect-ratio: 3/4"]{aspect-ratio:unset !important;height:200px !important;}
+        [style*="aspect-ratio:1;"],[style*="aspect-ratio: 1;"]{aspect-ratio:unset !important;height:160px !important;}
+        div[style*="height:120px"]{height:40px !important;}
+        div[style*="height:96px"]{height:28px !important;}
+        div[style*="height:80px"]{height:24px !important;}
+        div[style*="height:64px"]{height:20px !important;}
+        div[style*="height:48px"]{height:16px !important;}
+        div[style*="height:40px"]{height:14px !important;}
+        div[style*="height:32px"]{height:10px !important;}
+        div[style*="height:24px"]{height:8px !important;}
+        h1{font-size:clamp(26px,7vw,38px) !important;line-height:1.15 !important;}
+        h2{font-size:clamp(22px,6vw,30px) !important;}
+        h3{font-size:17px !important;}
         a[style*="display:inline-block"]{white-space:normal !important;text-align:center !important;width:100% !important;box-sizing:border-box !important;}
         nav{padding:14px 20px !important;}
         .cta-grid{grid-template-columns:1fr !important;}
+        [style*="min-height:80vh"],[style*="min-height: 80vh"]{min-height:50vh !important;}
+        footer{padding:32px 20px !important;}
+        .footer-grid > div{padding-left:0 !important;}
       }
       /* Inline editing affordances */
       [data-edit]{position:relative;cursor:text;transition:outline 0.15s, background 0.15s;outline:1px dashed transparent;outline-offset:6px;border-radius:2px;}
@@ -3964,13 +3983,29 @@ function previewHTML(page, brand) {
     <nav style="position:sticky;top:0;background:${pc}f5;backdrop-filter:blur(10px);padding:20px clamp(24px,8vw,100px);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid ${bdr};z-index:100;">
       <a href="#" style="text-decoration:none;display:inline-flex;align-items:center;">${logoHTML(18, "left")}</a>
       <div class="nav-links" style="display:flex;align-items:center;">${navLinks}${navSocial}</div>
-      <div class="hamburger" style="display:none;align-items:center;cursor:pointer;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${headingColor}" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div>
+      <button class="hamburger" onclick="toggleMobileNav()" style="display:none;align-items:center;cursor:pointer;background:none;border:none;padding:4px;">
+        <svg id="ham-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${headingColor}" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <svg id="close-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${headingColor}" stroke-width="2" stroke-linecap="round" style="display:none;"><line x1="4" y1="4" x2="20" y2="20"/><line x1="20" y1="4" x2="4" y2="20"/></svg>
+      </button>
     </nav>
+    <div id="mobile-nav" style="background:${pc};border-top:1px solid ${bdr};padding:0 20px;">
+      <div style="display:flex;flex-direction:column;">
+        ${(brand.navItems || ["Home","About","Services","Contact"]).map(item => `<a href="#" style="color:${headingColor};text-decoration:none;font-size:16px;font-weight:500;padding:14px 0;border-bottom:1px solid ${bdr};display:block;">${item}</a>`).join("")}
+      </div>
+    </div>
     ${page.sections.map(section).join("")}
     ${footer}
     <div id="edit-toast" data-edit-toast>✓ Saved</div>
     <script>
       // Inline editing: contentEditable + postMessage on blur back to parent App
+      function toggleMobileNav() {
+        var nav = document.getElementById('mobile-nav');
+        var ham = document.getElementById('ham-icon');
+        var cls = document.getElementById('close-icon');
+        var open = nav.classList.toggle('open');
+        ham.style.display = open ? 'none' : 'block';
+        cls.style.display = open ? 'block' : 'none';
+      }
       (function() {
         const toast = document.getElementById('edit-toast');
         const showToast = (msg) => {
