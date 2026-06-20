@@ -1972,6 +1972,7 @@ function buildGenericPage(colors, brief, pageDef, inspoContext) {
   var ink = colors.ink || "#1C1A17";
   var bone = colors.bone || "#EDE7DB";
   var brass = colors.brass || "#C2A35B";
+  var brassDp = colors["brass-deep"] || "#9C7E3A";
   var warmWhite = colors["warm-white"] || "#FBFAF7";
   var text = colors.text || "#2A2722";
   var stone = colors.stone || "#8A8170";
