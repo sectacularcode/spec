@@ -3309,7 +3309,26 @@ function auditBrand(brand, pages) {
 // ──────────────────────────────────────────────────────────────────────────────
 // PREVIEW HTML — matches Rosalie/Lustre/Faure aesthetic
 // ──────────────────────────────────────────────────────────────────────────────
+// Escape HTML special characters — prevents XSS when inserting user input into preview HTML
+const he = (str) => String(str || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+
 function previewHTML(page, brand) {
+  // Sanitize all brand string fields before any HTML insertion
+  const safeBrand = {};
+  Object.keys(brand || {}).forEach(k => {
+    const v = (brand || {})[k];
+    safeBrand[k] = typeof v === "string" ? he(v) : v;
+  });
+  brand = safeBrand;
+
+  // Sanitize page string fields
+  const safePage = {};
+  Object.keys(page || {}).forEach(k => {
+    const v = (page || {})[k];
+    safePage[k] = typeof v === "string" ? he(v) : v;
+  });
+  page = safePage;
+
   const { primaryColor: pc, accentColor: ac, cardBgColor: card, bodyTextColor: body, borderColor: bdr, headingFont: hf, bodyFont: bf } = brand;
   const theme = THEMES.find(t => t.id === brand.themeId);
   const isDark = (brand.themeMode || (theme && theme.mode)) === "dark";
@@ -6824,12 +6843,13 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   const isDark = (brand.themeMode || (theme && theme.mode)) === "dark";
                   const hc = (theme && theme.headingColor) || (isDark ? "#ffffff" : "#0a0a0a");
                   const tc = brand.bodyTextColor || (isDark ? "#aaa" : "#444");
+                  const safeLogoText = he(brand.logoText || brand.name || "Brand");
                   const logoEl = brand.logoUrl
-                    ? `<img src="${brand.logoUrl}" style="height:28px;width:auto;" />`
-                    : `<span style="font-family:'${hf}',sans-serif;font-size:20px;font-weight:700;color:${hc};">${brand.logoText || brand.name || "Brand"}</span>`;
+                    ? `<img src="${he(brand.logoUrl)}" style="height:28px;width:auto;" />`
+                    : `<span style="font-family:'${hf}',sans-serif;font-size:20px;font-weight:700;color:${hc};">${safeLogoText}</span>`;
                   const navLinks = (brand.primaryMenu || "Home, About, Services, Contact").split(",").map(l =>
-                    `<a href="#" style="font-family:'${bf}',sans-serif;font-size:13px;color:${tc};text-decoration:none;margin:0 12px;white-space:nowrap;">${l.trim()}</a>`).join("");
-                  const btnTxt = `<a href="#" style="font-family:'${bf}',sans-serif;font-size:12px;font-weight:600;color:#fff;background:${ac};padding:8px 18px;text-decoration:none;border-radius:4px;white-space:nowrap;">${brand.cta1 || "Get in touch"}</a>`;
+                    `<a href="#" style="font-family:'${bf}',sans-serif;font-size:13px;color:${tc};text-decoration:none;margin:0 12px;white-space:nowrap;">${he(l.trim())}</a>`).join("");
+                  const btnTxt = `<a href="#" style="font-family:'${bf}',sans-serif;font-size:12px;font-weight:600;color:#fff;background:${ac};padding:8px 18px;text-decoration:none;border-radius:4px;white-space:nowrap;">${he(brand.cta1 || "Get in touch")}</a>`;
                   const hs = brand.headerStyle || "Editorial";
                   let headerHTML = "";
                   if (hs === "Editorial") headerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding:0 40px;height:60px;background:${pc};border-bottom:1px solid ${brand.borderColor||"rgba(128,128,128,0.15)"};">${logoEl}<div style="display:flex;">${navLinks}</div><div></div></div>`;
@@ -6872,14 +6892,15 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   const isDark = (brand.themeMode || (theme && theme.mode)) === "dark";
                   const hc = (theme && theme.headingColor) || (isDark ? "#ffffff" : "#0a0a0a");
                   const tc = brand.bodyTextColor || (isDark ? "#888" : "#666");
+                  const safeLogoTextF = he(brand.logoText || brand.name || "Brand");
                   const logoEl = brand.logoUrl
-                    ? `<img src="${brand.logoUrl}" style="height:24px;width:auto;" />`
-                    : `<span style="font-family:'${hf}',sans-serif;font-size:18px;font-weight:700;color:${hc};">${brand.logoText || brand.name || "Brand"}</span>`;
+                    ? `<img src="${he(brand.logoUrl)}" style="height:24px;width:auto;" />`
+                    : `<span style="font-family:'${hf}',sans-serif;font-size:18px;font-weight:700;color:${hc};">${safeLogoTextF}</span>`;
                   const navLinks = (brand.primaryMenu || "Home, About, Services, Contact").split(",").map(l =>
-                    `<a href="#" style="font-family:'${bf}',sans-serif;font-size:12px;color:${tc};text-decoration:none;margin:0 10px;">${l.trim()}</a>`).join("");
-                  const tagline = brand.tagline ? `<p style="font-family:'${bf}',sans-serif;font-size:12px;color:${tc};margin:8px 0 0;">${brand.tagline}</p>` : "";
-                  const email = brand.contactEmail ? `<p style="font-family:'${bf}',sans-serif;font-size:12px;color:${tc};margin:6px 0 0;">${brand.contactEmail}</p>` : "";
-                  const copy = `<p style="font-family:'${bf}',sans-serif;font-size:11px;color:${tc};margin:16px 0 0;opacity:0.7;">© ${new Date().getFullYear()} ${brand.name || "Brand"}. All rights reserved.</p>`;
+                    `<a href="#" style="font-family:'${bf}',sans-serif;font-size:12px;color:${tc};text-decoration:none;margin:0 10px;">${he(l.trim())}</a>`).join("");
+                  const tagline = brand.tagline ? `<p style="font-family:'${bf}',sans-serif;font-size:12px;color:${tc};margin:8px 0 0;">${he(brand.tagline)}</p>` : "";
+                  const email = brand.contactEmail ? `<p style="font-family:'${bf}',sans-serif;font-size:12px;color:${tc};margin:6px 0 0;">${he(brand.contactEmail)}</p>` : "";
+                  const copy = `<p style="font-family:'${bf}',sans-serif;font-size:11px;color:${tc};margin:16px 0 0;opacity:0.7;">© ${new Date().getFullYear()} ${he(brand.name || "Brand")}. All rights reserved.</p>`;
                   const fs = brand.footerStyle || "Editorial";
                   let footerHTML = "";
                   if (fs === "Editorial") {
