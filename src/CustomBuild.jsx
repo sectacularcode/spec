@@ -2462,6 +2462,178 @@ function buildPreviewHTML(brief, activePage, variant) {
         "</section>" +
         contactClose;
     })(),
+
+    // ── LANDING PAGE ──
+    landing: (function() {
+      return "<section style='background:" + ink + ";min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 40px;text-align:center;'>" +
+        "<h1 style='font-family:Fraunces,serif;font-weight:300;font-size:clamp(40px,7vw,72px);line-height:1.06;color:" + warmWhite + ";max-width:800px;margin:0 0 24px;'>" + (brief.heroHeadline || "Your offer, front and center.") + "</h1>" +
+        "<p style='font-size:18px;color:" + warmWhite + ";opacity:.8;max-width:520px;margin:0 0 40px;line-height:1.7;'>" + (brief.heroSubhead || "One clear message. One clear action.") + "</p>" +
+        "<a style='padding:16px 48px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+      "</section>" +
+      "<section style='background:" + bone + ";padding:80px 40px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:32px;max-width:1000px;margin:0 auto;text-align:center;'>" +
+        "<div style='padding:32px;'><div style='font-size:32px;color:" + brass + ";margin-bottom:12px;font-weight:800;'>01</div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin-bottom:8px;'>Benefit one</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;'>Explain the first key benefit clearly.</p></div>" +
+        "<div style='padding:32px;'><div style='font-size:32px;color:" + brass + ";margin-bottom:12px;font-weight:800;'>02</div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin-bottom:8px;'>Benefit two</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;'>What makes this worth their time.</p></div>" +
+        "<div style='padding:32px;'><div style='font-size:32px;color:" + brass + ";margin-bottom:12px;font-weight:800;'>03</div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin-bottom:8px;'>Benefit three</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;'>The final push to convert.</p></div>" +
+      "</div></section>" +
+      "<section style='background:" + ink + ";padding:80px 40px;text-align:center;'>" +
+        "<h2 style='font-size:clamp(28px,4vw,44px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>Ready?</h2>" +
+        "<a style='padding:16px 48px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+      "</section>";
+    })(),
+
+    // ── TEAM ──
+    team: "<section style='background:" + bone + ";padding:88px 40px;'>" +
+      "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>The Team</div>" +
+      "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>The people behind the work.</h1>" +
+      "<p style='font-size:17px;color:" + text + ";max-width:560px;margin-bottom:48px;line-height:1.65;'>Every person here chose to be here.</p>" +
+    "</section>" +
+    "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:32px;max-width:1160px;margin:0 auto;'>" +
+      ["Founder", "Lead Designer", "Strategist", "Developer"].map(function(role) {
+        return "<div style='text-align:center;'><div style='background:#e0ddd7;aspect-ratio:1;margin-bottom:16px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Photo</div><div style='font-size:16px;font-weight:700;color:" + ink + ";'>[Name]</div><div style='font-size:14px;color:" + stone + ";margin-top:4px;'>" + role + "</div></div>";
+      }).join("") +
+    "</div></section>",
+
+    // ── BLOG ──
+    blog: "<section style='background:" + bone + ";padding:88px 40px;'>" +
+      "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Journal</div>" +
+      "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 48px;'>Latest thoughts.</h1>" +
+    "</section>" +
+    "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:32px;max-width:1160px;margin:0 auto;'>" +
+      ["Strategy & Growth", "Behind the Scenes", "Industry Insights"].map(function(cat) {
+        return "<div><div style='background:#e0ddd7;aspect-ratio:16/10;margin-bottom:16px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Featured image</div><div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;'>" + cat + "</div><h3 style='font-size:20px;font-weight:700;color:" + ink + ";margin-bottom:8px;'>Article Title Goes Here</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;'>A short excerpt that gives readers a reason to click through and read the full piece.</p><div style='font-size:13px;color:" + stone + ";margin-top:12px;'>5 min read</div></div>";
+      }).join("") +
+    "</div></section>",
+
+    // ── BLOG POST ──
+    "blog-post": "<section style='background:" + bone + ";padding:80px 40px;max-width:760px;margin:0 auto;'>" +
+      "<div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;'>Category</div>" +
+      "<h1 style='font-size:clamp(32px,5vw,48px);font-weight:800;color:" + ink + ";margin:0 0 16px;line-height:1.15;'>Article Title Goes Here</h1>" +
+      "<p style='font-size:15px;color:" + stone + ";margin-bottom:32px;'>Published on [Date] · 5 min read</p>" +
+      "<div style='background:#e0ddd7;aspect-ratio:16/9;margin-bottom:40px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Featured image</div>" +
+      "<div style='font-size:17px;color:" + text + ";line-height:1.8;'><p style='margin-bottom:24px;'>Opening paragraph of the article. This is where you hook the reader and set up the premise.</p><h2 style='font-size:24px;font-weight:700;color:" + ink + ";margin:40px 0 16px;'>Section heading</h2><p style='margin-bottom:24px;'>Body copy continues here with supporting details, examples, and insights.</p><blockquote style='border-left:3px solid " + brass + ";padding:16px 24px;margin:32px 0;font-style:italic;color:" + ink + ";font-size:18px;'>A pull quote that highlights a key insight from the article.</blockquote><p>Concluding thoughts that tie everything together and lead to a call to action.</p></div>" +
+    "</section>",
+
+    // ── FAQ ──
+    faq: "<section style='background:" + bone + ";padding:88px 40px;'>" +
+      "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>FAQ</div>" +
+      "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>Common questions.</h1>" +
+      "<p style='font-size:17px;color:" + text + ";max-width:560px;margin-bottom:48px;'>If you do not see your answer here, reach out directly.</p>" +
+    "</section>" +
+    "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:800px;margin:0 auto;'>" +
+      ["How does pricing work?", "What is the typical timeline?", "Do you offer revisions?", "What do I need to get started?", "Can I see examples of past work?"].map(function(q) {
+        return "<div style='border-bottom:1px solid #E2DBCC;padding:28px 0;'><div style='display:flex;justify-content:space-between;align-items:center;cursor:pointer;'><h3 style='font-size:17px;font-weight:600;color:" + ink + ";margin:0;'>" + q + "</h3><span style='font-size:20px;color:" + brass + ";'>+</span></div><p style='font-size:15px;color:" + stone + ";line-height:1.7;margin:12px 0 0;'>Answer placeholder — replace with your actual answer in Elementor.</p></div>";
+      }).join("") +
+    "</div></section>",
+
+    // ── PRICING ──
+    pricing: "<section style='background:" + bone + ";padding:88px 40px;text-align:center;'>" +
+      "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Pricing</div>" +
+      "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>Simple, transparent pricing.</h1>" +
+      "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0 auto 48px;'>No hidden fees. Pick what works.</p>" +
+    "</section>" +
+    "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;max-width:1000px;margin:0 auto;'>" +
+      [["Starter","$500","For small projects"],["Professional","$1,500","For growing businesses"],["Enterprise","Custom","For large-scale needs"]].map(function(t) {
+        return "<div style='background:" + (t[0]==="Professional" ? asphalt : "#fff") + ";border:1px solid #E2DBCC;padding:40px 32px;text-align:center;'><div style='font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + (t[0]==="Professional" ? brass : brassDp) + ";margin-bottom:16px;'>" + t[0] + "</div><div style='font-size:clamp(32px,4vw,48px);font-weight:800;color:" + (t[0]==="Professional" ? warmWhite : ink) + ";margin-bottom:8px;'>" + t[1] + "</div><p style='font-size:14px;color:" + (t[0]==="Professional" ? stone : stone) + ";margin-bottom:32px;'>" + t[2] + "</p><a style='display:inline-block;padding:14px 32px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;'>Get started</a></div>";
+      }).join("") +
+    "</div></section>",
+
+    // ── TESTIMONIALS ──
+    testimonials: "<section style='background:" + bone + ";padding:88px 40px;'>" +
+      "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Testimonials</div>" +
+      "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 48px;'>What our clients say.</h1>" +
+    "</section>" +
+    "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:32px;max-width:1160px;margin:0 auto;'>" +
+      ["This changed everything for our business.", "Professional, efficient, and genuinely cared about the outcome.", "We saw results within the first month."].map(function(q) {
+        return "<div style='background:#fff;border-left:3px solid " + brass + ";padding:32px;'><p style='font-family:Fraunces,serif;font-style:italic;font-size:18px;color:" + ink + ";line-height:1.5;margin:0 0 20px;'>" + q + "</p><div style='font-size:14px;font-weight:600;color:" + ink + ";'>Client Name</div><div style='font-size:13px;color:" + stone + ";'>Role, Company</div></div>";
+      }).join("") +
+    "</div></section>",
+
+    // ── EVENTS ──
+    events: "<section style='background:" + bone + ";padding:88px 40px;'>" +
+      "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Events</div>" +
+      "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 48px;'>Upcoming events.</h1>" +
+    "</section>" +
+    "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:900px;margin:0 auto;'>" +
+      [["JAN 15","Workshop: Brand Strategy Fundamentals","10:00 AM — 2:00 PM · Virtual"],["FEB 22","Networking Mixer","6:00 PM — 9:00 PM · Downtown Studio"],["MAR 10","Annual Conference","All Day · Convention Center"]].map(function(e) {
+        return "<div style='display:grid;grid-template-columns:100px 1fr auto;gap:24px;padding:28px 0;border-bottom:1px solid #E2DBCC;align-items:center;'><div style='font-size:14px;font-weight:800;color:" + brass + ";letter-spacing:1px;'>" + e[0] + "</div><div><div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + e[1] + "</div><div style='font-size:14px;color:" + stone + ";'>" + e[2] + "</div></div><a style='padding:10px 24px;border:1px solid " + brass + ";color:" + ink + ";font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;white-space:nowrap;'>Register</a></div>";
+      }).join("") +
+    "</div></section>",
+
+    // ── CAREERS ──
+    careers: "<section style='background:" + bone + ";padding:88px 40px;'>" +
+      "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Careers</div>" +
+      "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>Work with us.</h1>" +
+      "<p style='font-size:17px;color:" + text + ";max-width:560px;margin-bottom:48px;'>We are always looking for talented people who care about the craft.</p>" +
+    "</section>" +
+    "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:800px;margin:0 auto;'>" +
+      [["Senior Designer","Full-time · Remote"],["Project Manager","Full-time · Hybrid"],["Content Strategist","Contract · Remote"]].map(function(j) {
+        return "<div style='display:flex;justify-content:space-between;align-items:center;padding:24px 0;border-bottom:1px solid #E2DBCC;'><div><div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + j[0] + "</div><div style='font-size:14px;color:" + stone + ";'>" + j[1] + "</div></div><a style='padding:10px 24px;background:" + brass + ";color:" + ink + ";font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;'>Apply</a></div>";
+      }).join("") +
+    "</div></section>",
+
+    // ── CASE STUDY ──
+    "case-study": "<section style='background:" + ink + ";padding:100px 40px;'>" +
+      "<div style='max-width:800px;'>" +
+        "<div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:24px;'>Case Study</div>" +
+        "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;line-height:1.1;'>Client Name: Project Title</h1>" +
+        "<p style='font-size:18px;color:" + warmWhite + ";opacity:.8;line-height:1.7;'>Brief overview of the challenge and the outcome.</p>" +
+      "</div>" +
+    "</section>" +
+    "<section style='background:" + bone + ";padding:80px 40px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:40px;max-width:900px;margin:0 auto 48px;text-align:center;'>" +
+      [["Challenge","What the client was facing"],["Solution","How we approached it"],["Result","The measurable outcome"]].map(function(c) {
+        return "<div><div style='font-size:13px;color:" + brass + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;font-weight:600;'>" + c[0] + "</div><p style='font-size:16px;color:" + text + ";line-height:1.6;'>" + c[1] + "</p></div>";
+      }).join("") +
+    "</div></section>" +
+    "<section style='background:" + bone + ";padding:0 40px 80px;max-width:760px;margin:0 auto;'><div style='font-size:17px;color:" + text + ";line-height:1.8;'><p>The full case study narrative goes here — context, approach, execution, and results with real numbers.</p></div></section>",
+
+    // ── THANK YOU ──
+    "thank-you": "<section style='background:" + bone + ";min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;'>" +
+      "<div style='font-size:48px;margin-bottom:24px;'>✓</div>" +
+      "<h1 style='font-size:clamp(32px,5vw,48px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>Thank you.</h1>" +
+      "<p style='font-size:18px;color:" + text + ";max-width:480px;margin:0 auto 32px;line-height:1.7;'>Your message has been received. We will get back to you within one business day.</p>" +
+      "<a href='/' style='font-size:14px;color:" + brassDp + ";text-decoration:underline;'>← Back to homepage</a>" +
+    "</section>",
+
+    // ── PRIVACY / TERMS ──
+    privacy: "<section style='background:" + bone + ";padding:80px 40px;'><div style='max-width:760px;margin:0 auto;'>" +
+      "<h1 style='font-size:clamp(28px,4vw,40px);font-weight:800;color:" + ink + ";margin:0 0 32px;'>Privacy Policy</h1>" +
+      "<div style='font-size:16px;color:" + text + ";line-height:1.8;'><p style='margin-bottom:20px;'>Last updated: [Date]</p><h2 style='font-size:20px;font-weight:700;color:" + ink + ";margin:32px 0 12px;'>Information We Collect</h2><p style='margin-bottom:20px;'>Placeholder for your privacy policy content.</p><h2 style='font-size:20px;font-weight:700;color:" + ink + ";margin:32px 0 12px;'>How We Use Your Information</h2><p style='margin-bottom:20px;'>Placeholder for usage details.</p><h2 style='font-size:20px;font-weight:700;color:" + ink + ";margin:32px 0 12px;'>Contact</h2><p>For questions about this policy, contact us at [email].</p></div>" +
+    "</div></section>",
+
+    terms: "<section style='background:" + bone + ";padding:80px 40px;'><div style='max-width:760px;margin:0 auto;'>" +
+      "<h1 style='font-size:clamp(28px,4vw,40px);font-weight:800;color:" + ink + ";margin:0 0 32px;'>Terms of Service</h1>" +
+      "<div style='font-size:16px;color:" + text + ";line-height:1.8;'><p style='margin-bottom:20px;'>Last updated: [Date]</p><h2 style='font-size:20px;font-weight:700;color:" + ink + ";margin:32px 0 12px;'>Agreement to Terms</h2><p style='margin-bottom:20px;'>By accessing this website, you agree to these terms.</p><h2 style='font-size:20px;font-weight:700;color:" + ink + ";margin:32px 0 12px;'>Services</h2><p style='margin-bottom:20px;'>Description of services provided.</p><h2 style='font-size:20px;font-weight:700;color:" + ink + ";margin:32px 0 12px;'>Limitation of Liability</h2><p>Standard limitation clause placeholder.</p></div>" +
+    "</div></section>",
+
+    // ── 404 ──
+    "404": "<section style='background:" + bone + ";min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;'>" +
+      "<div style='font-family:Fraunces,serif;font-size:clamp(80px,15vw,160px);font-weight:300;color:" + brass + ";line-height:1;margin-bottom:16px;'>404</div>" +
+      "<h1 style='font-size:clamp(24px,4vw,36px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>Page not found.</h1>" +
+      "<p style='font-size:17px;color:" + text + ";max-width:400px;margin:0 auto 32px;'>The page you are looking for does not exist or has been moved.</p>" +
+      "<a href='/' style='padding:14px 32px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;display:inline-block;'>Back to homepage</a>" +
+    "</section>",
+
+    // ── PORTFOLIO SINGLE ──
+    portfolio: "<section style='background:" + ink + ";padding:100px 40px;'>" +
+      "<div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:24px;'>Portfolio</div>" +
+      "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + warmWhite + ";margin:0 0 16px;line-height:1.1;'>Project Title</h1>" +
+      "<p style='font-size:16px;color:" + warmWhite + ";opacity:.7;'>Client Name · Category · Year</p>" +
+    "</section>" +
+    "<section style='background:" + bone + ";padding:64px 40px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:16px;max-width:1160px;margin:0 auto;'>" +
+      "<div style='background:#e0ddd7;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Project image</div>" +
+      "<div style='background:#e0ddd7;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Project image</div>" +
+    "</div></section>" +
+    "<section style='background:" + bone + ";padding:48px 40px 96px;'><div style='max-width:760px;margin:0 auto;font-size:17px;color:" + text + ";line-height:1.8;'><p>Project description and details go here.</p></div></section>",
+
+    // ── LOCATION ──
+    location: "<section style='background:" + bone + ";padding:88px 40px;'>" +
+      "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Location</div>" +
+      "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 48px;'>Visit us.</h1>" +
+      "<div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;max-width:1000px;'>" +
+        "<div><div style='background:#e0ddd7;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;margin-bottom:16px;'>Map embed</div></div>" +
+        "<div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin-bottom:16px;'>Address</h3><p style='font-size:16px;color:" + text + ";line-height:1.7;margin-bottom:24px;'>123 Main Street<br>Suite 100<br>City, State 00000</p><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin-bottom:16px;'>Hours</h3><p style='font-size:16px;color:" + text + ";line-height:1.7;'>Monday – Friday: 9am – 5pm<br>Saturday – Sunday: Closed</p></div>" +
+      "</div>" +
+    "</section>",
   };
 
   var body = sections[activePage] || sections.home;
