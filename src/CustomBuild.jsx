@@ -2636,9 +2636,11 @@ function buildPreviewHTML(brief, activePage, variant) {
     "</section>",
   };
 
-  var body = sections[activePage] 
-    || sections[activePage.replace(/-\d+$/, "")] 
-    || sections[activePage.split("-")[0]] 
+  var ap = activePage.toLowerCase();
+  var body = sections[ap] 
+    || sections[ap.replace(/-\d+$/, "")] 
+    || sections[ap.split("-")[0]]
+    || sections[ap.replace(/[^a-z]/g, "")]
     || sections.home;
 
   return "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>" +
