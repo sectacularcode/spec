@@ -3354,6 +3354,7 @@ export default function CustomBuild() {
   async function generate() {
     if (!canGenerate) return;
     setGenerating(true);
+    try {
 
     // Step 1: build shared inspo pool
     const inspoContext = buildInspoContext(crawlResults, storedPatterns);
@@ -3363,7 +3364,10 @@ export default function CustomBuild() {
     if (!copyBriefOnly) {
       setGeneratingStatus("Drafting blank fields in brand voice...");
       try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
         const res = await fetch("/api/draft-copy", {
+          signal: controller.signal,
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ 
@@ -3403,7 +3407,10 @@ export default function CustomBuild() {
     if (hasInspo && variantPages.length > 0) {
       setGeneratingStatus("Analyzing inspo patterns...");
       try {
+        const controller2 = new AbortController();
+        const timeout2 = setTimeout(() => controller2.abort(), 5000);
         const res = await fetch("/api/analyze-inspo", {
+          signal: controller2.signal,
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -3433,11 +3440,16 @@ export default function CustomBuild() {
     setLayoutVariants(variants);
     setGenerated({ pages, inspoContext, aiRecs });
     setPreviewPage(selectedPages[0] || "home");
-    setGenerating(false);
-    setGeneratingStatus("");
     setDraftsView(false);
     // Save to drafts list
     saveDraftToList({ brief: workingBrief, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants: variants, generated: { pages, inspoContext, aiRecs }, previewPage: selectedPages[0] || "home", crawlResults });
+
+    } catch(genErr) {
+      console.error("Generate error:", genErr);
+    } finally {
+      setGenerating(false);
+      setGeneratingStatus("");
+    }
   }
 
   function downloadHeader() {
