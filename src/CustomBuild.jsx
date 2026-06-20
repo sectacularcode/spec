@@ -2131,8 +2131,80 @@ function generatePages(brief, selectedPages, inspoContext, aiRecs, customPagesAr
 }
 
 // ─── HTML Preview ─────────────────────────────────────────────────────────────
+
+// ── LAYOUT PATTERNS ── Multiple visual structures per section type.
+// Inspo analysis + brief data selects the pattern. Different inputs = different outputs.
+const LAYOUT_PATTERNS = {
+  hero: [
+    { id: "split-left", label: "Split — text left, image right", industries: ["agency", "saas", "consulting"] },
+    { id: "split-right", label: "Split — image left, text right", industries: ["creative", "photography", "design"] },
+    { id: "centered-bold", label: "Centered headline, no image", industries: ["law", "finance", "enterprise"] },
+    { id: "full-image", label: "Full image background with overlay", industries: ["hospitality", "events", "real-estate"] },
+    { id: "minimal", label: "Minimal text, large whitespace", industries: ["studio", "architecture", "luxury"] },
+  ],
+  services: [
+    { id: "card-grid", label: "3-column card grid", industries: ["saas", "consulting", "agency"] },
+    { id: "alternating-rows", label: "Alternating image-text rows", industries: ["creative", "photography", "design"] },
+    { id: "icon-list", label: "Icon + text list", industries: ["law", "finance", "healthcare"] },
+    { id: "numbered-features", label: "Numbered feature blocks", industries: ["saas", "tech", "startup"] },
+  ],
+  about: [
+    { id: "split-image", label: "Image left, text right", industries: ["agency", "studio", "consulting"] },
+    { id: "centered-narrative", label: "Centered long-form story", industries: ["founder", "personal-brand"] },
+    { id: "team-grid", label: "Team grid with bios", industries: ["law", "agency", "enterprise"] },
+    { id: "timeline", label: "Company timeline", industries: ["enterprise", "manufacturing", "established"] },
+  ],
+  testimonials: [
+    { id: "card-grid", label: "3-column quote cards", industries: ["agency", "saas", "consulting"] },
+    { id: "single-large", label: "One large centered quote", industries: ["luxury", "studio", "architecture"] },
+    { id: "alternating", label: "Alternating left-right quotes", industries: ["creative", "personal-brand"] },
+  ],
+  cta: [
+    { id: "dark-full", label: "Dark full-width with heading", industries: ["all"] },
+    { id: "split-cta", label: "Text left, button right", industries: ["saas", "consulting"] },
+    { id: "minimal-line", label: "Single line with button", industries: ["studio", "luxury", "minimal"] },
+  ],
+  portfolio: [
+    { id: "masonry-grid", label: "Masonry image grid", industries: ["photography", "design", "creative"] },
+    { id: "case-study-cards", label: "Case study cards with text", industries: ["agency", "consulting", "law"] },
+    { id: "full-width-stacked", label: "Full-width stacked projects", industries: ["architecture", "studio"] },
+  ],
+};
+
+// Select patterns based on brief + inspo, ensuring variety between generations
+function selectPatterns(brief, inspoContext) {
+  // Create a seed from the brief content so same brief = same patterns, but different brief = different patterns
+  var seed = 0;
+  var seedStr = (brief.brandName || "") + (brief.industry || "") + (brief.heroHeadline || "") + (inspoContext || "");
+  for (var i = 0; i < seedStr.length; i++) seed = ((seed << 5) - seed + seedStr.charCodeAt(i)) | 0;
+  seed = Math.abs(seed);
+  
+  var result = {};
+  var industry = (brief.industry || brief.niche || "general").toLowerCase();
+  
+  Object.keys(LAYOUT_PATTERNS).forEach(function(sectionType) {
+    var options = LAYOUT_PATTERNS[sectionType];
+    // Score each pattern by industry match
+    var scored = options.map(function(p, idx) {
+      var score = 0;
+      if (p.industries.includes("all")) score += 5;
+      p.industries.forEach(function(ind) {
+        if (industry.indexOf(ind) !== -1) score += 10;
+      });
+      // Add seed-based variety so different briefs pick different patterns
+      score += ((seed + idx * 7) % 5);
+      return { pattern: p, score: score, idx: idx };
+    });
+    scored.sort(function(a, b) { return b.score - a.score || ((seed % 3) - 1); });
+    result[sectionType] = scored[0].pattern.id;
+  });
+  
+  return result;
+}
+
 function buildPreviewHTML(brief, activePage, variant) {
   variant = variant || "A";
+  var patterns = selectPatterns(brief, "");
   var C = brief.colors || {
     ink: "#1C1A17", brass: "#C2A35B", "brass-deep": "#9C7E3A",
     bone: "#EDE7DB", asphalt: "#2B2823", stone: "#8A8170",
@@ -2145,92 +2217,185 @@ function buildPreviewHTML(brief, activePage, variant) {
   var fontUrl = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap";
 
   var sections = {
-    home:
-      // ── HERO ──
-      "<section style='background:" + ink + ";padding:clamp(60px,10vw,100px) clamp(24px,8vw,80px);'>" +
-        "<div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;max-width:1160px;margin:0 auto;'>" +
-          "<div>" +
-            "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:20px;'>" + (brief.brandName || "Brand") + "</div>" +
-            "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(32px,5vw,56px);color:" + warmWhite + ";margin:0 0 20px;line-height:1.1;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
-            "<p style='font-size:17px;color:" + warmWhite + ";opacity:.8;margin:0 0 32px;line-height:1.7;max-width:480px;'>" + (brief.heroSubhead || "Your subheadline goes here.") + "</p>" +
-            "<div style='display:flex;gap:12px;flex-wrap:wrap;'>" +
+    home: (function() {
+      var hp = patterns.hero;
+      
+      // ── HERO VARIANTS ──
+      var heroHTML = "";
+      if (hp === "split-right") {
+        heroHTML = "<section style='background:" + ink + ";padding:clamp(60px,10vw,100px) clamp(24px,8vw,80px);'>" +
+          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;max-width:1160px;margin:0 auto;'>" +
+            "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:8px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Hero image</div>" +
+            "<div>" +
+              "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:20px;'>" + (brief.brandName || "Brand") + "</div>" +
+              "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(32px,5vw,56px);color:" + warmWhite + ";margin:0 0 20px;line-height:1.1;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
+              "<p style='font-size:17px;color:" + warmWhite + ";opacity:.8;margin:0 0 32px;line-height:1.7;'>" + (brief.heroSubhead || "Subheadline goes here.") + "</p>" +
               "<a style='padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
-              "<a style='padding:14px 32px;background:transparent;color:" + warmWhite + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border:1px solid rgba(255,255,255,0.3);border-radius:4px;display:inline-block;'>" + (brief.heroCta2 || "Learn more") + "</a>" +
             "</div>" +
           "</div>" +
-          "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:8px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Hero image</div>" +
-        "</div>" +
-      "</section>" +
-
-      // ── HOOK / PROBLEM ──
-      "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);text-align:center;'>" +
-        "<div style='max-width:720px;margin:0 auto;'>" +
-          "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(24px,4vw,40px);color:" + ink + ";margin:0 0 16px;line-height:1.15;'>" + (brief.hookStatement || "The problem you solve, stated clearly.") + "</h2>" +
-          "<p style='font-size:17px;color:" + text + ";line-height:1.7;margin:0;'>" + (brief.hookBody || "A supporting sentence that builds on the hook.") + "</p>" +
-        "</div>" +
-      "</section>" +
-
-      // ── SERVICES / WHAT WE DO — 3 CARDS ──
-      "<section style='background:" + bone + ";padding:0 clamp(24px,8vw,80px) 80px;'>" +
-        "<div style='max-width:1160px;margin:0 auto;'>" +
+        "</section>";
+      } else if (hp === "centered-bold") {
+        heroHTML = "<section style='background:" + ink + ";padding:clamp(80px,12vw,140px) clamp(24px,8vw,80px);text-align:center;'>" +
+          "<div style='max-width:800px;margin:0 auto;'>" +
+            "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:24px;'>" + (brief.brandName || "Brand") + "</div>" +
+            "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,6vw,72px);color:" + warmWhite + ";margin:0 0 24px;line-height:1.05;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
+            "<p style='font-size:18px;color:" + warmWhite + ";opacity:.8;margin:0 auto 40px;line-height:1.7;max-width:560px;'>" + (brief.heroSubhead || "Subheadline goes here.") + "</p>" +
+            "<div style='display:flex;gap:12px;justify-content:center;flex-wrap:wrap;'>" +
+              "<a style='padding:14px 40px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+              "<a style='padding:14px 40px;background:transparent;color:" + warmWhite + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border:1px solid rgba(255,255,255,0.3);border-radius:4px;display:inline-block;'>" + (brief.heroCta2 || "Learn more") + "</a>" +
+            "</div>" +
+          "</div>" +
+        "</section>";
+      } else if (hp === "full-image") {
+        heroHTML = "<section style='background:" + ink + ";padding:clamp(100px,15vw,180px) clamp(24px,8vw,80px);text-align:center;position:relative;'>" +
+          "<div style='position:absolute;inset:0;background:#e0ddd7;opacity:0.3;'></div>" +
+          "<div style='position:relative;max-width:700px;margin:0 auto;'>" +
+            "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,6vw,64px);color:" + warmWhite + ";margin:0 0 20px;line-height:1.08;text-shadow:0 2px 20px rgba(0,0,0,0.3);'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
+            "<p style='font-size:18px;color:" + warmWhite + ";margin:0 0 36px;line-height:1.7;'>" + (brief.heroSubhead || "Subheadline goes here.") + "</p>" +
+            "<a style='padding:16px 48px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+          "</div>" +
+        "</section>";
+      } else if (hp === "minimal") {
+        heroHTML = "<section style='background:" + bone + ";padding:clamp(100px,15vw,200px) clamp(24px,8vw,80px);'>" +
+          "<div style='max-width:800px;'>" +
+            "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(40px,7vw,80px);color:" + ink + ";margin:0 0 24px;line-height:1.05;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
+            "<p style='font-size:18px;color:" + stone + ";margin:0 0 40px;line-height:1.7;max-width:480px;'>" + (brief.heroSubhead || "Subheadline goes here.") + "</p>" +
+            "<a style='padding:14px 32px;background:" + ink + ";color:" + warmWhite + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:0;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+          "</div>" +
+        "</section>";
+      } else { // split-left (default)
+        heroHTML = "<section style='background:" + ink + ";padding:clamp(60px,10vw,100px) clamp(24px,8vw,80px);'>" +
+          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;max-width:1160px;margin:0 auto;'>" +
+            "<div>" +
+              "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:20px;'>" + (brief.brandName || "Brand") + "</div>" +
+              "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(32px,5vw,56px);color:" + warmWhite + ";margin:0 0 20px;line-height:1.1;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
+              "<p style='font-size:17px;color:" + warmWhite + ";opacity:.8;margin:0 0 32px;line-height:1.7;max-width:480px;'>" + (brief.heroSubhead || "Subheadline goes here.") + "</p>" +
+              "<div style='display:flex;gap:12px;flex-wrap:wrap;'>" +
+                "<a style='padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+                "<a style='padding:14px 32px;background:transparent;color:" + warmWhite + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border:1px solid rgba(255,255,255,0.3);border-radius:4px;display:inline-block;'>" + (brief.heroCta2 || "Learn more") + "</a>" +
+              "</div>" +
+            "</div>" +
+            "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:8px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Hero image</div>" +
+          "</div>" +
+        "</section>";
+      }
+      
+      // ── SERVICES VARIANTS ──
+      var sp = patterns.services;
+      var svcCards = (brief.serviceCards || [["Service One","Description of what this service provides."],["Service Two","Description of what this service provides."],["Service Three","Description of what this service provides."]]);
+      var servicesHTML = "";
+      if (sp === "alternating-rows") {
+        servicesHTML = "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);'><div style='max-width:1160px;margin:0 auto;'>" +
           "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>What we do</div>" +
-          "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 40px;'>" + (brief.servicesHeading || "Our services") + "</h2>" +
+          "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 48px;'>" + (brief.servicesHeading || "Our services") + "</h2>" +
+          svcCards.map(function(pair, idx) {
+            var imgFirst = idx % 2 === 0;
+            return "<div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-bottom:48px;'>" +
+              (imgFirst ? "<div style='background:#e0ddd7;aspect-ratio:3/2;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Image</div>" : "") +
+              "<div><h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + pair[0] + "</h3><p style='font-size:16px;color:" + stone + ";line-height:1.7;margin:0;'>" + pair[1] + "</p></div>" +
+              (!imgFirst ? "<div style='background:#e0ddd7;aspect-ratio:3/2;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Image</div>" : "") +
+            "</div>";
+          }).join("") +
+        "</div></section>";
+      } else if (sp === "numbered-features") {
+        servicesHTML = "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);'><div style='max-width:900px;margin:0 auto;'>" +
+          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>What we do</div>" +
+          "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 48px;'>" + (brief.servicesHeading || "Our services") + "</h2>" +
+          svcCards.map(function(pair, idx) {
+            return "<div style='display:grid;grid-template-columns:60px 1fr;gap:24px;padding:28px 0;border-top:1px solid #E2DBCC;'>" +
+              "<div style='font-size:36px;font-weight:800;color:" + brass + ";line-height:1;'>0" + (idx+1) + "</div>" +
+              "<div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + pair[0] + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>" + pair[1] + "</p></div>" +
+            "</div>";
+          }).join("") +
+        "</div></section>";
+      } else { // card-grid
+        servicesHTML = "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);'><div style='max-width:1160px;margin:0 auto;'>" +
+          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>What we do</div>" +
+          "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 40px;'>" + (brief.servicesHeading || "Our services") + "</h2>" +
           "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;'>" +
-            (brief.serviceCards || [["Service One","Description of this service."],["Service Two","Description of this service."],["Service Three","Description of this service."]]).map(function(pair) {
-              return "<div style='background:#ffffff;border:1px solid #E2DBCC;padding:32px;border-radius:4px;'>" +
-                "<div style='width:40px;height:3px;background:" + brass + ";margin-bottom:20px;'></div>" +
-                "<h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + pair[0] + "</h3>" +
-                "<p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>" + pair[1] + "</p>" +
-              "</div>";
+            svcCards.map(function(pair) {
+              return "<div style='background:#ffffff;border:1px solid #E2DBCC;padding:32px;border-radius:4px;'><div style='width:40px;height:3px;background:" + brass + ";margin-bottom:20px;'></div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + pair[0] + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>" + pair[1] + "</p></div>";
             }).join("") +
           "</div>" +
-        "</div>" +
-      "</section>" +
+        "</div></section>";
+      }
 
-      // ── ABOUT SPLIT ──
-      "<section style='background:#ffffff;padding:80px clamp(24px,8vw,80px);'>" +
-        "<div style='display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1160px;margin:0 auto;'>" +
+      // ── ABOUT VARIANTS ──
+      var ap = patterns.about;
+      var aboutHTML = "";
+      if (ap === "centered-narrative") {
+        aboutHTML = "<section style='background:#ffffff;padding:80px clamp(24px,8vw,80px);'><div style='max-width:720px;margin:0 auto;text-align:center;'>" +
+          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>About</div>" +
+          "<h2 style='font-weight:800;font-size:clamp(24px,4vw,40px);color:" + ink + ";margin:0 0 24px;line-height:1.15;'>" + (brief.aboutHeading || "Our story") + "</h2>" +
+          "<p style='font-size:17px;color:" + text + ";line-height:1.8;margin:0;text-align:left;'>" + (brief.aboutBody || "Your company story goes here.") + "</p>" +
+        "</div></section>";
+      } else { // split-image
+        aboutHTML = "<section style='background:#ffffff;padding:80px clamp(24px,8vw,80px);'><div style='display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1160px;margin:0 auto;'>" +
           "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>About image</div>" +
           "<div>" +
             "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>About</div>" +
-            "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 16px;line-height:1.15;'>" + (brief.aboutHeading || "About the company") + "</h2>" +
-            "<p style='font-size:16px;color:" + text + ";line-height:1.7;margin:0;'>" + (brief.aboutBody || "A short paragraph about who you are and why you do what you do.") + "</p>" +
+            "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 16px;line-height:1.15;'>" + (brief.aboutHeading || "About the company") + "</h2>" +
+            "<p style='font-size:16px;color:" + text + ";line-height:1.7;margin:0;'>" + (brief.aboutBody || "Your company story goes here.") + "</p>" +
           "</div>" +
-        "</div>" +
-      "</section>" +
+        "</div></section>";
+      }
 
-      // ── SOCIAL PROOF / TESTIMONIALS ──
-      "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);'>" +
-        "<div style='max-width:1160px;margin:0 auto;'>" +
+      // ── TESTIMONIALS ──
+      var tp = patterns.testimonials;
+      var testimonialsHTML = "";
+      if (tp === "single-large") {
+        testimonialsHTML = "<section style='background:" + bone + ";padding:100px clamp(24px,8vw,80px);text-align:center;'><div style='max-width:720px;margin:0 auto;'>" +
+          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:32px;'>Kind words</div>" +
+          "<p style='font-size:clamp(20px,3vw,28px);color:" + ink + ";line-height:1.5;font-style:italic;margin:0 0 24px;'>This changed everything for our business. The quality of work exceeded every expectation.</p>" +
+          "<div style='font-size:14px;font-weight:600;color:" + ink + ";'>Client Name</div><div style='font-size:13px;color:" + stone + ";'>CEO, Company</div>" +
+        "</div></section>";
+      } else { // card-grid
+        testimonialsHTML = "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);'><div style='max-width:1160px;margin:0 auto;'>" +
           "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Kind words</div>" +
-          "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 40px;'>What our clients say</h2>" +
+          "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 40px;'>What our clients say</h2>" +
           "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;'>" +
-            ["This changed everything for our business. Highly recommend.", "Professional, efficient, and genuinely cared about the outcome.", "We saw results within the first month of working together."].map(function(q) {
-              return "<div style='background:#ffffff;border-left:3px solid " + brass + ";padding:28px;'>" +
-                "<p style='font-size:17px;color:" + ink + ";line-height:1.5;margin:0 0 16px;font-style:italic;'>" + q + "</p>" +
-                "<div style='font-size:14px;font-weight:600;color:" + ink + ";'>Client Name</div>" +
-                "<div style='font-size:13px;color:" + stone + ";'>Role, Company</div>" +
-              "</div>";
+            ["This changed everything for our business.", "Professional and genuinely cared about the outcome.", "We saw results within the first month."].map(function(q) {
+              return "<div style='background:#ffffff;border-left:3px solid " + brass + ";padding:28px;'><p style='font-size:17px;color:" + ink + ";line-height:1.5;margin:0 0 16px;font-style:italic;'>" + q + "</p><div style='font-size:14px;font-weight:600;color:" + ink + ";'>Client Name</div><div style='font-size:13px;color:" + stone + ";'>Role, Company</div></div>";
             }).join("") +
           "</div>" +
-        "</div>" +
-      "</section>" +
+        "</div></section>";
+      }
+
+      // ── CTA VARIANTS ──
+      var cp = patterns.cta;
+      var ctaHTML = "";
+      if (cp === "split-cta") {
+        ctaHTML = "<section style='background:" + ink + ";padding:60px clamp(24px,8vw,80px);'><div style='display:flex;justify-content:space-between;align-items:center;max-width:1160px;margin:0 auto;flex-wrap:wrap;gap:24px;'>" +
+          "<h2 style='font-weight:800;font-size:clamp(20px,3vw,32px);color:" + warmWhite + ";margin:0;'>" + (brief.tagline || "Ready to get started?") + "</h2>" +
+          "<a style='padding:14px 40px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>Start a project</a>" +
+        "</div></section>";
+      } else if (cp === "minimal-line") {
+        ctaHTML = "<section style='background:" + bone + ";padding:60px clamp(24px,8vw,80px);text-align:center;border-top:1px solid #E2DBCC;'>" +
+          "<a style='font-size:16px;color:" + brassDp + ";text-decoration:underline;font-weight:600;'>" + (brief.heroCta1 || "Start a project") + " →</a>" +
+        "</section>";
+      } else { // dark-full
+        ctaHTML = "<section style='background:" + ink + ";padding:80px clamp(24px,8vw,80px);text-align:center;'>" +
+          "<h2 style='font-weight:800;font-size:clamp(24px,4vw,44px);color:" + warmWhite + ";margin:0 0 12px;'>" + (brief.tagline || "Ready to get started?") + "</h2>" +
+          "<p style='font-size:14px;color:" + stone + ";letter-spacing:2px;text-transform:uppercase;margin:0 0 32px;'>" + (brief.signatureLine || "") + "</p>" +
+          "<a style='padding:14px 40px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>Start a project</a>" +
+        "</section>";
+      }
+
+      // ── HOOK ──
+      var hookHTML = "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);text-align:center;'><div style='max-width:720px;margin:0 auto;'>" +
+        "<h2 style='font-weight:800;font-size:clamp(24px,4vw,40px);color:" + ink + ";margin:0 0 16px;line-height:1.15;'>" + (brief.hookStatement || "The problem you solve, stated clearly.") + "</h2>" +
+        "<p style='font-size:17px;color:" + text + ";line-height:1.7;margin:0;'>" + (brief.hookBody || "") + "</p>" +
+      "</div></section>";
 
       // ── PRICING TEASER ──
-      "<section style='background:#ffffff;padding:80px clamp(24px,8vw,80px);text-align:center;'>" +
-        "<div style='max-width:720px;margin:0 auto;'>" +
-          "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(24px,4vw,40px);color:" + ink + ";margin:0 0 16px;'>Clear pricing. No surprises.</h2>" +
-          "<p style='font-size:17px;color:" + text + ";line-height:1.7;margin:0 0 32px;'>See what it costs before you ever book a call.</p>" +
-          "<a style='padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "See pricing") + "</a>" +
-        "</div>" +
-      "</section>" +
+      var pricingHTML = "<section style='background:#ffffff;padding:80px clamp(24px,8vw,80px);text-align:center;'><div style='max-width:720px;margin:0 auto;'>" +
+        "<h2 style='font-weight:800;font-size:clamp(24px,4vw,40px);color:" + ink + ";margin:0 0 16px;'>Clear pricing. No surprises.</h2>" +
+        "<p style='font-size:17px;color:" + text + ";line-height:1.7;margin:0 0 32px;'>See what it costs before you book a call.</p>" +
+        "<a style='padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>See pricing</a>" +
+      "</div></section>";
 
-      // ── CTA FOOTER ──
-      "<section style='background:" + ink + ";padding:80px clamp(24px,8vw,80px);text-align:center;'>" +
-        "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(24px,4vw,44px);color:" + warmWhite + ";margin:0 0 12px;'>" + (brief.tagline || "Ready to get started?") + "</h2>" +
-        "<p style='font-size:14px;color:" + stone + ";letter-spacing:2px;text-transform:uppercase;margin:0 0 32px;'>" + (brief.signatureLine || "") + "</p>" +
-        "<a style='padding:14px 40px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>Start a project</a>" +
-      "</section>",
+      return heroHTML + hookHTML + servicesHTML + aboutHTML + testimonialsHTML + pricingHTML + ctaHTML;
+    })(),
 
     work: (function() {
       var items = brief.workItems || ["Project 1","Project 2","Project 3","Project 4","Project 5","Project 6"];
