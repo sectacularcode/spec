@@ -3573,13 +3573,15 @@ export default function CustomBuild() {
           <div style={{ display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
             <div style={{ padding: "12px 16px", borderBottom: "1px solid #dde0e6", background: "#fff", display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
               <span style={{ fontSize: "12px", color: "#6b7280", fontWeight: 600, marginRight: "4px" }}>PREVIEW</span>
-              {generated.pages.map(p => (
+              {generated.pages.map(p => {
+                const cleanLabel = (p.label || p.id).replace(/-\d{5,}$/, "").replace(/(^|-)(.)/g, (_, s, c) => (s ? " " : "") + c.toUpperCase());
+                return (
                 <button key={p.id}
                   onClick={() => setPreviewPage(p.id)}
                   style={{ padding: "6px 14px", fontSize: "13px", fontWeight: 500, cursor: "pointer", border: previewPage === p.id ? "1px solid #6b635c" : "1px solid #dde0e6", borderRadius: "20px", background: previewPage === p.id ? "#6b635c" : "#fff", color: previewPage === p.id ? "#fff" : "#09090b" }}>
-                  {p.label}
-                </button>
-              ))}
+                  {cleanLabel}
+                </button>);
+              })}
               {/* Swap sections button */}
               {sectionLibrary.length > 0 && (
                 <button
