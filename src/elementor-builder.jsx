@@ -3902,7 +3902,24 @@ function previewHTML(page, brand) {
     <style>
       *{box-sizing:border-box;margin:0;padding:0}
       body{background:${pc};color:${ts};font-family:'${bf}',sans-serif;}
-      @media(max-width:768px){.footer-grid{grid-template-columns:1fr !important;}.about-grid{grid-template-columns:1fr !important;gap:40px !important;}.nav-links{display:none !important;}}
+      @media(max-width:768px){
+        .footer-grid{grid-template-columns:1fr !important;gap:24px !important;}
+        .about-grid{grid-template-columns:1fr !important;gap:32px !important;}
+        .nav-links{display:none !important;}
+        .hamburger{display:flex !important;}
+        .hero-split{grid-template-columns:1fr !important;gap:32px !important;}
+        .hero-split>div:last-child{aspect-ratio:16/9 !important;width:100% !important;border-radius:8px !important;}
+        section [style*="grid-template-columns: repeat"]{grid-template-columns:1fr !important;}
+        section [style*="grid-template-columns:repeat"]{grid-template-columns:1fr !important;}
+        section [style*="grid-template-columns: 80px"]{grid-template-columns:1fr !important;gap:12px !important;}
+        section [style*="grid-template-columns:80px"]{grid-template-columns:1fr !important;gap:12px !important;}
+        section{padding-left:24px !important;padding-right:24px !important;}
+        h1{font-size:clamp(28px,8vw,48px) !important;}
+        h2{font-size:clamp(22px,6vw,36px) !important;}
+        a[style*="display:inline-block"]{white-space:normal !important;text-align:center !important;width:100% !important;box-sizing:border-box !important;}
+        nav{padding:14px 20px !important;}
+        .cta-grid{grid-template-columns:1fr !important;}
+      }
       /* Inline editing affordances */
       [data-edit]{position:relative;cursor:text;transition:outline 0.15s, background 0.15s;outline:1px dashed transparent;outline-offset:6px;border-radius:2px;}
       [data-edit]:hover{outline:1px dashed rgba(124,58,237,0.6);background:rgba(124,58,237,0.04);}
@@ -3915,6 +3932,7 @@ function previewHTML(page, brand) {
     <nav style="position:sticky;top:0;background:${pc}f5;backdrop-filter:blur(10px);padding:20px clamp(24px,8vw,100px);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid ${bdr};z-index:100;">
       <a href="#" style="text-decoration:none;display:inline-flex;align-items:center;">${logoHTML(18, "left")}</a>
       <div class="nav-links" style="display:flex;align-items:center;">${navLinks}${navSocial}</div>
+      <div class="hamburger" style="display:none;align-items:center;cursor:pointer;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${headingColor}" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div>
     </nav>
     ${page.sections.map(section).join("")}
     ${footer}
