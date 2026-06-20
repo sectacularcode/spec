@@ -2169,6 +2169,31 @@ const LAYOUT_PATTERNS = {
     { id: "case-study-cards", label: "Case study cards with text", industries: ["agency", "consulting", "law"] },
     { id: "full-width-stacked", label: "Full-width stacked projects", industries: ["architecture", "studio"] },
   ],
+  process: [
+    { id: "numbered-vertical", label: "Numbered vertical steps", industries: ["agency", "consulting", "services"] },
+    { id: "horizontal-timeline", label: "Horizontal timeline", industries: ["enterprise", "manufacturing"] },
+    { id: "icon-cards", label: "Icon cards grid", industries: ["saas", "tech", "startup"] },
+  ],
+  contact: [
+    { id: "split-form", label: "Info left, form right", industries: ["agency", "consulting", "services"] },
+    { id: "centered-minimal", label: "Centered minimal form", industries: ["studio", "luxury", "minimal"] },
+    { id: "full-details", label: "Full details with map placeholder", industries: ["local", "real-estate", "hospitality"] },
+  ],
+  pricing: [
+    { id: "three-tier", label: "3-column pricing cards", industries: ["saas", "agency", "services"] },
+    { id: "two-tier", label: "2-column with feature list", industries: ["consulting", "studio"] },
+    { id: "simple-list", label: "Simple price list", industries: ["creative", "photography", "freelance"] },
+  ],
+  blog: [
+    { id: "grid-3col", label: "3-column article grid", industries: ["agency", "saas", "media"] },
+    { id: "featured-plus-grid", label: "Featured post + grid", industries: ["creative", "editorial"] },
+    { id: "list-view", label: "List with thumbnails", industries: ["law", "consulting", "finance"] },
+  ],
+  faq: [
+    { id: "accordion", label: "Expandable accordion", industries: ["saas", "services", "agency"] },
+    { id: "two-column", label: "Two-column Q&A", industries: ["enterprise", "consulting"] },
+    { id: "categorized", label: "Categorized sections", industries: ["saas", "complex"] },
+  ],
 };
 
 // Select patterns based on brief + inspo, ensuring variety between generations
@@ -2398,282 +2423,176 @@ function buildPreviewHTML(brief, activePage, variant) {
     })(),
 
     work: (function() {
-      var items = brief.workItems || ["Project 1","Project 2","Project 3","Project 4","Project 5","Project 6"];
-      var workHeader = "<section style='background:" + bone + ";padding:88px 40px;'>" +
-        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>" + (brief.workEyebrow||"Work") + "</div>" +
-        "<h1 style='font-size:clamp(40px,6vw,64px);font-weight:800;color:" + ink + ";margin:0 0 20px;'>" + (brief.workH1||"Selected work.") + "</h1>" +
-        "<p style='font-size:17px;color:" + text + ";max-width:640px;'>" + (brief.workIntro||"A look at the work so far.") + "</p>" +
-        "</section>";
-      var workClose = "<section style='background:" + bone + ";padding:80px 40px;text-align:center;'><a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>Start a project</a></section>";
-
-      if (variant === "B") {
-        // Editorial: featured hero + supporting grid
-        var featured = items[0] || "Featured Project";
-        var rest = items.slice(1);
-        return workHeader +
-          "<section style='background:" + bone + ";padding:64px 40px;'>" +
-            "<div style='display:grid;grid-template-columns:1fr 1fr;gap:0;max-width:1160px;margin:0 auto 32px;border:1px solid #E2DBCC;'>" +
-              "<div style='background:#e0ddd7;min-height:360px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>" + featured + " — hero image</div>" +
-              "<div style='padding:56px 48px;background:#fff;'>" +
-                "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:16px;'>Featured</div>" +
-                "<h2 style='font-size:clamp(28px,3.5vw,40px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>" + featured + "</h2>" +
-                "<p style='font-size:16px;color:" + text + ";line-height:1.65;margin-bottom:32px;'>The standout piece. Add the description when publishing.</p>" +
-                "<a style='padding:14px 32px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>View project</a>" +
-              "</div>" +
-            "</div>" +
-            "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;max-width:1160px;margin:0 auto;'>" +
-              rest.map(function(title) {
-                return "<div style='background:#fff;border:1px solid #E2DBCC;'>" +
-                  "<div style='background:#e0ddd7;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>" + title + "</div>" +
-                  "<div style='padding:20px;'><div style='font-size:15px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + title + "</div><div style='font-size:12px;color:" + stone + ";'>Project context.</div></div>" +
-                "</div>";
-              }).join("") +
-            "</div>" +
-          "</section>" +
-          workClose;
+      var wp = patterns.portfolio || "masonry-grid";
+      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Work</div>" +
+        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>Selected projects</h1>" +
+        "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0;line-height:1.65;'>A look at what we have built.</p>" +
+      "</div></section>";
+      var body = "";
+      if (wp === "case-study-cards") {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:1160px;margin:0 auto;'>" +
+          [1,2,3,4].map(function(n) {
+            return "<div style='display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;margin-bottom:40px;background:#fff;border:1px solid #E2DBCC;border-radius:4px;overflow:hidden;'>" +
+              "<div style='background:#e0ddd7;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Project image</div>" +
+              "<div style='padding:32px;'><div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;'>Category</div>" +
+              "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 12px;'>Project Title " + n + "</h3>" +
+              "<p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>Brief description of this project and the results achieved.</p></div></div>";
+          }).join("") + "</div></section>";
+      } else if (wp === "full-width-stacked") {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:1160px;margin:0 auto;'>" +
+          [1,2,3].map(function(n) {
+            return "<div style='margin-bottom:48px;'><div style='background:#e0ddd7;aspect-ratio:21/9;display:flex;align-items:center;justify-content:center;color:" + stone + ";margin-bottom:20px;border-radius:4px;'>Project " + n + " — full width image</div>" +
+              "<div style='display:flex;justify-content:space-between;align-items:baseline;'>" +
+              "<h3 style='font-size:20px;font-weight:700;color:" + ink + ";margin:0;'>Project Title " + n + "</h3>" +
+              "<span style='font-size:13px;color:" + stone + ";'>Category · Year</span></div></div>";
+          }).join("") + "</div></section>";
+      } else {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px;max-width:1160px;margin:0 auto;'>" +
+          [1,2,3,4,5,6].map(function(n) {
+            return "<div><div style='background:#e0ddd7;aspect-ratio:" + (n % 2 === 0 ? "4/3" : "3/4") + ";display:flex;align-items:center;justify-content:center;color:" + stone + ";border-radius:4px;margin-bottom:12px;'>Project " + n + "</div>" +
+              "<div style='font-size:15px;font-weight:600;color:" + ink + ";'>Project Title " + n + "</div>" +
+              "<div style='font-size:13px;color:" + stone + ";'>Category</div></div>";
+          }).join("") + "</div></section>";
       }
-      // Variant A: filter row + standard grid
-      return workHeader +
-        "<section style='background:" + bone + ";padding:16px 40px;border-top:1px solid #E2DBCC;border-bottom:1px solid #E2DBCC;'>" +
-          "<div style='display:flex;gap:10px;flex-wrap:wrap;'>" +
-            ["All","Stories & testimonials","People & culture","Brand & leadership","Exit"].map(function(label, i) {
-              return "<a style='padding:10px 20px;font-size:13px;font-weight:600;text-decoration:none;border-radius:2px;letter-spacing:.05em;text-transform:uppercase;background:" + (i===0?brass:"transparent") + ";color:" + (i===0?ink:brassDp) + ";border:1px solid " + (i===0?brass:brassDp) + ";'>" + label + "</a>";
-            }).join("") +
-          "</div>" +
-        "</section>" +
-        "<section style='background:" + bone + ";padding:64px 40px;'>" +
-          "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;max-width:1160px;margin:0 auto;'>" +
-            items.map(function(title) {
-              return "<div style='background:#fff;border:1px solid #E2DBCC;'>" +
-                "<div style='background:#e0ddd7;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>" + title + "</div>" +
-                "<div style='padding:20px;'><div style='font-size:16px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + title + "</div><div style='font-size:12px;color:" + stone + ";'>Project context.</div></div>" +
-              "</div>";
-            }).join("") +
-          "</div>" +
-        "</section>" +
-        workClose;
+      return header + body;
     })(),
 
-    services:
-      "<section style='background:" + bone + ";padding:88px 40px;'>" +
-        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Services & pricing</div>" +
-        "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 20px;line-height:1.1;'>Every way to put your company on film.</h1>" +
-        "<p style='font-size:17px;color:" + text + ";max-width:640px;'>Real prices, in the open. Pick a package, or build a plan. No 30 minute call required to learn what something costs.</p>" +
-      "</section>" +
-      "<section style='background:" + ink + ";padding:80px 40px;'>" +
-        "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;max-width:1160px;margin:0 auto;'>" +
-          (brief.pricingTiers || [
-            ["01  Front Door","CASH FLOW & TRUST","Productized story and testimonial packages with set scope and open pricing.","From 2.5K per film"],
-            ["02  Premium","MARGIN & CRAFT","Brand films, founder stories, and exit work. Built around your story.","From 12K per film"],
-            ["03  The Partner Plan","RECURRING","An embedded video partner across your portfolio or for one company.","From 4K per month"],
-          ]).map(function(tier) {
-            return "<div style='background:" + asphalt + ";padding:48px 36px;border:1px solid #3a3632;'>" +
-              "<div style='font-size:22px;font-weight:700;color:" + warmWhite + ";margin-bottom:6px;'>" + tier[0] + "</div>" +
-              "<div style='font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + stone + ";margin-bottom:20px;'>" + tier[1] + "</div>" +
-              "<div style='width:34px;height:3px;background:" + brass + ";margin-bottom:20px;'></div>" +
-              "<p style='font-size:15px;color:" + warmWhite + ";line-height:1.6;margin-bottom:24px;'>" + tier[2] + "</p>" +
-              "<div style='font-size:26px;font-weight:700;color:" + brass + ";'>" + tier[3] + "</div>" +
-            "</div>";
-          }).join("") +
-        "</div>" +
-        "<div style='max-width:1160px;margin:24px auto 0;padding:32px 36px;border:1px solid #3a3632;'>" +
-          "<div style='font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:12px;'>Always included, in every package</div>" +
-          "<p style='font-size:15px;color:" + warmWhite + ";line-height:1.6;'>A set number of revision rounds, agreed up front. Professional lighting and audio, color grading, and a licensed music track. Delivery in web and social formats, plus short cutdowns from the same footage.</p>" +
-        "</div>" +
-      "</section>" +
-      "<section style='background:" + bone + ";padding:80px 40px;'>" +
-        "<h2 style='font-size:clamp(28px,3.5vw,44px);font-weight:800;color:" + ink + ";margin:0 0 48px;'>The full menu</h2>" +
-        "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:48px;max-width:1160px;'>" +
-          [["Proof & Trust",[["Customer Story","2.5K–4.5K"],["Case Study Film","4K–8K"],["Partner Testimonial","2.5K–4.5K"],["Sales Reel","5K–10K"]]],
-           ["People & Culture",[["Technician Origin Story","3K–6K"],["Day in the Life","2.5K–4.5K"],["Why Work Here","4K–8K"],["Culture & Values Film","6K–12K"]]],
-           ["Leadership & Vision",[["Founder Story","6K–15K"],["Leadership Address","3K–6K"],["Vision Film","6K–12K"],["All-Hands Video","2.5K–5K"]]],
-           ["Exit & Value Creation",[["About-Us Brand Film","12K–30K"],["Exit-Ready Company Film","25K–75K+"],["Milestone Film","10K–20K"],["Portfolio Showcase","Custom"]]]
-          ].map(function(cat) {
-            return "<div><div style='font-size:18px;font-weight:700;color:" + ink + ";margin-bottom:8px;'>" + cat[0] + "</div>" +
-              "<div style='height:2px;background:" + brass + ";margin-bottom:20px;'></div>" +
-              cat[1].map(function(item) {
-                return "<div style='display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-bottom:1px solid #E2DBCC;'>" +
-                  "<span style='font-size:14px;color:" + ink + ";font-weight:600;'>" + item[0] + "</span>" +
-                  "<span style='font-size:13px;color:" + brassDp + ";font-weight:600;'>" + item[1] + "</span>" +
-                "</div>";
-              }).join("") +
-            "</div>";
-          }).join("") +
-        "</div>" +
-      "</section>" +
-      "<section style='background:" + bone + ";padding:64px 40px;text-align:center;'>" +
-        "<p style='color:" + stone + ";margin-bottom:24px;'>Not sure where to start? Tell me about the company.</p>" +
-        "<a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>Start a project</a>" +
-      "</section>",
-
-    about: (function() {
-      var vals = (brief.founderValues || ["Grounded","Forward","Exact","Singular","Human"]);
-      var valuesHtml = "<section style='background:" + bone + ";padding:72px 40px;'>" +
-        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:32px;'>" + (brief.valuesEyebrow||"What we stand for") + "</div>" +
-        "<div style='display:flex;gap:0;max-width:1160px;flex-wrap:wrap;'>" +
-          vals.map(function(v) {
-            return "<div style='flex:1;min-width:160px;padding:24px 28px;border-left:3px solid " + brass + ";margin:0 12px 12px 0;'>" +
-              "<div style='font-size:20px;font-weight:700;color:" + ink + ";'>" + v + "</div>" +
-            "</div>";
-          }).join("") +
+    services: (function() {
+      var sp = patterns.services;
+      var svcCards = brief.serviceCards || [["Service One","Description goes here."],["Service Two","Description goes here."],["Service Three","Description goes here."]];
+      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'>" +
+        "<div style='max-width:1160px;margin:0 auto;'>" +
+          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Services</div>" +
+          "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>" + (brief.servicesH1 || "What we offer") + "</h1>" +
+          "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0;line-height:1.65;'>" + (brief.servicesSubhead || "Our full range of services.") + "</p>" +
         "</div></section>";
-      var aboutClose = "<section style='background:" + bone + ";padding:80px 40px;text-align:center;'><a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>Start a project</a></section>";
-      var aboutHeader = "<section style='background:" + bone + ";padding:88px 40px;'>" +
-        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>" + (brief.aboutEyebrow||"About") + "</div>" +
-        "<h1 style='font-size:clamp(40px,6vw,64px);font-weight:800;color:" + ink + ";margin:0;'>" + (brief.aboutH1||"One person. Every frame.") + "</h1>" +
-        "</section>";
-
-      if (variant === "B") {
-        // Timeline variant
-        var milestones = brief.milestones || [
-          ["The beginning","How it started and what drove the decision to build this."],
-          ["Finding the niche","The moment the right clients and right work became clear."],
-          ["The work that mattered","The projects that defined the approach and proved the model."],
-          ["Where it stands now","What the studio is today and where it is headed."],
-        ];
-        return aboutHeader +
-          "<section style='background:" + bone + ";padding:0;'>" +
-            milestones.map(function(m, i) {
-              return "<div style='padding:56px 40px;background:" + (i%2===0?bone:"#fff") + ";border-bottom:1px solid #E2DBCC;display:flex;gap:32px;align-items:flex-start;max-width:1160px;margin:0 auto;'>" +
-                "<div style='width:12px;height:12px;border-radius:50%;background:" + brass + ";flex-shrink:0;margin-top:8px;'></div>" +
-                "<div><div style='font-size:20px;font-weight:700;color:" + ink + ";margin-bottom:10px;'>" + m[0] + "</div>" +
-                "<p style='font-size:16px;color:" + text + ";line-height:1.65;'>" + m[1] + "</p></div>" +
-              "</div>";
-            }).join("") +
-          "</section>" +
-          "<section style='background:#fff;padding:80px 40px;'>" +
-            "<div style='display:grid;grid-template-columns:1fr 1fr;gap:64px;max-width:1160px;margin:0 auto;align-items:center;'>" +
-              "<div style='background:#e0ddd7;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Founder portrait</div>" +
-              "<div><div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>" + (brief.whyEyebrow||"The approach") + "</div>" +
-              "<p style='font-size:17px;color:" + text + ";line-height:1.65;'>" + (brief.whyOneMaker||"[Why this approach — fill in from brief]") + "</p></div>" +
-            "</div>" +
-          "</section>" +
-          valuesHtml + aboutClose;
+      var body = "";
+      if (sp === "alternating-rows") {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:1160px;margin:0 auto;'>" +
+          svcCards.map(function(pair, idx) {
+            var imgFirst = idx % 2 === 0;
+            return "<div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-bottom:48px;'>" +
+              (imgFirst ? "<div style='background:#e0ddd7;aspect-ratio:3/2;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Image</div>" : "") +
+              "<div><h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + pair[0] + "</h3><p style='font-size:16px;color:" + stone + ";line-height:1.7;margin:0;'>" + pair[1] + "</p></div>" +
+              (!imgFirst ? "<div style='background:#e0ddd7;aspect-ratio:3/2;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Image</div>" : "") +
+            "</div>";
+          }).join("") + "</div></section>";
+      } else if (sp === "numbered-features") {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:900px;margin:0 auto;'>" +
+          svcCards.map(function(pair, idx) {
+            return "<div style='display:grid;grid-template-columns:60px 1fr;gap:24px;padding:28px 0;border-top:1px solid #E2DBCC;'>" +
+              "<div style='font-size:36px;font-weight:800;color:" + brass + ";'>0" + (idx+1) + "</div>" +
+              "<div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + pair[0] + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>" + pair[1] + "</p></div></div>";
+          }).join("") + "</div></section>";
+      } else {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;max-width:1160px;margin:0 auto;'>" +
+          svcCards.map(function(pair) {
+            return "<div style='background:#fff;border:1px solid #E2DBCC;padding:32px;border-radius:4px;'><div style='width:40px;height:3px;background:" + brass + ";margin-bottom:20px;'></div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + pair[0] + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>" + pair[1] + "</p></div>";
+          }).join("") + "</div></section>";
       }
-
-      // Variant A: story/portrait split
-      return aboutHeader +
-        "<section style='background:" + bone + ";padding:80px 40px;'>" +
-          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:64px;max-width:1160px;margin:0 auto;align-items:start;'>" +
-            "<div><p style='font-size:17px;color:" + text + ";line-height:1.65;margin-bottom:24px;'>" + (brief.aboutStory||"The founder story goes here.") + "</p></div>" +
-            "<div style='background:#e0ddd7;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Portrait — on location</div>" +
-          "</div>" +
-        "</section>" +
-        "<section style='background:#fff;padding:80px 40px;'>" +
-          "<div style='max-width:720px;margin:0 auto;'>" +
-            "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>" + (brief.whyEyebrow||"The approach") + "</div>" +
-            "<h2 style='font-size:clamp(28px,3.5vw,44px);font-weight:800;color:" + ink + ";margin:0 0 24px;'>" + (brief.whyH2||"One mind on the whole project.") + "</h2>" +
-            "<p style='font-size:17px;color:" + text + ";line-height:1.65;'>" + (brief.whyOneMaker||"[Why this approach — fill in from brief]") + "</p>" +
-          "</div>" +
-        "</section>" +
-        valuesHtml + aboutClose;
+      return header + body;
+    })(),
+    about: (function() {
+      var ap = patterns.about;
+      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>About</div>" +
+        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>" + (brief.aboutHeading || "Our story") + "</h1>" +
+      "</div></section>";
+      var body = "";
+      if (ap === "centered-narrative") {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:720px;margin:0 auto;'>" +
+          "<p style='font-size:18px;color:" + text + ";line-height:1.8;margin:0 0 32px;'>" + (brief.aboutBody || "Your company story goes here.") + "</p>" +
+          "<div style='display:flex;gap:32px;flex-wrap:wrap;margin-top:40px;'>" +
+            ["Direct", "Useful", "Opinionated", "Human"].map(function(v) {
+              return "<div style='font-size:15px;font-weight:700;color:" + brass + ";'>" + v + "</div>";
+            }).join("") +
+          "</div></div></section>";
+      } else if (ap === "team-grid") {
+        body = "<section style='background:" + bone + ";padding:40px 40px 48px;'><div style='max-width:720px;margin:0 auto;'>" +
+          "<p style='font-size:17px;color:" + text + ";line-height:1.8;margin:0 0 48px;'>" + (brief.aboutBody || "Your company story.") + "</p></div></section>" +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px;max-width:1160px;margin:0 auto;text-align:center;'>" +
+            ["Founder", "Lead Designer", "Strategist", "Developer"].map(function(role) {
+              return "<div><div style='background:#e0ddd7;aspect-ratio:1;margin-bottom:16px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Photo</div><div style='font-weight:700;color:" + ink + ";'>[Name]</div><div style='font-size:13px;color:" + stone + ";margin-top:4px;'>" + role + "</div></div>";
+            }).join("") +
+          "</div></section>";
+      } else {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1160px;margin:0 auto;'>" +
+          "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>About image</div>" +
+          "<div><p style='font-size:17px;color:" + text + ";line-height:1.8;margin:0;'>" + (brief.aboutBody || "Your company story.") + "</p></div>" +
+        "</div></section>";
+      }
+      return header + body;
     })(),
 
     process: (function() {
-      var steps = brief.processSteps || [
-        ["01","The intro","A short call to understand the company and the goal. No charge, no maze."],
-        ["02","The plan","A clear scope and a fixed quote up front. You know the price before anything starts."],
-        ["03","The work","One focused engagement, lean and calm."],
-        ["04","The review","A first draft, then a set number of revision rounds."],
-        ["05","Delivery","Final files in every format you need, ready to use immediately."],
-      ];
-      var processHeader = "<section style='background:" + bone + ";padding:88px 40px;'>" +
-        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>" + (brief.processEyebrow||"Process") + "</div>" +
-        "<h1 style='font-size:clamp(40px,6vw,64px);font-weight:800;color:" + ink + ";margin:0 0 20px;'>" + (brief.processH1||"How it gets made.") + "</h1>" +
-        "<p style='font-size:17px;color:" + text + ";max-width:560px;'>" + (brief.processIntro||"Simple and calm, from first call to final files. No maze, no surprises.") + "</p>" +
-        "</section>";
-      var processCallout = "<section style='background:" + ink + ";padding:80px 40px;'>" +
-        "<div style='max-width:720px;margin:0 auto;'>" +
-          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:16px;'>" + (brief.calloutEyebrow||"What to expect") + "</div>" +
-          "<p style='font-size:18px;color:" + warmWhite + ";line-height:1.65;'>" + (brief.calloutBody||"Most projects take four to six weeks from the intro call to final delivery. You will always know where the project stands.") + "</p>" +
-        "</div></section>";
-      var processClose = "<section style='background:" + bone + ";padding:80px 40px;text-align:center;'><a style='padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>Start a project</a></section>";
-
-      if (variant === "B") {
-        // Horizontal timeline cards
-        return processHeader +
-          "<section style='background:" + bone + ";padding:80px 40px;'>" +
-            "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;max-width:1160px;margin:0 auto;'>" +
-              steps.map(function(step) {
-                return "<div style='background:#fff;padding:40px 32px;border-top:3px solid " + brass + ";'>" +
-                  "<div style='font-family:Inter,sans-serif;font-size:52px;font-weight:300;color:" + brass + ";line-height:1;margin-bottom:20px;'>" + step[0] + "</div>" +
-                  "<div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:10px;'>" + step[1] + "</div>" +
-                  "<p style='font-size:14px;color:" + text + ";line-height:1.65;'>" + step[2] + "</p>" +
-                "</div>";
-              }).join("") +
-            "</div>" +
-          "</section>" +
-          processCallout + processClose;
-      }
-
-      // Variant A: two-column grid
-      return processHeader +
-        "<section style='background:" + bone + ";padding:0;'>" +
-          "<div style='display:grid;grid-template-columns:1fr 1fr;max-width:1160px;margin:0 auto;'>" +
-            steps.map(function(step, i) {
-              return "<div style='padding:56px 40px;background:" + (i%2===0?bone:"#fff") + ";border:1px solid #E2DBCC;'>" +
-                "<div style='font-family:Inter,sans-serif;font-size:72px;font-weight:300;color:" + brass + ";line-height:1;margin-bottom:24px;'>" + step[0] + "</div>" +
-                "<div style='height:1px;background:" + brass + ";width:34px;margin-bottom:24px;'></div>" +
-                "<div style='font-size:20px;font-weight:700;color:" + ink + ";margin-bottom:12px;'>" + step[1] + "</div>" +
-                "<p style='font-size:16px;color:" + text + ";line-height:1.65;'>" + step[2] + "</p>" +
-              "</div>";
+      var pp = patterns.process || "numbered-vertical";
+      var steps = brief.processSteps || [["Discovery","We learn about your business and goals."],["Strategy","We create a plan tailored to you."],["Execute","We bring the plan to life."],["Deliver","You get the finished product, ready to use."]];
+      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Process</div>" +
+        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>" + (brief.processH1 || "How it works") + "</h1>" +
+        "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0;line-height:1.65;'>Simple and calm, from first call to final files.</p>" +
+      "</div></section>";
+      var body = "";
+      if (pp === "icon-cards") {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;max-width:1160px;margin:0 auto;'>" +
+          steps.map(function(s, i) {
+            return "<div style='background:#fff;border:1px solid #E2DBCC;padding:32px;border-radius:4px;text-align:center;'>" +
+              "<div style='font-size:32px;font-weight:800;color:" + brass + ";margin-bottom:16px;'>0" + (i+1) + "</div>" +
+              "<h3 style='font-size:17px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + s[0] + "</h3>" +
+              "<p style='font-size:14px;color:" + stone + ";line-height:1.6;margin:0;'>" + s[1] + "</p></div>";
+          }).join("") + "</div></section>";
+      } else if (pp === "horizontal-timeline") {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:1160px;margin:0 auto;'>" +
+          "<div style='display:flex;gap:0;position:relative;'>" +
+            steps.map(function(s, i) {
+              return "<div style='flex:1;text-align:center;padding:0 16px;'>" +
+                "<div style='width:32px;height:32px;background:" + brass + ";border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;'>" + (i+1) + "</div>" +
+                "<h3 style='font-size:16px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + s[0] + "</h3>" +
+                "<p style='font-size:13px;color:" + stone + ";line-height:1.5;margin:0;'>" + s[1] + "</p></div>";
             }).join("") +
-          "</div>" +
-        "</section>" +
-        processCallout + processClose;
+          "</div></div></section>";
+      } else {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:800px;margin:0 auto;'>" +
+          steps.map(function(s, i) {
+            return "<div style='display:grid;grid-template-columns:60px 1fr;gap:24px;padding:28px 0;" + (i < steps.length-1 ? "border-bottom:1px solid #E2DBCC;" : "") + "'>" +
+              "<div style='font-size:36px;font-weight:800;color:" + brass + ";line-height:1;'>0" + (i+1) + "</div>" +
+              "<div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + s[0] + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>" + s[1] + "</p></div></div>";
+          }).join("") + "</div></section>";
+      }
+      return header + body;
     })(),
 
     contact: (function() {
-      var formBox = "<div style='background:#fff;border:1px solid #E2DBCC;padding:32px;margin-bottom:24px;'>" +
-        "<p style='font-size:14px;color:" + stone + ";line-height:1.8;'>Form fields: Name · Company · Email · What do you need? · Budget range (optional) · Message</p>" +
-        "<p style='font-size:12px;color:" + stone + ";margin-top:12px;'>Connect a forms plugin and replace this with the live shortcode.</p>" +
-      "</div>";
-      var contactClose = "<section style='background:" + ink + ";padding:96px 40px;text-align:center;'>" +
-        "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(32px,4.5vw,52px);color:" + warmWhite + ";max-width:720px;margin:0 auto 32px;line-height:1.1;'>" + (brief.tagline||"Ready to get started?") + "</h2>" +
-        "<div style='font-size:14px;color:" + stone + ";letter-spacing:2px;text-transform:uppercase;'>" + (brief.signatureLine||"") + "</div>" +
-      "</section>";
-
-      if (variant === "B") {
-        // Split: statement left, form right
-        return "<section style='background:" + bone + ";padding:96px 40px;'>" +
-          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:80px;max-width:1160px;margin:0 auto;align-items:start;'>" +
-            "<div>" +
-              "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:24px;'>" + (brief.contactEyebrow||"Contact") + "</div>" +
-              "<h2 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,4.5vw,56px);color:" + ink + ";margin:0 0 32px;line-height:1.06;'>" + (brief.contactH1||"Tell us about your project.") + "</h2>" +
-              "<p style='font-size:17px;color:" + text + ";line-height:1.65;margin-bottom:24px;'>" + (brief.contactIntro||"A quick note about what you need.") + "</p>" +
-              "<p style='font-size:14px;color:" + stone + ";'>" + (brief.contactReassurance||"No sales team. A real reply from a real person.") + "</p>" +
-            "</div>" +
-            "<div>" +
-              formBox +
-              "<a style='display:inline-block;padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;'>" + (brief.contactCta||"Send it over") + "</a>" +
-            "</div>" +
+      var cp2 = patterns.contact || "split-form";
+      if (cp2 === "centered-minimal") {
+        return "<section style='background:" + bone + ";padding:100px 40px;text-align:center;'><div style='max-width:560px;margin:0 auto;'>" +
+          "<h1 style='font-weight:800;font-size:clamp(32px,5vw,48px);color:" + ink + ";margin:0 0 16px;'>" + (brief.contactH1 || "Get in touch") + "</h1>" +
+          "<p style='font-size:17px;color:" + text + ";margin:0 0 40px;line-height:1.7;'>" + (brief.contactSubhead || "We will get back to you within one business day.") + "</p>" +
+          "<div style='background:#fff;border:1px solid #E2DBCC;padding:32px;border-radius:8px;text-align:left;'>" +
+            ["Name", "Email", "Message"].map(function(f) {
+              return "<div style='margin-bottom:16px;'><div style='font-size:13px;font-weight:600;color:" + ink + ";margin-bottom:6px;'>" + f + "</div><div style='background:#f9f9f9;border:1px solid #E2DBCC;padding:12px;border-radius:4px;color:" + stone + ";font-size:14px;'>Enter " + f.toLowerCase() + "</div></div>";
+            }).join("") +
+            "<a style='display:block;padding:14px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;text-align:center;'>" + (brief.contactButton || "Send it over") + "</a>" +
+          "</div></div></section>";
+      } else {
+        return "<section style='background:" + bone + ";padding:88px 40px;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:60px;max-width:1160px;margin:0 auto;'>" +
+          "<div>" +
+            "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Contact</div>" +
+            "<h1 style='font-weight:800;font-size:clamp(32px,4vw,48px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>" + (brief.contactH1 || "Tell us about your project.") + "</h1>" +
+            "<p style='font-size:17px;color:" + text + ";margin:0 0 32px;line-height:1.7;'>" + (brief.contactSubhead || "A real reply, usually within one business day.") + "</p>" +
+            "<p style='font-size:15px;color:" + stone + ";'>" + (brief.contactReassurance || "No sales team. No automated funnel. Just one maker who will read it and write back.") + "</p>" +
           "</div>" +
-        "</section>" + contactClose;
+          "<div style='background:#fff;border:1px solid #E2DBCC;padding:32px;border-radius:8px;'>" +
+            ["Name", "Email", "Company", "What do you need?", "Message"].map(function(f) {
+              return "<div style='margin-bottom:16px;'><div style='font-size:13px;font-weight:600;color:" + ink + ";margin-bottom:6px;'>" + f + "</div><div style='background:#f9f9f9;border:1px solid #E2DBCC;padding:12px;border-radius:4px;color:" + stone + ";font-size:14px;'></div></div>";
+            }).join("") +
+            "<a style='display:block;padding:14px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;text-align:center;'>" + (brief.contactButton || "Send it over") + "</a>" +
+          "</div>" +
+        "</div></section>";
       }
-
-      // Variant A: stacked
-      return "<section style='background:" + bone + ";padding:88px 40px;'>" +
-          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>" + (brief.contactEyebrow||"Contact") + "</div>" +
-          "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 20px;'>" + (brief.contactH1||"Tell us about your project.") + "</h1>" +
-          "<p style='font-size:17px;color:" + text + ";max-width:560px;'>" + (brief.contactIntro||"A quick note about what you need. You will get a real reply from a real person, usually within one business day.") + "</p>" +
-        "</section>" +
-        "<section style='background:" + bone + ";padding:64px 40px;'>" +
-          "<div style='max-width:680px;'>" +
-            formBox +
-            "<a style='display:inline-block;padding:16px 40px;background:" + brass + ";color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:2px;margin-bottom:20px;'>" + (brief.contactCta||"Send it over") + "</a>" +
-            "<p style='font-size:14px;color:" + stone + ";margin-top:16px;'>" + (brief.contactReassurance||"No sales team. A real reply from a real person.") + "</p>" +
-          "</div>" +
-        "</section>" +
-        "<section style='background:" + bone + ";padding:72px 40px;border-top:1px solid #E2DBCC;'>" +
-          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:64px;max-width:1160px;margin:0 auto;'>" +
-            "<div><div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>What happens next</div><p style='font-size:16px;color:" + text + ";line-height:1.65;'>You send a note. Within one business day, you hear back from the person who actually does the work. No account manager, no intro call just to learn what you need.</p></div>" +
-            "<div><div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Not sure what you need?</div><p style='font-size:16px;color:" + text + ";line-height:1.65;'>Tell us what the company does and what you are trying to show. That is enough to start.</p></div>" +
-          "</div>" +
-        "</section>" +
-        contactClose;
     })(),
 
-    // ── LANDING PAGE ──
     landing: (function() {
       return "<section style='background:" + ink + ";min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 40px;text-align:center;'>" +
         "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,6vw,64px);line-height:1.08;color:" + warmWhite + ";max-width:800px;margin:0 0 24px;'>" + (brief.heroHeadline || "Your offer, front and center.") + "</h1>" +
@@ -2704,17 +2623,52 @@ function buildPreviewHTML(brief, activePage, variant) {
     "</div></section>",
 
     // ── BLOG ──
-    blog: "<section style='background:" + bone + ";padding:88px 40px;'>" +
-      "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Journal</div>" +
-      "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 48px;'>Latest thoughts.</h1>" +
-    "</section>" +
-    "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:32px;max-width:1160px;margin:0 auto;'>" +
-      ["Strategy & Growth", "Behind the Scenes", "Industry Insights"].map(function(cat) {
-        return "<div><div style='background:#e0ddd7;aspect-ratio:16/10;margin-bottom:16px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Featured image</div><div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;'>" + cat + "</div><h3 style='font-size:20px;font-weight:700;color:" + ink + ";margin-bottom:8px;'>Article Title Goes Here</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;'>A short excerpt that gives readers a reason to click through and read the full piece.</p><div style='font-size:13px;color:" + stone + ";margin-top:12px;'>5 min read</div></div>";
-      }).join("") +
-    "</div></section>",
+    blog: (function() {
+      var bp = patterns.blog || "grid-3col";
+      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Journal</div>" +
+        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 48px;line-height:1.1;'>Latest thoughts</h1>" +
+      "</div></section>";
+      var articles = ["Strategy & Growth", "Behind the Scenes", "Industry Insights", "Case Study", "Tips & Guides", "News"];
+      if (bp === "featured-plus-grid") {
+        return header + "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:1160px;margin:0 auto;'>" +
+          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:32px;'>" +
+            "<div style='background:#e0ddd7;aspect-ratio:16/10;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Featured image</div>" +
+            "<div style='display:flex;flex-direction:column;justify-content:center;'><div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;'>Featured</div>" +
+            "<h2 style='font-size:28px;font-weight:700;color:" + ink + ";margin:0 0 12px;'>Featured Article Title</h2>" +
+            "<p style='font-size:16px;color:" + stone + ";line-height:1.6;margin:0;'>A longer excerpt that gives readers a reason to dive into this featured piece.</p></div>" +
+          "</div>" +
+          "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;'>" +
+            articles.slice(0,3).map(function(cat) {
+              return "<div><div style='background:#e0ddd7;aspect-ratio:16/10;margin-bottom:12px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Image</div>" +
+                "<div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;'>" + cat + "</div>" +
+                "<h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>Article Title</h3>" +
+                "<p style='font-size:14px;color:" + stone + ";line-height:1.5;margin:0;'>Short excerpt text.</p></div>";
+            }).join("") +
+          "</div></div></section>";
+      } else if (bp === "list-view") {
+        return header + "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:800px;margin:0 auto;'>" +
+          articles.slice(0,5).map(function(cat) {
+            return "<div style='display:grid;grid-template-columns:120px 1fr;gap:20px;padding:24px 0;border-bottom:1px solid #E2DBCC;align-items:center;'>" +
+              "<div style='background:#e0ddd7;aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:11px;'>Thumb</div>" +
+              "<div><div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;'>" + cat + "</div>" +
+              "<h3 style='font-size:17px;font-weight:700;color:" + ink + ";margin:0 0 4px;'>Article Title Goes Here</h3>" +
+              "<p style='font-size:13px;color:" + stone + ";margin:0;'>5 min read</p></div></div>";
+          }).join("") +
+        "</div></section>";
+      } else {
+        return header + "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:32px;max-width:1160px;margin:0 auto;'>" +
+          articles.slice(0,3).map(function(cat) {
+            return "<div><div style='background:#e0ddd7;aspect-ratio:16/10;margin-bottom:16px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Image</div>" +
+              "<div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;'>" + cat + "</div>" +
+              "<h3 style='font-size:20px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>Article Title Goes Here</h3>" +
+              "<p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>Short excerpt giving readers a reason to click through.</p>" +
+              "<div style='font-size:13px;color:" + stone + ";margin-top:12px;'>5 min read</div></div>";
+          }).join("") +
+        "</div></section>";
+      }
+    })(),
 
-    // ── BLOG POST ──
     "blog-post": "<section style='background:" + bone + ";padding:80px 40px;max-width:760px;margin:0 auto;'>" +
       "<div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;'>Category</div>" +
       "<h1 style='font-size:clamp(32px,5vw,48px);font-weight:800;color:" + ink + ";margin:0 0 16px;line-height:1.15;'>Article Title Goes Here</h1>" +
@@ -2724,30 +2678,60 @@ function buildPreviewHTML(brief, activePage, variant) {
     "</section>",
 
     // ── FAQ ──
-    faq: "<section style='background:" + bone + ";padding:88px 40px;'>" +
-      "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>FAQ</div>" +
-      "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>Common questions.</h1>" +
-      "<p style='font-size:17px;color:" + text + ";max-width:560px;margin-bottom:48px;'>If you do not see your answer here, reach out directly.</p>" +
-    "</section>" +
-    "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:800px;margin:0 auto;'>" +
-      ["How does pricing work?", "What is the typical timeline?", "Do you offer revisions?", "What do I need to get started?", "Can I see examples of past work?"].map(function(q) {
-        return "<div style='border-bottom:1px solid #E2DBCC;padding:28px 0;'><div style='display:flex;justify-content:space-between;align-items:center;cursor:pointer;'><h3 style='font-size:17px;font-weight:600;color:" + ink + ";margin:0;'>" + q + "</h3><span style='font-size:20px;color:" + brass + ";'>+</span></div><p style='font-size:15px;color:" + stone + ";line-height:1.7;margin:12px 0 0;'>Answer placeholder — replace with your actual answer in Elementor.</p></div>";
-      }).join("") +
-    "</div></section>",
+    faq: (function() {
+      var fp = patterns.faq || "accordion";
+      var questions = [["How does pricing work?","Every price is a starting point that scales with scope."],["What is the typical timeline?","Most projects wrap in 2-4 weeks depending on complexity."],["Do you offer revisions?","Yes, a set number of revision rounds agreed up front."],["What do I need to get started?","A brief conversation about your business and goals."],["Can I see examples?","Absolutely. Check our work page for recent projects."]];
+      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>FAQ</div>" +
+        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>Common questions</h1>" +
+        "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0;'>If you do not see your answer here, reach out directly.</p>" +
+      "</div></section>";
+      if (fp === "two-column") {
+        return header + "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:40px;max-width:1160px;margin:0 auto;'>" +
+          questions.map(function(q) {
+            return "<div style='padding:24px 0;border-bottom:1px solid #E2DBCC;'><h3 style='font-size:17px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + q[0] + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>" + q[1] + "</p></div>";
+          }).join("") +
+        "</div></section>";
+      } else {
+        return header + "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:800px;margin:0 auto;'>" +
+          questions.map(function(q) {
+            return "<div style='border-bottom:1px solid #E2DBCC;padding:24px 0;'><div style='display:flex;justify-content:space-between;align-items:center;'><h3 style='font-size:17px;font-weight:600;color:" + ink + ";margin:0;'>" + q[0] + "</h3><span style='font-size:20px;color:" + brass + ";'>+</span></div><p style='font-size:15px;color:" + stone + ";line-height:1.7;margin:12px 0 0;'>" + q[1] + "</p></div>";
+          }).join("") +
+        "</div></section>";
+      }
+    })(),
 
-    // ── PRICING ──
-    pricing: "<section style='background:" + bone + ";padding:88px 40px;text-align:center;'>" +
-      "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Pricing</div>" +
-      "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>Simple, transparent pricing.</h1>" +
-      "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0 auto 48px;'>No hidden fees. Pick what works.</p>" +
-    "</section>" +
-    "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;max-width:1000px;margin:0 auto;'>" +
-      [["Starter","$500","For small projects"],["Professional","$1,500","For growing businesses"],["Enterprise","Custom","For large-scale needs"]].map(function(t) {
-        return "<div style='background:" + (t[0]==="Professional" ? asphalt : "#fff") + ";border:1px solid #E2DBCC;padding:40px 32px;text-align:center;'><div style='font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + (t[0]==="Professional" ? brass : brassDp) + ";margin-bottom:16px;'>" + t[0] + "</div><div style='font-size:clamp(32px,4vw,48px);font-weight:800;color:" + (t[0]==="Professional" ? warmWhite : ink) + ";margin-bottom:8px;'>" + t[1] + "</div><p style='font-size:14px;color:" + (t[0]==="Professional" ? stone : stone) + ";margin-bottom:32px;'>" + t[2] + "</p><a style='display:inline-block;padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;'>Get started</a></div>";
-      }).join("") +
-    "</div></section>",
+    pricing: (function() {
+      var pp2 = patterns.pricing || "three-tier";
+      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;text-align:center;'><div style='max-width:800px;margin:0 auto;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Pricing</div>" +
+        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>Simple, transparent pricing</h1>" +
+        "<p style='font-size:17px;color:" + text + ";margin:0;'>No hidden fees. Pick what works.</p>" +
+      "</div></section>";
+      var tiers = [["Starter","$500","For small projects"],["Professional","$1,500","For growing businesses"],["Enterprise","Custom","For large-scale needs"]];
+      if (pp2 === "two-tier") {
+        return header + "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:900px;margin:0 auto;'>" +
+          tiers.slice(0,2).map(function(t, i) {
+            var featured = i === 1;
+            return "<div style='background:" + (featured ? asphalt : "#fff") + ";border:1px solid #E2DBCC;padding:48px 32px;text-align:center;border-radius:4px;'>" +
+              "<div style='font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + (featured ? brass : brassDp) + ";margin-bottom:16px;'>" + t[0] + "</div>" +
+              "<div style='font-size:clamp(36px,5vw,52px);font-weight:800;color:" + (featured ? warmWhite : ink) + ";margin-bottom:8px;'>" + t[1] + "</div>" +
+              "<p style='font-size:15px;color:" + stone + ";margin-bottom:32px;'>" + t[2] + "</p>" +
+              "<a style='display:inline-block;padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Get started</a></div>";
+          }).join("") + "</div></section>";
+      } else {
+        return header + "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;max-width:1000px;margin:0 auto;'>" +
+          tiers.map(function(t, i) {
+            var featured = i === 1;
+            return "<div style='background:" + (featured ? asphalt : "#fff") + ";border:1px solid #E2DBCC;padding:40px 32px;text-align:center;border-radius:4px;'>" +
+              "<div style='font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + (featured ? brass : brassDp) + ";margin-bottom:16px;'>" + t[0] + "</div>" +
+              "<div style='font-size:clamp(32px,4vw,48px);font-weight:800;color:" + (featured ? warmWhite : ink) + ";margin-bottom:8px;'>" + t[1] + "</div>" +
+              "<p style='font-size:14px;color:" + stone + ";margin-bottom:32px;'>" + t[2] + "</p>" +
+              "<a style='display:inline-block;padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Get started</a></div>";
+          }).join("") + "</div></section>";
+      }
+    })(),
 
-    // ── TESTIMONIALS ──
     testimonials: "<section style='background:" + bone + ";padding:88px 40px;'>" +
       "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Testimonials</div>" +
       "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 48px;'>What our clients say.</h1>" +
