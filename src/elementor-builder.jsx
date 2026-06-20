@@ -6605,26 +6605,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             <>
               <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%", padding: "24px 24px 40px" }}>
               <Section id="social-links" title="Social Media Links" icon="">
-                {brand.socialLinks.map((s, i) => (
-                  <div key={i} className="responsive-4col" style={{ display: "grid", gridTemplateColumns: "140px 140px 1fr 30px", gap: "8px", alignItems: "end" }}>
-                    <select style={{ width: "100%", padding: "11px 40px 11px 13px", background: "#ffffff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\") no-repeat right 14px center", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", color: "#09090b", outline: "none", boxSizing: "border-box", appearance: "none", WebkitAppearance: "none" }} value={s.key} onChange={e => updSocial(i, "key", e.target.value)}>
-                      {Object.keys(SVG).map(k => <option key={k}>{k}</option>)}
-                    </select>
-                    <input style={I.inp} value={s.label || ""} onChange={e => updSocial(i, "label", e.target.value)} placeholder="@handle" />
-                    <input style={I.inp} value={s.url} onChange={e => updSocial(i, "url", e.target.value)} placeholder={
-                      s.key === "instagram" ? "https://instagram.com/yourbrand" :
-                      s.key === "tiktok" ? "https://tiktok.com/@yourbrand" :
-                      s.key === "youtube" ? "https://youtube.com/@yourbrand" :
-                      s.key === "linkedin" ? "https://linkedin.com/in/yourbrand" :
-                      s.key === "facebook" ? "https://facebook.com/yourbrand" :
-                      s.key === "pinterest" ? "https://pinterest.com/yourbrand" :
-                      s.key === "threads" ? "https://threads.net/@yourbrand" :
-                      "https://example.com/yourbrand"
-                    } />
-                    <button onClick={() => delSocial(i)} style={{ ...I.btnGhost, padding: "8px", color: "#b45309", borderColor: "#b45309" }}>×</button>
-                  </div>
-                ))}
-                <div style={{ marginTop: "4px" }}>
+                <div style={{ marginBottom: "4px" }}>
                   <div style={{ fontSize: "10px", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600, marginBottom: "8px" }}>Quick add</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                     {Object.keys(SVG).map(platform => {
@@ -6657,6 +6638,25 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     })}
                   </div>
                 </div>
+                {brand.socialLinks.map((s, i) => (
+                  <div key={i} className="responsive-4col" style={{ display: "grid", gridTemplateColumns: "140px 140px 1fr 30px", gap: "8px", alignItems: "end" }}>
+                    <select style={{ width: "100%", padding: "11px 40px 11px 13px", background: "#ffffff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\") no-repeat right 14px center", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", color: "#09090b", outline: "none", boxSizing: "border-box", appearance: "none", WebkitAppearance: "none" }} value={s.key} onChange={e => updSocial(i, "key", e.target.value)}>
+                      {Object.keys(SVG).map(k => <option key={k}>{k}</option>)}
+                    </select>
+                    <input style={I.inp} value={s.label || ""} onChange={e => updSocial(i, "label", e.target.value)} placeholder="@yourbrand" />
+                    <input style={I.inp} value={s.url} onChange={e => updSocial(i, "url", e.target.value)} placeholder={
+                      s.key === "instagram" ? "https://instagram.com/yourbrand" :
+                      s.key === "tiktok" ? "https://tiktok.com/@yourbrand" :
+                      s.key === "youtube" ? "https://youtube.com/@yourbrand" :
+                      s.key === "linkedin" ? "https://linkedin.com/in/yourbrand" :
+                      s.key === "facebook" ? "https://facebook.com/yourbrand" :
+                      s.key === "pinterest" ? "https://pinterest.com/yourbrand" :
+                      s.key === "threads" ? "https://threads.net/@yourbrand" :
+                      "https://example.com/yourbrand"
+                    } />
+                    <button onClick={() => delSocial(i)} style={{ ...I.btnGhost, padding: "8px", color: "#b45309", borderColor: "#b45309" }}>×</button>
+                  </div>
+                ))}
                 <div style={{ display: "grid", gap: "8px", marginTop: "10px" }}>
                   <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInNav} onChange={e => updBrand("showSocialInNav", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Show icons in top navigation</label>
                   <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInPage} onChange={e => updBrand("showSocialInPage", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Show as a section while scrolling (requires "Social" section enabled)</label>
