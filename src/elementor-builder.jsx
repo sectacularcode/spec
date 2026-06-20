@@ -4823,6 +4823,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   const I = {
     lbl: { display: "block", fontSize: "11px", color: "#6b7280", marginBottom: "6px", textTransform: "none", letterSpacing: "0", fontWeight: 600 },
     inp: { width: "100%", maxWidth: "100%", padding: "11px 13px", background: "#ffffff", border: "1px solid #dde0e6", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5, boxSizing: "border-box" },
+    sel: { width: "100%", maxWidth: "100%", padding: "11px 40px 11px 13px", background: "#ffffff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\") no-repeat right 14px center", border: "1px solid #dde0e6", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5, boxSizing: "border-box", appearance: "none", WebkitAppearance: "none", cursor: "pointer" },
     sel: { width: "100%", maxWidth: "100%", padding: "11px 36px 11px 13px", background: "#ffffff", border: "1px solid #dde0e6", color: "#000000", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", outline: "none", lineHeight: 1.5, appearance: "auto", boxSizing: "border-box" },
     btn: { padding: "8px 16px", background: "#6b635c", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer" },
     btnGhost: { padding: "8px 16px", background: "#ffffff", color: "#6b635c", border: "1px solid #6b635c", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer" },
@@ -5248,7 +5249,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <select
                   value={libraryFilter.visual}
                   onChange={e => setLibraryFilter(f => ({ ...f, visual: e.target.value }))}
-                  style={{ padding: "8px 12px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", cursor: "pointer", outline: "none" }}>
+                  style={{ padding: "8px 36px 8px 12px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\") no-repeat right 12px center", color: "#09090b", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none", boxSizing: "border-box" }}>
                   <option value="">All visual styles</option>
                   {[...new Set(savedBuilds.flatMap(b => b.visualTags || []))].map(tag => (
                     <option key={tag} value={tag}>{tag.replace(/-/g, " ")}</option>
@@ -5257,7 +5258,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <select
                   value={libraryFilter.industry}
                   onChange={e => setLibraryFilter(f => ({ ...f, industry: e.target.value }))}
-                  style={{ padding: "8px 12px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", cursor: "pointer", outline: "none" }}>
+                  style={{ padding: "8px 36px 8px 12px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\") no-repeat right 12px center", color: "#09090b", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none", boxSizing: "border-box" }}>
                   <option value="">All industries</option>
                   {[...new Set(savedBuilds.flatMap(b => b.industryFit || []))].sort().map(ind => (
                     <option key={ind} value={ind}>{ind.replace(/-/g, " ")}</option>
@@ -6402,8 +6403,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
               <Section id="brand-typography" title="Typography" icon="">
                 <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                  <div><label style={I.lbl}>Heading Font</label><select style={I.inp} value={brand.headingFont} onChange={e => updBrand("headingFont", e.target.value)}>{FONT_OPTIONS.map(f => <option key={f}>{f}</option>)}</select></div>
-                  <div><label style={I.lbl}>Body Font</label><select style={I.inp} value={brand.bodyFont} onChange={e => updBrand("bodyFont", e.target.value)}>{FONT_OPTIONS.map(f => <option key={f}>{f}</option>)}</select></div>
+                  <div><label style={I.lbl}>Heading Font</label><select style={I.sel} value={brand.headingFont} onChange={e => updBrand("headingFont", e.target.value)}>{FONT_OPTIONS.map(f => <option key={f}>{f}</option>)}</select></div>
+                  <div><label style={I.lbl}>Body Font</label><select style={I.sel} value={brand.bodyFont} onChange={e => updBrand("bodyFont", e.target.value)}>{FONT_OPTIONS.map(f => <option key={f}>{f}</option>)}</select></div>
                 </div>
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Pair a distinctive display font (heading) with a clean sans-serif (body). All fonts are Google Fonts and load automatically.</p>
               </Section>
