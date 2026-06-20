@@ -1294,7 +1294,6 @@ const TAB_ORDER = [
   { id: "brand", label: "Visual" },
   { id: "content", label: "Content" },
   { id: "social", label: "Social" },
-  { id: "page", label: "Page" },
   { id: "footer", label: "Header & Footer" },
   { id: "export", label: "Export & Import" },
 ];
@@ -3271,7 +3270,7 @@ function auditBrand(brand, pages) {
   // ─── CONTENT — sections turned on but empty
   pages.forEach(p => {
     const has = (s) => p.sections.includes(s);
-    if (!p.heroHeading) add("content", `${p.name}: hero heading is empty`, "Add a hero heading or apply a template.", { tab: "page", section: "page-hero" });
+    if (!p.heroHeading) add("content", `${p.name}: hero heading is empty`, "Add a hero heading or apply a template.", { tab: "content", section: "page-hero" });
     if (has("Portfolio") && !p.portfolio) add("content", `${p.name}: Portfolio section is on but no items added`, "Add items — Title|Category|ImageURL per line.", { tab: "content", section: "content-portfolio" });
     if (has("Portfolio Carousel") && !p.portfolio) add("content", `${p.name}: Portfolio Carousel is on but no items`, "Add items in the Portfolio block.", { tab: "content", section: "content-portfolio" });
     if (has("Services") && !p.services) add("content", `${p.name}: Services section is on but no services`, "Add services — Title|Description per line.", { tab: "content", section: "content-services" });
@@ -3305,11 +3304,11 @@ function auditBrand(brand, pages) {
     const aboutBlob = ((pages[0]?.aboutBody || "") + " " + (brand.description || "")).toLowerCase();
     const heroHits = keywords.filter(k => heroBlob.includes(k));
     const aboutHits = keywords.filter(k => aboutBlob.includes(k));
-    if (heroHits.length === 0) add("seo", "No primary keywords appear in your hero", `Work at least one of "${keywords.slice(0, 3).join('", "')}" naturally into the hero.`, { tab: "page", section: "page-hero" });
-    if (aboutHits.length === 0) add("seo", "No primary keywords appear in your about copy", "Search engines weigh About heavily — work in at least one primary keyword.", { tab: "page", section: "page-about" });
+    if (heroHits.length === 0) add("seo", "No primary keywords appear in your hero", `Work at least one of "${keywords.slice(0, 3).join('", "')}" naturally into the hero.`, { tab: "content", section: "page-hero" });
+    if (aboutHits.length === 0) add("seo", "No primary keywords appear in your about copy", "Search engines weigh About heavily — work in at least one primary keyword.", { tab: "content", section: "page-about" });
   }
 
-  if (pages[0] && !pages[0].heroHeading) add("seo", "Hero heading is empty — bad for ranking", "The H1 is the single most important on-page SEO signal.", { tab: "page", section: "page-hero" });
+  if (pages[0] && !pages[0].heroHeading) add("seo", "Hero heading is empty — bad for ranking", "The H1 is the single most important on-page SEO signal.", { tab: "content", section: "page-hero" });
 
   // ─── AIO — AI search optimization
   const activeGoals = brand.goals && brand.goals.length ? brand.goals : (brand.goal ? [brand.goal] : []);
@@ -3317,22 +3316,22 @@ function auditBrand(brand, pages) {
   if (!brand.outcome) add("aio", "No desired outcome specified", "Add an outcome sentence in Brand Brief — helps LLMs understand what your page is for.", { tab: "positioning", section: "positioning-goals" });
 
   const aboutWords = (pages[0]?.aboutBody || "").split(/\s+/).filter(Boolean).length;
-  if (aboutWords > 0 && aboutWords < 60) add("aio", "About copy is too thin to be cited by AI search", "Aim for 80–150 words with specific facts — LLMs cite specific, factual passages.", { tab: "page", section: "page-about" });
+  if (aboutWords > 0 && aboutWords < 60) add("aio", "About copy is too thin to be cited by AI search", "Aim for 80–150 words with specific facts — LLMs cite specific, factual passages.", { tab: "content", section: "page-about" });
 
   const hasFAQ = pages.some(p => p.sections.includes("FAQ") && p.faq);
-  if (!hasFAQ) add("aio", "No FAQ section on any page", "FAQs in Q&A format are the single most cited content type by AI search.", { tab: "page", section: "page-sections" });
+  if (!hasFAQ) add("aio", "No FAQ section on any page", "FAQs in Q&A format are the single most cited content type by AI search.", { tab: "content", section: "page-sections" });
 
   const hasStats = pages.some(p => p.sections.includes("Stats") && p.stats);
-  if (!hasStats) add("aio", "No stats anywhere on the site", "Specific numbers (years in business, clients served, outcomes) get cited by AI summaries.", { tab: "page", section: "page-sections" });
+  if (!hasStats) add("aio", "No stats anywhere on the site", "Specific numbers (years in business, clients served, outcomes) get cited by AI summaries.", { tab: "content", section: "page-sections" });
 
   const hero = (pages[0]?.heroHeading || "").toLowerCase();
-  if (hero && hero.split(/\s+/).length < 5) add("aio", "Hero heading is very short", "Aim for 8–14 words — LLMs need enough context to understand what you offer.", { tab: "page", section: "page-hero" });
+  if (hero && hero.split(/\s+/).length < 5) add("aio", "Hero heading is very short", "Aim for 8–14 words — LLMs need enough context to understand what you offer.", { tab: "content", section: "page-hero" });
 
   // ─── BEST PRACTICES — patterns that perform
   const homepage = pages[0];
-  if (homepage && !homepage.sections.includes("Testimonials")) add("best", "No testimonials on the homepage", "Social proof above the fold lifts conversion 20–40%.", { tab: "page", section: "page-sections" });
-  if (homepage && !homepage.sections.includes("CTA") && !homepage.sections.includes("Form") && !homepage.sections.includes("Contact")) add("best", "No CTA, Form, or Contact section on the homepage", "Every homepage should have a clear conversion path.", { tab: "page", section: "page-sections" });
-  if (homepage && !homepage.sections.includes("Logo Carousel") && !homepage.sections.includes("Clients") && homepage.sections.includes("Services")) add("best", "Service business with no client logos or social proof", "Add a Logo Carousel with brands you've worked with.", { tab: "page", section: "page-sections" });
+  if (homepage && !homepage.sections.includes("Testimonials")) add("best", "No testimonials on the homepage", "Social proof above the fold lifts conversion 20–40%.", { tab: "content", section: "page-sections" });
+  if (homepage && !homepage.sections.includes("CTA") && !homepage.sections.includes("Form") && !homepage.sections.includes("Contact")) add("best", "No CTA, Form, or Contact section on the homepage", "Every homepage should have a clear conversion path.", { tab: "content", section: "page-sections" });
+  if (homepage && !homepage.sections.includes("Logo Carousel") && !homepage.sections.includes("Clients") && homepage.sections.includes("Services")) add("best", "Service business with no client logos or social proof", "Add a Logo Carousel with brands you've worked with.", { tab: "content", section: "page-sections" });
 
   // Check CTA alignment against ANY of the user's goals (not just the first one)
   if (brand.cta1 && activeGoals.length) {
@@ -5808,7 +5807,6 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <TabBtn id="brand" label="Visual" />
                 <TabBtn id="content" label="Content" />
                 <TabBtn id="social" label="Social" />
-                <TabBtn id="page" label="Page" />
                 <TabBtn id="footer" label="Header & Footer" />
                 <TabBtn id="export" label="Export & Import" />
               </div>
@@ -6415,12 +6413,21 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           )}
 
           {/* PAGE TAB */}
-          {tab === "page" && (
+          {/* CONTENT TAB */}
+          {tab === "content" && (
             <>
               <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%", padding: "24px 24px 40px" }}>
+              {(!!(page.heroHeading || page.heroSubhead || page.aboutBody || page.services || page.process || page.testimonials || page.faq || page.portfolio || page.stats || page.pricing || page.blog || page.leaders)) && (
+                <div style={{ marginBottom: "16px", padding: "12px 16px", background: "#b45309", border: "none", borderRadius: "8px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
+                  <div style={{ fontSize: "13px", color: "#ffffff" }}>This page has demo content from the template. Clear it to start fresh with your client's copy.</div>
+                  <button onClick={clearDemoContent} style={{ padding: "6px 14px", background: "#ffffff", color: "#b45309", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>Clear demo content</button>
+                </div>
+              )}
               <Section id="page-setup" title="Page Setup" icon="">
-                <div><label style={I.lbl}>Page Name</label><input style={I.inp} value={page.name} onChange={e => updPage("name", e.target.value)} /></div>
-                <div><label style={I.lbl}>Page Type</label><select style={{ ...I.inp, paddingRight: "36px", appearance: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center" }} value={page.pageType} onChange={e => updPage("pageType", e.target.value)}>{PAGE_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
+                <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <div><label style={I.lbl}>Page Name</label><input style={I.inp} value={page.name} onChange={e => updPage("name", e.target.value)} /></div>
+                  <div><label style={I.lbl}>Page Type</label><select style={I.sel} value={page.pageType} onChange={e => updPage("pageType", e.target.value)}>{PAGE_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
+                </div>
               </Section>
               <Section id="page-sections" title="Sections on this Page" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.55 }}>Compose the page top to bottom. Tap a section in the library to add it to the outline. Tap the × to remove.</p>
@@ -6481,20 +6488,6 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   })()}
                 </div>
               </Section>
-              </div>
-            </>
-          )}
-
-          {/* CONTENT TAB */}
-          {tab === "content" && (
-            <>
-              <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%", padding: "24px 24px 40px" }}>
-              {(!!(page.heroHeading || page.heroSubhead || page.aboutBody || page.services || page.process || page.testimonials || page.faq || page.portfolio || page.stats || page.pricing || page.blog || page.leaders)) && (
-                <div style={{ marginBottom: "16px", padding: "12px 16px", background: "#b45309", border: "none", borderRadius: "8px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
-                  <div style={{ fontSize: "13px", color: "#ffffff" }}>This page has demo content from the template. Clear it to start fresh with your client's copy.</div>
-                  <button onClick={clearDemoContent} style={{ padding: "6px 14px", background: "#ffffff", color: "#b45309", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>Clear demo content</button>
-                </div>
-              )}
               <Section id="page-hero" title="Hero Text" icon="">
                 <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>The first thing visitors see. Your main headline and supporting line.</p>
                 <div><label style={I.lbl}>Heading</label><input style={I.inp} value={page.heroHeading || ""} onChange={e => updPage("heroHeading", e.target.value)} placeholder="e.g. Your main headline goes here." /></div>
