@@ -6618,7 +6618,39 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                     <button onClick={() => delSocial(i)} style={{ ...I.btnGhost, padding: "8px" }}>×</button>
                   </div>
                 ))}
-                <button onClick={addSocial} style={{ ...I.btnGhost, alignSelf: "start", display: "inline-flex", alignItems: "center", gap: "6px", color: "#09090b", borderColor: "#09090b" }}>+ Add Social</button>
+                <div style={{ marginTop: "4px" }}>
+                  <div style={{ fontSize: "10px", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600, marginBottom: "8px" }}>Quick add</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                    {Object.keys(SVG).map(platform => {
+                      const alreadyAdded = brand.socialLinks.some(s => s.key === platform);
+                      return (
+                        <button
+                          key={platform}
+                          onClick={() => { if (!alreadyAdded) updBrand("socialLinks", [...(brand.socialLinks || []), { key: platform, label: platform.charAt(0).toUpperCase() + platform.slice(1), url: "" }]); }}
+                          disabled={alreadyAdded}
+                          style={{
+                            padding: "6px 12px",
+                            background: alreadyAdded ? "rgba(180, 83, 9, 0.1)" : "#ffffff",
+                            color: alreadyAdded ? "#b45309" : "#09090b",
+                            border: `1px solid ${alreadyAdded ? "rgba(180, 83, 9, 0.25)" : "#dde0e6"}`,
+                            borderRadius: "6px",
+                            fontSize: "12px",
+                            fontWeight: 500,
+                            cursor: alreadyAdded ? "default" : "pointer",
+                            opacity: alreadyAdded ? 0.6 : 1,
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            textTransform: "capitalize",
+                          }}>
+                          <span dangerouslySetInnerHTML={{ __html: SVG[platform]("#09090b", 14) }} style={{ display: "inline-flex" }} />
+                          {platform}
+                          {alreadyAdded && " ✓"}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
                 <div style={{ display: "grid", gap: "8px", marginTop: "10px" }}>
                   <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInNav} onChange={e => updBrand("showSocialInNav", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Show icons in top navigation</label>
                   <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInPage} onChange={e => updBrand("showSocialInPage", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Show as a section while scrolling (requires "Social" section enabled)</label>
