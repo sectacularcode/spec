@@ -1568,6 +1568,7 @@ const BLANK_BRAND = {
   multiMenu: false,
   primaryMenu: "Home, About, Services, Contact",
   utilityMenu: "Privacy, Terms",
+  socialHandle: "",
   socialLinks: [],
   showSocialInNav: true,
   showSocialInPage: true,
@@ -6602,6 +6603,11 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {tab === "social" && (
             <>
               <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%", padding: "24px 24px 40px" }}>
+              <Section id="social-handle" title="Brand Handle" icon="">
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 10px", lineHeight: 1.5 }}>Your primary social handle. Used in the footer and anywhere the brand is referenced on social.</p>
+                <input style={I.inp} value={brand.socialHandle || ""} onChange={e => updBrand("socialHandle", e.target.value)} placeholder="@yourbrand" />
+              </Section>
+
               <Section id="social-links" title="Social Media Links" icon="">
                 {brand.socialLinks.map((s, i) => (
                   <div key={i} className="responsive-4col" style={{ display: "grid", gridTemplateColumns: "140px 1fr 1fr 30px", gap: "8px", alignItems: "end" }}>
@@ -6620,6 +6626,34 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInFooter} onChange={e => updBrand("showSocialInFooter", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Show in footer</label>
                 </div>
               </Section>
+
+              {brand.socialLinks.length > 0 && (() => {
+                const theme = THEMES.find(t => t.id === brand.themeId);
+                const isDark = (brand.themeMode || (theme && theme.mode)) === "dark";
+                const pc = brand.primaryColor || "#ffffff";
+                const ac = brand.accentColor || "#000000";
+                const hc = (theme && theme.headingColor) || (isDark ? "#ffffff" : "#0a0a0a");
+                const tc = brand.bodyTextColor || (isDark ? "#888" : "#666");
+                const iconHTML = brand.socialLinks.map(s => SVG[s.key] ? SVG[s.key](hc, 22) : "").filter(Boolean).join('<span style="display:inline-block;width:16px;"></span>');
+                const handleText = brand.socialHandle ? `<div style="font-family:'${brand.bodyFont || "Inter"}',sans-serif;font-size:13px;color:${tc};margin-top:12px;">${brand.socialHandle}</div>` : "";
+                return (
+                  <Section id="social-preview" title="Icon Preview" icon="">
+                    <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 10px", lineHeight: 1.5 }}>How your social icons will appear in the site, using your current brand colors.</p>
+                    <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+                      <div style={{ flex: 1, minWidth: "200px", padding: "24px", background: pc, borderRadius: "8px", border: "1px solid #dde0e6", textAlign: "center" }}>
+                        <div style={{ fontSize: "9px", color: tc, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "12px", fontWeight: 600 }}>On brand background</div>
+                        <div dangerouslySetInnerHTML={{ __html: iconHTML }} />
+                        {brand.socialHandle && <div dangerouslySetInnerHTML={{ __html: handleText }} />}
+                      </div>
+                      <div style={{ flex: 1, minWidth: "200px", padding: "24px", background: isDark ? "#ffffff" : "#0a0a0a", borderRadius: "8px", border: "1px solid #dde0e6", textAlign: "center" }}>
+                        <div style={{ fontSize: "9px", color: isDark ? "#666" : "#aaa", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "12px", fontWeight: 600 }}>On {isDark ? "light" : "dark"} background</div>
+                        <div dangerouslySetInnerHTML={{ __html: brand.socialLinks.map(s => SVG[s.key] ? SVG[s.key](isDark ? "#0a0a0a" : "#ffffff", 22) : "").filter(Boolean).join('<span style="display:inline-block;width:16px;"></span>') }} />
+                        {brand.socialHandle && <div style={{ fontFamily: `'${brand.bodyFont || "Inter"}',sans-serif`, fontSize: "13px", color: isDark ? "#444" : "#ccc", marginTop: "12px" }}>{brand.socialHandle}</div>}
+                      </div>
+                    </div>
+                  </Section>
+                );
+              })()}
               </div>
             </>
           )}
