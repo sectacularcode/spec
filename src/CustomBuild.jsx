@@ -2151,8 +2151,15 @@ function generatePages(brief, selectedPages, inspoContext, aiRecs, customPagesAr
     var result = null;
 
     if (pid === "home") {
-      var data = buildHomePage(colors, brief, inspoContext, patterns);
-      return { id: pid, label: label, data: data, variantA: data, variantB: null, recommended: "A", hasVariants: false };
+      var homePatterns = Object.assign({}, patterns);
+      homePatterns.hero = "centered-bold";
+      var homeA = buildHomePage(colors, brief, inspoContext, homePatterns);
+      var homePatternsB = Object.assign({}, patterns);
+      homePatternsB.hero = "split-left";
+      var homeB = buildHomePage(colors, brief, inspoContext, homePatternsB);
+      var homeRec = (patterns.hero === "split-left" || patterns.hero === "split-right") ? "B" : "A";
+      var homeData = homeRec === "B" ? homeB : homeA;
+      return { id: pid, label: label, data: homeData, variantA: homeA, variantB: homeB, recommended: homeRec, hasVariants: true };
     }
     if (pid === "services") {
       var data = buildServicesPage(colors, brief, inspoContext);
@@ -2382,6 +2389,23 @@ function selectPatterns(brief, inspoContext) {
 function buildPreviewHTML(brief, activePage, variant, inspoContext) {
   variant = variant || "A";
   var patterns = selectPatterns(brief, inspoContext || "");
+
+  // Apply A/B variant overrides so the toggle actually changes the preview
+  if (activePage === "home") {
+    patterns.hero = (variant === "B") ? "split-left" : "centered-bold";
+  }
+  if (activePage === "about") {
+    patterns.about = (variant === "B") ? "timeline" : "split-image";
+  }
+  if (activePage === "process") {
+    patterns.process = (variant === "B") ? "horizontal-timeline" : "numbered-vertical";
+  }
+  if (activePage === "contact") {
+    patterns.contact = (variant === "B") ? "split-form" : "centered-minimal";
+  }
+  if (activePage === "work") {
+    patterns.portfolio = (variant === "B") ? "case-study-cards" : "masonry-grid";
+  }
   var C = brief.colors || {
     ink: "#1C1A17", brass: "#C2A35B", "brass-deep": "#9C7E3A",
     bone: "#EDE7DB", asphalt: "#2B2823", stone: "#8A8170",
@@ -3408,25 +3432,84 @@ function buildPreviewHTML(brief, activePage, variant, inspoContext) {
     || sections[ap.replace(/[^a-z]/g, "")]
     || sections.home;
 
+  var navItems = (brief.pages || ["Home","About","Services","Contact"]).map(function(p) { return typeof p === "string" ? p : (p.label || p.name || p); }).slice(0,6);
+
   return "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>" +
     "<title>" + (brief.brandName || "Preview") + "</title>" +
     "<link href='" + fontUrl + "' rel='stylesheet'>" +
-    "<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Inter',system-ui,sans-serif;font-size:17px;line-height:1.65;background:" + bone + ";color:" + text + ";}img{max-width:100%;}section{width:100%;}" + "@media(max-width:768px){" + "nav .nav-links{display:none !important;}" + "nav .hamburger{display:flex !important;}" + "section{padding-left:24px !important;padding-right:24px !important;}" + "section [style*='grid-template-columns:1fr 1fr']{grid-template-columns:1fr !important;gap:32px !important;}" + "section [style*='grid-template-columns: 1fr 1fr']{grid-template-columns:1fr !important;gap:32px !important;}" + "section [style*='grid-template-columns:repeat']{grid-template-columns:1fr !important;}" + "section [style*='grid-template-columns: repeat']{grid-template-columns:1fr !important;}" + "h1{font-size:clamp(28px,8vw,48px) !important;}" + "h2{font-size:clamp(22px,6vw,36px) !important;}" + "a[style*='display:inline-block'],a[style*='display: inline-block']{text-align:center !important;width:100% !important;box-sizing:border-box !important;}" + "div[style*='display:flex'][style*='gap:16px']{flex-direction:column !important;align-items:stretch !important;}" + "div[style*='display:flex'][style*='gap: 16px']{flex-direction:column !important;align-items:stretch !important;}" + "}" + "</style>" +
+    "<style>" +
+      "*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}" +
+      "body{font-family:'Inter',system-ui,sans-serif;font-size:17px;line-height:1.65;background:" + bone + ";color:" + text + ";}" +
+      "img{max-width:100%;}section{width:100%;}" +
+      "#mobile-nav{display:none;}" +
+      "@media(max-width:768px){" +
+        ".nav-links{display:none !important;}" +
+        ".hamburger{display:flex !important;}" +
+        "#mobile-nav.open{display:block !important;}" +
+        "section{padding-left:20px !important;padding-right:20px !important;padding-top:48px !important;padding-bottom:48px !important;}" +
+        "section > div{padding-left:0 !important;padding-right:0 !important;}" +
+        "[style*='grid-template-columns:1fr 1fr'],[style*='grid-template-columns: 1fr 1fr']{grid-template-columns:1fr !important;gap:24px !important;}" +
+        "[style*='grid-template-columns:repeat'],[style*='grid-template-columns: repeat']{grid-template-columns:1fr !important;gap:20px !important;}" +
+        "[style*='grid-template-columns:100px'],[style*='grid-template-columns: 100px']{grid-template-columns:1fr !important;}" +
+        "[style*='display:grid'][style*='grid-template-columns']{grid-template-columns:1fr !important;}" +
+        "[style*='display:flex'][style*='gap:48px'],[style*='display:flex'][style*='gap:64px'],[style*='display:flex'][style*='gap:80px']{flex-direction:column !important;gap:24px !important;}" +
+        "h1{font-size:clamp(26px,7vw,40px) !important;line-height:1.15 !important;}" +
+        "h2{font-size:clamp(22px,6vw,32px) !important;}" +
+        "h3{font-size:18px !important;}" +
+        "p,div{font-size:15px;}" +
+        "a[style*='padding:14px']{padding:12px 20px !important;width:100%;text-align:center !important;display:block !important;}" +
+        "a[style*='padding:16px']{padding:14px 20px !important;width:100%;text-align:center !important;display:block !important;}" +
+        "[style*='min-height:80vh'],[style*='min-height: 80vh']{min-height:60vh !important;padding-top:48px !important;padding-bottom:48px !important;}" +
+        "[style*='padding:100px']{padding:56px 20px !important;}" +
+        "[style*='padding:88px']{padding:56px 20px !important;}" +
+        "[style*='padding:80px']{padding:48px 20px !important;}" +
+        "[style*='padding:96px']{padding:56px 20px !important;}" +
+        "[style*='padding:120px']{padding:64px 20px !important;}" +
+        "footer{padding:40px 20px !important;}" +
+        "footer > div{flex-direction:column !important;gap:20px !important;}" +
+      "}" +
+    "</style>" +
     "</head><body>" +
-    "<nav style='background:" + ink + ";padding:16px clamp(24px,5vw,60px);display:flex;justify-content:space-between;align-items:center;'>" +
+    "<nav style='background:" + ink + ";padding:14px clamp(20px,5vw,60px);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;'>" +
       "<div style='font-family:Inter,sans-serif;font-weight:800;font-size:18px;color:" + warmWhite + ";'>" + (brief.brandName || "Brand") + "</div>" +
-      "<div class='nav-links' style='display:flex;gap:24px;align-items:center;'>" + (brief.pages || ["Home","About","Services","Contact"]).map(function(p) { return typeof p === "string" ? p : (p.label || p.name || p); }).slice(0,6).map(function(l) { return "<a style='color:" + warmWhite + ";text-decoration:none;font-size:14px;font-weight:500;'>" + l + "</a>"; }).join("") + "</div>" +
-      "<div class='hamburger' style='display:none;cursor:pointer;'><svg width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='" + warmWhite + "' stroke-width='2' stroke-linecap='round'><line x1='3' y1='6' x2='21' y2='6'/><line x1='3' y1='12' x2='21' y2='12'/><line x1='3' y1='18' x2='21' y2='18'/></svg></div>" +
+      "<div class='nav-links' style='display:flex;gap:24px;align-items:center;'>" +
+        navItems.map(function(l) { return "<a style='color:" + warmWhite + ";text-decoration:none;font-size:14px;font-weight:500;'>" + l + "</a>"; }).join("") +
+        "<a style='padding:8px 20px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;text-decoration:none;border-radius:4px;margin-left:8px;'>" + (brief.headerCta || "Get in touch") + "</a>" +
+      "</div>" +
+      "<button class='hamburger' onclick='toggleMobileNav()' style='display:none;background:none;border:none;cursor:pointer;padding:4px;'>" +
+        "<svg id='ham-icon' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='" + warmWhite + "' stroke-width='2' stroke-linecap='round'>" +
+          "<line x1='3' y1='6' x2='21' y2='6'/><line x1='3' y1='12' x2='21' y2='12'/><line x1='3' y1='18' x2='21' y2='18'/>" +
+        "</svg>" +
+        "<svg id='close-icon' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='" + warmWhite + "' stroke-width='2' stroke-linecap='round' style='display:none;'>" +
+          "<line x1='4' y1='4' x2='20' y2='20'/><line x1='20' y1='4' x2='4' y2='20'/>" +
+        "</svg>" +
+      "</button>" +
     "</nav>" +
+    "<div id='mobile-nav' style='background:" + ink + ";border-top:1px solid rgba(255,255,255,.1);'>" +
+      "<div style='padding:8px 20px 20px;display:flex;flex-direction:column;gap:0;'>" +
+        navItems.map(function(l) { return "<a style='color:" + warmWhite + ";text-decoration:none;font-size:16px;font-weight:500;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07);display:block;'>" + l + "</a>"; }).join("") +
+        "<a style='margin-top:16px;padding:14px 20px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;text-decoration:none;border-radius:4px;text-align:center;display:block;'>" + (brief.headerCta || "Get in touch") + "</a>" +
+      "</div>" +
+    "</div>" +
     body +
-    "<footer style='background:" + ink + ";padding:48px clamp(24px,5vw,60px);'>" +
+    "<footer style='background:" + ink + ";padding:48px clamp(20px,5vw,60px);'>" +
       "<div style='display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:32px;'>" +
         "<div><div style='font-family:Inter,sans-serif;font-weight:800;font-size:18px;color:" + warmWhite + ";margin-bottom:8px;'>" + (brief.brandName || "Brand") + "</div>" +
         "<div style='font-size:13px;color:" + stone + ";'>" + (brief.tagline || "") + "</div></div>" +
-        "<div style='display:flex;gap:20px;flex-wrap:wrap;'>" + (brief.pages || ["Home","About","Services","Contact"]).map(function(p) { return typeof p === "string" ? p : (p.label || p.name || p); }).slice(0,6).map(function(l) { return "<a style='color:" + stone + ";text-decoration:none;font-size:13px;'>" + l + "</a>"; }).join("") + "</div>" +
+        "<div style='display:flex;gap:20px;flex-wrap:wrap;'>" + navItems.map(function(l) { return "<a style='color:" + stone + ";text-decoration:none;font-size:13px;'>" + l + "</a>"; }).join("") + "</div>" +
         "<div style='font-size:13px;color:" + stone + ";'>" + (brief.contactEmail || "") + "</div>" +
       "</div>" +
     "</footer>" +
+    "<script>" +
+      "function toggleMobileNav(){" +
+        "var nav=document.getElementById('mobile-nav');" +
+        "var ham=document.getElementById('ham-icon');" +
+        "var cls=document.getElementById('close-icon');" +
+        "var open=nav.classList.toggle('open');" +
+        "ham.style.display=open?'none':'block';" +
+        "cls.style.display=open?'block':'none';" +
+      "}" +
+    "</script>" +
     "</body></html>";
 }
 
@@ -4463,11 +4546,6 @@ export default function CustomBuild() {
                       </button>
                     ))}
                   </div>
-                  {p.reason && (
-                    <div style={{ fontSize: "11px", color: "#6b7280", maxWidth: "280px", textAlign: "right", lineHeight: 1.4 }}>
-                      {p.reason}
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
