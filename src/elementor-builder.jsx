@@ -1773,6 +1773,7 @@ const eContainer = (settings = {}) => ({
   elType: "container",
   isInner: false,
   settings: {
+    container_type: "flex",
     content_width: "full",
     flex_direction: "column",
     flex_gap: { unit: "px", size: 0, sizes: [] },
@@ -1795,20 +1796,27 @@ const eSection = (bg = "", padTop = 100, padBot = 100) => eContainer({
 const eRow = (gap = 24) => eContainer({
   content_width: "full",
   flex_direction: "row",
+  flex_direction_mobile: "column",
   flex_wrap: "wrap",
   flex_gap: { unit: "px", size: gap, sizes: [] },
+  flex_gap_mobile: { unit: "px", size: Math.round(gap * 0.75), sizes: [] },
+  flex_align_items: "stretch",
   width: { unit: "%", size: 100, sizes: [] },
 });
 
 // Column inside a row — widths are slightly under theoretical to leave room for gaps
-const eCol = (size = 100) => eContainer({
-  content_width: "full",
-  width: { unit: "%", size, sizes: [] },
-  width_tablet: { unit: "%", size: size < 100 ? 48 : 100, sizes: [] },
-  width_mobile: { unit: "%", size: 100, sizes: [] },
-  flex_grow: 0,
-  flex_shrink: 0,
-});
+const eCol = (size = 100) => {
+  const c = eContainer({
+    content_width: "full",
+    width: { unit: "%", size, sizes: [] },
+    width_tablet: { unit: "%", size: size < 100 ? 48 : 100, sizes: [] },
+    width_mobile: { unit: "%", size: 100, sizes: [] },
+    flex_grow: 0,
+    flex_shrink: 0,
+  });
+  c.isInner = true;
+  return c;
+};
 
 // ──────────────────────────────────────────────────────────────────────────────
 // RESPONSIVE SIZE HELPERS — auto-generates desktop / tablet / mobile sizes
