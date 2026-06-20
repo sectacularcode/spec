@@ -2196,6 +2196,70 @@ const LAYOUT_PATTERNS = {
   ],
 };
 
+// Parse inspo crawl text and return a boost map: { patternId: boostScore }
+function parseInspoPatterns(inspoContext) {
+  if (!inspoContext) return {};
+  var text = inspoContext.toLowerCase();
+  var boosts = {};
+  function bump(id, amt) { boosts[id] = (boosts[id] || 0) + (amt || 8); }
+
+  // Hero
+  if (text.match(/split.{0,20}(hero|left|right)|image.{0,10}(left|right).{0,20}text/)) { bump("split-left"); bump("split-right"); }
+  if (text.match(/centered.{0,20}(headline|hero|title)|full.?width.{0,20}(text|headline)/)) bump("centered-bold");
+  if (text.match(/full.?(image|bleed|background)|hero.{0,20}(background|photo|image)/)) bump("full-image");
+  if (text.match(/minimal|large.{0,20}whitespace|clean.{0,20}layout/)) bump("minimal");
+
+  // Services
+  if (text.match(/card.{0,10}grid|grid.{0,10}card|three.?column|3.?col/)) bump("card-grid");
+  if (text.match(/alternating.?(row|image|text)|image.?text.?row/)) { bump("alternating-rows"); bump("alternating"); }
+  if (text.match(/numbered.{0,20}(feature|step|block)/)) { bump("numbered-features"); bump("numbered-vertical"); }
+  if (text.match(/icon.{0,10}(list|card|grid)/)) { bump("icon-list"); bump("icon-cards"); }
+
+  // About
+  if (text.match(/split.{0,10}image|image.{0,10}(left|right).{0,20}(text|copy)/)) bump("split-image");
+  if (text.match(/long.?form|narrative|centered.{0,20}(story|text)/)) bump("centered-narrative");
+  if (text.match(/team.{0,10}grid|team.{0,10}photo|headshot|staff.{0,10}photo/)) bump("team-grid");
+  if (text.match(/timeline|company.{0,10}history|mileston/)) { bump("timeline"); bump("horizontal-timeline"); }
+
+  // Testimonials
+  if (text.match(/large.{0,10}quote|single.{0,10}(quote|testimonial)|featured.{0,10}quote/)) bump("single-large");
+  if (text.match(/alternating.{0,10}(quote|testimonial)/)) bump("alternating");
+
+  // CTA
+  if (text.match(/dark.{0,20}(cta|section|band)|cta.{0,20}dark/)) bump("dark-full");
+  if (text.match(/split.{0,10}(cta|call.to.action)|text.{0,10}left.{0,10}button/)) bump("split-cta");
+  if (text.match(/minimal.{0,10}(cta|call)|single.?line.{0,10}(cta|button)/)) bump("minimal-line");
+
+  // Portfolio
+  if (text.match(/masonry|pinterest.?style/)) bump("masonry-grid");
+  if (text.match(/case.?study.{0,10}card|project.{0,10}card/)) bump("case-study-cards");
+  if (text.match(/full.?width.{0,20}(project|work|portfolio)|stacked.{0,10}(project|work)/)) bump("full-width-stacked");
+
+  // Process
+  if (text.match(/horizontal.{0,10}timeline|step.{0,20}horizontal/)) bump("horizontal-timeline");
+
+  // Contact
+  if (text.match(/split.{0,10}(form|contact)|form.{0,10}right|info.{0,10}left/)) bump("split-form");
+  if (text.match(/centered.{0,10}form|minimal.{0,10}(form|contact)/)) bump("centered-minimal");
+  if (text.match(/\bmap\b|location.{0,10}detail|address.{0,20}detail/)) bump("full-details");
+
+  // Pricing
+  if (text.match(/three.?tier|3.?tier|three.?column.{0,20}pric/)) bump("three-tier");
+  if (text.match(/two.?tier|2.?tier|two.?column.{0,20}pric/)) bump("two-tier");
+  if (text.match(/price.{0,10}list|simple.{0,10}pric/)) bump("simple-list");
+
+  // Blog
+  if (text.match(/featured.{0,10}(post|article)|hero.{0,10}(post|article)/)) bump("featured-plus-grid");
+  if (text.match(/article.{0,10}list|list.{0,10}(view|layout)/)) bump("list-view");
+
+  // FAQ
+  if (text.match(/accordion|expandable|collaps/)) bump("accordion");
+  if (text.match(/two.?column.{0,10}(faq|q.?a)/)) bump("two-column");
+  if (text.match(/categori.{0,10}(faq|question)|grouped.{0,10}faq/)) bump("categorized");
+
+  return boosts;
+}
+
 // Select patterns based on brief + inspo, ensuring variety between generations
 function selectPatterns(brief, inspoContext) {
   // Create a seed from the brief content so same brief = same patterns, but different brief = different patterns
@@ -2203,33 +2267,36 @@ function selectPatterns(brief, inspoContext) {
   var seedStr = (brief.brandName || "") + (brief.industry || "") + (brief.heroHeadline || "") + (inspoContext || "");
   for (var i = 0; i < seedStr.length; i++) seed = ((seed << 5) - seed + seedStr.charCodeAt(i)) | 0;
   seed = Math.abs(seed);
-  
+
   var result = {};
   var industry = (brief.industry || brief.niche || "general").toLowerCase();
-  
+  var inspoBoosts = parseInspoPatterns(inspoContext);
+
   Object.keys(LAYOUT_PATTERNS).forEach(function(sectionType) {
     var options = LAYOUT_PATTERNS[sectionType];
-    // Score each pattern by industry match
+    // Score each pattern: industry match + inspo keyword boost + seed-based variety
     var scored = options.map(function(p, idx) {
       var score = 0;
       if (p.industries.includes("all")) score += 5;
       p.industries.forEach(function(ind) {
         if (industry.indexOf(ind) !== -1) score += 10;
       });
-      // Add seed-based variety so different briefs pick different patterns
+      // Inspo boost — crawled site structure nudges toward matching patterns
+      if (inspoBoosts[p.id]) score += inspoBoosts[p.id];
+      // Seed-based variety so different briefs pick different patterns even with same industry
       score += ((seed + idx * 7) % 5);
       return { pattern: p, score: score, idx: idx };
     });
     scored.sort(function(a, b) { return b.score - a.score || ((seed % 3) - 1); });
     result[sectionType] = scored[0].pattern.id;
   });
-  
+
   return result;
 }
 
-function buildPreviewHTML(brief, activePage, variant) {
+function buildPreviewHTML(brief, activePage, variant, inspoContext) {
   variant = variant || "A";
-  var patterns = selectPatterns(brief, "");
+  var patterns = selectPatterns(brief, inspoContext || "");
   var C = brief.colors || {
     ink: "#1C1A17", brass: "#C2A35B", "brass-deep": "#9C7E3A",
     bone: "#EDE7DB", asphalt: "#2B2823", stone: "#8A8170",
@@ -4068,7 +4135,7 @@ export default function CustomBuild() {
 
             <div style={{ flex: 1, overflow: "auto", background: mobilePreview ? "#eeedf1" : "#fff", display: "flex", justifyContent: mobilePreview ? "center" : "stretch", alignItems: mobilePreview ? "flex-start" : "stretch", padding: mobilePreview ? "24px 0" : "0" }}>
               <iframe
-                srcDoc={buildPreviewHTML(brief, previewPage, layoutVariants[previewPage] || "A")}
+                srcDoc={buildPreviewHTML(brief, previewPage, layoutVariants[previewPage] || "A", generated?.inspoContext || "")}
                 style={{
                   border: mobilePreview ? "1px solid #dde0e6" : "none",
                   borderRadius: mobilePreview ? "12px" : "0",
