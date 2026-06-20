@@ -6605,41 +6605,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             <>
               <div style={{ maxWidth: "1400px", margin: "0 auto", width: "100%", padding: "24px 24px 40px" }}>
               <Section id="social-links" title="Social Media Links" icon="">
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "24px", alignItems: "start" }}>
-                <div>
-                <div style={{ marginBottom: "4px" }}>
-                  <div style={{ fontSize: "10px", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600, marginBottom: "8px" }}>Quick add</div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", justifyContent: "center" }}>
-                    {Object.keys(SVG).map(platform => {
-                      const alreadyAdded = brand.socialLinks.some(s => s.key === platform);
-                      return (
-                        <button
-                          key={platform}
-                          onClick={() => { if (!alreadyAdded) updBrand("socialLinks", [...(brand.socialLinks || []), { key: platform, label: platform.charAt(0).toUpperCase() + platform.slice(1), url: "" }]); }}
-                          disabled={alreadyAdded}
-                          style={{
-                            padding: "6px 12px",
-                            background: alreadyAdded ? "rgba(180, 83, 9, 0.1)" : "#ffffff",
-                            color: alreadyAdded ? "#b45309" : "#09090b",
-                            border: `1px solid ${alreadyAdded ? "rgba(180, 83, 9, 0.25)" : "#dde0e6"}`,
-                            borderRadius: "6px",
-                            fontSize: "12px",
-                            fontWeight: 500,
-                            cursor: alreadyAdded ? "default" : "pointer",
-                            opacity: alreadyAdded ? 0.6 : 1,
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "6px",
-                            textTransform: "capitalize",
-                          }}>
-                          <span dangerouslySetInnerHTML={{ __html: SVG[platform]("#09090b", 14) }} style={{ display: "inline-flex" }} />
-                          {platform}
-                          {alreadyAdded && " ✓"}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "16px", alignItems: "start" }}>
+                <div style={{ display: "grid", gap: "10px" }}>
                 {brand.socialLinks.map((s, i) => (
                   <div key={i} className="responsive-4col" style={{ display: "grid", gridTemplateColumns: "140px 120px 240px 30px", gap: "8px", alignItems: "end" }}>
                     <select style={{ width: "100%", padding: "11px 40px 11px 13px", background: "#ffffff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\") no-repeat right 14px center", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", color: "#09090b", outline: "none", boxSizing: "border-box", appearance: "none", WebkitAppearance: "none" }} value={s.key} onChange={e => updSocial(i, "key", e.target.value)}>
@@ -6665,8 +6632,41 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInFooter} onChange={e => updBrand("showSocialInFooter", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Show in footer</label>
                 </div>
                 </div>
-                <div>
-                  <div style={{ fontSize: "10px", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600, marginBottom: "10px" }}>Preview</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                  <div>
+                    <div style={{ fontSize: "10px", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600, marginBottom: "10px" }}>Quick add</div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                      {Object.keys(SVG).map(platform => {
+                        const alreadyAdded = brand.socialLinks.some(s => s.key === platform);
+                        return (
+                          <button
+                            key={platform}
+                            onClick={() => { if (!alreadyAdded) updBrand("socialLinks", [...(brand.socialLinks || []), { key: platform, label: platform.charAt(0).toUpperCase() + platform.slice(1), url: "" }]); }}
+                            disabled={alreadyAdded}
+                            style={{
+                              padding: "6px 10px",
+                              background: alreadyAdded ? "rgba(180, 83, 9, 0.1)" : "#ffffff",
+                              color: alreadyAdded ? "#b45309" : "#09090b",
+                              border: `1px solid ${alreadyAdded ? "rgba(180, 83, 9, 0.25)" : "#dde0e6"}`,
+                              borderRadius: "6px",
+                              fontSize: "11px",
+                              fontWeight: 500,
+                              cursor: alreadyAdded ? "default" : "pointer",
+                              opacity: alreadyAdded ? 0.6 : 1,
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "5px",
+                              textTransform: "capitalize",
+                            }}>
+                            <span dangerouslySetInnerHTML={{ __html: SVG[platform]("#09090b", 14) }} style={{ display: "inline-flex" }} />
+                            {platform}
+                            {alreadyAdded && " ✓"}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div style={{ fontSize: "10px", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600, marginBottom: "2px" }}>Preview</div>
                   {brand.socialLinks.length > 0 ? (() => {
                     const theme = THEMES.find(t => t.id === brand.themeId);
                     const isDark = (brand.themeMode || (theme && theme.mode)) === "dark";
