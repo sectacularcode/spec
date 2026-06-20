@@ -6839,15 +6839,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   </button>
                 )}
               </div>
-              <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>What you'll get</div>
-              <div style={{ fontSize: "14px", color: "#09090b", lineHeight: 1.7 }}>
-                {exportFormat === "elementor" ? (
-                  <><strong style={{ color: "#09090b" }}>Page JSON</strong> — Elementor template using native widgets (Heading, Text, Button, Icon Box, Image, Counter, Testimonial, Accordion, Social Icons, Video, Form).<br /><br />
-                  <strong style={{ color: "#09090b" }}>Footer Template</strong> — separate Theme Builder template. Import once under Theme Builder → Footer.</>
-                ) : (
-                  <><strong style={{ color: "#09090b" }}>Page JSON</strong> — Divi layout using native modules (et_pb_text, et_pb_button, et_pb_blurb, et_pb_image, et_pb_number_counter, et_pb_testimonial, et_pb_accordion, et_pb_social_media_follow, et_pb_video, et_pb_contact_form).<br /><br />
-                  <strong style={{ color: "#09090b" }}>Footer Template</strong> — separate Divi layout. Import via Theme Builder or insert into a Global Footer template.</>
-                )}
+              <div style={{ fontSize: "13px", color: "#6b7280", lineHeight: 1.6 }}>
+                Header and footer templates are exported separately and uploaded in the Theme Builder.
               </div>
             </div>
 
