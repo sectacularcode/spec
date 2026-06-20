@@ -6698,6 +6698,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
           {tab === "footer" && (
             <>
               <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "24px 24px 40px" }}>
+              <Section id="nav-menus" title="Navigation Menus" icon="">
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 4px", lineHeight: 1.5 }}>Menu items for your header and footer. Create matching menus in WP → Appearance → Menus.</p>
+                <div><label style={I.lbl}>Primary Menu (comma-separated)</label><input style={I.inp} value={brand.primaryMenu} onChange={e => updBrand("primaryMenu", e.target.value)} placeholder="Home, About, Services, Work, Contact" /></div>
+                <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}>
+                  <input type="checkbox" checked={brand.multiMenu} onChange={e => updBrand("multiMenu", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Enable utility menu (footer/legal links)
+                </label>
+                {brand.multiMenu && <div><label style={I.lbl}>Utility Menu (comma-separated)</label><input style={I.inp} value={brand.utilityMenu} onChange={e => updBrand("utilityMenu", e.target.value)} placeholder="Privacy, Terms, Sitemap" /></div>}
+              </Section>
               <Section id="footer-header" title="Header Style" icon="">
                 <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "10px" }}>
                   {HEADER_STYLES.map(f => (
@@ -6745,14 +6753,6 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   );
                 })()}
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Download separately and import once in Elementor → Theme Builder → Header. Set display conditions to "Entire Site".</p>
-              </Section>
-              <Section id="nav-menus" title="Navigation Menus" icon="">
-                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 4px", lineHeight: 1.5 }}>Menu items for your header and footer. Create matching menus in WP → Appearance → Menus.</p>
-                <div><label style={I.lbl}>Primary Menu (comma-separated)</label><input style={I.inp} value={brand.primaryMenu} onChange={e => updBrand("primaryMenu", e.target.value)} placeholder="Home, About, Services, Work, Contact" /></div>
-                <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}>
-                  <input type="checkbox" checked={brand.multiMenu} onChange={e => updBrand("multiMenu", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Enable utility menu (footer/legal links)
-                </label>
-                {brand.multiMenu && <div><label style={I.lbl}>Utility Menu (comma-separated)</label><input style={I.inp} value={brand.utilityMenu} onChange={e => updBrand("utilityMenu", e.target.value)} placeholder="Privacy, Terms, Sitemap" /></div>}
               </Section>
               <Section id="footer-footer" title="Footer Style" icon="">
                 <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "10px" }}>
