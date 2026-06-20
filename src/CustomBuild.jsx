@@ -2478,7 +2478,7 @@ var T = {
   surface: { background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "10px", padding: "20px", boxSizing: "border-box", overflow: "hidden", width: "100%" },
   label: { fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "8px", display: "block" },
   input: { width: "100%", padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "14px", color: "#09090b", outline: "none", background: "#fff" },
-  btnPrimary: { padding: "12px 24px", background: "#000", color: "#fff", border: "none", borderRadius: "6px", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px" },
+  btnPrimary: { padding: "12px 24px", background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px" },
   btnGhost: { padding: "10px 16px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" },
   stepNum: function(active, done) { return { width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 700, background: done ? "#6b635c" : active ? "#6b635c" : "#eeedf1", color: done || active ? "#fff" : "#9ca3af", flexShrink: 0 }; },
 };
@@ -3256,14 +3256,14 @@ export default function CustomBuild() {
               <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>Only checked pages are included in the export.</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                 {ALL_PAGES.map(p => (
-                  <label key={p.id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px", border: selectedPages.includes(p.id) ? "1px solid #000" : "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: 500, color: "#09090b" }}>
-                    <input type="checkbox" checked={selectedPages.includes(p.id)} onChange={() => togglePage(p.id)} style={{ accentColor: "#000", width: "15px", height: "15px" }} />
+                  <label key={p.id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px", border: selectedPages.includes(p.id) ? "1px solid #b45309" : "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: 500, color: selectedPages.includes(p.id) ? "#b45309" : "#09090b", background: selectedPages.includes(p.id) ? "rgba(180, 83, 9, 0.06)" : "#ffffff" }}>
+                    <input type="checkbox" checked={selectedPages.includes(p.id)} onChange={() => togglePage(p.id)} style={{ accentColor: "#b45309", width: "15px", height: "15px" }} />
                     <span>{p.label}</span>
                   </label>
                 ))}
                 {customPages.map(p => (
-                  <label key={p.id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px", border: selectedPages.includes(p.id) ? "1px solid #000" : "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: 500, color: "#09090b" }}>
-                    <input type="checkbox" checked={selectedPages.includes(p.id)} onChange={() => togglePage(p.id)} style={{ accentColor: "#000", width: "15px", height: "15px" }} />
+                  <label key={p.id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px", border: selectedPages.includes(p.id) ? "1px solid #b45309" : "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: 500, color: selectedPages.includes(p.id) ? "#b45309" : "#09090b", background: selectedPages.includes(p.id) ? "rgba(180, 83, 9, 0.06)" : "#ffffff" }}>
+                    <input type="checkbox" checked={selectedPages.includes(p.id)} onChange={() => togglePage(p.id)} style={{ accentColor: "#b45309", width: "15px", height: "15px" }} />
                     <span style={{ flex: 1 }}>{p.label}</span>
                     <button
                       onClick={e => { e.preventDefault(); setCustomPages(prev => prev.filter(cp => cp.id !== p.id)); setPages(prev => prev.filter(pid => pid !== p.id)); }}
@@ -3276,7 +3276,7 @@ export default function CustomBuild() {
               <div style={{ marginTop: "10px", position: "relative" }}>
                 <button
                   onClick={() => setShowAddPage(!showAddPage)}
-                  style={{ fontSize: "12px", color: "#6b7280", background: "none", border: "1px dashed #e5e7eb", borderRadius: "6px", padding: "8px 14px", cursor: "pointer", width: "100%" }}>
+                  style={{ fontSize: "12px", color: "#b45309", background: "rgba(180, 83, 9, 0.06)", border: "1px dashed rgba(180, 83, 9, 0.3)", borderRadius: "6px", padding: "8px 14px", cursor: "pointer", width: "100%" }}>
                   + Add page
                 </button>
                 {showAddPage && (
@@ -3305,7 +3305,7 @@ export default function CustomBuild() {
           </div>
 
           {/* STEP 4 */}
-          <div style={{ marginBottom: "28px" }}>
+          <div style={{ marginBottom: "32px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
               <div style={T.stepNum(true, true)}>4</div>
               <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Copy Settings</div>
@@ -3313,12 +3313,12 @@ export default function CustomBuild() {
             <div style={T.surface}>
               <div style={{ fontSize: "13px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>Use copy from brand brief only?</div>
               <div style={{ display: "flex", gap: "10px" }}>
-                <label style={{ flex: 1, padding: "14px", border: copyBriefOnly ? "2px solid #000" : "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", textAlign: "center" }}>
+                <label style={{ flex: 1, padding: "14px", border: copyBriefOnly ? "2px solid #b45309" : "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", textAlign: "center" }}>
                   <input type="radio" name="copy" checked={copyBriefOnly} onChange={() => setCopy(true)} style={{ display: "none" }} />
                   <div style={{ fontSize: "14px", fontWeight: 700, color: "#09090b" }}>Yes</div>
                   <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>Brief copy used verbatim. Nothing is changed or generated by AI.</div>
                 </label>
-                <label style={{ flex: 1, padding: "14px", border: !copyBriefOnly ? "2px solid #000" : "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", textAlign: "center" }}>
+                <label style={{ flex: 1, padding: "14px", border: !copyBriefOnly ? "2px solid #b45309" : "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", textAlign: "center" }}>
                   <input type="radio" name="copy" checked={!copyBriefOnly} onChange={() => setCopy(false)} style={{ display: "none" }} />
                   <div style={{ fontSize: "14px", fontWeight: 700, color: "#09090b" }}>No</div>
                   <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>AI will fill any empty fields using the brand voice from the brief. You can review and edit every drafted field before anything exports.</div>
@@ -3327,12 +3327,14 @@ export default function CustomBuild() {
             </div>
           </div>
 
+          <div style={{ display: "flex", justifyContent: "center", marginTop: "8px" }}>
           <button
             onClick={generate}
             disabled={!canGenerate || generating}
-            style={{ ...T.btnPrimary, width: "100%", justifyContent: "center", padding: "16px 24px", fontSize: "15px", opacity: canGenerate ? 1 : 0.4, cursor: canGenerate ? "pointer" : "not-allowed" }}>
+            style={{ ...T.btnPrimary, justifyContent: "center", padding: "14px 40px", fontSize: "14px", borderRadius: "8px", opacity: canGenerate ? 1 : 0.4, cursor: canGenerate ? "pointer" : "not-allowed" }}>
             {generating ? (generatingStatus || "Generating…") : "Generate " + selectedPages.length + " Page" + (selectedPages.length !== 1 ? "s" : "")}
           </button>
+          </div>
           {!brief && <div style={{ fontSize: "12px", color: "#9ca3af", textAlign: "center", marginTop: "8px" }}>Upload a brand brief to enable generation</div>}
 
           {generated && (
