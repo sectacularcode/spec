@@ -6422,14 +6422,6 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 <div><label style={I.lbl}>Page Name</label><input style={I.inp} value={page.name} onChange={e => updPage("name", e.target.value)} /></div>
                 <div><label style={I.lbl}>Page Type</label><select style={{ ...I.inp, paddingRight: "36px", appearance: "none", WebkitAppearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center" }} value={page.pageType} onChange={e => updPage("pageType", e.target.value)}>{PAGE_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
               </Section>
-              <Section id="page-nav" title="Navigation Menus" icon="">
-                <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Header and footer menu items. Menus output as Elementor Nav Menu widgets linked to WordPress menus by name — create matching menus in WP → Appearance → Menus.</p>
-                <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}>
-                  <input type="checkbox" checked={brand.multiMenu} onChange={e => updBrand("multiMenu", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Enable multi-menu (primary + utility)
-                </label>
-                <div><label style={I.lbl}>Primary Menu (comma-separated)</label><input style={I.inp} value={brand.primaryMenu} onChange={e => updBrand("primaryMenu", e.target.value)} placeholder="Home, About, Services, Work, Contact" /></div>
-                {brand.multiMenu && <div><label style={I.lbl}>Utility Menu (footer/legal)</label><input style={I.inp} value={brand.utilityMenu} onChange={e => updBrand("utilityMenu", e.target.value)} placeholder="Privacy, Terms, Sitemap" /></div>}
-              </Section>
               <Section id="page-sections" title="Sections on this Page" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.55 }}>Compose the page top to bottom. Tap a section in the library to add it to the outline. Tap the × to remove.</p>
                 <div style={{ background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "10px", padding: "22px 24px" }}>
@@ -6753,6 +6745,14 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                   );
                 })()}
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0 }}>Download separately and import once in Elementor → Theme Builder → Header. Set display conditions to "Entire Site".</p>
+              </Section>
+              <Section id="nav-menus" title="Navigation Menus" icon="">
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 4px", lineHeight: 1.5 }}>Menu items for your header and footer. Create matching menus in WP → Appearance → Menus.</p>
+                <div><label style={I.lbl}>Primary Menu (comma-separated)</label><input style={I.inp} value={brand.primaryMenu} onChange={e => updBrand("primaryMenu", e.target.value)} placeholder="Home, About, Services, Work, Contact" /></div>
+                <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}>
+                  <input type="checkbox" checked={brand.multiMenu} onChange={e => updBrand("multiMenu", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Enable utility menu (footer/legal links)
+                </label>
+                {brand.multiMenu && <div><label style={I.lbl}>Utility Menu (comma-separated)</label><input style={I.inp} value={brand.utilityMenu} onChange={e => updBrand("utilityMenu", e.target.value)} placeholder="Privacy, Terms, Sitemap" /></div>}
               </Section>
               <Section id="footer-footer" title="Footer Style" icon="">
                 <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "10px" }}>
