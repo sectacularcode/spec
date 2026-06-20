@@ -55,8 +55,6 @@ const DEFAULT_TIERS = [
   { name: "", subtitle: "", description: "", price: "" },
 ];
 
-const DEFAULT_SEO_PAGES = ["Home", "Work", "Services", "About", "Process", "Contact"];
-
 function IntakeForm({ onClose, onComplete }) {
   const [tab, setTab] = React.useState(0);
   const [form, setForm] = React.useState({
@@ -687,21 +685,6 @@ function BriefReview({ parsed, onConfirm, onClose }) {
   );
 }
 
-const TEMPLATE_LIBRARY = [
-  {
-    id: "mile-marker-2026",
-    client: "Specish Studio",
-    industry: "Video Production",
-    style: "Dark Premium · Editorial",
-    tags: ["dark-premium", "warm-editorial", "confident", "direct"],
-    industryFit: ["video-production","creative-agency","consulting","private-equity","luxury-services","hospitality","industrial","founder-led","photography","architecture"],
-    pages: ["home","work","services","about","process","contact"],
-    date: "2026-06-02",
-    description: "Full-bleed dark hero, editorial splits, brass accent system, Fraunces display type. Built for a one-person filmmaker targeting industrial and founder-led companies.",
-    source: "built-in",
-  }
-];
-
 // ─── Library helpers ───────────────────────────────────────────────────────────
 
 function inferTags(brief, pages, layoutVariants) {
@@ -1282,8 +1265,6 @@ function inspoMatchesVariant(hint, keywords) {
 }
 
 function buildHomePage(C, brief, inspoHint, patterns) {
-  // inspoHint: structural notes from crawled reference sites for this page type
-  var hasInspo = !!inspoHint;
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       asphalt = C.asphalt, brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
@@ -1567,7 +1548,6 @@ function buildWorkPage(C, brief, inspoHint) {
 }
 
 function buildServicesPage(C, brief, inspoHint) {
-  var hasInspo = !!inspoHint;
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", asphalt = C.asphalt || "#2B2823", text = C.text;
@@ -2256,7 +2236,6 @@ function generatePages(brief, selectedPages, inspoContext, aiRecs, customPagesAr
     }
 
     var recommended = (recs[pid] && recs[pid].variant) ? recs[pid].variant : result.recommended;
-    var reason = (recs[pid] && recs[pid].reason) ? recs[pid].reason : null;
 
     return {
       id: pid,
@@ -2265,7 +2244,6 @@ function generatePages(brief, selectedPages, inspoContext, aiRecs, customPagesAr
       variantA: result.variantA,
       variantB: result.variantB,
       recommended: recommended,
-      reason: reason,
       hasVariants: true,
     };
   }).filter(function(p) { return p !== null; });
@@ -3929,7 +3907,6 @@ export default function CustomBuild() {
             label: p.label,
             recommended: p.recommended,
             hasVariants: p.hasVariants,
-            reason: p.reason,
             // store full data so preview and download work on return
             data: p.data,
             variantA: p.variantA,
