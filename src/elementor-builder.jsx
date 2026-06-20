@@ -5603,8 +5603,8 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
           {/* Left: All Projects + project info */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <button onClick={() => setView("projects")} style={{ padding: "7px 12px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", cursor: "pointer" }}>
-              <Icon name="arrowLeft" size={13} color="#09090b" /> All Projects
+            <button onClick={() => setView("projects")} style={{ padding: "7px 14px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "6px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", cursor: "pointer" }}>
+              <Icon name="arrowLeft" size={13} color="#ffffff" /> All Projects
             </button>
             <div>
               <div style={{ fontSize: "16px", fontWeight: 700, letterSpacing: "-0.01em", color: "#000000", lineHeight: 1 }}>{brand.name || "Untitled"}</div>
