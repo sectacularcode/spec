@@ -1480,61 +1480,6 @@ const SVG = {
 };
 
 // ──────────────────────────────────────────────────────────────────────────────
-// INITIAL STATE — Editorial Vibes pre-loaded
-// ──────────────────────────────────────────────────────────────────────────────
-const EV_BRAND = {
-  name: "Editorial Vibes",
-  industry: "Premium content production studio — beauty, health, wellness & lifestyle",
-  tagline: "Content that moves product.",
-  description: "Editorial Vibes is a premium content production studio founded in 2015. We produce video, product photography, model photography, and lifestyle photography for beauty, health, wellness and lifestyle brands. 100+ clients including Sephora, Laura Mercier, Kérastase, La Roche-Posay, Garnier. Full production partner from brief to final delivery.",
-  targetAudience: "Brand managers and marketing directors at premium product-based brands; PE firms with consumer portfolio companies.",
-  keyMessages: "Premium studio quality with strategy behind every shoot. 10 years in business. 100+ brand clients. Full production partner — video, photo, and consulting under one roof.",
-  tone: "Editorial & Minimal",
-  goal: "Lead Generation",
-  goals: ["Lead Generation", "Awareness & Brand Building"],
-  outcome: "Book 4–6 qualified project inquiries per month from premium beauty and wellness brands.",
-  primaryKeywords: "content production studio, beauty brand photography, video production, premium brand content, product photography",
-  brandColors: { background: "", accent: "", text: "", card: "" },
-  templateId: "studio-portfolio",
-  imageCategory: "editorial",
-  themeId: "editorial-dark",
-  themeMode: "dark",
-  layoutId: "editorial-minimal",
-  primaryColor: "#0a0a0a",
-  accentColor: "#c7a572",
-  cardBgColor: "#111111",
-  bodyTextColor: "#a8a8a8",
-  borderColor: "#1f1f1f",
-  headingFont: "Yeseva One",
-  bodyFont: "DM Sans",
-  logoUrl: "",
-  logoText: "Editorial Vibes",
-  cta1: "Start a project",
-  cta2: "See the work",
-  inspoUrls: "https://www.rosalie.agency/\nhttps://www.lustre.nyc/\nhttps://www.breef.com/\nhttps://faure.octrace.com/\nhttps://nevo.themevillain.com/",
-  styleNotes: "Dark background, lowercase or all-caps navigation, work-first hierarchy, extreme restraint on copy, editorial feel. Numbered services. Split layouts. Generous negative space.",
-  footerStyle: "Premium",
-  headerStyle: "Editorial",
-  multiMenu: true,
-  primaryMenu: "Home, Work, Services, About, Contact",
-  utilityMenu: "Privacy, Terms, Sitemap",
-  socialLinks: [
-    { key: "instagram", label: "Instagram", url: "https://instagram.com/editorialvibes" },
-    { key: "tiktok", label: "TikTok", url: "https://tiktok.com/@editorialvibes" },
-    { key: "youtube", label: "YouTube", url: "https://youtube.com/@editorialvibes" },
-  ],
-  showSocialInNav: true,
-  showSocialInPage: true,
-  showSocialInFooter: true,
-  contactEmail: "hello@editorialvibes.com",
-  contactPhone: "",
-  address: "",
-  founderName: "Kalei",
-  founderTitle: "Founder & Creative Director",
-  founderBio: "10+ years producing premium content for the world's biggest beauty brands.",
-  clientLogos: "Sephora\nLaura Mercier\nKérastase\nLa Roche-Posay\nGarnier\nL'Oréal",
-};
-
 // BLANK_BRAND — a clean slate for new projects. Keeps the structural defaults
 // (theme, layout, fonts, colors) so the project still renders, but clears all
 // content fields and replaces them with placeholders the user will overwrite.
@@ -1768,8 +1713,6 @@ const PAGE_TEMPLATES = {
   },
 };
 
-const EV_PROJECT = { id: "ev", name: "Editorial Vibes", brand: EV_BRAND, pages: [newPage("Homepage")] };
-
 // ──────────────────────────────────────────────────────────────────────────────
 // ELEMENTOR JSON BUILDERS — native widgets only
 // ──────────────────────────────────────────────────────────────────────────────
@@ -1961,20 +1904,6 @@ const eCounter = (num, suffix, label, accent, color, font, bf) => {
     },
   };
 };
-
-const eTestimonial = (text, name, role, color, accent, font, bf) => ({
-  id: uid(), elType: "widget", widgetType: "testimonial", elements: [],
-  settings: {
-    testimonial_content: text,
-    testimonial_name: name,
-    testimonial_job: role,
-    testimonial_alignment: "left",
-    testimonial_image_position: "none",
-    content_color: color,
-    name_text_color: accent,
-    job_text_color: "#888",
-  },
-});
 
 const eAccordion = (items, color, accent, font, bf) => ({
   id: uid(), elType: "widget", widgetType: "accordion", elements: [],
@@ -4143,7 +4072,7 @@ export default function App() {
           } catch(e3) {}
         }
       } catch (e) {
-        // No saved data, key doesn't exist, or parse error — keep default EV_PROJECT
+        // No saved data or parse error — start with empty projects list
       } finally {
         if (!cancelled) setStorageLoaded(true);
       }
