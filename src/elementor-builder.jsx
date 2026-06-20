@@ -1350,12 +1350,18 @@ const luminance = (hex) => {
   if (!hex || typeof hex !== "string") return 0.5;
   const h = hex.replace("#", "");
   if (h.length < 6) return 0.5;
-  const r = parseInt(h.substr(0, 2), 16) / 255;
-  const g = parseInt(h.substr(2, 2), 16) / 255;
-  const b = parseInt(h.substr(4, 2), 16) / 255;
-  return 0.299 * r + 0.587 * g + 0.114 * b;
+  const [r, g, b] = [0, 2, 4].map(i => {
+    const c = parseInt(h.substr(i, 2), 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 };
-const isLight = (hex) => luminance(hex) > 0.55;
+const contrastRatio = (hex1, hex2) => {
+  const l1 = Math.max(luminance(hex1), luminance(hex2));
+  const l2 = Math.min(luminance(hex1), luminance(hex2));
+  return (l1 + 0.05) / (l2 + 0.05);
+};
+const isLight = (hex) => luminance(hex) > 0.179;
 const textOn = (bg) => isLight(bg) ? "#0a0a0a" : "#ffffff";
 const mutedTextOn = (bg) => isLight(bg) ? "rgba(10,10,10,0.65)" : "rgba(255,255,255,0.75)";
 const subtleTextOn = (bg) => isLight(bg) ? "rgba(10,10,10,0.5)" : "rgba(255,255,255,0.55)";
@@ -1366,7 +1372,8 @@ const buttonOn = (sectionBg, accent) => {
   // Otherwise fall back to textOn (black or white) for guaranteed readability.
   const accentLum = luminance(accent);
   const sectionLum = luminance(sectionBg);
-  const hasContrast = Math.abs(accentLum - sectionLum) > 0.25;
+  const ratio = (Math.max(accentLum, sectionLum) + 0.05) / (Math.min(accentLum, sectionLum) + 0.05);
+  const hasContrast = ratio >= 3;
   const btnBg = hasContrast ? accent : textOn(sectionBg);
   const btnText = textOn(btnBg);
   return { btnBg, btnText };
@@ -6445,6 +6452,43 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                 </details>
               </Section>
 
+              <Section id="brand-contrast" title="Contrast Check" icon="">
+                <p style={{ fontSize: "12px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>WCAG AA requires 4.5:1 for normal text and 3:1 for large text. These are your current ratios.</p>
+                {(() => {
+                  const pc = brand.primaryColor || "#ffffff";
+                  const ac = brand.accentColor || "#000000";
+                  const tc = brand.bodyTextColor || "#333333";
+                  const hc = (() => { const theme = THEMES.find(t => t.id === brand.themeId); return (theme && theme.headingColor) || (isLight(pc) ? "#0a0a0a" : "#ffffff"); })();
+                  const checks = [
+                    { label: "Body text on background", fg: tc, bg: pc },
+                    { label: "Heading on background", fg: hc, bg: pc },
+                    { label: "Accent on background", fg: ac, bg: pc },
+                    { label: "Button text on accent", fg: isLight(ac) ? "#0a0a0a" : "#ffffff", bg: ac },
+                  ];
+                  return (
+                    <div style={{ display: "grid", gap: "8px" }}>
+                      {checks.map(({ label, fg, bg }) => {
+                        const ratio = contrastRatio(fg, bg);
+                        const passAA = ratio >= 4.5;
+                        const passLarge = ratio >= 3;
+                        return (
+                          <div key={label} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 14px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "6px" }}>
+                            <div style={{ width: "32px", height: "32px", borderRadius: "6px", background: bg, border: "1px solid #dde0e6", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: 700, color: fg, flexShrink: 0 }}>Aa</div>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontSize: "13px", color: "#09090b", fontWeight: 500 }}>{label}</div>
+                              <div style={{ fontSize: "11px", color: "#6b7280" }}>{fg} on {bg}</div>
+                            </div>
+                            <div style={{ textAlign: "right", flexShrink: 0 }}>
+                              <div style={{ fontSize: "14px", fontWeight: 700, color: passAA ? "#16a34a" : passLarge ? "#b45309" : "#dc2626" }}>{ratio.toFixed(1)}:1</div>
+                              <div style={{ fontSize: "10px", color: passAA ? "#16a34a" : passLarge ? "#b45309" : "#dc2626", fontWeight: 600 }}>{passAA ? "AA Pass" : passLarge ? "Large only" : "Fail"}</div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
+              </Section>
               <Section id="brand-typography" title="Typography" icon="">
                 <div className="responsive-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                   <div><label style={I.lbl}>Heading Font</label><select style={I.sel} value={brand.headingFont} onChange={e => updBrand("headingFont", e.target.value)}>{FONT_OPTIONS.map(f => <option key={f}>{f}</option>)}</select></div>
