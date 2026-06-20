@@ -1281,26 +1281,79 @@ function inspoMatchesVariant(hint, keywords) {
   return keywords.some(function(k) { return lower.indexOf(k) !== -1; });
 }
 
-function buildHomePage(C, brief, inspoHint) {
+function buildHomePage(C, brief, inspoHint, patterns) {
   // inspoHint: structural notes from crawled reference sites for this page type
   var hasInspo = !!inspoHint;
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       asphalt = C.asphalt, brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
+  var heroPattern = (patterns && patterns.hero) || "centered-bold";
 
-  var hero = mkContainer([
-    mkHeading(brief.brandName || "Brand Name", brass, "h6", { eyebrow: true, align: "center" }),
-    mkSpacer(24),
-    mkHeading(brief.heroHeadline || "Your headline here.", warmWhite, "h1",
-      { font: "Fraunces", weight: 300, px: 72, align: "center" }),
-    mkSpacer(28),
-    mkText(brief.heroSubhead || "Your subheadline here.", warmWhite, "center"),
-    mkSpacer(40),
-    mkContainer([
-      mkButton(brief.heroCta1 || "See the work", brassDp, "#ffffff"),
-      mkButton(brief.heroCta2 || "See pricing", "rgba(0,0,0,0)", warmWhite),
-    ], null, { direction: "row", gap: "16", padY: "0", center: true, isInner: true, buttonRow: true }),
-  ], ink, { padY: "80", minH: 0, center: true });
+  // ── HERO — pattern-driven ──────────────────────────────────────────────────
+  var hero;
+  if (heroPattern === "split-left") {
+    // Text left, image placeholder right
+    var heroTextCol = mkContainer([
+      mkHeading(brief.brandName || "Brand Name", brass, "h6", { eyebrow: true }),
+      mkSpacer(20),
+      mkHeading(brief.heroHeadline || "Your headline here.", warmWhite, "h1", { weight: 800, px: 56 }),
+      mkSpacer(24),
+      mkText(brief.heroSubhead || "Your subheadline here.", warmWhite),
+      mkSpacer(40),
+      mkContainer([
+        mkButton(brief.heroCta1 || "See the work", brassDp, "#ffffff"),
+        mkButton(brief.heroCta2 || "See pricing", "rgba(0,0,0,0)", warmWhite),
+      ], null, { direction: "row", gap: "16", padY: "0", isInner: true, buttonRow: true }),
+    ], null, { padY: "0", grow: 1, isInner: true });
+    var heroImgCol = mkContainer([
+      mkImagePh("Hero image"),
+    ], null, { padY: "0", grow: 1, isInner: true });
+    var heroRow = mkContainer([heroTextCol, heroImgCol], null, { direction: "row", gap: "64", padY: "0", isInner: true });
+    hero = mkContainer([heroRow], ink, { padY: "80" });
+  } else if (heroPattern === "split-right") {
+    // Image placeholder left, text right
+    var heroImgColR = mkContainer([
+      mkImagePh("Hero image"),
+    ], null, { padY: "0", grow: 1, isInner: true });
+    var heroTextColR = mkContainer([
+      mkHeading(brief.brandName || "Brand Name", brass, "h6", { eyebrow: true }),
+      mkSpacer(20),
+      mkHeading(brief.heroHeadline || "Your headline here.", warmWhite, "h1", { weight: 800, px: 56 }),
+      mkSpacer(24),
+      mkText(brief.heroSubhead || "Your subheadline here.", warmWhite),
+      mkSpacer(40),
+      mkContainer([
+        mkButton(brief.heroCta1 || "See the work", brassDp, "#ffffff"),
+        mkButton(brief.heroCta2 || "See pricing", "rgba(0,0,0,0)", warmWhite),
+      ], null, { direction: "row", gap: "16", padY: "0", isInner: true, buttonRow: true }),
+    ], null, { padY: "0", grow: 1, isInner: true });
+    var heroRowR = mkContainer([heroImgColR, heroTextColR], null, { direction: "row", gap: "64", padY: "0", isInner: true });
+    hero = mkContainer([heroRowR], ink, { padY: "80" });
+  } else if (heroPattern === "minimal") {
+    // Large whitespace, minimal text, no image
+    hero = mkContainer([
+      mkHeading(brief.heroHeadline || "Your headline here.", warmWhite, "h1",
+        { font: "Fraunces", weight: 300, px: 80, align: "center" }),
+      mkSpacer(48),
+      mkContainer([mkButton(brief.heroCta1 || "See the work", brassDp, "#ffffff")],
+        null, { padY: "0", center: true, isInner: true }),
+    ], ink, { padY: "140", minH: 80, center: true });
+  } else {
+    // centered-bold / full-image / default — centered layout
+    hero = mkContainer([
+      mkHeading(brief.brandName || "Brand Name", brass, "h6", { eyebrow: true, align: "center" }),
+      mkSpacer(24),
+      mkHeading(brief.heroHeadline || "Your headline here.", warmWhite, "h1",
+        { font: "Fraunces", weight: 300, px: 72, align: "center" }),
+      mkSpacer(28),
+      mkText(brief.heroSubhead || "Your subheadline here.", warmWhite, "center"),
+      mkSpacer(40),
+      mkContainer([
+        mkButton(brief.heroCta1 || "See the work", brassDp, "#ffffff"),
+        mkButton(brief.heroCta2 || "See pricing", "rgba(0,0,0,0)", warmWhite),
+      ], null, { direction: "row", gap: "16", padY: "0", center: true, isInner: true, buttonRow: true }),
+    ], ink, { padY: "80", minH: 0, center: true });
+  }
 
   var hook = mkContainer([
     mkHeading(brief.hookStatement || "Your honest hook statement.", ink, "h2",
@@ -1661,7 +1714,7 @@ function buildServicesPage(C, brief, inspoHint) {
     content: [header, tiersSection, menuSection, pricingNoteSection, closing] };
 }
 
-function buildAboutPage(C, brief, inspoHint) {
+function buildAboutPage(C, brief, inspoHint, patterns) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", asphalt = C.asphalt, text = C.text;
@@ -1761,13 +1814,13 @@ function buildAboutPage(C, brief, inspoHint) {
   var variantB = { version: "0.4", title: "About", type: "page", page_settings: {},
     content: [header, timeline, portraitSection, valuesSection, closing] };
 
-  var recommended = inspoMatchesVariant(inspoHint, ["timeline", "journey", "history", "milestones", "story arc", "chapters"])
-    ? "B" : "A";
+  var aboutPattern = (patterns && patterns.about) || "split-image";
+  var recommended = (aboutPattern === "timeline" || aboutPattern === "team-grid") ? "B" : "A";
 
   return { variantA: variantA, variantB: variantB, recommended: recommended };
 }
 
-function buildProcessPage(C, brief, inspoHint) {
+function buildProcessPage(C, brief, inspoHint, patterns) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
@@ -1846,13 +1899,13 @@ function buildProcessPage(C, brief, inspoHint) {
   var variantB = { version: "0.4", title: "Process", type: "page", page_settings: {},
     content: [header, timelineSection, callout, closing] };
 
-  var recommended = inspoMatchesVariant(inspoHint, ["timeline", "horizontal", "flowing", "steps across", "linear", "connector"])
-    ? "B" : "A";
+  var processPattern = (patterns && patterns.process) || "numbered-vertical";
+  var recommended = (processPattern === "horizontal-timeline" || processPattern === "icon-cards") ? "B" : "A";
 
   return { variantA: variantA, variantB: variantB, recommended: recommended };
 }
 
-function buildContactPage(C, brief, inspoHint) {
+function buildContactPage(C, brief, inspoHint, patterns) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
@@ -1931,8 +1984,8 @@ function buildContactPage(C, brief, inspoHint) {
   var variantB = { version: "0.4", title: "Contact", type: "page", page_settings: {},
     content: [splitSection, closingDark] };
 
-  var recommended = inspoMatchesVariant(inspoHint, ["split", "two column", "side by side", "statement", "minimal", "direct", "lean"])
-    ? "B" : "A";
+  var contactPattern = (patterns && patterns.contact) || "split-form";
+  var recommended = (contactPattern === "split-form") ? "B" : "A";
 
   return { variantA: variantA, variantB: variantB, recommended: recommended };
 }
@@ -2090,6 +2143,7 @@ function generatePages(brief, selectedPages, inspoContext, aiRecs, customPagesAr
   };
   var recs = aiRecs || {};
   var allPageDefs = ALL_PAGES.concat(ADDITIONAL_PAGE_TYPES).concat(customPagesArg || []);
+  var patterns = selectPatterns(brief, inspoContext || "");
 
   return selectedPages.map(function(pid) {
     var pageDef = allPageDefs.find(function(p) { return p.id === pid; }) || { id: pid, label: pid.replace(/-\d+$/, "").replace(/(^|-)(.)/g, function(_, s, c) { return (s ? " " : "") + c.toUpperCase(); }), slug: "/" + pid.replace(/-\d+$/, "") };
@@ -2097,7 +2151,7 @@ function generatePages(brief, selectedPages, inspoContext, aiRecs, customPagesAr
     var result = null;
 
     if (pid === "home") {
-      var data = buildHomePage(colors, brief, inspoContext);
+      var data = buildHomePage(colors, brief, inspoContext, patterns);
       return { id: pid, label: label, data: data, variantA: data, variantB: null, recommended: "A", hasVariants: false };
     }
     if (pid === "services") {
@@ -2105,9 +2159,9 @@ function generatePages(brief, selectedPages, inspoContext, aiRecs, customPagesAr
       return { id: pid, label: label, data: data, variantA: data, variantB: null, recommended: "A", hasVariants: false };
     }
     if (pid === "work")    result = buildWorkPage(colors, brief, inspoContext);
-    if (pid === "about")   result = buildAboutPage(colors, brief, inspoContext);
-    if (pid === "process") result = buildProcessPage(colors, brief, inspoContext);
-    if (pid === "contact") result = buildContactPage(colors, brief, inspoContext);
+    if (pid === "about")   result = buildAboutPage(colors, brief, inspoContext, patterns);
+    if (pid === "process") result = buildProcessPage(colors, brief, inspoContext, patterns);
+    if (pid === "contact") result = buildContactPage(colors, brief, inspoContext, patterns);
 
     // Additional and custom page types
     if (!result) {
