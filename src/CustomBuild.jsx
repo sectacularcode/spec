@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 
 // ─── Server-side KV storage helpers ──────────────────────────────────────────
 // Replaces window.storage — works on live Vercel deployment via Upstash Redis
@@ -56,8 +56,8 @@ const DEFAULT_TIERS = [
 ];
 
 function IntakeForm({ onClose, onComplete }) {
-  const [tab, setTab] = React.useState(0);
-  const [form, setForm] = React.useState({
+  const [tab, setTab] = useState(0);
+  const [form, setForm] = useState({
     // Brand
     brandName: "", whatItIs: "", whoItIsFor: "", storyBehindName: "",
     voiceRules: "", tagline: "", signatureLine: "",
@@ -577,7 +577,7 @@ function IntakeForm({ onClose, onComplete }) {
 
 // ─── Brief Review Modal ────────────────────────────────────────────────────────
 function BriefReview({ parsed, onConfirm, onClose }) {
-  const [draft, setDraft] = React.useState(parsed || {});
+  const [draft, setDraft] = useState(parsed || {});
 
   function upd(key, val) { setDraft(d => ({ ...d, [key]: val })); }
 
