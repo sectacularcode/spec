@@ -1,4 +1,4 @@
-import { useUser, useClerk } from "@clerk/clerk-react";
+import { useUser, useClerk, UserButton } from "@clerk/clerk-react";
 import { useState, useEffect } from "react";
 
 const TOOLS = [
@@ -126,7 +126,13 @@ export default function Dashboard({ onSelectTool, role, tools: allowedTools }) {
         <div style={S.navRight}>
           <span style={S.rolePill}>{role}</span>
           <span style={S.email}>{user?.primaryEmailAddress?.emailAddress}</span>
-          <button style={S.signOutBtn} onClick={() => signOut()}>Sign out</button>
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox: { width: "28px", height: "28px" },
+              }
+            }}
+          />
         </div>
       </div>
 
