@@ -89,8 +89,8 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
     (async () => {
       try {
         const lsRaw = (() => { try { return localStorage.getItem("projects"); } catch(e2) { return null; } })();
-        if (typeof window !== "undefined" && window.storage) {
-          const result = await window.storage.get("projects");
+        if (true) {
+          const _sRes = await fetch("/api/storage?key=projects", { headers: userId ? { "x-spec-user-id": userId } : {} }); const _sData = _sRes.ok ? await _sRes.json() : {}; const result = _sData.value ? { value: _sData.value } : null;
           if (result && result.value && !cancelled) {
             const parsed = JSON.parse(result.value);
             if (Array.isArray(parsed) && parsed.length > 0) {
@@ -176,8 +176,8 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
     const timer = setTimeout(async () => {
       try {
         try { localStorage.setItem("projects", JSON.stringify(projects)); } catch(e) {}
-        if (typeof window !== "undefined" && window.storage && !cancelled) {
-          await window.storage.set("projects", JSON.stringify(projects));
+        if (!cancelled) {
+          await fetch("/api/storage", { method: "POST", headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) }, body: JSON.stringify({ action: "set", key: "projects", value: JSON.stringify(projects) }) });
         }
       } catch (e) {
         // Storage write failed — fail silently, user can export to file as backup
@@ -189,9 +189,9 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
   // Load Blueprint saved builds from storage
   useEffect(() => {
     async function loadSavedBuilds() {
-      if (typeof window === "undefined" || !window.storage) return;
+      // storage guard removed — use /api/storage directly
       try {
-        const result = await window.storage.get("spec-template-library");
+        const _tlRes = await fetch("/api/storage?key=spec-template-library", { headers: userId ? { "x-spec-user-id": userId } : {} }); const _tlData = _tlRes.ok ? await _tlRes.json() : {}; const result = _tlData.value ? { value: _tlData.value } : null;
         if (result && result.value) {
           const parsed = JSON.parse(result.value);
           if (Array.isArray(parsed)) setSavedBuilds(parsed);
@@ -1421,9 +1421,9 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                           </button>
                           <button
                             onClick={async () => {
-                              if (!window.storage) return;
+                              // storage guard removed
                               try {
-                                const result = await window.storage.get("spec-template-library");
+                                const _tl2Res = await fetch("/api/storage?key=spec-template-library", { headers: userId ? { "x-spec-user-id": userId } : {} }); const _tl2Data = _tl2Res.ok ? await _tl2Res.json() : {}; const result = _tl2Data.value ? { value: _tl2Data.value } : null;
                                 if (!result || !result.value) return;
                                 const existing = JSON.parse(result.value);
                                 const updated = existing.filter(b => b.id !== build.id);
