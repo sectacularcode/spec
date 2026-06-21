@@ -1,5 +1,4 @@
 // Website templates, brand defaults, and page scaffolding
-import { THEMES } from "./themes.js";
 // WEBSITE_TEMPLATES — industry-specific presets that pre-fill brand settings
 // PAGE_TEMPLATES — default section lists per page type
 // BLANK_BRAND — the clean-slate brand used for new projects
@@ -697,8 +696,8 @@ export const layoutFooterStyle = (layoutId) => {
 };
 
 // Apply a website template — sets layout, theme, fonts, accent, sections, and copy
-export const applyWebsiteTemplate = (template, brand, page) => {
-  const theme = THEMES.find(t => t.id === template.themeId);
+export const applyWebsiteTemplate = (template, brand, page, themes = []) => {
+  const theme = themes.find(t => t.id === template.themeId);
   const d = template.defaults || {};
   const newBrand = {
     ...brand,
