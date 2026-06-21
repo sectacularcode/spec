@@ -1,6 +1,6 @@
 import { Section } from "../Section.jsx";
 import { I } from "../../styles.js";
-import { FOOTER_STYLES, HEADER_STYLES } from "../../constants/ui.js";
+import { FOOTER_STYLES, HEADER_STYLES } from "../../constants/ui.jsx";
 import { THEMES } from "../../constants/themes.js";
 import { he } from "../../utils/htmlEscape.js";
 
