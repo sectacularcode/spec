@@ -611,7 +611,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
     // Start from BLANK_BRAND (no leftover EV content), then layer template, then layer AI overrides
     let brand = { ...BLANK_BRAND, name: r.projectName || "New Project", industry: briefText.slice(0, 80) };
     let page = newPage("Homepage", "Homepage");
-    const applied = applyWebsiteTemplate(template, brand, page);
+    const applied = applyWebsiteTemplate(template, brand, page, THEMES);
     brand = applied.brand;
     page = applied.page;
     // Layer the AI brief on top
@@ -668,7 +668,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
     setProjects(ps => ps.map(p => {
       if (p.id !== activeId) return p;
       // Apply template to current brand + current page
-      let { brand: newBrand, page: newPage } = applyWebsiteTemplate(template, p.brand, p.pages[pageIdx]);
+      let { brand: newBrand, page: newPage } = applyWebsiteTemplate(template, p.brand, p.pages[pageIdx], THEMES);
       // Layer the AI brief on top
       newBrand = {
         ...newBrand,
