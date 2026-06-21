@@ -284,7 +284,7 @@ You return ONLY valid JSON matching this exact schema, no preamble or trailing p
   "heroHeading": "8-14 words. Declarative. Confident. Front-loads the primary keyword naturally if it fits.",
   "heroSubhead": "1 sentence, 15-25 words. Answers what + who + why-now. Avoids fluff.",
   "aboutHeading": "5-9 words. A pointed statement, not a label.",
-  "aboutBody": "80-130 words. First person if it's a solo brand, otherwise 'we'. Includes specific facts (years, numbers, named clients/wins if known). Naturally uses at least one primary keyword. Reads like a human wrote it.",
+  "aboutBody": "80-130 words. First person if it's a solo brand, otherwise 'we'. Includes specific facts (years, numbers, types of clients served — never real brand names). Naturally uses at least one primary keyword. Reads like a human wrote it.",
   "cta1": "2-3 words. The primary action verb + object. E.g. 'Book a call', 'Get started', 'Shop now'.",
   "cta2": "2-3 words. The secondary action. E.g. 'View our work', 'See pricing'.",
   "keyMessages": "3-4 short phrases separated by periods. The pillars that should show up across the site."
@@ -303,7 +303,7 @@ ${b.differentiator ? `What makes them different (use this to avoid generic copy 
 ${b.description ? `Existing description for context: ${b.description}` : ""}
 ${b.inspoUrls ? `Inspiration sites (the user loves the aesthetic of these — match the voice and rhythm): ${b.inspoUrls.replace(/\n/g, ", ")}` : ""}
 ${b.styleNotes ? `Style notes (specific aesthetic principles to honor): ${b.styleNotes}` : ""}
-${b.clientLogos ? `Past clients / brands worked with (cite where natural, especially in About body): ${b.clientLogos.replace(/\n/g, ", ")}` : ""}
+${b.clientLogos ? `Notable context about this brand (use for tone and specificity only — never cite these as client names in the copy): ${b.clientLogos.replace(/\n/g, ", ")}` : ""}
 ${b.founderName ? `Founder: ${b.founderName}${b.founderTitle ? `, ${b.founderTitle}` : ""}` : ""}
 
 Important guardrails:
@@ -317,13 +317,11 @@ Important guardrails:
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-      const res = await fetch("/api/anthropic", {
+      const res = await fetch("/api/generate-copy", {
         method: "POST",
-        headers: { "Content-Type": "application/json",
-          "x-api-key": "",
-          "anthropic-dangerous-direct-browser-access": "true" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "claude-sonnet-4-5",
+          model: "claude-haiku-4-5-20251001",
           max_tokens: 1000,
           system: systemPrompt,
           messages: [{ role: "user", content: userPrompt }],
