@@ -46,7 +46,17 @@ export default function App() {
   const [view, setView] = useState(function(){try{return localStorage.getItem("spec_view")||"projects";}catch(e){return "projects";}});
   useEffect(() => { const h = () => setView("projects"); window.addEventListener("spec-go-projects", h); return () => window.removeEventListener("spec-go-projects", h); }, []);
   const [mobilePreviewTS, setMobilePreviewTS] = useState(false);
-  const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_tab")||"discovery";}catch(e){return "discovery";}});
+  const TAB_ORDER = [
+  { id: "discovery",   label: "Discovery" },
+  { id: "positioning", label: "Positioning" },
+  { id: "brand",       label: "Visual" },
+  { id: "content",     label: "Content" },
+  { id: "social",      label: "Social" },
+  { id: "footer",      label: "Header & Footer" },
+  { id: "export",      label: "Export & Import" },
+];
+
+const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_tab")||"discovery";}catch(e){return "discovery";}});
   const [pageIdx, setPageIdx] = useState(function(){try{return parseInt(localStorage.getItem("spec_pageIdx")||"0",10);}catch(e){return 0;}});
   const [showAudit, setShowAudit] = useState(false);
   const [showAllThemes, setShowAllThemes] = useState(false);
