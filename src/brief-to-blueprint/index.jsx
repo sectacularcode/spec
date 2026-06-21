@@ -132,7 +132,7 @@ export default function CustomBuild({ userId } = {}) {
       kvStorageSet("spec-blueprint-draft", JSON.stringify(draft), userId).catch(() => {});
     }, 800);
     return () => clearTimeout(timer);
-  }, [brief, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants, previewPage, crawlResults", generated]);
+  }, [brief, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants, previewPage, crawlResults, generated]);
 
   // Load saved drafts list on mount
   useEffect(() => {
