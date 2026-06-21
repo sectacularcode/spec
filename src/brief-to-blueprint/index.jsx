@@ -254,7 +254,7 @@ export default function CustomBuild({ userId } = {}) {
       reader.onload = async e => {
         try {
           const base64 = e.target.result.split(",")[1];
-          const res = await fetch("/api/parse-brief", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: base64, type: "pdf", fileName: file.name }) });
+          const res = await fetch("/api/parse-brief", { method: "POST", headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) }, body: JSON.stringify({ content: base64, type: "pdf", fileName: file.name }) });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || "Parsing failed");
           setBriefName(file.name); setBriefError("");
@@ -270,7 +270,7 @@ export default function CustomBuild({ userId } = {}) {
       reader.onload = async e => {
         try {
           const base64 = e.target.result.split(",")[1];
-          const res = await fetch("/api/parse-brief", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: base64, type: "docx", fileName: file.name }) });
+          const res = await fetch("/api/parse-brief", { method: "POST", headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) }, body: JSON.stringify({ content: base64, type: "docx", fileName: file.name }) });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || "Parsing failed");
           setBriefName(file.name); setBriefError("");
@@ -285,7 +285,7 @@ export default function CustomBuild({ userId } = {}) {
       const reader = new FileReader();
       reader.onload = async e => {
         try {
-          const res = await fetch("/api/parse-brief", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: e.target.result, type: "text", fileName: file.name }) });
+          const res = await fetch("/api/parse-brief", { method: "POST", headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) }, body: JSON.stringify({ content: e.target.result, type: "text", fileName: file.name }) });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || "Parsing failed");
           setBriefName(file.name); setBriefError("");
@@ -392,7 +392,7 @@ export default function CustomBuild({ userId } = {}) {
     try {
       const res = await fetch("/api/crawl-inspo", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) },
         body: JSON.stringify({ url: trimmed }),
       });
       const data = await res.json();
@@ -438,7 +438,7 @@ export default function CustomBuild({ userId } = {}) {
           const res = await fetch("/api/draft-copy", {
             signal: controller.signal,
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) },
             body: JSON.stringify({ brief, positioning: { valueProposition: brief.valueProposition || "", targetAudience: brief.targetAudience || "" } }),
           });
           if (res.ok) {
@@ -462,7 +462,7 @@ export default function CustomBuild({ userId } = {}) {
           const res = await fetch("/api/analyze-inspo", {
             signal: controller2.signal,
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) },
             body: JSON.stringify({ patterns: inspoContext, pages: selectedPages }),
           });
           if (res.ok) {
