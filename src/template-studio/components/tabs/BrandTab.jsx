@@ -1,7 +1,7 @@
 import { Section } from "../Section.jsx";
 import { Icon } from "../Icon.jsx";
 import { I } from "../../styles.js";
-import { FONT_OPTIONS, TONES } from "../../constants/ui.js";
+import { FONT_OPTIONS, TONES } from "../../constants/ui.jsx";
 import { THEMES } from "../../constants/themes.js";
 import { LAYOUTS } from "../../constants/layouts.js";
 import { WEBSITE_TEMPLATES, applyWebsiteTemplate, applyTheme } from "../../constants/templates.js";
