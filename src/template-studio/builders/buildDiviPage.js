@@ -1,4 +1,6 @@
 import { THEMES } from "../constants/themes.js";
+import { imgOrPlaceholder } from "../utils/images.js";
+import { he } from "../utils/htmlEscape.js";
 // Builds Divi shortcode format for a page (secondary export format)
 // Returns a plain string of Divi [et_pb_*] shortcodes.
 export function buildDiviPage(page, brand) {
