@@ -1,9 +1,14 @@
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  // Session auth
+  const _secret = process.env.SPEC_SESSION_SECRET;
+  const _cookie = req.headers.cookie || "";
+  const _sess   = _cookie.match(/(?:^|;\s*)spec_sess=([^;]+)/);
+  if (!_secret || !_sess || _sess[1] !== _secret) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
 
   const { brief, positioning } = req.body || {};
   if (!brief) return res.status(400).json({ error: "No brief provided" });
