@@ -60,7 +60,7 @@ export function inferTags(brief, pages, layoutVariants) {
 
 // Saves a completed build to the template library and each section to the section library.
 // Both are stored in Upstash Redis with a 50-build / 300-section cap (oldest dropped).
-export async function saveToLibrary(brief, pages, layoutVariants, selectedVariants) {
+export async function saveToLibrary(brief, pages, layoutVariants, selectedVariants, userId) {
   try {
     var existing = [];
     try {
