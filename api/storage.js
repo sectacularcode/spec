@@ -14,10 +14,15 @@ async function kvFetch(path) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(200).end();
+
+  // Session auth
+  const _secret = process.env.SPEC_SESSION_SECRET;
+  const _cookie = req.headers.cookie || "";
+  const _sess   = _cookie.match(/(?:^|;\s*)spec_sess=([^;]+)/);
+  if (!_secret || !_sess || _sess[1] !== _secret) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
 
   if (!KV_URL || !KV_TOKEN) {
     return res.status(500).json({ error: "KV not configured" });
