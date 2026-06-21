@@ -1,3 +1,4 @@
+import { THEMES } from "../constants/themes.js";
 // Builds Divi shortcode format for the site footer
 export function buildDiviFooter(brand) {
   const { accentColor: ac, cardBgColor: card, headingFont: hf, bodyFont: bf, footerStyle } = brand;
