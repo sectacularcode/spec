@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from "react";
+import { INTAKE_TABS, DEFAULT_COLORS, DEFAULT_TIERS, ALL_PAGES, ADDITIONAL_PAGE_TYPES } from "./constants/pages.js";
+import { LAYOUT_PATTERNS } from "./constants/patterns.js";
 
 // ─── Server-side KV storage helpers ──────────────────────────────────────────
 // Replaces window.storage — works on live Vercel deployment via Upstash Redis
@@ -36,25 +38,6 @@ async function kvStorageDel(key) {
 
 
 // ─── Intake Form Modal ────────────────────────────────────────────────────────
-const INTAKE_TABS = ["Brand", "Positioning", "Design", "Sitemap", "Copy", "Pricing"];
-
-const DEFAULT_COLORS = [
-  { name: "Ink", hex: "", use: "Primary text, dark section backgrounds" },
-  { name: "Accent", hex: "", use: "Buttons, accent elements" },
-  { name: "Accent Deep", hex: "", use: "Links, hover states" },
-  { name: "Background", hex: "", use: "Primary surface, default background" },
-  { name: "Dark Panel", hex: "", use: "Dark panels, cards, pricing tiers" },
-  { name: "Muted", hex: "", use: "Muted labels, captions" },
-  { name: "Warm White", hex: "", use: "Clean surface, text on dark" },
-  { name: "Text", hex: "", use: "Body copy on light backgrounds" },
-];
-
-const DEFAULT_TIERS = [
-  { name: "", subtitle: "", description: "", price: "" },
-  { name: "", subtitle: "", description: "", price: "" },
-  { name: "", subtitle: "", description: "", price: "" },
-];
-
 function IntakeForm({ onClose, onComplete }) {
   const [tab, setTab] = useState(0);
   const [form, setForm] = useState({
@@ -825,39 +808,6 @@ async function saveToLibrary(brief, pages, layoutVariants, selectedVariants) {
     console.warn("saveToLibrary failed:", e);
   }
 }
-
-const ALL_PAGES = [
-  { id: "home",        label: "Home",                slug: "/" },
-  { id: "work",        label: "Work / Portfolio",     slug: "/work" },
-  { id: "services",    label: "Services & Pricing",   slug: "/services" },
-  { id: "about",       label: "About",                slug: "/about" },
-  { id: "process",     label: "Process",              slug: "/process" },
-  { id: "contact",     label: "Contact",              slug: "/contact" },
-];
-
-const ADDITIONAL_PAGE_TYPES = [
-  { id: "landing",       label: "Landing Page",         slug: "/landing" },
-  { id: "team",          label: "Team",                 slug: "/team" },
-  { id: "blog",          label: "Blog / Journal",       slug: "/blog" },
-  { id: "blog-post",     label: "Blog Post",            slug: "/blog/post" },
-  { id: "case-study",    label: "Case Study",           slug: "/case-study" },
-  { id: "testimonials",  label: "Testimonials",         slug: "/testimonials" },
-  { id: "faq",           label: "FAQ",                  slug: "/faq" },
-  { id: "pricing",       label: "Pricing",              slug: "/pricing" },
-  { id: "portfolio",     label: "Portfolio Single",     slug: "/portfolio/project" },
-  { id: "events",        label: "Events",               slug: "/events" },
-  { id: "event-single",  label: "Event Single",         slug: "/events/event" },
-  { id: "location",      label: "Location",             slug: "/location" },
-  { id: "careers",       label: "Careers",              slug: "/careers" },
-  { id: "press",         label: "Press / Media",        slug: "/press" },
-  { id: "partners",      label: "Partners",             slug: "/partners" },
-  { id: "resources",     label: "Resources",            slug: "/resources" },
-  { id: "downloads",     label: "Downloads",            slug: "/downloads" },
-  { id: "thank-you",     label: "Thank You",            slug: "/thank-you" },
-  { id: "privacy",       label: "Privacy Policy",       slug: "/privacy-policy" },
-  { id: "terms",         label: "Terms of Service",     slug: "/terms" },
-  { id: "404",           label: "404",                  slug: "/404" },
-];
 
 // ─── Elementor helpers ────────────────────────────────────────────────────────
 function nid() { return Math.random().toString(16).slice(2, 9); }
@@ -2253,97 +2203,6 @@ function generatePages(brief, selectedPages, inspoContext, aiRecs, customPagesAr
 
 // ── LAYOUT PATTERNS ── Multiple visual structures per section type.
 // Inspo analysis + brief data selects the pattern. Different inputs = different outputs.
-const LAYOUT_PATTERNS = {
-  hero: [
-    { id: "split-left", label: "Split — text left, image right", industries: ["agency", "saas", "consulting"] },
-    { id: "split-right", label: "Split — image left, text right", industries: ["creative", "photography", "design"] },
-    { id: "centered-bold", label: "Centered headline, no image", industries: ["law", "finance", "enterprise"] },
-    { id: "full-image", label: "Full image background with overlay", industries: ["hospitality", "events", "real-estate"] },
-    { id: "minimal", label: "Minimal text, large whitespace", industries: ["studio", "architecture", "luxury"] },
-  ],
-  services: [
-    { id: "card-grid", label: "3-column card grid", industries: ["saas", "consulting", "agency"] },
-    { id: "alternating-rows", label: "Alternating image-text rows", industries: ["creative", "photography", "design"] },
-    { id: "icon-list", label: "Icon + text list", industries: ["law", "finance", "healthcare"] },
-    { id: "numbered-features", label: "Numbered feature blocks", industries: ["saas", "tech", "startup"] },
-  ],
-  about: [
-    { id: "split-image", label: "Image left, text right", industries: ["agency", "studio", "consulting"] },
-    { id: "centered-narrative", label: "Centered long-form story", industries: ["founder", "personal-brand"] },
-    { id: "team-grid", label: "Team grid with bios", industries: ["law", "agency", "enterprise"] },
-    { id: "timeline", label: "Company timeline", industries: ["enterprise", "manufacturing", "established"] },
-  ],
-  testimonials: [
-    { id: "card-grid", label: "3-column quote cards", industries: ["agency", "saas", "consulting"] },
-    { id: "single-large", label: "One large centered quote", industries: ["luxury", "studio", "architecture"] },
-    { id: "alternating", label: "Alternating left-right quotes", industries: ["creative", "personal-brand"] },
-  ],
-  cta: [
-    { id: "dark-full", label: "Dark full-width with heading", industries: ["all"] },
-    { id: "split-cta", label: "Text left, button right", industries: ["saas", "consulting"] },
-    { id: "minimal-line", label: "Single line with button", industries: ["studio", "luxury", "minimal"] },
-  ],
-  portfolio: [
-    { id: "masonry-grid", label: "Masonry image grid", industries: ["photography", "design", "creative"] },
-    { id: "case-study-cards", label: "Case study cards with text", industries: ["agency", "consulting", "law"] },
-    { id: "full-width-stacked", label: "Full-width stacked projects", industries: ["architecture", "studio"] },
-  ],
-  process: [
-    { id: "numbered-vertical", label: "Numbered vertical steps", industries: ["agency", "consulting", "services"] },
-    { id: "horizontal-timeline", label: "Horizontal timeline", industries: ["enterprise", "manufacturing"] },
-    { id: "icon-cards", label: "Icon cards grid", industries: ["saas", "tech", "startup"] },
-  ],
-  contact: [
-    { id: "split-form", label: "Info left, form right", industries: ["agency", "consulting", "services"] },
-    { id: "centered-minimal", label: "Centered minimal form", industries: ["studio", "luxury", "minimal"] },
-    { id: "full-details", label: "Full details with map placeholder", industries: ["local", "real-estate", "hospitality"] },
-  ],
-  pricing: [
-    { id: "three-tier", label: "3-column pricing cards", industries: ["saas", "agency", "services"] },
-    { id: "two-tier", label: "2-column with feature list", industries: ["consulting", "studio"] },
-    { id: "simple-list", label: "Simple price list", industries: ["creative", "photography", "freelance"] },
-  ],
-  blog: [
-    { id: "grid-3col", label: "3-column article grid", industries: ["agency", "saas", "media"] },
-    { id: "featured-plus-grid", label: "Featured post + grid", industries: ["creative", "editorial"] },
-    { id: "list-view", label: "List with thumbnails", industries: ["law", "consulting", "finance"] },
-  ],
-  faq: [
-    { id: "accordion", label: "Expandable accordion", industries: ["saas", "services", "agency"] },
-    { id: "two-column", label: "Two-column Q&A", industries: ["enterprise", "consulting"] },
-    { id: "categorized", label: "Categorized sections", industries: ["saas", "complex"] },
-  ],
-  landing: [
-    { id: "centered-dark", label: "Dark centered hero + numbered benefits", industries: ["saas", "startup", "agency"] },
-    { id: "split-light", label: "Light split hero + alternating benefits", industries: ["consulting", "services", "creative"] },
-    { id: "social-proof", label: "Light hero + logo strip + feature cards", industries: ["saas", "enterprise", "b2b"] },
-  ],
-  team: [
-    { id: "photo-grid", label: "Equal photo grid with name and role", industries: ["agency", "consulting", "law"] },
-    { id: "featured-founder", label: "Featured founder large + supporting team", industries: ["founder", "studio", "startup"] },
-    { id: "horizontal-list", label: "Horizontal list with bio text", industries: ["enterprise", "finance", "healthcare"] },
-  ],
-  testimonials: [
-    { id: "card-grid", label: "3-column quote cards", industries: ["agency", "saas", "consulting"] },
-    { id: "single-feature", label: "Single large dark feature quote", industries: ["luxury", "studio", "architecture"] },
-    { id: "alternating-quotes", label: "Alternating left-right with avatar", industries: ["creative", "personal-brand", "services"] },
-  ],
-  events: [
-    { id: "date-list", label: "Date-anchored list with register button", industries: ["all"] },
-    { id: "event-cards", label: "Card grid with image and date badge", industries: ["hospitality", "creative", "entertainment"] },
-    { id: "featured-next", label: "Featured next event hero + list", industries: ["enterprise", "conference", "education"] },
-  ],
-  careers: [
-    { id: "job-list", label: "Clean job list with apply buttons", industries: ["all"] },
-    { id: "values-first", label: "Culture and values section + job list", industries: ["startup", "agency", "creative"] },
-    { id: "split-layout", label: "Culture copy left, open roles right", industries: ["enterprise", "saas", "consulting"] },
-  ],
-  "case-study": [
-    { id: "dark-hero-metrics", label: "Dark hero + challenge/solution/result", industries: ["agency", "consulting", "creative"] },
-    { id: "editorial-light", label: "Light editorial with large image and pull quote", industries: ["design", "photography", "brand"] },
-    { id: "numbers-first", label: "Big stat numbers lead + narrative", industries: ["saas", "enterprise", "b2b"] },
-  ],
-};
 
 // Parse inspo crawl text and return a boost map: { patternId: boostScore }
 function parseInspoPatterns(inspoContext) {
