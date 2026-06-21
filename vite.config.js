@@ -5,6 +5,18 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   return {
     plugins: [react()],
+    build: {
+      rollupOptions: {
+        output: {
+          // Split Template Studio and Brief to Blueprint into separate chunks
+          // so the browser only loads what's needed for the active tab
+          manualChunks: {
+            'template-studio': ['./src/elementor-builder.jsx'],
+            'brief-to-blueprint': ['./src/CustomBuild.jsx'],
+          },
+        },
+      },
+    },
     server: {
       proxy: {
         '/api/anthropic': {
