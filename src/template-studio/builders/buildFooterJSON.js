@@ -1,4 +1,7 @@
 import { THEMES } from "../constants/themes.js";
+import { uid, eContainer, eSection, eRow, eCol, rPx, eHead, eTxt, eBtn, eSpacer, eImg } from "./helpers.js";
+import { luminance, isLight, textOn, mutedTextOn, buttonOn } from "../utils/colors.js";
+import { he } from "../utils/htmlEscape.js";
 // Builds Elementor JSON for the site footer (Theme Builder global template)
 export function buildFooterJSON(brand) {
   const { accentColor: ac, cardBgColor: card, headingFont: hf, bodyFont: bf, footerStyle } = brand;
