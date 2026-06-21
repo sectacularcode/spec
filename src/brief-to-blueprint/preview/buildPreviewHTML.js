@@ -1,0 +1,1384 @@
+import { selectPatterns } from "../utils/patterns.js";
+import { he } from "../utils/htmlEscape.js";
+
+// Generates a complete HTML document string for the preview iframe.
+// All user-controlled brief fields are sanitized via he() before insertion.
+// The variant param ("A" or "B") controls which layout variant is shown.
+//
+// To add a new page preview:
+//   1. Add a section key to the sections object below
+//   2. Add a pattern override in the override block at the top
+//   3. If the page needs A/B, ensure generatePages.js returns hasVariants: true
+
+// he() is imported separately but re-exported for backward compat with any
+// callers that may import it from here
+export { he };
+
+export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
+  variant = variant || "A";
+
+  // Sanitize all string fields up-front so every downstream insertion is XSS-safe
+  var safe = {};
+  Object.keys(brief || {}).forEach(function(k) {
+    var v = (brief || {})[k];
+    safe[k] = typeof v === "string" ? he(v) : v;
+  });
+  brief = safe;
+
+  var patterns = selectPatterns(brief, inspoContext || "");
+
+  // Apply A/B variant overrides so the toggle actually changes the preview
+  if (activePage === "services") {
+    patterns.services = (variant === "B") ? "alternating-rows" : "card-grid";
+  }
+  if (activePage === "home") {
+    patterns.hero = (variant === "B") ? "split-left" : "centered-bold";
+  }
+  if (activePage === "about") {
+    patterns.about = (variant === "B") ? "team-grid" : "split-image";
+  }
+  if (activePage === "process") {
+    patterns.process = (variant === "B") ? "horizontal-timeline" : "numbered-vertical";
+  }
+  if (activePage === "contact") {
+    patterns.contact = (variant === "B") ? "split-form" : "centered-minimal";
+  }
+  if (activePage === "work") {
+    patterns.portfolio = (variant === "B") ? "case-study-cards" : "masonry-grid";
+  }
+  if (activePage === "landing") {
+    patterns.landing = (variant === "B") ? "split-light" : "centered-dark";
+  }
+  if (activePage === "team") {
+    patterns.team = (variant === "B") ? "featured-founder" : "photo-grid";
+  }
+  if (activePage === "blog") {
+    patterns.blog = (variant === "B") ? "featured-plus-grid" : "grid-3col";
+  }
+  if (activePage === "testimonials") {
+    patterns.testimonials = (variant === "B") ? "single-feature" : "card-grid";
+  }
+  if (activePage === "events") {
+    patterns.events = (variant === "B") ? "event-cards" : "date-list";
+  }
+  if (activePage === "careers") {
+    patterns.careers = (variant === "B") ? "values-first" : "job-list";
+  }
+  if (activePage === "case-study") {
+    patterns["case-study"] = (variant === "B") ? "editorial-light" : "dark-hero-metrics";
+  }
+  if (activePage === "faq") {
+    patterns.faq = (variant === "B") ? "two-column" : "accordion";
+  }
+  if (activePage === "pricing") {
+    patterns.pricing = (variant === "B") ? "two-tier" : "three-tier";
+  }
+  if (activePage === "portfolio") {
+    patterns.portfolio = (variant === "B") ? "editorial" : "dark-grid";
+  }
+  if (activePage === "location") {
+    patterns.location = (variant === "B") ? "centered" : "map-split";
+  }
+  if (activePage === "press") {
+    patterns.press = (variant === "B") ? "featured-hero" : "list";
+  }
+  if (activePage === "partners") {
+    patterns.partners = (variant === "B") ? "description-list" : "logo-grid";
+  }
+  if (activePage === "resources") {
+    patterns.resources = (variant === "B") ? "category-list" : "card-grid";
+  }
+  if (activePage === "downloads") {
+    patterns.downloads = (variant === "B") ? "card-grid" : "simple-list";
+  }
+  if (activePage === "blog-post") {
+    patterns["blog-post"] = (variant === "B") ? "wide-editorial" : "narrow-centered";
+  }
+  if (activePage === "event-single") {
+    patterns["event-single"] = (variant === "B") ? "light-centered" : "dark-hero";
+  }
+  var C = brief.colors || {
+    ink: "#1C1A17", brass: "#C2A35B", "brass-deep": "#9C7E3A",
+    bone: "#EDE7DB", asphalt: "#2B2823", stone: "#8A8170",
+    "warm-white": "#FBFAF7", text: "#2A2722"
+  };
+  var ink = C.ink, brass = C.brass, bone = C.bone,
+      warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
+      brassDp = C["brass-deep"] || "#9C7E3A", asphalt = C.asphalt || "#2B2823",
+      text = C.text || "#2A2722";
+  var fontUrl = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap";
+
+  var sections = {
+    home: (function() {
+      var hp = patterns.hero;
+      
+      // ── HERO VARIANTS ──
+      var heroHTML = "";
+      if (hp === "split-right") {
+        heroHTML = "<section style='background:" + ink + ";padding:clamp(60px,10vw,100px) clamp(24px,8vw,80px);'>" +
+          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;max-width:1160px;margin:0 auto;'>" +
+            "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:8px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Hero image</div>" +
+            "<div>" +
+              "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:20px;'>" + (brief.brandName || "Brand") + "</div>" +
+              "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(32px,5vw,56px);color:" + warmWhite + ";margin:0 0 20px;line-height:1.1;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
+              "<p style='font-size:17px;color:" + warmWhite + ";opacity:.8;margin:0 0 32px;line-height:1.7;'>" + (brief.heroSubhead || "Subheadline goes here.") + "</p>" +
+              "<a style='padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+            "</div>" +
+          "</div>" +
+        "</section>";
+      } else if (hp === "centered-bold") {
+        heroHTML = "<section style='background:" + ink + ";padding:clamp(80px,12vw,140px) clamp(24px,8vw,80px);text-align:center;'>" +
+          "<div style='max-width:800px;margin:0 auto;'>" +
+            "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:24px;'>" + (brief.brandName || "Brand") + "</div>" +
+            "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,6vw,72px);color:" + warmWhite + ";margin:0 0 24px;line-height:1.05;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
+            "<p style='font-size:18px;color:" + warmWhite + ";opacity:.8;margin:0 auto 40px;line-height:1.7;max-width:560px;'>" + (brief.heroSubhead || "Subheadline goes here.") + "</p>" +
+            "<div style='display:flex;gap:12px;justify-content:center;flex-wrap:wrap;'>" +
+              "<a style='padding:14px 40px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+              "<a style='padding:14px 40px;background:transparent;color:" + warmWhite + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border:1px solid rgba(255,255,255,0.3);border-radius:4px;display:inline-block;'>" + (brief.heroCta2 || "Learn more") + "</a>" +
+            "</div>" +
+          "</div>" +
+        "</section>";
+      } else if (hp === "full-image") {
+        heroHTML = "<section style='background:" + ink + ";padding:clamp(100px,15vw,180px) clamp(24px,8vw,80px);text-align:center;position:relative;'>" +
+          "<div style='position:absolute;inset:0;background:#e0ddd7;opacity:0.3;'></div>" +
+          "<div style='position:relative;max-width:700px;margin:0 auto;'>" +
+            "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,6vw,64px);color:" + warmWhite + ";margin:0 0 20px;line-height:1.08;text-shadow:0 2px 20px rgba(0,0,0,0.3);'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
+            "<p style='font-size:18px;color:" + warmWhite + ";margin:0 0 36px;line-height:1.7;'>" + (brief.heroSubhead || "Subheadline goes here.") + "</p>" +
+            "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+          "</div>" +
+        "</section>";
+      } else if (hp === "minimal") {
+        heroHTML = "<section style='background:" + bone + ";padding:clamp(100px,15vw,200px) clamp(24px,8vw,80px);'>" +
+          "<div style='max-width:800px;'>" +
+            "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(40px,7vw,80px);color:" + ink + ";margin:0 0 24px;line-height:1.05;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
+            "<p style='font-size:18px;color:" + stone + ";margin:0 0 40px;line-height:1.7;max-width:480px;'>" + (brief.heroSubhead || "Subheadline goes here.") + "</p>" +
+            "<a style='padding:14px 32px;background:" + ink + ";color:" + warmWhite + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:0;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+          "</div>" +
+        "</section>";
+      } else { // split-left (default)
+        heroHTML = "<section style='background:" + ink + ";padding:clamp(60px,10vw,100px) clamp(24px,8vw,80px);'>" +
+          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;max-width:1160px;margin:0 auto;'>" +
+            "<div>" +
+              "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:20px;'>" + (brief.brandName || "Brand") + "</div>" +
+              "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(32px,5vw,56px);color:" + warmWhite + ";margin:0 0 20px;line-height:1.1;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
+              "<p style='font-size:17px;color:" + warmWhite + ";opacity:.8;margin:0 0 32px;line-height:1.7;max-width:480px;'>" + (brief.heroSubhead || "Subheadline goes here.") + "</p>" +
+              "<div style='display:flex;gap:12px;flex-wrap:wrap;'>" +
+                "<a style='padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+                "<a style='padding:14px 32px;background:transparent;color:" + warmWhite + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border:1px solid rgba(255,255,255,0.3);border-radius:4px;display:inline-block;'>" + (brief.heroCta2 || "Learn more") + "</a>" +
+              "</div>" +
+            "</div>" +
+            "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:8px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Hero image</div>" +
+          "</div>" +
+        "</section>";
+      }
+      
+      // ── SERVICES VARIANTS ──
+      var sp = patterns.services;
+      var svcCards = (brief.serviceCards || [["Service One","Description of what this service provides."],["Service Two","Description of what this service provides."],["Service Three","Description of what this service provides."]]);
+      var servicesHTML = "";
+      if (sp === "alternating-rows") {
+        servicesHTML = "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);'><div style='max-width:1160px;margin:0 auto;'>" +
+          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>What we do</div>" +
+          "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 48px;'>" + (brief.servicesHeading || "Our services") + "</h2>" +
+          svcCards.map(function(pair, idx) {
+            var imgFirst = idx % 2 === 0;
+            return "<div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-bottom:48px;'>" +
+              (imgFirst ? "<div style='background:#e0ddd7;aspect-ratio:3/2;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Image</div>" : "") +
+              "<div><h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + pair[0] + "</h3><p style='font-size:16px;color:" + stone + ";line-height:1.7;margin:0;'>" + pair[1] + "</p></div>" +
+              (!imgFirst ? "<div style='background:#e0ddd7;aspect-ratio:3/2;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Image</div>" : "") +
+            "</div>";
+          }).join("") +
+        "</div></section>";
+      } else if (sp === "numbered-features") {
+        servicesHTML = "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);'><div style='max-width:900px;margin:0 auto;'>" +
+          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>What we do</div>" +
+          "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 48px;'>" + (brief.servicesHeading || "Our services") + "</h2>" +
+          svcCards.map(function(pair, idx) {
+            return "<div style='display:grid;grid-template-columns:60px 1fr;gap:24px;padding:28px 0;border-top:1px solid #E2DBCC;'>" +
+              "<div style='font-size:36px;font-weight:800;color:" + brass + ";line-height:1;'>0" + (idx+1) + "</div>" +
+              "<div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + pair[0] + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>" + pair[1] + "</p></div>" +
+            "</div>";
+          }).join("") +
+        "</div></section>";
+      } else { // card-grid
+        servicesHTML = "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);'><div style='max-width:1160px;margin:0 auto;'>" +
+          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>What we do</div>" +
+          "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 40px;'>" + (brief.servicesHeading || "Our services") + "</h2>" +
+          "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;'>" +
+            svcCards.map(function(pair) {
+              return "<div style='background:#ffffff;border:1px solid #E2DBCC;padding:32px;border-radius:4px;'><div style='width:40px;height:3px;background:" + brass + ";margin-bottom:20px;'></div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + pair[0] + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>" + pair[1] + "</p></div>";
+            }).join("") +
+          "</div>" +
+        "</div></section>";
+      }
+
+      // ── ABOUT VARIANTS ──
+      var ap = patterns.about;
+      var aboutHTML = "";
+      if (ap === "centered-narrative") {
+        aboutHTML = "<section style='background:#ffffff;padding:80px clamp(24px,8vw,80px);'><div style='max-width:720px;margin:0 auto;text-align:center;'>" +
+          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>About</div>" +
+          "<h2 style='font-weight:800;font-size:clamp(24px,4vw,40px);color:" + ink + ";margin:0 0 24px;line-height:1.15;'>" + (brief.aboutHeading || "Our story") + "</h2>" +
+          "<p style='font-size:17px;color:" + text + ";line-height:1.8;margin:0;text-align:left;'>" + (brief.aboutBody || "Your company story goes here.") + "</p>" +
+        "</div></section>";
+      } else { // split-image
+        aboutHTML = "<section style='background:#ffffff;padding:80px clamp(24px,8vw,80px);'><div style='display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1160px;margin:0 auto;'>" +
+          "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>About image</div>" +
+          "<div>" +
+            "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>About</div>" +
+            "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 16px;line-height:1.15;'>" + (brief.aboutHeading || "About the company") + "</h2>" +
+            "<p style='font-size:16px;color:" + text + ";line-height:1.7;margin:0;'>" + (brief.aboutBody || "Your company story goes here.") + "</p>" +
+          "</div>" +
+        "</div></section>";
+      }
+
+      // ── TESTIMONIALS ──
+      var tp = patterns.testimonials;
+      var testimonialsHTML = "";
+      if (tp === "single-large") {
+        testimonialsHTML = "<section style='background:" + bone + ";padding:100px clamp(24px,8vw,80px);text-align:center;'><div style='max-width:720px;margin:0 auto;'>" +
+          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:32px;'>Kind words</div>" +
+          "<p style='font-size:clamp(20px,3vw,28px);color:" + ink + ";line-height:1.5;font-style:italic;margin:0 0 24px;'>This changed everything for our business. The quality of work exceeded every expectation.</p>" +
+          "<div style='font-size:14px;font-weight:600;color:" + ink + ";'>Client Name</div><div style='font-size:13px;color:" + stone + ";'>CEO, Company</div>" +
+        "</div></section>";
+      } else { // card-grid
+        testimonialsHTML = "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);'><div style='max-width:1160px;margin:0 auto;'>" +
+          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Kind words</div>" +
+          "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 40px;'>What our clients say</h2>" +
+          "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;'>" +
+            ["This changed everything for our business.", "Professional and genuinely cared about the outcome.", "We saw results within the first month."].map(function(q) {
+              return "<div style='background:#ffffff;border-left:3px solid " + brass + ";padding:28px;'><p style='font-size:17px;color:" + ink + ";line-height:1.5;margin:0 0 16px;font-style:italic;'>" + q + "</p><div style='font-size:14px;font-weight:600;color:" + ink + ";'>Client Name</div><div style='font-size:13px;color:" + stone + ";'>Role, Company</div></div>";
+            }).join("") +
+          "</div>" +
+        "</div></section>";
+      }
+
+      // ── CTA VARIANTS ──
+      var cp = patterns.cta;
+      var ctaHTML = "";
+      if (cp === "split-cta") {
+        ctaHTML = "<section style='background:" + ink + ";padding:60px clamp(24px,8vw,80px);'><div style='display:flex;justify-content:space-between;align-items:center;max-width:1160px;margin:0 auto;flex-wrap:wrap;gap:24px;'>" +
+          "<h2 style='font-weight:800;font-size:clamp(20px,3vw,32px);color:" + warmWhite + ";margin:0;'>" + (brief.tagline || "Ready to get started?") + "</h2>" +
+          "<a style='padding:14px 40px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>Start a project</a>" +
+        "</div></section>";
+      } else if (cp === "minimal-line") {
+        ctaHTML = "<section style='background:" + bone + ";padding:60px clamp(24px,8vw,80px);text-align:center;border-top:1px solid #E2DBCC;'>" +
+          "<a style='font-size:16px;color:" + brassDp + ";text-decoration:underline;font-weight:600;'>" + (brief.heroCta1 || "Start a project") + " →</a>" +
+        "</section>";
+      } else { // dark-full
+        ctaHTML = "<section style='background:" + ink + ";padding:80px clamp(24px,8vw,80px);text-align:center;'>" +
+          "<h2 style='font-weight:800;font-size:clamp(24px,4vw,44px);color:" + warmWhite + ";margin:0 0 12px;'>" + (brief.tagline || "Ready to get started?") + "</h2>" +
+          "<p style='font-size:14px;color:" + stone + ";letter-spacing:2px;text-transform:uppercase;margin:0 0 32px;'>" + (brief.signatureLine || "") + "</p>" +
+          "<a style='padding:14px 40px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>Start a project</a>" +
+        "</section>";
+      }
+
+      // ── HOOK ──
+      var hookHTML = "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);text-align:center;'><div style='max-width:720px;margin:0 auto;'>" +
+        "<h2 style='font-weight:800;font-size:clamp(24px,4vw,40px);color:" + ink + ";margin:0 0 16px;line-height:1.15;'>" + (brief.hookStatement || "The problem you solve, stated clearly.") + "</h2>" +
+        "<p style='font-size:17px;color:" + text + ";line-height:1.7;margin:0;'>" + (brief.hookBody || "") + "</p>" +
+      "</div></section>";
+
+      // ── PRICING TEASER ──
+      var pricingHTML = "<section style='background:#ffffff;padding:80px clamp(24px,8vw,80px);text-align:center;'><div style='max-width:720px;margin:0 auto;'>" +
+        "<h2 style='font-weight:800;font-size:clamp(24px,4vw,40px);color:" + ink + ";margin:0 0 16px;'>Clear pricing. No surprises.</h2>" +
+        "<p style='font-size:17px;color:" + text + ";line-height:1.7;margin:0 0 32px;'>See what it costs before you book a call.</p>" +
+        "<a style='padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>See pricing</a>" +
+      "</div></section>";
+
+      return heroHTML + hookHTML + servicesHTML + aboutHTML + testimonialsHTML + pricingHTML + ctaHTML;
+    })(),
+
+    work: (function() {
+      var wp = patterns.portfolio || "masonry-grid";
+      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Work</div>" +
+        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>Selected projects</h1>" +
+        "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0;line-height:1.65;'>A look at what we have built.</p>" +
+      "</div></section>";
+      var body = "";
+      if (wp === "case-study-cards") {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:1160px;margin:0 auto;'>" +
+          [1,2,3,4].map(function(n) {
+            return "<div style='display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;margin-bottom:40px;background:#fff;border:1px solid #E2DBCC;border-radius:4px;overflow:hidden;'>" +
+              "<div style='background:#e0ddd7;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Project image</div>" +
+              "<div style='padding:32px;'><div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;'>Category</div>" +
+              "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 12px;'>Project Title " + n + "</h3>" +
+              "<p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>Brief description of this project and the results achieved.</p></div></div>";
+          }).join("") + "</div></section>";
+      } else if (wp === "full-width-stacked") {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:1160px;margin:0 auto;'>" +
+          [1,2,3].map(function(n) {
+            return "<div style='margin-bottom:48px;'><div style='background:#e0ddd7;aspect-ratio:21/9;display:flex;align-items:center;justify-content:center;color:" + stone + ";margin-bottom:20px;border-radius:4px;'>Project " + n + " — full width image</div>" +
+              "<div style='display:flex;justify-content:space-between;align-items:baseline;'>" +
+              "<h3 style='font-size:20px;font-weight:700;color:" + ink + ";margin:0;'>Project Title " + n + "</h3>" +
+              "<span style='font-size:13px;color:" + stone + ";'>Category · Year</span></div></div>";
+          }).join("") + "</div></section>";
+      } else {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px;max-width:1160px;margin:0 auto;'>" +
+          [1,2,3,4,5,6].map(function(n) {
+            return "<div><div style='background:#e0ddd7;aspect-ratio:" + (n % 2 === 0 ? "4/3" : "3/4") + ";display:flex;align-items:center;justify-content:center;color:" + stone + ";border-radius:4px;margin-bottom:12px;'>Project " + n + "</div>" +
+              "<div style='font-size:15px;font-weight:600;color:" + ink + ";'>Project Title " + n + "</div>" +
+              "<div style='font-size:13px;color:" + stone + ";'>Category</div></div>";
+          }).join("") + "</div></section>";
+      }
+      return header + body;
+    })(),
+
+    services: (function() {
+      var sp = patterns.services;
+      var svcCards = brief.serviceCards || [["Service One","Description goes here."],["Service Two","Description goes here."],["Service Three","Description goes here."]];
+      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'>" +
+        "<div style='max-width:1160px;margin:0 auto;'>" +
+          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Services</div>" +
+          "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>" + (brief.servicesH1 || "What we offer") + "</h1>" +
+          "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0;line-height:1.65;'>" + (brief.servicesSubhead || "Our full range of services.") + "</p>" +
+        "</div></section>";
+      var body = "";
+      if (sp === "alternating-rows") {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:1160px;margin:0 auto;'>" +
+          svcCards.map(function(pair, idx) {
+            var imgFirst = idx % 2 === 0;
+            return "<div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-bottom:48px;'>" +
+              (imgFirst ? "<div style='background:#e0ddd7;aspect-ratio:3/2;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Image</div>" : "") +
+              "<div><h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + pair[0] + "</h3><p style='font-size:16px;color:" + stone + ";line-height:1.7;margin:0;'>" + pair[1] + "</p></div>" +
+              (!imgFirst ? "<div style='background:#e0ddd7;aspect-ratio:3/2;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Image</div>" : "") +
+            "</div>";
+          }).join("") + "</div></section>";
+      } else if (sp === "numbered-features") {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:900px;margin:0 auto;'>" +
+          svcCards.map(function(pair, idx) {
+            return "<div style='display:grid;grid-template-columns:60px 1fr;gap:24px;padding:28px 0;border-top:1px solid #E2DBCC;'>" +
+              "<div style='font-size:36px;font-weight:800;color:" + brass + ";'>0" + (idx+1) + "</div>" +
+              "<div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + pair[0] + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>" + pair[1] + "</p></div></div>";
+          }).join("") + "</div></section>";
+      } else {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;max-width:1160px;margin:0 auto;'>" +
+          svcCards.map(function(pair) {
+            return "<div style='background:#fff;border:1px solid #E2DBCC;padding:32px;border-radius:4px;'><div style='width:40px;height:3px;background:" + brass + ";margin-bottom:20px;'></div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + pair[0] + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>" + pair[1] + "</p></div>";
+          }).join("") + "</div></section>";
+      }
+      return header + body;
+    })(),
+    about: (function() {
+      var ap = patterns.about;
+      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>About</div>" +
+        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>" + (brief.aboutHeading || "Our story") + "</h1>" +
+      "</div></section>";
+      var body = "";
+      if (ap === "centered-narrative") {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:720px;margin:0 auto;'>" +
+          "<p style='font-size:18px;color:" + text + ";line-height:1.8;margin:0 0 32px;'>" + (brief.aboutBody || "Your company story goes here.") + "</p>" +
+          "<div style='display:flex;gap:32px;flex-wrap:wrap;margin-top:40px;'>" +
+            ["Direct", "Useful", "Opinionated", "Human"].map(function(v) {
+              return "<div style='font-size:15px;font-weight:700;color:" + brass + ";'>" + v + "</div>";
+            }).join("") +
+          "</div></div></section>";
+      } else if (ap === "team-grid") {
+        body = "<section style='background:" + bone + ";padding:40px 40px 48px;'><div style='max-width:720px;margin:0 auto;'>" +
+          "<p style='font-size:17px;color:" + text + ";line-height:1.8;margin:0 0 48px;'>" + (brief.aboutBody || "Your company story.") + "</p></div></section>" +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px;max-width:1160px;margin:0 auto;text-align:center;'>" +
+            ["Founder", "Lead Designer", "Strategist", "Developer"].map(function(role) {
+              return "<div><div style='background:#e0ddd7;aspect-ratio:1;margin-bottom:16px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Photo</div><div style='font-weight:700;color:" + ink + ";'>[Name]</div><div style='font-size:13px;color:" + stone + ";margin-top:4px;'>" + role + "</div></div>";
+            }).join("") +
+          "</div></section>";
+      } else {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1160px;margin:0 auto;'>" +
+          "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>About image</div>" +
+          "<div><p style='font-size:17px;color:" + text + ";line-height:1.8;margin:0;'>" + (brief.aboutBody || "Your company story.") + "</p></div>" +
+        "</div></section>";
+      }
+      return header + body;
+    })(),
+
+    process: (function() {
+      var pp = patterns.process || "numbered-vertical";
+      var steps = brief.processSteps || [["Discovery","We learn about your business and goals."],["Strategy","We create a plan tailored to you."],["Execute","We bring the plan to life."],["Deliver","You get the finished product, ready to use."]];
+      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Process</div>" +
+        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>" + (brief.processH1 || "How it works") + "</h1>" +
+        "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0;line-height:1.65;'>Simple and calm, from first call to final files.</p>" +
+      "</div></section>";
+      var body = "";
+      if (pp === "icon-cards") {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;max-width:1160px;margin:0 auto;'>" +
+          steps.map(function(s, i) {
+            return "<div style='background:#fff;border:1px solid #E2DBCC;padding:32px;border-radius:4px;text-align:center;'>" +
+              "<div style='font-size:32px;font-weight:800;color:" + brass + ";margin-bottom:16px;'>0" + (i+1) + "</div>" +
+              "<h3 style='font-size:17px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + s[0] + "</h3>" +
+              "<p style='font-size:14px;color:" + stone + ";line-height:1.6;margin:0;'>" + s[1] + "</p></div>";
+          }).join("") + "</div></section>";
+      } else if (pp === "horizontal-timeline") {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:1160px;margin:0 auto;'>" +
+          "<div style='display:flex;gap:0;position:relative;'>" +
+            steps.map(function(s, i) {
+              return "<div style='flex:1;text-align:center;padding:0 16px;'>" +
+                "<div style='width:32px;height:32px;background:" + brass + ";border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;'>" + (i+1) + "</div>" +
+                "<h3 style='font-size:16px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + s[0] + "</h3>" +
+                "<p style='font-size:13px;color:" + stone + ";line-height:1.5;margin:0;'>" + s[1] + "</p></div>";
+            }).join("") +
+          "</div></div></section>";
+      } else {
+        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:800px;margin:0 auto;'>" +
+          steps.map(function(s, i) {
+            return "<div style='display:grid;grid-template-columns:60px 1fr;gap:24px;padding:28px 0;" + (i < steps.length-1 ? "border-bottom:1px solid #E2DBCC;" : "") + "'>" +
+              "<div style='font-size:36px;font-weight:800;color:" + brass + ";line-height:1;'>0" + (i+1) + "</div>" +
+              "<div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + s[0] + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>" + s[1] + "</p></div></div>";
+          }).join("") + "</div></section>";
+      }
+      return header + body;
+    })(),
+
+    contact: (function() {
+      var cp2 = patterns.contact || "split-form";
+      if (cp2 === "centered-minimal") {
+        return "<section style='background:" + bone + ";padding:100px 40px;text-align:center;'><div style='max-width:560px;margin:0 auto;'>" +
+          "<h1 style='font-weight:800;font-size:clamp(32px,5vw,48px);color:" + ink + ";margin:0 0 16px;'>" + (brief.contactH1 || "Get in touch") + "</h1>" +
+          "<p style='font-size:17px;color:" + text + ";margin:0 0 40px;line-height:1.7;'>" + (brief.contactSubhead || "We will get back to you within one business day.") + "</p>" +
+          "<div style='background:#fff;border:1px solid #E2DBCC;padding:32px;border-radius:8px;text-align:left;'>" +
+            ["Name", "Email", "Message"].map(function(f) {
+              return "<div style='margin-bottom:16px;'><div style='font-size:13px;font-weight:600;color:" + ink + ";margin-bottom:6px;'>" + f + "</div><div style='background:#f9f9f9;border:1px solid #E2DBCC;padding:12px;border-radius:4px;color:" + stone + ";font-size:14px;'>Enter " + f.toLowerCase() + "</div></div>";
+            }).join("") +
+            "<a style='display:block;padding:14px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;text-align:center;'>" + (brief.contactButton || "Send it over") + "</a>" +
+          "</div></div></section>";
+      } else {
+        return "<section style='background:" + bone + ";padding:88px 40px;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:60px;max-width:1160px;margin:0 auto;'>" +
+          "<div>" +
+            "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Contact</div>" +
+            "<h1 style='font-weight:800;font-size:clamp(32px,4vw,48px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>" + (brief.contactH1 || "Tell us about your project.") + "</h1>" +
+            "<p style='font-size:17px;color:" + text + ";margin:0 0 32px;line-height:1.7;'>" + (brief.contactSubhead || "A real reply, usually within one business day.") + "</p>" +
+            "<p style='font-size:15px;color:" + stone + ";'>" + (brief.contactReassurance || "No sales team. No automated funnel. Just one maker who will read it and write back.") + "</p>" +
+          "</div>" +
+          "<div style='background:#fff;border:1px solid #E2DBCC;padding:32px;border-radius:8px;'>" +
+            ["Name", "Email", "Company", "What do you need?", "Message"].map(function(f) {
+              return "<div style='margin-bottom:16px;'><div style='font-size:13px;font-weight:600;color:" + ink + ";margin-bottom:6px;'>" + f + "</div><div style='background:#f9f9f9;border:1px solid #E2DBCC;padding:12px;border-radius:4px;color:" + stone + ";font-size:14px;'></div></div>";
+            }).join("") +
+            "<a style='display:block;padding:14px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;text-align:center;'>" + (brief.contactButton || "Send it over") + "</a>" +
+          "</div>" +
+        "</div></section>";
+      }
+    })(),
+
+    landing: (function() {
+      var lp = patterns.landing || "centered-dark";
+      var benefits = [
+        { num: "01", title: "Benefit one", body: "Explain the first key benefit clearly." },
+        { num: "02", title: "Benefit two", body: "What makes this worth their time." },
+        { num: "03", title: "Benefit three", body: "The final push to convert." },
+      ];
+      if (lp === "split-light") {
+        return "<section style='background:" + bone + ";padding:clamp(60px,10vw,100px) clamp(24px,8vw,80px);'>" +
+          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;max-width:1160px;margin:0 auto;'>" +
+            "<div>" +
+              "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:20px;'>" + (brief.brandName || "Brand") + "</div>" +
+              "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(32px,5vw,56px);color:" + ink + ";margin:0 0 20px;line-height:1.1;'>" + (brief.heroHeadline || "Your offer, front and center.") + "</h1>" +
+              "<p style='font-size:17px;color:" + text + ";margin:0 0 36px;line-height:1.7;'>" + (brief.heroSubhead || "One clear message. One clear action.") + "</p>" +
+              "<div style='display:flex;gap:16px;flex-wrap:wrap;'>" +
+                "<a style='padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+                "<a style='padding:14px 32px;background:transparent;color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border:1px solid " + ink + ";border-radius:4px;'>" + (brief.heroCta2 || "Learn more") + "</a>" +
+              "</div>" +
+            "</div>" +
+            "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:8px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Hero image</div>" +
+          "</div>" +
+        "</section>" +
+        "<section style='background:#ffffff;padding:80px clamp(24px,8vw,80px);'>" +
+          "<div style='max-width:1160px;margin:0 auto;'>" +
+            benefits.map(function(b) {
+              return "<div style='display:grid;grid-template-columns:80px 1fr;gap:32px;padding:40px 0;border-bottom:1px solid #E2DBCC;align-items:start;'>" +
+                "<div style='font-size:28px;font-weight:800;color:" + brass + ";'>" + b.num + "</div>" +
+                "<div><h3 style='font-size:19px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + b.title + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.65;margin:0;'>" + b.body + "</p></div>" +
+              "</div>";
+            }).join("") +
+          "</div>" +
+        "</section>" +
+        "<section style='background:" + bone + ";padding:80px 40px;text-align:center;'>" +
+          "<h2 style='font-size:clamp(28px,4vw,40px);font-weight:800;color:" + ink + ";margin:0 0 24px;'>" + (brief.heroHeadline || "Ready to get started?") + "</h2>" +
+          "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+        "</section>";
+      } else if (lp === "social-proof") {
+        var logos = ["Partner A", "Partner B", "Partner C", "Partner D", "Partner E"];
+        return "<section style='background:" + bone + ";padding:clamp(60px,10vw,100px) clamp(24px,8vw,80px);text-align:center;'>" +
+          "<div style='max-width:800px;margin:0 auto;'>" +
+            "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:20px;'>" + (brief.brandName || "Brand") + "</div>" +
+            "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(32px,5vw,56px);color:" + ink + ";margin:0 0 20px;line-height:1.1;'>" + (brief.heroHeadline || "Your offer, front and center.") + "</h1>" +
+            "<p style='font-size:18px;color:" + text + ";margin:0 0 40px;line-height:1.7;'>" + (brief.heroSubhead || "One clear message. One clear action.") + "</p>" +
+            "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+          "</div>" +
+        "</section>" +
+        "<section style='background:#ffffff;padding:40px;border-top:1px solid #E2DBCC;border-bottom:1px solid #E2DBCC;'>" +
+          "<div style='max-width:900px;margin:0 auto;text-align:center;'>" +
+            "<p style='font-size:12px;color:" + stone + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:24px;'>Trusted by teams at</p>" +
+            "<div style='display:flex;gap:40px;justify-content:center;flex-wrap:wrap;align-items:center;'>" +
+              logos.map(function(l) {
+                return "<div style='font-size:15px;font-weight:700;color:" + stone + ";opacity:.5;'>" + l + "</div>";
+              }).join("") +
+            "</div>" +
+          "</div>" +
+        "</section>" +
+        "<section style='background:" + bone + ";padding:80px 40px;'>" +
+          "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:32px;max-width:1060px;margin:0 auto;'>" +
+            benefits.map(function(b) {
+              return "<div style='background:#ffffff;border:1px solid #E2DBCC;padding:36px 28px;border-radius:6px;'>" +
+                "<div style='font-size:28px;color:" + brass + ";margin-bottom:16px;font-weight:800;'>" + b.num + "</div>" +
+                "<h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 10px;'>" + b.title + "</h3>" +
+                "<p style='font-size:15px;color:" + stone + ";line-height:1.65;margin:0;'>" + b.body + "</p>" +
+              "</div>";
+            }).join("") +
+          "</div>" +
+        "</section>" +
+        "<section style='background:" + ink + ";padding:80px 40px;text-align:center;'>" +
+          "<h2 style='font-size:clamp(28px,4vw,40px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>Ready?</h2>" +
+          "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+        "</section>";
+      } else {
+        // centered-dark (default)
+        return "<section style='background:" + ink + ";min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 40px;text-align:center;'>" +
+          "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,6vw,64px);line-height:1.08;color:" + warmWhite + ";max-width:800px;margin:0 0 24px;'>" + (brief.heroHeadline || "Your offer, front and center.") + "</h1>" +
+          "<p style='font-size:18px;color:" + warmWhite + ";opacity:.8;max-width:520px;margin:0 0 40px;line-height:1.7;'>" + (brief.heroSubhead || "One clear message. One clear action.") + "</p>" +
+          "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+        "</section>" +
+        "<section style='background:" + bone + ";padding:80px 40px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:32px;max-width:1000px;margin:0 auto;text-align:center;'>" +
+          benefits.map(function(b) {
+            return "<div style='padding:32px;'><div style='font-size:32px;color:" + brass + ";margin-bottom:12px;font-weight:800;'>" + b.num + "</div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin-bottom:8px;'>" + b.title + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;'>" + b.body + "</p></div>";
+          }).join("") +
+        "</div></section>" +
+        "<section style='background:" + ink + ";padding:80px 40px;text-align:center;'>" +
+          "<h2 style='font-size:clamp(28px,4vw,44px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>Ready?</h2>" +
+          "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+        "</section>";
+      }
+    })(),
+
+    // ── TEAM ──
+    team: (function() {
+      var tp = patterns.team || "photo-grid";
+      var members = [
+        { role: "Founder & CEO", name: "[Name]" },
+        { role: "Lead Designer", name: "[Name]" },
+        { role: "Strategist", name: "[Name]" },
+        { role: "Developer", name: "[Name]" },
+      ];
+      var header = "<section style='background:" + bone + ";padding:88px 40px 56px;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>The Team</div>" +
+        "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>The people behind the work.</h1>" +
+        "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0;line-height:1.65;'>Every person here chose to be here.</p>" +
+      "</section>";
+      if (tp === "featured-founder") {
+        return header +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:1160px;margin:0 auto;'>" +
+            "<div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-bottom:56px;padding-bottom:56px;border-bottom:1px solid #E2DBCC;'>" +
+              "<div style='background:#e0ddd7;aspect-ratio:3/4;border-radius:6px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Founder photo</div>" +
+              "<div>" +
+                "<div style='font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + brass + ";margin-bottom:12px;'>Founder</div>" +
+                "<h2 style='font-size:clamp(24px,3vw,36px);font-weight:800;color:" + ink + ";margin:0 0 8px;'>[Founder Name]</h2>" +
+                "<p style='font-size:15px;color:" + stone + ";margin-bottom:20px;'>Founder & CEO</p>" +
+                "<p style='font-size:16px;color:" + text + ";line-height:1.7;'>A short founder bio that establishes credibility and voice. Who they are, where they came from, and why they started this.</p>" +
+              "</div>" +
+            "</div>" +
+            "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px;'>" +
+              members.slice(1).map(function(m) {
+                return "<div style='text-align:center;'>" +
+                  "<div style='background:#e0ddd7;aspect-ratio:1;margin-bottom:14px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Photo</div>" +
+                  "<div style='font-size:15px;font-weight:700;color:" + ink + ";'>" + m.name + "</div>" +
+                  "<div style='font-size:13px;color:" + stone + ";margin-top:4px;'>" + m.role + "</div>" +
+                "</div>";
+              }).join("") +
+            "</div>" +
+          "</div></section>";
+      } else if (tp === "horizontal-list") {
+        return header +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:900px;margin:0 auto;'>" +
+            members.map(function(m) {
+              return "<div style='display:grid;grid-template-columns:100px 1fr;gap:28px;padding:32px 0;border-bottom:1px solid #E2DBCC;align-items:center;'>" +
+                "<div style='background:#e0ddd7;aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:11px;'>Photo</div>" +
+                "<div>" +
+                  "<div style='font-size:16px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + m.name + "</div>" +
+                  "<div style='font-size:13px;color:" + brass + ";font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;'>" + m.role + "</div>" +
+                  "<p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>Short bio for this team member — background, focus, and what they bring.</p>" +
+                "</div>" +
+              "</div>";
+            }).join("") +
+          "</div></section>";
+      } else {
+        // photo-grid (default)
+        return header +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:32px;max-width:1160px;margin:0 auto;'>" +
+            members.map(function(m) {
+              return "<div style='text-align:center;'><div style='background:#e0ddd7;aspect-ratio:1;margin-bottom:16px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Photo</div><div style='font-size:16px;font-weight:700;color:" + ink + ";'>" + m.name + "</div><div style='font-size:14px;color:" + stone + ";margin-top:4px;'>" + m.role + "</div></div>";
+            }).join("") +
+          "</div></section>";
+      }
+    })(),
+
+    // ── BLOG ──
+    blog: (function() {
+      var bp = patterns.blog || "grid-3col";
+      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Journal</div>" +
+        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 48px;line-height:1.1;'>Latest thoughts</h1>" +
+      "</div></section>";
+      var articles = ["Strategy & Growth", "Behind the Scenes", "Industry Insights", "Case Study", "Tips & Guides", "News"];
+      if (bp === "featured-plus-grid") {
+        return header + "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:1160px;margin:0 auto;'>" +
+          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:32px;'>" +
+            "<div style='background:#e0ddd7;aspect-ratio:16/10;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Featured image</div>" +
+            "<div style='display:flex;flex-direction:column;justify-content:center;'><div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;'>Featured</div>" +
+            "<h2 style='font-size:28px;font-weight:700;color:" + ink + ";margin:0 0 12px;'>Featured Article Title</h2>" +
+            "<p style='font-size:16px;color:" + stone + ";line-height:1.6;margin:0;'>A longer excerpt that gives readers a reason to dive into this featured piece.</p></div>" +
+          "</div>" +
+          "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;'>" +
+            articles.slice(0,3).map(function(cat) {
+              return "<div><div style='background:#e0ddd7;aspect-ratio:16/10;margin-bottom:12px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Image</div>" +
+                "<div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;'>" + cat + "</div>" +
+                "<h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>Article Title</h3>" +
+                "<p style='font-size:14px;color:" + stone + ";line-height:1.5;margin:0;'>Short excerpt text.</p></div>";
+            }).join("") +
+          "</div></div></section>";
+      } else if (bp === "list-view") {
+        return header + "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:800px;margin:0 auto;'>" +
+          articles.slice(0,5).map(function(cat) {
+            return "<div style='display:grid;grid-template-columns:120px 1fr;gap:20px;padding:24px 0;border-bottom:1px solid #E2DBCC;align-items:center;'>" +
+              "<div style='background:#e0ddd7;aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:11px;'>Thumb</div>" +
+              "<div><div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;'>" + cat + "</div>" +
+              "<h3 style='font-size:17px;font-weight:700;color:" + ink + ";margin:0 0 4px;'>Article Title Goes Here</h3>" +
+              "<p style='font-size:13px;color:" + stone + ";margin:0;'>5 min read</p></div></div>";
+          }).join("") +
+        "</div></section>";
+      } else {
+        return header + "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:32px;max-width:1160px;margin:0 auto;'>" +
+          articles.slice(0,3).map(function(cat) {
+            return "<div><div style='background:#e0ddd7;aspect-ratio:16/10;margin-bottom:16px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Image</div>" +
+              "<div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;'>" + cat + "</div>" +
+              "<h3 style='font-size:20px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>Article Title Goes Here</h3>" +
+              "<p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>Short excerpt giving readers a reason to click through.</p>" +
+              "<div style='font-size:13px;color:" + stone + ";margin-top:12px;'>5 min read</div></div>";
+          }).join("") +
+        "</div></section>";
+      }
+    })(),
+
+    "blog-post": (function() {
+      if (variant === "B") {
+        // Wide editorial — no sidebar column, wider content, pull quote prominent
+        return "<section style='background:" + bone + ";padding:80px 40px 40px;max-width:880px;margin:0 auto;'>" +
+          "<div style='font-size:12px;color:" + brassDp + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;font-weight:600;'>Category</div>" +
+          "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 20px;line-height:1.1;'>Article Title Goes Here</h1>" +
+          "<p style='font-size:15px;color:" + stone + ";margin-bottom:40px;'>Published on [Date] · 5 min read</p>" +
+        "</section>" +
+        "<section style='background:#e0ddd7;padding:0;'><div style='aspect-ratio:21/9;max-height:480px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Featured image — full width</div></section>" +
+        "<section style='background:" + bone + ";padding:56px 40px 96px;'><div style='max-width:880px;margin:0 auto;'>" +
+          "<blockquote style='border-left:4px solid " + brass + ";padding:20px 28px;margin:0 0 40px;font-size:22px;color:" + ink + ";font-style:italic;line-height:1.5;background:#fff;border-radius:0 4px 4px 0;'>A key pull quote that sets the tone for the piece and gives readers a reason to keep reading.</blockquote>" +
+          "<div style='font-size:17px;color:" + text + ";line-height:1.85;'>" +
+            "<p style='margin-bottom:24px;'>Opening paragraph of the article. This is where you hook the reader and set up the premise of what they will learn.</p>" +
+            "<h2 style='font-size:26px;font-weight:700;color:" + ink + ";margin:48px 0 16px;'>Section heading</h2>" +
+            "<p style='margin-bottom:24px;'>Body copy continues here with supporting details, examples, and insights that develop the main argument.</p>" +
+            "<p>Concluding thoughts that tie everything together and lead naturally to a call to action.</p>" +
+          "</div>" +
+        "</div></section>";
+      }
+      // Variant A — narrow centered with featured image (current)
+      return "<section style='background:" + bone + ";padding:80px 40px;max-width:760px;margin:0 auto;'>" +
+        "<div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;'>Category</div>" +
+        "<h1 style='font-size:clamp(32px,5vw,48px);font-weight:800;color:" + ink + ";margin:0 0 16px;line-height:1.15;'>Article Title Goes Here</h1>" +
+        "<p style='font-size:15px;color:" + stone + ";margin-bottom:32px;'>Published on [Date] · 5 min read</p>" +
+        "<div style='background:#e0ddd7;aspect-ratio:16/9;margin-bottom:40px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Featured image</div>" +
+        "<div style='font-size:17px;color:" + text + ";line-height:1.8;'><p style='margin-bottom:24px;'>Opening paragraph of the article. This is where you hook the reader and set up the premise.</p><h2 style='font-size:24px;font-weight:700;color:" + ink + ";margin:40px 0 16px;'>Section heading</h2><p style='margin-bottom:24px;'>Body copy continues here with supporting details, examples, and insights.</p><blockquote style='border-left:3px solid " + brass + ";padding:16px 24px;margin:32px 0;color:" + ink + ";font-size:18px;'>A pull quote that highlights a key insight from the article.</blockquote><p>Concluding thoughts that tie everything together and lead to a call to action.</p></div>" +
+      "</section>";
+    })(),
+
+    // ── FAQ ──
+    faq: (function() {
+      var fp = patterns.faq || "accordion";
+      var questions = [["How does pricing work?","Every price is a starting point that scales with scope."],["What is the typical timeline?","Most projects wrap in 2-4 weeks depending on complexity."],["Do you offer revisions?","Yes, a set number of revision rounds agreed up front."],["What do I need to get started?","A brief conversation about your business and goals."],["Can I see examples?","Absolutely. Check our work page for recent projects."]];
+      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>FAQ</div>" +
+        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>Common questions</h1>" +
+        "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0;'>If you do not see your answer here, reach out directly.</p>" +
+      "</div></section>";
+      if (fp === "two-column") {
+        return header + "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:40px;max-width:1160px;margin:0 auto;'>" +
+          questions.map(function(q) {
+            return "<div style='padding:24px 0;border-bottom:1px solid #E2DBCC;'><h3 style='font-size:17px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + q[0] + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>" + q[1] + "</p></div>";
+          }).join("") +
+        "</div></section>";
+      } else {
+        return header + "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:800px;margin:0 auto;'>" +
+          questions.map(function(q) {
+            return "<div style='border-bottom:1px solid #E2DBCC;padding:24px 0;'><div style='display:flex;justify-content:space-between;align-items:center;'><h3 style='font-size:17px;font-weight:600;color:" + ink + ";margin:0;'>" + q[0] + "</h3><span style='font-size:20px;color:" + brass + ";'>+</span></div><p style='font-size:15px;color:" + stone + ";line-height:1.7;margin:12px 0 0;'>" + q[1] + "</p></div>";
+          }).join("") +
+        "</div></section>";
+      }
+    })(),
+
+    pricing: (function() {
+      var pp2 = patterns.pricing || "three-tier";
+      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;text-align:center;'><div style='max-width:800px;margin:0 auto;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Pricing</div>" +
+        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>Simple, transparent pricing</h1>" +
+        "<p style='font-size:17px;color:" + text + ";margin:0;'>No hidden fees. Pick what works.</p>" +
+      "</div></section>";
+      var tiers = [["Starter","$500","For small projects"],["Professional","$1,500","For growing businesses"],["Enterprise","Custom","For large-scale needs"]];
+      if (pp2 === "two-tier") {
+        return header + "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:900px;margin:0 auto;'>" +
+          tiers.slice(0,2).map(function(t, i) {
+            var featured = i === 1;
+            return "<div style='background:" + (featured ? asphalt : "#fff") + ";border:1px solid #E2DBCC;padding:48px 32px;text-align:center;border-radius:4px;'>" +
+              "<div style='font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + (featured ? brass : brassDp) + ";margin-bottom:16px;'>" + t[0] + "</div>" +
+              "<div style='font-size:clamp(36px,5vw,52px);font-weight:800;color:" + (featured ? warmWhite : ink) + ";margin-bottom:8px;'>" + t[1] + "</div>" +
+              "<p style='font-size:15px;color:" + stone + ";margin-bottom:32px;'>" + t[2] + "</p>" +
+              "<a style='display:inline-block;padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Get started</a></div>";
+          }).join("") + "</div></section>";
+      } else {
+        return header + "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;max-width:1000px;margin:0 auto;'>" +
+          tiers.map(function(t, i) {
+            var featured = i === 1;
+            return "<div style='background:" + (featured ? asphalt : "#fff") + ";border:1px solid #E2DBCC;padding:40px 32px;text-align:center;border-radius:4px;'>" +
+              "<div style='font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + (featured ? brass : brassDp) + ";margin-bottom:16px;'>" + t[0] + "</div>" +
+              "<div style='font-size:clamp(32px,4vw,48px);font-weight:800;color:" + (featured ? warmWhite : ink) + ";margin-bottom:8px;'>" + t[1] + "</div>" +
+              "<p style='font-size:14px;color:" + stone + ";margin-bottom:32px;'>" + t[2] + "</p>" +
+              "<a style='display:inline-block;padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Get started</a></div>";
+          }).join("") + "</div></section>";
+      }
+    })(),
+
+    testimonials: (function() {
+      var tp = patterns.testimonials || "card-grid";
+      var quotes = [
+        { q: "This changed everything for our business.", name: "Client Name", role: "Role, Company" },
+        { q: "Professional, efficient, and genuinely cared about the outcome.", name: "Client Name", role: "Role, Company" },
+        { q: "We saw results within the first month.", name: "Client Name", role: "Role, Company" },
+      ];
+      var header = "<section style='background:" + bone + ";padding:88px 40px 48px;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Testimonials</div>" +
+        "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 48px;'>What our clients say.</h1>" +
+      "</section>";
+      if (tp === "single-feature") {
+        return "<section style='background:" + ink + ";padding:120px 40px;text-align:center;'>" +
+          "<div style='max-width:800px;margin:0 auto;'>" +
+            "<div style='font-size:60px;color:" + brass + ";line-height:1;margin-bottom:24px;'>\u201c</div>" +
+            "<p style='font-size:clamp(22px,3vw,32px);color:" + warmWhite + ";line-height:1.5;font-weight:300;margin:0 0 40px;'>" + quotes[0].q + "</p>" +
+            "<div style='width:40px;height:2px;background:" + brass + ";margin:0 auto 24px;'></div>" +
+            "<div style='font-size:15px;font-weight:700;color:" + warmWhite + ";'>" + quotes[0].name + "</div>" +
+            "<div style='font-size:13px;color:" + stone + ";margin-top:6px;'>" + quotes[0].role + "</div>" +
+          "</div>" +
+        "</section>" +
+        "<section style='background:" + bone + ";padding:80px 40px 96px;'>" +
+          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:32px;max-width:900px;margin:0 auto;'>" +
+            quotes.slice(1).map(function(qt) {
+              return "<div style='background:#ffffff;border:1px solid #E2DBCC;padding:32px;border-radius:4px;'>" +
+                "<p style='font-size:16px;color:" + ink + ";line-height:1.6;margin:0 0 20px;'>" + qt.q + "</p>" +
+                "<div style='font-size:14px;font-weight:600;color:" + ink + ";'>" + qt.name + "</div>" +
+                "<div style='font-size:13px;color:" + stone + ";'>" + qt.role + "</div>" +
+              "</div>";
+            }).join("") +
+          "</div>" +
+        "</section>";
+      } else if (tp === "alternating-quotes") {
+        return header +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:960px;margin:0 auto;'>" +
+            quotes.map(function(qt, i) {
+              var isRight = i % 2 === 1;
+              return "<div style='display:grid;grid-template-columns:72px 1fr;gap:24px;padding:40px 0;border-bottom:1px solid #E2DBCC;align-items:start;" + (isRight ? "direction:rtl;" : "") + "'>" +
+                "<div style='background:#e0ddd7;width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:11px;" + (isRight ? "direction:ltr;" : "") + "'>Photo</div>" +
+                "<div style='" + (isRight ? "direction:ltr;text-align:right;" : "") + "'>" +
+                  "<p style='font-size:18px;color:" + ink + ";line-height:1.6;margin:0 0 16px;font-style:italic;'>\u201c" + qt.q + "\u201d</p>" +
+                  "<div style='font-size:14px;font-weight:700;color:" + ink + ";'>" + qt.name + "</div>" +
+                  "<div style='font-size:13px;color:" + stone + ";'>" + qt.role + "</div>" +
+                "</div>" +
+              "</div>";
+            }).join("") +
+          "</div></section>";
+      } else {
+        // card-grid (default)
+        return header +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:32px;max-width:1160px;margin:0 auto;'>" +
+            quotes.map(function(qt) {
+              return "<div style='background:#fff;border-left:3px solid " + brass + ";padding:32px;'><p style='font-family:Inter,sans-serif;font-size:18px;color:" + ink + ";line-height:1.5;margin:0 0 20px;'>" + qt.q + "</p><div style='font-size:14px;font-weight:600;color:" + ink + ";'>" + qt.name + "</div><div style='font-size:13px;color:" + stone + ";'>" + qt.role + "</div></div>";
+            }).join("") +
+          "</div></section>";
+      }
+    })(),
+
+    // ── EVENTS ──
+    events: (function() {
+      var ep = patterns.events || "date-list";
+      var evts = [
+        { date: "JAN 15", title: "Workshop: Brand Strategy Fundamentals", meta: "10:00 AM — 2:00 PM · Virtual" },
+        { date: "FEB 22", title: "Networking Mixer", meta: "6:00 PM — 9:00 PM · Downtown Studio" },
+        { date: "MAR 10", title: "Annual Conference", meta: "All Day · Convention Center" },
+      ];
+      var header = "<section style='background:" + bone + ";padding:88px 40px 56px;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Events</div>" +
+        "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 48px;'>Upcoming events.</h1>" +
+      "</section>";
+      if (ep === "event-cards") {
+        return header +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'>" +
+            "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:28px;max-width:1160px;margin:0 auto;'>" +
+              evts.map(function(e) {
+                return "<div style='background:#ffffff;border:1px solid #E2DBCC;border-radius:6px;overflow:hidden;'>" +
+                  "<div style='background:#e0ddd7;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Event image</div>" +
+                  "<div style='padding:24px;'>" +
+                    "<div style='font-size:12px;font-weight:800;color:" + brass + ";letter-spacing:1px;margin-bottom:10px;'>" + e.date + "</div>" +
+                    "<h3 style='font-size:17px;font-weight:700;color:" + ink + ";margin:0 0 8px;line-height:1.3;'>" + e.title + "</h3>" +
+                    "<p style='font-size:13px;color:" + stone + ";margin:0 0 20px;'>" + e.meta + "</p>" +
+                    "<a style='display:inline-block;padding:10px 24px;background:" + brassDp + ";color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Register</a>" +
+                  "</div>" +
+                "</div>";
+              }).join("") +
+            "</div>" +
+          "</section>";
+      } else if (ep === "featured-next") {
+        var next = evts[0];
+        return "<section style='background:" + ink + ";padding:96px 40px;'>" +
+          "<div style='max-width:1160px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;'>" +
+            "<div>" +
+              "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:16px;'>Next Event</div>" +
+              "<div style='font-size:14px;font-weight:800;color:" + brass + ";letter-spacing:2px;margin-bottom:16px;'>" + next.date + "</div>" +
+              "<h2 style='font-size:clamp(28px,4vw,44px);font-weight:800;color:" + warmWhite + ";margin:0 0 16px;line-height:1.15;'>" + next.title + "</h2>" +
+              "<p style='font-size:16px;color:" + warmWhite + ";opacity:.7;margin:0 0 32px;'>" + next.meta + "</p>" +
+              "<a style='display:inline-block;padding:14px 36px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Register now</a>" +
+            "</div>" +
+            "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:6px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Event image</div>" +
+          "</div>" +
+        "</section>" +
+        header +
+        "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:900px;margin:0 auto;'>" +
+          evts.slice(1).map(function(e) {
+            return "<div style='display:grid;grid-template-columns:100px 1fr auto;gap:24px;padding:28px 0;border-bottom:1px solid #E2DBCC;align-items:center;'>" +
+              "<div style='font-size:14px;font-weight:800;color:" + brass + ";letter-spacing:1px;'>" + e.date + "</div>" +
+              "<div><div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + e.title + "</div><div style='font-size:14px;color:" + stone + ";'>" + e.meta + "</div></div>" +
+              "<a style='padding:10px 24px;background:" + brassDp + ";color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;white-space:nowrap;border-radius:4px;'>Register</a>" +
+            "</div>";
+          }).join("") +
+        "</div></section>";
+      } else {
+        // date-list (default)
+        return header +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:900px;margin:0 auto;'>" +
+            evts.map(function(e) {
+              return "<div style='display:grid;grid-template-columns:100px 1fr auto;gap:24px;padding:28px 0;border-bottom:1px solid #E2DBCC;align-items:center;'><div style='font-size:14px;font-weight:800;color:" + brass + ";letter-spacing:1px;'>" + e.date + "</div><div><div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + e.title + "</div><div style='font-size:14px;color:" + stone + ";'>" + e.meta + "</div></div><a style='padding:10px 24px;background:" + brassDp + ";color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;white-space:nowrap;border-radius:4px;'>Register</a></div>";
+            }).join("") +
+          "</div></section>";
+      }
+    })(),
+
+    // ── CAREERS ──
+    careers: (function() {
+      var cp = patterns.careers || "job-list";
+      var jobs = [
+        { title: "Senior Designer", meta: "Full-time · Remote" },
+        { title: "Project Manager", meta: "Full-time · Hybrid" },
+        { title: "Content Strategist", meta: "Contract · Remote" },
+      ];
+      var values = ["Ownership", "Craft", "Clarity", "Speed", "Honesty"];
+      var header = "<section style='background:" + bone + ";padding:88px 40px 56px;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Careers</div>" +
+        "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>Work with us.</h1>" +
+        "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0;line-height:1.65;'>We are always looking for talented people who care about the craft.</p>" +
+      "</section>";
+      var jobList = "<div style='max-width:800px;margin:0 auto;'>" +
+        jobs.map(function(j) {
+          return "<div style='display:flex;justify-content:space-between;align-items:center;padding:24px 0;border-bottom:1px solid #E2DBCC;'><div><div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + j.title + "</div><div style='font-size:14px;color:" + stone + ";'>" + j.meta + "</div></div><a style='padding:10px 24px;background:" + brassDp + ";color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Apply</a></div>";
+        }).join("") +
+      "</div>";
+      if (cp === "values-first") {
+        return "<section style='background:" + ink + ";padding:80px 40px;'>" +
+          "<div style='max-width:1060px;margin:0 auto;'>" +
+            "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:24px;'>Our values</div>" +
+            "<div style='display:flex;gap:24px;flex-wrap:wrap;'>" +
+              values.map(function(v) {
+                return "<div style='padding:14px 24px;border:1px solid rgba(255,255,255,.15);color:" + warmWhite + ";font-size:14px;font-weight:600;border-radius:4px;'>" + v + "</div>";
+              }).join("") +
+            "</div>" +
+          "</div>" +
+        "</section>" +
+        header +
+        "<section style='background:" + bone + ";padding:0 40px 96px;'>" + jobList + "</section>";
+      } else if (cp === "split-layout") {
+        return header +
+          "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:64px;max-width:1160px;margin:0 auto;'>" +
+            "<div>" +
+              "<h2 style='font-size:24px;font-weight:800;color:" + ink + ";margin:0 0 16px;'>Why join us</h2>" +
+              "<p style='font-size:16px;color:" + text + ";line-height:1.7;margin-bottom:28px;'>We move fast, care about craft, and give people room to own their work. No bureaucracy. No bottlenecks.</p>" +
+              "<div style='display:flex;flex-direction:column;gap:12px;'>" +
+                values.map(function(v) {
+                  return "<div style='display:flex;align-items:center;gap:12px;'><div style='width:6px;height:6px;background:" + brass + ";border-radius:50%;flex-shrink:0;'></div><span style='font-size:15px;font-weight:600;color:" + ink + ";'>" + v + "</span></div>";
+                }).join("") +
+              "</div>" +
+            "</div>" +
+            "<div>" +
+              "<h2 style='font-size:24px;font-weight:800;color:" + ink + ";margin:0 0 24px;'>Open roles</h2>" +
+              jobs.map(function(j) {
+                return "<div style='display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid #E2DBCC;'><div><div style='font-size:16px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + j.title + "</div><div style='font-size:13px;color:" + stone + ";'>" + j.meta + "</div></div><a style='padding:8px 20px;background:" + brassDp + ";color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Apply</a></div>";
+              }).join("") +
+            "</div>" +
+          "</div></section>";
+      } else {
+        // job-list (default)
+        return header +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'>" + jobList + "</section>";
+      }
+    })(),
+
+    // ── CASE STUDY ──
+    "case-study": (function() {
+      var csp = patterns["case-study"] || "dark-hero-metrics";
+      var metrics = [
+        { label: "Challenge", body: "What the client was facing" },
+        { label: "Solution", body: "How we approached it" },
+        { label: "Result", body: "The measurable outcome" },
+      ];
+      if (csp === "editorial-light") {
+        return "<section style='background:" + bone + ";padding:100px 40px 60px;'><div style='max-width:800px;margin:0 auto;'>" +
+          "<div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;font-weight:600;'>Case Study</div>" +
+          "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 20px;line-height:1.1;'>Client Name: Project Title</h1>" +
+          "<p style='font-size:18px;color:" + text + ";line-height:1.7;margin:0;'>Brief overview of the challenge and what was delivered.</p>" +
+        "</div></section>" +
+        "<section style='background:" + bone + ";padding:0 40px;'><div style='max-width:800px;margin:0 auto;'>" +
+          "<div style='background:#e0ddd7;aspect-ratio:16/9;border-radius:6px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;margin-bottom:56px;'>Project hero image</div>" +
+        "</div></section>" +
+        "<section style='background:" + bone + ";padding:0 40px 56px;'><div style='max-width:800px;margin:0 auto;'>" +
+          "<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:32px;padding:40px 0;border-top:1px solid #E2DBCC;border-bottom:1px solid #E2DBCC;margin-bottom:48px;'>" +
+            metrics.map(function(m) {
+              return "<div><div style='font-size:11px;color:" + brass + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;font-weight:600;'>" + m.label + "</div><p style='font-size:15px;color:" + text + ";line-height:1.6;margin:0;'>" + m.body + "</p></div>";
+            }).join("") +
+          "</div>" +
+          "<div style='font-size:17px;color:" + text + ";line-height:1.8;'>" +
+            "<p style='margin-bottom:24px;'>The full editorial narrative goes here. Context, approach, execution, and results written for a reader who wants the story, not a slide deck.</p>" +
+            "<blockquote style='border-left:3px solid " + brass + ";padding:16px 24px;margin:32px 0;font-size:20px;color:" + ink + ";font-style:italic;line-height:1.5;'>A pull quote that highlights a key moment or result from the project.</blockquote>" +
+            "<p>Concluding section with results and what came next.</p>" +
+          "</div>" +
+        "</div></section>";
+      } else if (csp === "numbers-first") {
+        var stats = [["3x", "Revenue growth"], ["6mo", "Time to results"], ["98%", "Client retention"]];
+        return "<section style='background:" + bone + ";padding:100px 40px 60px;'><div style='max-width:800px;'>" +
+          "<div style='font-size:12px;color:" + brassDp + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;font-weight:600;'>Case Study</div>" +
+          "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 20px;line-height:1.1;'>Client Name: Project Title</h1>" +
+          "<p style='font-size:18px;color:" + text + ";line-height:1.7;margin:0;'>Brief overview of the challenge and the outcome.</p>" +
+        "</div></section>" +
+        "<section style='background:" + ink + ";padding:80px 40px;'>" +
+          "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:40px;max-width:900px;margin:0 auto;text-align:center;'>" +
+            stats.map(function(s) {
+              return "<div><div style='font-size:clamp(48px,6vw,72px);font-weight:800;color:" + brass + ";line-height:1;margin-bottom:8px;'>" + s[0] + "</div><div style='font-size:14px;color:" + warmWhite + ";opacity:.7;text-transform:uppercase;letter-spacing:1px;'>" + s[1] + "</div></div>";
+            }).join("") +
+          "</div>" +
+        "</section>" +
+        "<section style='background:" + bone + ";padding:80px 40px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:40px;max-width:900px;margin:0 auto;'>" +
+          metrics.map(function(m) {
+            return "<div><div style='font-size:13px;color:" + brass + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;font-weight:600;'>" + m.label + "</div><p style='font-size:16px;color:" + text + ";line-height:1.6;'>" + m.body + "</p></div>";
+          }).join("") +
+        "</div></section>" +
+        "<section style='background:" + bone + ";padding:0 40px 80px;max-width:760px;margin:0 auto;'><div style='font-size:17px;color:" + text + ";line-height:1.8;'><p>The full narrative goes here — context, approach, execution, and the story behind the numbers.</p></div></section>";
+      } else {
+        // dark-hero-metrics (default)
+        return "<section style='background:" + ink + ";padding:100px 40px;'>" +
+          "<div style='max-width:800px;'>" +
+            "<div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:24px;'>Case Study</div>" +
+            "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;line-height:1.1;'>Client Name: Project Title</h1>" +
+            "<p style='font-size:18px;color:" + warmWhite + ";opacity:.8;line-height:1.7;'>Brief overview of the challenge and the outcome.</p>" +
+          "</div>" +
+        "</section>" +
+        "<section style='background:" + bone + ";padding:80px 40px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:40px;max-width:900px;margin:0 auto 48px;text-align:center;'>" +
+          metrics.map(function(m) {
+            return "<div><div style='font-size:13px;color:" + brass + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;font-weight:600;'>" + m.label + "</div><p style='font-size:16px;color:" + text + ";line-height:1.6;'>" + m.body + "</p></div>";
+          }).join("") +
+        "</div></section>" +
+        "<section style='background:" + bone + ";padding:0 40px 80px;max-width:760px;margin:0 auto;'><div style='font-size:17px;color:" + text + ";line-height:1.8;'><p>The full case study narrative goes here — context, approach, execution, and results with real numbers.</p></div></section>";
+      }
+    })(),
+
+    // ── THANK YOU ──
+    "thank-you": "<section style='background:" + bone + ";min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;'>" +
+      "<div style='font-size:48px;margin-bottom:24px;'>✓</div>" +
+      "<h1 style='font-size:clamp(32px,5vw,48px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>Thank you.</h1>" +
+      "<p style='font-size:18px;color:" + text + ";max-width:480px;margin:0 auto 32px;line-height:1.7;'>Your message has been received. We will get back to you within one business day.</p>" +
+      "<a href='/' style='font-size:14px;color:" + brassDp + ";text-decoration:underline;'>← Back to homepage</a>" +
+    "</section>",
+
+    // ── PRIVACY / TERMS ──
+    privacy: "<section style='background:" + bone + ";padding:80px 40px;'><div style='max-width:760px;margin:0 auto;'>" +
+      "<h1 style='font-size:clamp(28px,4vw,40px);font-weight:800;color:" + ink + ";margin:0 0 32px;'>Privacy Policy</h1>" +
+      "<div style='font-size:16px;color:" + text + ";line-height:1.8;'><p style='margin-bottom:20px;'>Last updated: [Date]</p><h2 style='font-size:20px;font-weight:700;color:" + ink + ";margin:32px 0 12px;'>Information We Collect</h2><p style='margin-bottom:20px;'>Placeholder for your privacy policy content.</p><h2 style='font-size:20px;font-weight:700;color:" + ink + ";margin:32px 0 12px;'>How We Use Your Information</h2><p style='margin-bottom:20px;'>Placeholder for usage details.</p><h2 style='font-size:20px;font-weight:700;color:" + ink + ";margin:32px 0 12px;'>Contact</h2><p>For questions about this policy, contact us at [email].</p></div>" +
+    "</div></section>",
+
+    terms: "<section style='background:" + bone + ";padding:80px 40px;'><div style='max-width:760px;margin:0 auto;'>" +
+      "<h1 style='font-size:clamp(28px,4vw,40px);font-weight:800;color:" + ink + ";margin:0 0 32px;'>Terms of Service</h1>" +
+      "<div style='font-size:16px;color:" + text + ";line-height:1.8;'><p style='margin-bottom:20px;'>Last updated: [Date]</p><h2 style='font-size:20px;font-weight:700;color:" + ink + ";margin:32px 0 12px;'>Agreement to Terms</h2><p style='margin-bottom:20px;'>By accessing this website, you agree to these terms.</p><h2 style='font-size:20px;font-weight:700;color:" + ink + ";margin:32px 0 12px;'>Services</h2><p style='margin-bottom:20px;'>Description of services provided.</p><h2 style='font-size:20px;font-weight:700;color:" + ink + ";margin:32px 0 12px;'>Limitation of Liability</h2><p>Standard limitation clause placeholder.</p></div>" +
+    "</div></section>",
+
+    // ── 404 ──
+    "404": "<section style='background:" + bone + ";min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;'>" +
+      "<div style='font-family:Inter,sans-serif;font-size:clamp(80px,15vw,160px);font-weight:300;color:" + brass + ";line-height:1;margin-bottom:16px;'>404</div>" +
+      "<h1 style='font-size:clamp(24px,4vw,36px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>Page not found.</h1>" +
+      "<p style='font-size:17px;color:" + text + ";max-width:400px;margin:0 auto 32px;'>The page you are looking for does not exist or has been moved.</p>" +
+      "<a href='/' style='padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;display:inline-block;'>Back to homepage</a>" +
+    "</section>",
+
+    // ── PORTFOLIO SINGLE ──
+    portfolio: (function() {
+      if (variant === "B") {
+        // Editorial: bone hero + single full-width image + case study narrative
+        return "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:800px;'>" +
+          "<div style='font-size:12px;color:" + brassDp + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;font-weight:600;'>Portfolio</div>" +
+          "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 16px;line-height:1.1;'>Project Title</h1>" +
+          "<p style='font-size:17px;color:" + text + ";margin:0;line-height:1.7;'>Client Name · Category · Year</p>" +
+        "</div></section>" +
+        "<section style='background:" + bone + ";padding:0 40px 40px;'><div style='background:#e0ddd7;aspect-ratio:16/7;max-width:1160px;margin:0 auto;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Project hero image</div></section>" +
+        "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:1fr 2fr;gap:64px;max-width:1160px;margin:0 auto;'>" +
+          "<div>" +
+            "<div style='margin-bottom:32px;'><div style='font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:8px;'>Client</div><p style='font-size:15px;color:" + text + ";'>Client Name</p></div>" +
+            "<div style='margin-bottom:32px;'><div style='font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:8px;'>Category</div><p style='font-size:15px;color:" + text + ";'>Category</p></div>" +
+            "<div><div style='font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:8px;'>Year</div><p style='font-size:15px;color:" + text + ";'>2026</p></div>" +
+          "</div>" +
+          "<div><p style='font-size:17px;color:" + text + ";line-height:1.8;'>Full project description, approach, and results go here. This editorial layout gives the narrative room to breathe alongside the images.</p></div>" +
+        "</div></section>";
+      }
+      // Variant A — dark hero + image grid (current)
+      return "<section style='background:" + ink + ";padding:100px 40px;'>" +
+        "<div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:24px;'>Portfolio</div>" +
+        "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + warmWhite + ";margin:0 0 16px;line-height:1.1;'>Project Title</h1>" +
+        "<p style='font-size:16px;color:" + warmWhite + ";opacity:.7;'>Client Name · Category · Year</p>" +
+      "</section>" +
+      "<section style='background:" + bone + ";padding:64px 40px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:16px;max-width:1160px;margin:0 auto;'>" +
+        "<div style='background:#e0ddd7;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Project image</div>" +
+        "<div style='background:#e0ddd7;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Project image</div>" +
+      "</div></section>" +
+      "<section style='background:" + bone + ";padding:48px 40px 96px;'><div style='max-width:760px;margin:0 auto;font-size:17px;color:" + text + ";line-height:1.8;'><p>Project description and details go here.</p></div></section>";
+    })(),
+
+    // ── LOCATION ──
+    location: (function() {
+      if (variant === "B") {
+        // Centered — address first, map below
+        return "<section style='background:" + bone + ";padding:88px 40px;text-align:center;'><div style='max-width:640px;margin:0 auto;'>" +
+          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Location</div>" +
+          "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 24px;'>Visit us.</h1>" +
+          "<p style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>123 Main Street, Suite 100</p>" +
+          "<p style='font-size:16px;color:" + stone + ";margin:0 0 32px;'>City, State 00000</p>" +
+          "<div style='display:flex;gap:32px;justify-content:center;flex-wrap:wrap;margin-bottom:48px;'>" +
+            "<div><div style='font-size:12px;font-weight:600;color:" + brassDp + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;'>Phone</div><div style='font-size:15px;color:" + text + ";'>(555) 000-0000</div></div>" +
+            "<div><div style='font-size:12px;font-weight:600;color:" + brassDp + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;'>Email</div><div style='font-size:15px;color:" + text + ";'>hello@brand.com</div></div>" +
+            "<div><div style='font-size:12px;font-weight:600;color:" + brassDp + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;'>Hours</div><div style='font-size:15px;color:" + text + ";'>Mon–Fri 9am–5pm</div></div>" +
+          "</div>" +
+        "</div></section>" +
+        "<section style='background:#e0ddd7;padding:0;'><div style='aspect-ratio:21/9;max-height:360px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:14px;'>Map embed</div></section>";
+      }
+      // Variant A — map left, address right (current)
+      return "<section style='background:" + bone + ";padding:88px 40px;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Location</div>" +
+        "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 48px;'>Visit us.</h1>" +
+        "<div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;max-width:1000px;'>" +
+          "<div><div style='background:#e0ddd7;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;margin-bottom:16px;'>Map embed</div></div>" +
+          "<div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin-bottom:16px;'>Address</h3><p style='font-size:16px;color:" + text + ";line-height:1.7;margin-bottom:24px;'>123 Main Street<br>Suite 100<br>City, State 00000</p><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin-bottom:16px;'>Hours</h3><p style='font-size:16px;color:" + text + ";line-height:1.7;'>Monday – Friday: 9am – 5pm<br>Saturday – Sunday: Closed</p></div>" +
+        "</div>" +
+      "</section>";
+    })(),
+    // ── EVENT SINGLE ──
+    "event-single": (function() {
+      if (variant === "B") {
+        // Light centered layout
+        return "<section style='background:" + bone + ";padding:88px 40px;text-align:center;'><div style='max-width:640px;margin:0 auto;'>" +
+          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Event</div>" +
+          "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>Event Title Goes Here</h1>" +
+          "<div style='display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-bottom:32px;'>" +
+            "<span style='font-size:15px;color:" + stone + ";'>March 15, 2026</span>" +
+            "<span style='font-size:15px;color:" + stone + ";'>6:00 PM — 9:00 PM</span>" +
+            "<span style='font-size:15px;color:" + stone + ";'>Downtown Convention Center</span>" +
+          "</div>" +
+          "<a style='padding:14px 40px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;margin-bottom:48px;'>Register Now</a>" +
+        "</div></section>" +
+        "<section style='background:#ffffff;padding:64px 40px;'><div style='max-width:720px;margin:0 auto;'>" +
+          "<h2 style='font-weight:700;font-size:24px;color:" + ink + ";margin:0 0 16px;'>About This Event</h2>" +
+          "<p style='font-size:16px;color:" + text + ";line-height:1.7;margin:0 0 32px;'>Event description with details about what attendees can expect, who should attend, and what they will learn or experience.</p>" +
+          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:32px;'>" +
+            "<div><h3 style='font-weight:700;font-size:15px;color:" + brassDp + ";text-transform:uppercase;letter-spacing:1px;margin:0 0 12px;'>Schedule</h3><p style='font-size:15px;color:" + stone + ";line-height:1.8;'>6:00 PM — Doors open<br>6:30 PM — Opening remarks<br>7:00 PM — Main session<br>8:30 PM — Networking</p></div>" +
+            "<div><h3 style='font-weight:700;font-size:15px;color:" + brassDp + ";text-transform:uppercase;letter-spacing:1px;margin:0 0 12px;'>Location</h3><div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Map embed</div></div>" +
+          "</div>" +
+        "</div></section>";
+      }
+      // Variant A — dark hero (current)
+      return "<section style='background:" + ink + ";padding:88px 40px;'><div style='max-width:900px;margin:0 auto;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:16px;'>Event</div>" +
+        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + warmWhite + ";margin:0 0 16px;line-height:1.1;'>Event Title Goes Here</h1>" +
+        "<div style='display:flex;gap:24px;flex-wrap:wrap;margin-bottom:32px;'>" +
+          "<span style='font-size:15px;color:" + stone + ";'>March 15, 2026</span>" +
+          "<span style='font-size:15px;color:" + stone + ";'>6:00 PM — 9:00 PM</span>" +
+          "<span style='font-size:15px;color:" + stone + ";'>Downtown Convention Center</span>" +
+        "</div>" +
+        "<a style='padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>Register Now</a>" +
+      "</div></section>" +
+      "<section style='background:" + bone + ";padding:80px 40px;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:60px;max-width:900px;margin:0 auto;'>" +
+        "<div><div style='background:#e0ddd7;aspect-ratio:16/10;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Event image</div></div>" +
+        "<div><h2 style='font-weight:700;font-size:24px;color:" + ink + ";margin:0 0 16px;'>About This Event</h2><p style='font-size:16px;color:" + text + ";line-height:1.7;margin:0 0 24px;'>Event description with details about what attendees can expect.</p><h3 style='font-weight:700;font-size:16px;color:" + ink + ";margin:0 0 12px;'>Schedule</h3><p style='font-size:15px;color:" + stone + ";line-height:1.8;margin:0;'>6:00 PM — Doors open<br>6:30 PM — Opening remarks<br>7:00 PM — Main session<br>9:00 PM — Close</p></div>" +
+      "</div></section>";
+    })(),
+
+    // ── PRESS / MEDIA ──
+    press: (function() {
+      var articles = [["How This Startup is Changing the Game","Forbes · January 2026"],["10 Companies to Watch in 2026","Inc. · March 2026"],["The Future of Digital Services","TechCrunch · May 2026"]];
+      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Press</div>" +
+        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>In the media</h1>" +
+        "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0 0 48px;line-height:1.65;'>Coverage, features, and media mentions.</p>" +
+      "</div></section>";
+      if (variant === "B") {
+        // Featured hero article + grid
+        return "<section style='background:" + ink + ";padding:80px 40px;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;max-width:1160px;margin:0 auto;'>" +
+          "<div><div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;'>Featured Coverage</div>" +
+          "<h2 style='font-size:clamp(24px,3vw,36px);font-weight:800;color:" + warmWhite + ";margin:0 0 16px;line-height:1.2;'>" + articles[0][0] + "</h2>" +
+          "<p style='font-size:15px;color:" + stone + ";margin:0 0 24px;'>" + articles[0][1] + "</p>" +
+          "<a style='font-size:14px;color:" + brass + ";font-weight:600;text-decoration:none;'>Read the story →</a></div>" +
+          "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Press image</div>" +
+        "</div></section>" +
+        header +
+        "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:1160px;margin:0 auto;'>" +
+          articles.slice(1).map(function(a) {
+            return "<div style='background:#fff;border:1px solid #E2DBCC;padding:28px;border-radius:4px;'>" +
+              "<h3 style='font-size:17px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + a[0] + "</h3>" +
+              "<div style='font-size:13px;color:" + stone + ";margin-bottom:16px;'>" + a[1] + "</div>" +
+              "<a style='font-size:13px;color:" + brassDp + ";font-weight:600;text-decoration:none;'>Read →</a></div>";
+          }).join("") +
+        "</div></section>";
+      }
+      // Variant A — logo bar + article list (current)
+      return header +
+        "<section style='background:" + bone + ";padding:0 40px 48px;'><div style='max-width:1160px;margin:0 auto;'>" +
+          "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px;padding:40px 0;border-bottom:1px solid #E2DBCC;'>" +
+            ["Forbes", "Inc.", "TechCrunch", "Fast Company", "Bloomberg"].map(function(pub) {
+              return "<div style='text-align:center;padding:20px;background:#fff;border:1px solid #E2DBCC;border-radius:4px;'><div style='font-size:18px;font-weight:700;color:" + stone + ";'>" + pub + "</div></div>";
+            }).join("") +
+          "</div>" +
+        "</div></section>" +
+        "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:900px;margin:0 auto;'>" +
+          articles.map(function(a) {
+            return "<div style='display:grid;grid-template-columns:1fr auto;gap:24px;padding:24px 0;border-bottom:1px solid #E2DBCC;align-items:center;'>" +
+              "<div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 4px;'>" + a[0] + "</h3><div style='font-size:14px;color:" + stone + ";'>" + a[1] + "</div></div>" +
+              "<a style='font-size:13px;color:" + brassDp + ";font-weight:600;text-decoration:none;white-space:nowrap;'>Read →</a></div>";
+          }).join("") +
+        "</div></section>";
+    })(),
+
+    // ── PARTNERS ──
+    partners: (function() {
+      var partnerList = ["Partner One","Partner Two","Partner Three","Partner Four","Partner Five","Partner Six"];
+      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Partners</div>" +
+        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>Companies we work with</h1>" +
+        "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0 0 48px;line-height:1.65;'>Strategic partnerships that strengthen what we deliver.</p>" +
+      "</div></section>";
+      if (variant === "B") {
+        // Description list
+        return header +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:800px;margin:0 auto;'>" +
+            partnerList.map(function(p) {
+              return "<div style='display:grid;grid-template-columns:80px 1fr;gap:24px;padding:28px 0;border-bottom:1px solid #E2DBCC;align-items:center;'>" +
+                "<div style='background:#e0ddd7;width:64px;height:64px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:10px;'>Logo</div>" +
+                "<div><div style='font-size:16px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + p + "</div><p style='font-size:14px;color:" + stone + ";margin:0;line-height:1.5;'>A brief description of what this partner does and how the relationship benefits clients.</p></div>" +
+              "</div>";
+            }).join("") +
+          "</div></section>";
+      }
+      // Variant A — logo grid (current)
+      return header +
+        "<section style='background:" + bone + ";padding:0 40px 48px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;max-width:1160px;margin:0 auto;'>" +
+          partnerList.map(function(p) {
+            return "<div style='background:#fff;border:1px solid #E2DBCC;padding:40px 24px;text-align:center;border-radius:4px;'>" +
+              "<div style='background:#e0ddd7;width:80px;height:80px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:11px;'>Logo</div>" +
+              "<div style='font-size:16px;font-weight:700;color:" + ink + ";'>" + p + "</div></div>";
+          }).join("") +
+        "</div></section>" +
+        "<section style='background:#ffffff;padding:80px 40px;text-align:center;'><div style='max-width:600px;margin:0 auto;'>" +
+          "<h2 style='font-weight:800;font-size:28px;color:" + ink + ";margin:0 0 16px;'>Become a partner</h2>" +
+          "<p style='font-size:16px;color:" + text + ";margin:0 0 32px;line-height:1.7;'>Interested in working together? We would love to hear from you.</p>" +
+          "<a style='padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>Get in touch</a>" +
+        "</div></section>";
+    })(),
+
+    // ── RESOURCES ──
+    resources: (function() {
+      var items = [["Getting Started Guide","A step-by-step walkthrough for new clients.","PDF"],["Brand Toolkit","Templates, guidelines, and assets for your brand.","ZIP"],["Project Brief Template","Fill this out before our first meeting.","DOCX"],["Case Study Collection","Real results from real projects.","PDF"]];
+      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Resources</div>" +
+        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>Guides, tools, and downloads</h1>" +
+        "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0 0 48px;line-height:1.65;'>Everything you need to get the most out of working with us.</p>" +
+      "</div></section>";
+      if (variant === "B") {
+        // Categorized list
+        return header +
+          "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:800px;margin:0 auto;'>" +
+            items.map(function(r) {
+              return "<div style='display:grid;grid-template-columns:1fr auto;gap:24px;padding:20px 0;border-bottom:1px solid #E2DBCC;align-items:center;'>" +
+                "<div><div style='font-size:16px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + r[0] + "</div><div style='font-size:14px;color:" + stone + ";'>" + r[1] + "</div></div>" +
+                "<div style='display:flex;align-items:center;gap:12px;'><span style='font-size:11px;font-weight:700;color:" + brassDp + ";background:rgba(180,83,9,.1);padding:4px 8px;border-radius:3px;'>" + r[2] + "</span><a style='font-size:13px;color:" + brassDp + ";font-weight:600;text-decoration:none;white-space:nowrap;'>Download →</a></div>" +
+              "</div>";
+            }).join("") +
+          "</div></section>";
+      }
+      // Variant A — card grid (current)
+      return header +
+        "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;max-width:1160px;margin:0 auto;'>" +
+          items.map(function(r) {
+            return "<div style='background:#fff;border:1px solid #E2DBCC;padding:28px;border-radius:4px;display:flex;gap:20px;align-items:flex-start;'>" +
+              "<div style='width:48px;height:48px;background:" + bone + ";border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:" + brassDp + ";flex-shrink:0;'>" + r[2] + "</div>" +
+              "<div><h3 style='font-size:17px;font-weight:700;color:" + ink + ";margin:0 0 6px;'>" + r[0] + "</h3><p style='font-size:14px;color:" + stone + ";line-height:1.5;margin:0 0 12px;'>" + r[1] + "</p><a style='font-size:13px;color:" + brassDp + ";font-weight:600;text-decoration:none;'>Download →</a></div></div>";
+          }).join("") +
+        "</div></section>";
+    })(),
+
+    // ── DOWNLOADS ──
+    // ── DOWNLOADS ──
+    downloads: (function() {
+      var ditems = [["Brand Guidelines Template","Start with a professional framework."],["Social Media Calendar","Plan your content month by month."],["Project Scope Template","Define deliverables before you start."],["Invoice Template","Clean, professional billing."]];
+      var dheader = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +
+        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Downloads</div>" +
+        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>Free downloads</h1>" +
+        "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0 0 48px;line-height:1.65;'>Grab what you need. No email required.</p>" +
+      "</div></section>";
+      if (variant === "B") {
+        return dheader + "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;max-width:1160px;margin:0 auto;'>" +
+          ditems.map(function(d) {
+            return "<div style='background:#fff;border:1px solid #E2DBCC;padding:32px;border-radius:4px;text-align:center;'>" +
+              "<div style='width:48px;height:48px;background:rgba(180,83,9,.1);border-radius:10px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:" + brassDp + ";'>PDF</div>" +
+              "<h3 style='font-size:15px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + d[0] + "</h3>" +
+              "<p style='font-size:13px;color:" + stone + ";margin:0 0 20px;line-height:1.5;'>" + d[1] + "</p>" +
+              "<a style='padding:10px 20px;background:" + brassDp + ";color:#ffffff;font-size:12px;font-weight:600;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>Download</a>" +
+            "</div>";
+          }).join("") + "</div></section>";
+      }
+      return dheader + "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:800px;margin:0 auto;'>" +
+        ditems.map(function(d) {
+          return "<div style='display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid #E2DBCC;'><div><div style='font-size:16px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + d[0] + "</div><div style='font-size:14px;color:" + stone + ";'>" + d[1] + "</div></div><a style='padding:10px 24px;background:" + brassDp + ";color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;white-space:nowrap;'>Download</a></div>";
+        }).join("") +
+      "</div></section>";
+    })(),
+
+    // ── 404 ──
+    "404": "<section style='background:" + bone + ";min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;'>" +
+      "<div style='font-size:clamp(80px,15vw,160px);font-weight:800;color:" + brass + ";line-height:1;margin-bottom:16px;'>404</div>" +
+      "<h1 style='font-size:clamp(24px,4vw,36px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>Page not found</h1>" +
+      "<p style='font-size:17px;color:" + text + ";max-width:400px;margin:0 auto 32px;line-height:1.7;'>The page you are looking for does not exist or has been moved.</p>" +
+      "<a style='padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>Back to homepage</a>" +
+    "</section>",
+
+  };
+
+  var ap = activePage.toLowerCase();
+  var body = sections[ap] 
+    || sections[ap.replace(/-\d+$/, "")] 
+    || sections[ap.split("-")[0]]
+    || sections[ap.replace(/[^a-z]/g, "")]
+    || sections.home;
+
+  var navItems = (brief.pages || ["Home","About","Services","Contact"]).map(function(p) { return typeof p === "string" ? p : (p.label || p.name || p); }).slice(0,6);
+
+  return "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>" +
+    "<title>" + (brief.brandName || "Preview") + "</title>" +
+    "<link href='" + fontUrl + "' rel='stylesheet'>" +
+    "<style>" +
+      "*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}" +
+      "body{font-family:'Inter',system-ui,sans-serif;font-size:17px;line-height:1.65;background:" + bone + ";color:" + text + ";}" +
+      "img{max-width:100%;}section{width:100%;}" +
+      "#mobile-nav{display:none;}" +
+      "@media(max-width:768px){" +
+        ".nav-links{display:none !important;}" +
+        ".hamburger{display:flex !important;}" +
+        "#mobile-nav.open{display:block !important;}" +
+        // Section padding — catch all patterns including clamp() values
+        "section{padding:44px 20px !important;}" +
+        // Kill inner div horizontal padding so content isn't double-indented
+        "section > div{padding-left:0 !important;padding-right:0 !important;}" +
+        // Grid: force single column
+        "[style*='grid-template-columns']{grid-template-columns:1fr !important;gap:16px !important;}" +
+        // Flex rows that should stack
+        "[style*='display:flex'][style*='gap:48px'],[style*='display:flex'][style*='gap:64px'],[style*='display:flex'][style*='gap:80px']{flex-direction:column !important;gap:20px !important;}" +
+        "[style*='display:flex'][style*='gap:40px']{flex-direction:column !important;gap:16px !important;}" +
+        // Image placeholders — cap height so they don't eat the whole screen
+        "[style*='aspect-ratio:16/9']{aspect-ratio:unset !important;height:180px !important;}" +
+        "[style*='aspect-ratio:4/3']{aspect-ratio:unset !important;height:180px !important;}" +
+        "[style*='aspect-ratio:3/4']{aspect-ratio:unset !important;height:200px !important;}" +
+        "[style*='aspect-ratio:1']{aspect-ratio:unset !important;height:160px !important;}" +
+        // Spacers — halve them all
+        "div[style='height:120px']{height:40px !important;}" +
+        "div[style='height:112px']{height:36px !important;}" +
+        "div[style='height:96px']{height:32px !important;}" +
+        "div[style='height:88px']{height:28px !important;}" +
+        "div[style='height:80px']{height:28px !important;}" +
+        "div[style='height:72px']{height:24px !important;}" +
+        "div[style='height:64px']{height:20px !important;}" +
+        "div[style='height:56px']{height:16px !important;}" +
+        "div[style='height:48px']{height:16px !important;}" +
+        "div[style='height:40px']{height:14px !important;}" +
+        "div[style='height:32px']{height:12px !important;}" +
+        "div[style='height:28px']{height:10px !important;}" +
+        "div[style='height:24px']{height:8px !important;}" +
+        // Headings
+        "h1{font-size:clamp(26px,7vw,38px) !important;line-height:1.15 !important;}" +
+        "h2{font-size:clamp(22px,6vw,30px) !important;}" +
+        "h3{font-size:17px !important;}" +
+        // Buttons full width on mobile
+        "a[style*='padding:14px'],a[style*='padding:16px']{display:block !important;text-align:center !important;width:100% !important;box-sizing:border-box !important;}" +
+        // Min-height sections (heroes) — less tall on mobile
+        "[style*='min-height:80vh'],[style*='min-height:70vh']{min-height:50vh !important;}" +
+        // Footer
+        "footer{padding:32px 20px !important;}" +
+        "footer > div{flex-direction:column !important;gap:16px !important;}" +
+      "}" +
+    "</style>" +
+    "</head><body>" +
+    "<nav style='background:" + ink + ";padding:14px clamp(20px,5vw,60px);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;'>" +
+      "<div style='font-family:Inter,sans-serif;font-weight:800;font-size:18px;color:" + warmWhite + ";'>" + (brief.brandName || "Brand") + "</div>" +
+      "<div class='nav-links' style='display:flex;gap:24px;align-items:center;'>" +
+        navItems.map(function(l) { return "<a style='color:" + warmWhite + ";text-decoration:none;font-size:14px;font-weight:500;'>" + l + "</a>"; }).join("") +
+        "<a style='padding:8px 20px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;text-decoration:none;border-radius:4px;margin-left:8px;'>" + (brief.headerCta || "Get in touch") + "</a>" +
+      "</div>" +
+      "<button class='hamburger' onclick='toggleMobileNav()' style='display:none;background:none;border:none;cursor:pointer;padding:4px;'>" +
+        "<svg id='ham-icon' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='" + warmWhite + "' stroke-width='2' stroke-linecap='round'>" +
+          "<line x1='3' y1='6' x2='21' y2='6'/><line x1='3' y1='12' x2='21' y2='12'/><line x1='3' y1='18' x2='21' y2='18'/>" +
+        "</svg>" +
+        "<svg id='close-icon' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='" + warmWhite + "' stroke-width='2' stroke-linecap='round' style='display:none;'>" +
+          "<line x1='4' y1='4' x2='20' y2='20'/><line x1='20' y1='4' x2='4' y2='20'/>" +
+        "</svg>" +
+      "</button>" +
+    "</nav>" +
+    "<div id='mobile-nav' style='background:" + ink + ";border-top:1px solid rgba(255,255,255,.1);'>" +
+      "<div style='padding:8px 20px 20px;display:flex;flex-direction:column;gap:0;'>" +
+        navItems.map(function(l) { return "<a style='color:" + warmWhite + ";text-decoration:none;font-size:16px;font-weight:500;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07);display:block;'>" + l + "</a>"; }).join("") +
+        "<a style='margin-top:16px;padding:14px 20px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;text-decoration:none;border-radius:4px;text-align:center;display:block;'>" + (brief.headerCta || "Get in touch") + "</a>" +
+      "</div>" +
+    "</div>" +
+    body +
+    "<footer style='background:" + ink + ";padding:48px clamp(20px,5vw,60px);'>" +
+      "<div style='display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:32px;'>" +
+        "<div><div style='font-family:Inter,sans-serif;font-weight:800;font-size:18px;color:" + warmWhite + ";margin-bottom:8px;'>" + (brief.brandName || "Brand") + "</div>" +
+        "<div style='font-size:13px;color:" + stone + ";'>" + (brief.tagline || "") + "</div></div>" +
+        "<div style='display:flex;gap:20px;flex-wrap:wrap;'>" + navItems.map(function(l) { return "<a style='color:" + stone + ";text-decoration:none;font-size:13px;'>" + l + "</a>"; }).join("") + "</div>" +
+        "<div style='font-size:13px;color:" + stone + ";'>" + (brief.contactEmail || "") + "</div>" +
+      "</div>" +
+    "</footer>" +
+    "<script>" +
+      "function toggleMobileNav(){" +
+        "var nav=document.getElementById('mobile-nav');" +
+        "var ham=document.getElementById('ham-icon');" +
+        "var cls=document.getElementById('close-icon');" +
+        "var open=nav.classList.toggle('open');" +
+        "ham.style.display=open?'none':'block';" +
+        "cls.style.display=open?'block':'none';" +
+      "}" +
+      // Mobile padding catch-all — fires after render, catches clamp() values CSS can't target
+      "if(window.innerWidth<=768){" +
+        "document.querySelectorAll('section').forEach(function(el){" +
+          "el.style.paddingTop='44px';" +
+          "el.style.paddingBottom='44px';" +
+          "el.style.paddingLeft='20px';" +
+          "el.style.paddingRight='20px';" +
+        "});" +
+        "document.querySelectorAll('section > div').forEach(function(el){" +
+          "el.style.paddingLeft='0';" +
+          "el.style.paddingRight='0';" +
+        "});" +
+      "}" +
+    "</script>" +
+    "</body></html>";
+}
