@@ -353,7 +353,7 @@ Important guardrails:
 
       const res = await fetch("/api/generate-copy", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) },
         body: JSON.stringify({
           model: "claude-haiku-4-5-20251001",
           max_tokens: 1000,
@@ -423,11 +423,9 @@ Return ONLY the new ${fieldName} value as plain text.`;
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 20000);
-      const res = await fetch("/api/anthropic", {
+      const res = await fetch("/api/generate-copy", {
         method: "POST",
-        headers: { "Content-Type": "application/json",
-          "x-api-key": "",
-          "anthropic-dangerous-direct-browser-access": "true" },
+        headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) },
         body: JSON.stringify({
           model: "claude-sonnet-4-5",
           max_tokens: 400,
@@ -575,11 +573,9 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000);
-      const res = await fetch("/api/anthropic", {
+      const res = await fetch("/api/generate-copy", {
         method: "POST",
-        headers: { "Content-Type": "application/json",
-          "x-api-key": "",
-          "anthropic-dangerous-direct-browser-access": "true" },
+        headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) },
         body: JSON.stringify({
           model: "claude-sonnet-4-5",
           max_tokens: 800,
