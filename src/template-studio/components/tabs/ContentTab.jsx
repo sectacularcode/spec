@@ -1,7 +1,7 @@
 import { Section } from "../Section.jsx";
 import { Icon } from "../Icon.jsx";
 import { I } from "../../styles.js";
-import { PAGE_TYPES, SECTION_OPTIONS } from "../../constants/ui.js";
+import { PAGE_TYPES, SECTION_OPTIONS } from "../../constants/ui.jsx";
 
 export default function ContentTab({ ctx }) {
   const { brand, page, project, updPage, clearDemoContent } = ctx;
