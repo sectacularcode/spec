@@ -2,19 +2,19 @@
 
 A browser-based planning tool for WordPress designers. Converts brand briefs into structured, importable page templates for Elementor (primary) and Divi (secondary).
 
-**Live:** [specish.com](https://specish.com)  
-**Repo:** `sectacularcode/elementor-builder2`  
-**Stack:** React 19 + Vite, deployed on Vercel Pro, Upstash Redis for KV storage
+**Live:** [specish.com](https://specish.com)
+**Repo:** `sectacularcode/elementor-builder2`
+**Stack:** React 19 + Vite v8, deployed on Vercel Pro, Upstash Redis for KV storage
 
 ---
 
-## Two workflows
+## Two tools
 
 ### Template Studio
-Pre-built industry templates with a full visual editor. Fill in brand details (colors, fonts, copy), pick page sections, and export clean Elementor JSON. Renders a live preview of the site as you edit.
+Pre-built industry templates with a full visual editor. Fill in brand details (colors, fonts, copy), pick page sections, and export clean Elementor JSON. Renders a live preview as you edit.
 
 ### Brief to Blueprint
-Upload a client brand brief (DOCX, PDF, JSON, or TXT) or fill out the intake form. Select pages. Generate a complete multi-page site structure with AI-drafted copy in the brand voice. A/B layout variants are selected based on the brief's industry and any crawled inspo URLs.
+Upload a client brand brief (DOCX, PDF, JSON, or TXT) or fill out the intake form. Select pages. Generate a complete multi-page site structure with AI-drafted copy in the brand voice. A/B layout variants are selected based on the brief and any crawled inspo URLs.
 
 ---
 
@@ -22,124 +22,130 @@ Upload a client brand brief (DOCX, PDF, JSON, or TXT) or fill out the intake for
 
 ```
 src/
-  App.jsx                    — Auth, top nav, tab routing between tools
-  main.jsx                   — React root, ErrorBoundary wrapper
-  index.css                  — Global resets only
-  elementor-builder.jsx      — Template Studio (entire tool)
-  CustomBuild.jsx            — Brief to Blueprint (entire tool)
+  App.jsx                        — Auth, top nav, tab routing between tools
+  main.jsx                       — React root, ErrorBoundary wrapper
+  index.css                      — Global resets only
   components/
-    ErrorBoundary.jsx        — Catches render errors, shows reload prompt
+    ErrorBoundary.jsx
   constants/
-    pages.js                 — Page definitions, form tabs, default colors/tiers
-    patterns.js              — Layout pattern library (LAYOUT_PATTERNS)
+    pages.js                     — Shared page type definitions (B2B)
+    patterns.js                  — Shared layout pattern data (B2B)
+  utils/
+    htmlEscape.js                — Shared HTML escape utility
+
+  template-studio/
+    index.jsx                    — State, handlers, layout shell, ctx object
+    styles.js                    — I style tokens (inputs, labels, buttons)
+    builders/
+      helpers.js                 — Elementor JSON primitives
+      buildPageJSON.js           — Page template builder
+      buildHeaderJSON.js         — Header template builder
+      buildFooterJSON.js         — Footer template builder
+      buildDiviPage.js           — Divi page builder
+      buildDiviFooter.js         — Divi footer builder
+    components/
+      Icon.jsx                   — SVG icon component
+      Section.jsx                — Collapsible section wrapper
+      tabs/
+        DiscoveryTab.jsx         — Discovery tab UI
+        PositioningTab.jsx       — Positioning tab UI
+        BrandTab.jsx             — Visual/brand tab UI
+        ContentTab.jsx           — Content tab UI
+        SocialTab.jsx            — Social tab UI
+        HeaderFooterTab.jsx      — Header & Footer tab UI
+        ExportTab.jsx            — Export & Import tab UI
+    constants/
+      ui.js                      — Page types, section options, tones, fonts
+      themes.js                  — Color themes
+      layouts.js                 — Layout definitions
+      templates.js               — Website and page templates
+    preview/
+      previewHTML.js             — Live preview HTML renderer
+    utils/
+      colors.js                  — Contrast and color utilities
+      images.js                  — Image library and helpers
+      svg.js                     — Social SVG icons
+      audit.js                   — Brand audit logic
+      htmlEscape.js              — Re-exports from src/utils/htmlEscape.js
+
+  brief-to-blueprint/
+    index.jsx                    — State, handlers, layout shell
+    styles.js                    — T style tokens (inputs, buttons, surfaces)
+    builders/
+      generatePages.js           — Orchestrates all page builders
+      helpers.js                 — Elementor JSON primitives
+      headerFooter.js            — Header and footer builders
+      home.js / about.js / work.js / services.js / process.js / contact.js / generic.js
+    components/
+      IntakeForm.jsx             — Manual brand intake form
+      BriefReview.jsx            — Parsed brief review/edit UI
+    preview/
+      buildPreviewHTML.js        — Live preview HTML renderer
+    utils/
+      extractBrief.js            — Extract fields from raw brief data
+      inspo.js                   — Inspo URL pattern builder
+      library.js                 — Section library save/load
+      patterns.js                — Layout pattern selection
+      storage.js                 — KV storage wrappers
+      htmlEscape.js              — Re-exports from src/utils/htmlEscape.js
 
 api/
-  auth.js                    — POST /api/auth — login with rate limiting
-  me.js                      — GET /api/me — session check
-  signout.js                 — POST /api/signout — clear session cookie
-  parse-brief.js             — POST /api/parse-brief — extract fields from uploaded file
-  crawl-inspo.js             — POST /api/crawl-inspo — crawl a URL for layout patterns
-  draft-copy.js              — POST /api/draft-copy — AI-draft empty brief fields
-  analyze-inspo.js           — POST /api/analyze-inspo — AI layout recommendations
-  storage.js                 — GET/POST /api/storage — Upstash Redis KV proxy
-  anthropic.js               — Anthropic API proxy (dev only)
+  auth.js                        — Password auth, httpOnly cookie, rate limiting
+  me.js                          — Session check
+  signout.js                     — Clear session cookie
+  parse-brief.js                 — DOCX/PDF/TXT brief extraction via Claude
+  draft-copy.js                  — AI copy drafting for blank fields
+  analyze-inspo.js               — AI layout variant recommendations from inspo
+  crawl-inspo.js                 — Crawl inspo URLs, extract structure via Claude
+  storage.js                     — KV proxy for project and draft persistence
 ```
 
 ---
 
-## Running locally
+## Auth
 
-```bash
-npm install
-npm run dev
-```
+Password-based. Passwords stored in `SPEC_PASSWORDS` Vercel env var (comma-separated for multiple users). Session stored as an httpOnly cookie keyed to `SPEC_SESSION_SECRET`. Rate limited: 5 failed attempts per IP locks out for 15 minutes via Upstash Redis.
 
-Create a `.env.local` file with:
-
-```
-VITE_ANTHROPIC_API_KEY=your_key_here
-SPEC_PASSWORDS=yourpassword
-SPEC_SESSION_SECRET=any_long_random_string
-KV_REST_API_URL=your_upstash_url
-KV_REST_API_TOKEN=your_upstash_token
-```
-
-The dev server proxies `/api/anthropic` to Anthropic's API. All other `/api/*` routes are Vercel serverless functions — use `vercel dev` to run them locally, or the tool will gracefully skip features that depend on them.
+All API routes (except `auth.js`, `me.js`, `signout.js`) verify the session cookie before processing.
 
 ---
 
 ## Environment variables (Vercel)
 
 | Variable | Purpose |
-|----------|---------|
-| `SPEC_PASSWORDS` | Comma-separated list of valid passwords e.g. `pass1,pass2,pass3` |
-| `SPEC_SESSION_SECRET` | Random 32+ char string used as the session cookie value |
-| `KV_REST_API_URL` | Upstash Redis REST URL |
-| `KV_REST_API_TOKEN` | Upstash Redis token |
+|---|---|
+| `SPEC_PASSWORDS` | Comma-separated login passwords |
+| `SPEC_SESSION_SECRET` | Session cookie value (treat as a secret) |
+| `KV_REST_API_URL` | Upstash Redis endpoint |
+| `KV_REST_API_TOKEN` | Upstash Redis auth token |
 | `KV_REST_API_READ_ONLY_TOKEN` | Upstash read-only token |
-| `ANTHROPIC_API_KEY` | Claude API key for brief parsing and AI copy drafting |
-| `VITE_ANTHROPIC_API_KEY` | Same key, exposed to Vite dev proxy |
+| `ANTHROPIC_API_KEY` | Claude API key for server-side AI routes |
 
 ---
 
-## Elementor JSON export format
+## Key rules for contributors
 
-Exports use Elementor's container/flexbox system (v4.x compatible). The JSON structure is:
-
-```json
-{
-  "version": "0.4",
-  "title": "Page name",
-  "type": "page",
-  "page_settings": {},
-  "content": [ ...container widgets... ]
-}
-```
-
-Each container widget looks like:
-```json
-{
-  "id": "abc1234",
-  "elType": "container",
-  "settings": { "background_color": "#1C1A17", "padding": {...} },
-  "elements": [ ...child widgets... ]
-}
-```
-
-Import via: **WordPress → Templates → Saved Templates → Import**  
-Header/Footer via: **WordPress → Templates → Theme Builder → Import**
+- **Always fetch fresh file SHA via GET before any PUT to GitHub** — reusing cached SHAs causes silent failures.
+- **Validate JSX with `@babel/parser` before pushing** — Vite v8/rolldown gives cryptic errors on bad JSX.
+- **Never do global hex replacements** — the same hex values appear in both UI styles and generated Elementor JSON template strings.
+- **All fonts load from `index.html` globally** — never use component-level `@import`.
+- **State lives in `index.jsx`** for each tool. Tab components receive a `ctx` prop containing all state and handlers they need. Add new state to `index.jsx`, add it to the `ctx` object, then consume it in the relevant tab.
+- **New API routes must include the session auth check** — see any existing protected route for the pattern.
+- **Auto-deploys from `main` in ~60–90 seconds.** Hard refresh (`Cmd+Shift+R`) required after deploy.
 
 ---
 
-## Adding a layout pattern variant
+## Design system
 
-1. Add an entry to `src/constants/patterns.js` under the relevant section key
-2. Add a rendering case in `buildPreviewHTML()` inside `CustomBuild.jsx` (find the `sections` object)
-3. Add an A/B override in the pattern override block at the top of `buildPreviewHTML()`
-4. Optionally add a variant JSON builder in `generatePages()` for the Elementor export
-
----
-
-## Adding a new page type
-
-1. Add the page definition to `ADDITIONAL_PAGE_TYPES` in `src/constants/pages.js`
-2. Add a preview section in the `sections` object inside `buildPreviewHTML()` in `CustomBuild.jsx`
-3. Add pattern overrides for A/B if the page should have layout variants
-4. If the page needs a custom Elementor JSON structure, add a builder function and wire it in `generatePages()`
-
----
-
-## Auth
-
-Login is server-side. The password is validated against `SPEC_PASSWORDS` in `api/auth.js`. Sessions use an httpOnly cookie (`spec_sess`). Rate limited to 5 failed attempts per IP per 15 minutes using Upstash Redis.
-
-To add a tester: add their password to `SPEC_PASSWORDS` and redeploy.  
-To revoke access: remove their password from `SPEC_PASSWORDS` and redeploy.  
-To force all sessions to expire: change `SPEC_SESSION_SECRET` and redeploy.
-
----
-
-## Deploying
-
-Pushes to `main` auto-deploy to Vercel. Build takes ~60–90 seconds.  
-Hard refresh (`Cmd+Shift+R`) required to clear browser cache after deploy.
+| Token | Value |
+|---|---|
+| Primary accent | `#b45309` (amber) |
+| Accent wash | `rgba(180, 83, 9, 0.1)` |
+| Secondary buttons | `#6b635c` (warm stone) |
+| Border | `#dde0e6` |
+| Canvas background | `#eeedf1` |
+| Cards | `#ffffff` |
+| UI font | Be Vietnam Pro |
+| Logo / headings | Outfit 800 |
+| Top nav | system Inter |
+| Top nav height | 48px fixed |
