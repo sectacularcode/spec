@@ -25,7 +25,7 @@ import { buildPreviewHTML } from "./preview/buildPreviewHTML.js";
 import { IntakeForm } from "./components/IntakeForm.jsx";
 import { BriefReview } from "./components/BriefReview.jsx";
 
-export default function CustomBuild() {
+export default function CustomBuild({ userId } = {}) {
   const [brief, setBrief]               = useState(null);
   const [briefName, setBriefName]       = useState("");
   const [briefError, setBriefError]     = useState("");
@@ -80,7 +80,7 @@ export default function CustomBuild() {
     async function loadDraft() {
       
       try {
-        const result = await kvStorageGet("spec-blueprint-draft");
+        const result = await kvStorageGet("spec-blueprint-draft, userId);
         if (!result || !result.value) return;
         const draft = JSON.parse(result.value);
         if (draft.brief)          setBrief(draft.brief);
@@ -129,7 +129,7 @@ export default function CustomBuild() {
           }))
         } : null,
       };
-      kvStorageSet("spec-blueprint-draft", JSON.stringify(draft)).catch(() => {});
+      kvStorageSet("spec-blueprint-draft, JSON.stringify(draft, userId)).catch(() => {});
     }, 800);
     return () => clearTimeout(timer);
   }, [brief, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants, previewPage, crawlResults, generated]);
@@ -138,7 +138,7 @@ export default function CustomBuild() {
   useEffect(() => {
     async function loadDrafts() {
       try {
-        const result = await kvStorageGet("spec-blueprint-drafts");
+        const result = await kvStorageGet("spec-blueprint-drafts, userId);
         if (result && result.value) {
           const parsed = JSON.parse(result.value);
           if (Array.isArray(parsed)) setDrafts(parsed);
@@ -150,7 +150,7 @@ export default function CustomBuild() {
 
   async function saveDraftToList(draftState) {
     try {
-      const existing = await kvStorageGet("spec-blueprint-drafts");
+      const existing = await kvStorageGet("spec-blueprint-drafts, userId);
       let list = [];
       if (existing && existing.value) {
         try { list = JSON.parse(existing.value); } catch(e) {}
@@ -169,7 +169,7 @@ export default function CustomBuild() {
       const deduped = list.filter(d => !(d.clientName === entry.clientName && d.date === entry.date));
       deduped.unshift(entry);
       if (deduped.length > 20) deduped.length = 20;
-      await kvStorageSet("spec-blueprint-drafts", JSON.stringify(deduped));
+      await kvStorageSet("spec-blueprint-drafts, JSON.stringify(deduped, userId));
       setDrafts(deduped);
     } catch(e) {}
   }
@@ -192,14 +192,14 @@ export default function CustomBuild() {
   async function deleteDraft(id) {
     try {
       const updated = drafts.filter(d => d.id !== id);
-      await kvStorageSet("spec-blueprint-drafts", JSON.stringify(updated));
+      await kvStorageSet("spec-blueprint-drafts, JSON.stringify(updated, userId));
       setDrafts(updated);
     } catch(e) {}
   }
   useEffect(() => {
     async function loadPatterns() {
       try {
-        const result = await kvStorageGet("spec-inspo-patterns");
+        const result = await kvStorageGet("spec-inspo-patterns, userId);
         if (result && result.value) {
           const parsed = JSON.parse(result.value);
           // Handle both old per-page format and new flat pool format
@@ -217,7 +217,7 @@ export default function CustomBuild() {
     async function loadSectionLibrary() {
       
       try {
-        const result = await kvStorageGet("spec-section-library");
+        const result = await kvStorageGet("spec-section-library, userId);
         if (result && result.value) setSectionLibrary(JSON.parse(result.value));
       } catch(e) {}
     }
@@ -402,7 +402,7 @@ export default function CustomBuild() {
           // Persist the merged pattern pool to storage
           if (data.patterns) {
             const merged = buildInspoContext(updated, storedPatterns);
-            kvStorageSet("spec-inspo-patterns", JSON.stringify({ pool: merged })).catch(() => {});
+            kvStorageSet("spec-inspo-patterns, JSON.stringify({ pool: merged }, userId)).catch(() => {});
             setStoredPatterns({ pool: merged });
           }
           return updated;
@@ -694,7 +694,7 @@ export default function CustomBuild() {
                   setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]);
                   setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({});
                   setPreviewPage("home"); setPageOverrides({}); setCustomPages([]);
-                  { try { await kvStorageDel("spec-blueprint-draft"); } catch(e) {} }
+                  { try { await kvStorageDel("spec-blueprint-draft, userId); } catch(e) {} }
                 }}
                 style={{ fontSize: "12px", color: "#6b7280", background: "none", border: "1px solid #dde0e6", borderRadius: "4px", padding: "5px 10px", cursor: "pointer" }}>
                 Clear draft
