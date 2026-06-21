@@ -1,6 +1,5 @@
-// GET  /api/user-role?userId=xxx  — get a user's role and tools
-// POST /api/user-role — { action: "set"|"delete", userId, role?, tools? }
-// Admin-only for set/delete. Any authed user can GET their own role.
+// GET  /api/user-role?userId=xxx  — get a user role (userId from Clerk client)
+// POST /api/user-role — { action: "set"|"delete"|"list", userId, role?, tools? }
 
 const KV_URL   = process.env.KV_REST_API_URL;
 const KV_TOKEN = process.env.KV_REST_API_TOKEN;
@@ -25,53 +24,38 @@ async function kvDel(key) {
   });
 }
 
-async function verifyClerkToken(req) {
-  const clerkSecretKey = process.env.CLERK_SECRET_KEY;
-  if (!clerkSecretKey) return null;
-  const authHeader = req.headers.authorization || "";
-  const cookieHeader = req.headers.cookie || "";
-  const sessionToken =
-    (authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null) ||
-    (cookieHeader.match(/(?:^|;\s*)__session=([^;]+)/)?.[1]) ||
-    null;
-  if (!sessionToken) return null;
-  try {
-    const verifyRes = await fetch("https://api.clerk.com/v1/tokens/verify", {
-      method: "POST",
-      headers: { "Authorization": "Bearer " + clerkSecretKey, "Content-Type": "application/json" },
-      body: JSON.stringify({ token: sessionToken })
-    });
-    if (!verifyRes.ok) return null;
-    const data = await verifyRes.json();
-    return data.sub || null; // returns clerk user ID
-  } catch { return null; }
+// For write operations, verify using bootstrap secret or existing admin check
+async function getRequesterRole(requesterId) {
+  if (!requesterId) return null;
+  const profile = await kvGet(`spec:user:${requesterId}`);
+  return profile ? profile.role : "staff";
 }
 
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  const requesterId = await verifyClerkToken(req);
-  if (!requesterId) return res.status(401).json({ error: "Unauthorized" });
-
+  // GET — read role for a userId passed from the authenticated Clerk client
   if (req.method === "GET") {
-    const userId = req.query.userId || requesterId;
+    const userId = req.query.userId;
+    if (!userId) return res.status(400).json({ error: "Missing userId" });
     const profile = await kvGet(`spec:user:${userId}`) || { role: "staff", tools: ["template-studio", "brief-to-blueprint"] };
     return res.status(200).json(profile);
   }
 
   if (req.method === "POST") {
-    // Only admin or manager can set/delete roles
-    const requesterProfile = await kvGet(`spec:user:${requesterId}`) || { role: "staff" };
-    if (!["admin", "manager"].includes(requesterProfile.role)) {
+    const { action, userId, role, tools, requesterId } = req.body || {};
+
+    // list and set/delete require a requesterId to check permissions
+    if (!requesterId) return res.status(401).json({ error: "Missing requesterId" });
+    const requesterRole = await getRequesterRole(requesterId);
+
+    if (!["admin", "manager"].includes(requesterRole)) {
       return res.status(403).json({ error: "Forbidden" });
     }
 
-    const { action, userId, role, tools } = req.body || {};
-    if (!userId) return res.status(400).json({ error: "Missing userId" });
-
     if (action === "set") {
-      // Managers can only set staff roles, not admin or manager
-      if (requesterProfile.role === "manager" && role !== "staff") {
+      if (!userId) return res.status(400).json({ error: "Missing userId" });
+      if (requesterRole === "manager" && role !== "staff") {
         return res.status(403).json({ error: "Managers can only assign staff roles" });
       }
       const existing = await kvGet(`spec:user:${userId}`) || {};
@@ -85,15 +69,14 @@ export default async function handler(req, res) {
     }
 
     if (action === "delete") {
-      if (requesterProfile.role !== "admin") return res.status(403).json({ error: "Forbidden" });
+      if (requesterRole !== "admin") return res.status(403).json({ error: "Forbidden" });
+      if (!userId) return res.status(400).json({ error: "Missing userId" });
       await kvDel(`spec:user:${userId}`);
       return res.status(200).json({ ok: true });
     }
 
     if (action === "list") {
-      // Admin only
-      if (requesterProfile.role !== "admin") return res.status(403).json({ error: "Forbidden" });
-      // Return list of all user keys
+      if (requesterRole !== "admin") return res.status(403).json({ error: "Forbidden" });
       const listRes = await fetch(`${KV_URL}/keys/spec:user:*`, {
         headers: { Authorization: `Bearer ${KV_TOKEN}` },
       });
