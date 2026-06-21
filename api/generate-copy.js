@@ -5,25 +5,19 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  // Clerk auth — verify session token from Authorization header or __session cookie
-  const clerkSecretKey = process.env.CLERK_SECRET_KEY;
-  if (!clerkSecretKey) return res.status(500).json({ error: "Auth not configured" });
-  const authHeader = req.headers.authorization || "";
-  const cookieHeader = req.headers.cookie || "";
-  const sessionToken =
-    (authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null) ||
-    (cookieHeader.match(/(?:^|;\s*)__session=([^;]+)/)?.[1]) ||
-    null;
-  if (!sessionToken) return res.status(401).json({ error: "Unauthorized" });
-  try {
-    const verifyRes = await fetch("https://api.clerk.com/v1/tokens/verify", {
-      method: "POST",
-      headers: { "Authorization": "Bearer " + clerkSecretKey, "Content-Type": "application/json" },
-      body: JSON.stringify({ token: sessionToken })
-    });
-    if (!verifyRes.ok) return res.status(401).json({ error: "Unauthorized" });
-  } catch {
-    return res.status(401).json({ error: "Unauthorized" });
+  // Auth — verify userId exists in Redis as a known Spec user
+  const _userId = req.headers["x-spec-user-id"] || (req.body && req.body._userId) || req.query._userId;
+  if (!_userId) return res.status(401).json({ error: "Unauthorized" });
+  const _kvUrl = process.env.KV_REST_API_URL;
+  const _kvToken = process.env.KV_REST_API_TOKEN;
+  if (_kvUrl && _kvToken) {
+    try {
+      const _profileRes = await fetch(`${_kvUrl}/get/${encodeURIComponent("spec:user:" + _userId)}`, {
+        headers: { Authorization: "Bearer " + _kvToken }
+      });
+      const _profileData = await _profileRes.json();
+      if (!_profileData.result) return res.status(401).json({ error: "Unauthorized" });
+    } catch { return res.status(401).json({ error: "Unauthorized" }); }
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
