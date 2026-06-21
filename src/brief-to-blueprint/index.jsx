@@ -129,7 +129,7 @@ export default function CustomBuild({ userId } = {}) {
           }))
         } : null,
       };
-      kvStorageSet("spec-blueprint-draft, JSON.stringify(draft, userId)).catch(() => {});
+      kvStorageSet("spec-blueprint-draft", JSON.stringify(draft), userId).catch(() => {});
     }, 800);
     return () => clearTimeout(timer);
   }, [brief, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants, previewPage, crawlResults", generated]);
@@ -169,7 +169,7 @@ export default function CustomBuild({ userId } = {}) {
       const deduped = list.filter(d => !(d.clientName === entry.clientName && d.date === entry.date));
       deduped.unshift(entry);
       if (deduped.length > 20) deduped.length = 20;
-      await kvStorageSet("spec-blueprint-drafts", JSON.stringify(deduped, userId));
+      await kvStorageSet("spec-blueprint-drafts", JSON.stringify(deduped), userId);
       setDrafts(deduped);
     } catch(e) {}
   }
@@ -192,7 +192,7 @@ export default function CustomBuild({ userId } = {}) {
   async function deleteDraft(id) {
     try {
       const updated = drafts.filter(d => d.id !== id);
-      await kvStorageSet("spec-blueprint-drafts, JSON.stringify(updated", userId));
+      await kvStorageSet("spec-blueprint-drafts", JSON.stringify(updated), userId);
       setDrafts(updated);
     } catch(e) {}
   }
@@ -402,7 +402,7 @@ export default function CustomBuild({ userId } = {}) {
           // Persist the merged pattern pool to storage
           if (data.patterns) {
             const merged = buildInspoContext(updated, storedPatterns);
-            kvStorageSet("spec-inspo-patterns", JSON.stringify({ pool: merged }, userId)).catch(() => {});
+            kvStorageSet("spec-inspo-patterns", JSON.stringify({ pool: merged }), userId).catch(() => {});
             setStoredPatterns({ pool: merged });
           }
           return updated;
