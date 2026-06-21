@@ -106,6 +106,30 @@ export default function App() {
                     // Rename legacy page types
                     if (pg.pageType === "Journal / Blog") pg.pageType = "Blog Index";
                     if (pg.pageType === "Single Post") pg.pageType = "Blog Post";
+
+                    // Migration: strip old branded demo copy that was hardcoded in
+                    // PAGE_TEMPLATES before the refactor (e.g. "Sephora Spring Campaign 2026").
+                    // These strings should never appear as real client content.
+                    const brandedStrings = [
+                      "Sephora Spring Campaign 2026",
+                      "How we produced a 12-asset launch in 14 days.",
+                      "Sephora needed a complete spring campaign",
+                      "Clinique Spring Launch",
+                      "Nike Air Max Launch",
+                      "Glossier Brand Film",
+                      "Apple Studio Series",
+                      "Spotify Wrapped",
+                      "Airbnb Belonging",
+                      "DoorDash Local",
+                      "How we scaled Sephora",
+                      "By Kalei Lagunero",
+                    ];
+                    const fieldsToClear = ["heroHeading","heroSubhead","aboutHeading","aboutBody","portfolio","blog","stats"];
+                    fieldsToClear.forEach(field => {
+                      if (pg[field] && brandedStrings.some(s => pg[field].includes(s))) {
+                        pg[field] = "";
+                      }
+                    });
                   });
                 }
               });
