@@ -4,7 +4,7 @@
 // BLANK_BRAND — the clean-slate brand used for new projects
 // newPage() — creates a new page object with default sections
 
-const WEBSITE_TEMPLATES = [
+export const WEBSITE_TEMPLATES = [
   {
     id: "agency",
     name: "Marketing & Growth Agency",
