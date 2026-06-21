@@ -49,8 +49,7 @@ export default function Dashboard({ onSelectTool, role, tools: allowedTools }) {
       const res = await fetch("/api/user-role", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ action: "list" })
+        body: JSON.stringify({ action: "list", requesterId: user?.id })
       });
       const data = await res.json();
       setUsers(data.users || []);
@@ -65,8 +64,7 @@ export default function Dashboard({ onSelectTool, role, tools: allowedTools }) {
       await fetch("/api/user-role", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ action: "set", userId: newUserId.trim(), role: newUserRole, tools: newUserTools })
+        body: JSON.stringify({ action: "set", requesterId: user?.id, userId: newUserId.trim(), role: newUserRole, tools: newUserTools })
       });
       setMsg("User saved.");
       setNewUserId("");
@@ -81,8 +79,7 @@ export default function Dashboard({ onSelectTool, role, tools: allowedTools }) {
     await fetch("/api/user-role", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ action: "delete", userId })
+      body: JSON.stringify({ action: "delete", requesterId: user?.id, userId })
     });
     loadUsers();
   }
