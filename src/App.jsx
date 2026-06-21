@@ -97,8 +97,8 @@ function AppShell() {
           </div>
         </div>
         <Suspense fallback={<Spinner />}>
-          {view === "template-studio"    && <ElementorBuilder />}
-          {view === "brief-to-blueprint" && <CustomBuild />}
+          {view === "template-studio"    && <ElementorBuilder userId={user?.id} />}
+          {view === "brief-to-blueprint" && <CustomBuild userId={user?.id} />}
         </Suspense>
       </div>
     );
