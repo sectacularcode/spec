@@ -1,3 +1,4 @@
+import { THEMES } from "../constants/themes.js";
 // Generates the full HTML document string for the Template Studio preview iframe.
 // Renders all page sections as HTML using brand colors, fonts, and layout settings.
 // All user-controlled brand fields are sanitized via he() before insertion.
