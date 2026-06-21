@@ -40,7 +40,7 @@ import ExportTab from "./components/tabs/ExportTab.jsx";
 // Styles
 import { I } from "./styles.js";
 
-export default function App() {
+export default function App({ userId } = {}) {
   const [projects, setProjects] = useState([]);
   const [activeId, setActiveId] = useState(function(){try{return localStorage.getItem("spec_activeId")||"";}catch(e){return "";}});
   const [view, setView] = useState(function(){try{return localStorage.getItem("spec_view")||"projects";}catch(e){return "projects";}});
