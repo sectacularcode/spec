@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from "react";
-import { SignIn, SignedIn, SignedOut, useClerk, useUser, UserButton } from "@clerk/clerk-react";
+import { SignIn, SignedIn, SignedOut, useUser, UserButton } from "@clerk/clerk-react";
 import Dashboard from "./components/Dashboard.jsx";
 
 const ElementorBuilder = lazy(() => import("./template-studio/index.jsx"));
