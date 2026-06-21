@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 
 // Constants
-import { PAGE_TYPES, SECTION_OPTIONS, TONES, FOOTER_STYLES, HEADER_STYLES, FONT_OPTIONS } from "./constants/ui.js";
+import { PAGE_TYPES, SECTION_OPTIONS, TONES, FOOTER_STYLES, HEADER_STYLES, FONT_OPTIONS } from "./constants/ui.jsx";
 import { THEMES } from "./constants/themes.js";
 import { LAYOUTS, getLayout, eyebrowText } from "./constants/layouts.js";
 import { WEBSITE_TEMPLATES, PAGE_TEMPLATES, BLANK_BRAND, newPage, applyWebsiteTemplate, applyTheme, layoutHeaderStyle, layoutFooterStyle } from "./constants/templates.js";
