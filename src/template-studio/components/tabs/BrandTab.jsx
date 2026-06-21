@@ -33,7 +33,7 @@ export default function BrandTab({ ctx }) {
                             if (p.id !== activeId) return p;
                             const currentPage = p.pages[pageIdx];
                             if (!currentPage) return p;
-                            const { brand: nb, page: np } = applyWebsiteTemplate(t, p.brand, currentPage);
+                            const { brand: nb, page: np } = applyWebsiteTemplate(t, p.brand, currentPage, THEMES);
                             return { ...p, brand: nb, pages: p.pages.map((pg, i) => i === pageIdx ? { ...pg, ...np } : pg) };
                           }));
                         }}
