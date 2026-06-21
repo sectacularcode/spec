@@ -1,3 +1,4 @@
+import { THEMES } from "../constants/themes.js";
 // Builds Elementor JSON for the site footer (Theme Builder global template)
 export function buildFooterJSON(brand) {
   const { accentColor: ac, cardBgColor: card, headingFont: hf, bodyFont: bf, footerStyle } = brand;
