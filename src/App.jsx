@@ -71,7 +71,7 @@ function AppShell() {
               style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", marginRight: "auto", marginLeft: "0", padding: "0" }}
               title="Back to dashboard">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-              <div style={{ fontSize: "24px", fontWeight: 800, letterSpacing: "-0.04em", color: "#09090b", lineHeight: 1 }}>spec</div>
+              <div style={{ fontSize: "24px", fontWeight: 800, letterSpacing: "-0.04em", color: "#09090b", lineHeight: 1 }}>spec<span style={{ color: "#b45309" }}>.</span></div>
               <div style={{ fontSize: "9px", color: "#ffffff", padding: "2px 6px", background: "#b45309", border: "none", borderRadius: "6px", letterSpacing: "0.04em", fontWeight: 500 }}>beta</div>
             </button>
             <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center" }}>
