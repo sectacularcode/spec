@@ -1,6 +1,6 @@
 import { Section } from "../Section.jsx";
 import { I } from "../../styles.js";
-import { TONES } from "../../constants/ui.js";
+import { TONES } from "../../constants/ui.jsx";
 
 export default function DiscoveryTab({ ctx }) {
   const { brand, updBrand } = ctx;
