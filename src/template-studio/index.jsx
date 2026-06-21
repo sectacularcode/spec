@@ -89,8 +89,8 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
     (async () => {
       try {
         const lsRaw = (() => { try { return localStorage.getItem("projects"); } catch(e2) { return null; } })();
-        if (true) {
-          const _sRes = await fetch("/api/storage?key=projects", { headers: userId ? { "x-spec-user-id": userId } : {} }); const _sData = _sRes.ok ? await _sRes.json() : {}; const result = _sData.value ? { value: _sData.value } : null;
+        if (userId) {
+          const _sRes = await fetch("/api/storage?key=projects", { headers: { "x-spec-user-id": userId } }); const _sData = _sRes.ok ? await _sRes.json() : {}; const result = _sData.value ? { value: _sData.value } : null;
           if (result && result.value && !cancelled) {
             const parsed = JSON.parse(result.value);
             if (Array.isArray(parsed) && parsed.length > 0) {
