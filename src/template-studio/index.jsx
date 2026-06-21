@@ -1427,7 +1427,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                                 if (!result || !result.value) return;
                                 const existing = JSON.parse(result.value);
                                 const updated = existing.filter(b => b.id !== build.id);
-                                await window.storage.set("spec-template-library", JSON.stringify(updated));
+                                await fetch("/api/storage", { method: "POST", headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) }, body: JSON.stringify({ action: "set", key: "spec-template-library", value: JSON.stringify(updated) }) });
                                 setSavedBuilds(updated);
                               } catch(e) {}
                             }}
