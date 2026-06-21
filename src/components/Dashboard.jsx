@@ -1,4 +1,4 @@
-import { useUser, useClerk, UserButton } from "@clerk/clerk-react";
+import { useUser, UserButton } from "@clerk/clerk-react";
 import { useState, useEffect } from "react";
 
 const TOOLS = [
@@ -29,7 +29,6 @@ const TOOLS = [
 
 export default function Dashboard({ onSelectTool, role, tools: allowedTools }) {
   const { user } = useUser();
-  const { signOut } = useClerk();
   const [showAdmin, setShowAdmin] = useState(false);
   const [users, setUsers] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
@@ -97,8 +96,7 @@ export default function Dashboard({ onSelectTool, role, tools: allowedTools }) {
     navRight: { display: "flex", alignItems: "center", gap: "16px" },
     email: { fontSize: "12px", color: "#6b7280" },
     rolePill: { fontSize: "10px", fontWeight: 600, padding: "2px 8px", borderRadius: "20px", background: role === "admin" ? "#09090b" : role === "manager" ? "#b45309" : "#eeedf1", color: role === "staff" ? "#6b635c" : "#fff", textTransform: "uppercase", letterSpacing: "0.06em" },
-    signOutBtn: { background: "none", border: "none", cursor: "pointer", fontSize: "12px", color: "#6b7280", padding: "4px 8px" },
-    body: { maxWidth: "960px", margin: "0 auto", padding: "48px 24px" },
+        body: { maxWidth: "960px", margin: "0 auto", padding: "48px 24px" },
     greeting: { fontSize: "22px", fontWeight: 700, color: "#09090b", marginBottom: "4px" },
     sub: { fontSize: "14px", color: "#6b7280", marginBottom: "40px" },
     grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px", marginBottom: "48px" },
