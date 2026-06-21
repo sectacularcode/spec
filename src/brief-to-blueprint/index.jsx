@@ -548,7 +548,7 @@ export default function CustomBuild({ userId } = {}) {
     a.click(); URL.revokeObjectURL(a.href);
     // Auto-save this single page to the library
     if (brief && generated) {
-      saveToLibrary(brief, [p], layoutVariants, layoutVariants);
+      saveToLibrary(brief, [p], layoutVariants, layoutVariants, userId);
     }
   }
 
@@ -562,7 +562,7 @@ export default function CustomBuild({ userId } = {}) {
     }, i * 300));
     // Auto-save full build to library
     if (brief && generated) {
-      saveToLibrary(brief, generated.pages, layoutVariants, layoutVariants);
+      saveToLibrary(brief, generated.pages, layoutVariants, layoutVariants, userId);
     }
   }
 
