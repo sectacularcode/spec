@@ -53,6 +53,7 @@ export default function CustomBuild() {
   const [selectedPages, setPages]       = useState(["home"]);
   const [customPages, setCustomPages]   = useState([]); // user-added pages beyond the defaults
   const [showAddPage, setShowAddPage]   = useState(false); // add page dropdown open
+  const [showAddPagePreview, setShowAddPagePreview] = useState(false); // separate state for preview header dropdown
   const [copyBriefOnly, setCopy]        = useState(true);
   const [generating, setGenerating]     = useState(false);
   const [generatingStatus, setGeneratingStatus] = useState("");
@@ -68,6 +69,21 @@ export default function CustomBuild() {
   const fileRef = useRef();
   const [parsing, setParsing]           = useState(false);
   const canGenerate = !!brief && selectedPages.length > 0;
+
+  const T = {
+    surface: { background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "10px", padding: "20px" },
+    stepNum: (active, complete) => ({
+      width: "24px", height: "24px", borderRadius: "50%",
+      background: complete ? "#b45309" : active ? "#09090b" : "#dde0e6",
+      color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center",
+      fontSize: "12px", fontWeight: 700, flexShrink: 0,
+    }),
+    label: { fontSize: "12px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.06em" },
+    input: { padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", fontFamily: "'Be Vietnam Pro', sans-serif", outline: "none", background: "#ffffff", color: "#09090b" },
+    btnGhost: { padding: "10px 16px", fontSize: "13px", fontWeight: 500, background: "#ffffff", color: "#6b635c", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" },
+    btnPrimary: { padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#ffffff", border: "none", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" },
+  };
+
 
   // ── Draft persistence ──────────────────────────────────────────────────────
   // Load saved draft on mount
@@ -990,11 +1006,11 @@ export default function CustomBuild() {
                 </button>);
               })}
               <div style={{ position: "relative" }}>
-                <button onClick={() => setShowAddPage(!showAddPage)} style={{ padding: "6px 14px", fontSize: "12px", fontWeight: 500, cursor: "pointer", border: "1px dashed #dde0e6", borderRadius: "20px", background: "#fff", color: "#6b7280" }}>+ Add Page</button>
-                {showAddPage && (
+                <button onClick={() => setShowAddPagePreview(!showAddPagePreview)} style={{ padding: "6px 14px", fontSize: "12px", fontWeight: 500, cursor: "pointer", border: "1px dashed #dde0e6", borderRadius: "20px", background: "#fff", color: "#6b7280" }}>+ Add Page</button>
+                {showAddPagePreview && (
                   <div style={{ position: "absolute", top: "100%", left: 0, width: "280px", marginTop: "4px", background: "#fff", border: "1px solid #dde0e6", borderRadius: "8px", boxShadow: "0 8px 32px rgba(0,0,0,0.15)", zIndex: 9999, maxHeight: "320px", overflowY: "auto" }}>
                     {ADDITIONAL_PAGE_TYPES.filter(p => !selectedPages.includes(p.id) && !customPages.find(cp => cp.id === p.id)).map(p => (
-                      <button key={p.id} onClick={() => { setPages(prev => [...prev, p.id]); setShowAddPage(false); if (generated) { try { const ic = generated.inspoContext || ''; const allIds = [...selectedPages, p.id]; const newPages = generatePages(brief, allIds, ic, generated.aiRecs, customPages); setGenerated(prev => ({ ...prev, pages: newPages })); setPreviewPage(p.id); } catch(e) { console.error('Add page error:', e); } } }} style={{ display: "block", width: "100%", padding: "10px 16px", background: "none", border: "none", borderBottom: "1px solid #f0f0f0", cursor: "pointer", textAlign: "left", fontSize: "13px", color: "#09090b" }}
+                      <button key={p.id} onClick={() => { setPages(prev => [...prev, p.id]); setShowAddPagePreview(false); if (generated) { try { const ic = generated.inspoContext || ''; const allIds = [...selectedPages, p.id]; const newPages = generatePages(brief, allIds, ic, generated.aiRecs, customPages); setGenerated(prev => ({ ...prev, pages: newPages })); setPreviewPage(p.id); } catch(e) { console.error('Add page error:', e); } } }} style={{ display: "block", width: "100%", padding: "10px 16px", background: "none", border: "none", borderBottom: "1px solid #f0f0f0", cursor: "pointer", textAlign: "left", fontSize: "13px", color: "#09090b" }}
                         onMouseOver={e => e.currentTarget.style.background = "#f5f5f7"}
                         onMouseOut={e => e.currentTarget.style.background = "none"}>
                         {p.label}
