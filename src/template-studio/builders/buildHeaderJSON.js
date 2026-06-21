@@ -1,4 +1,5 @@
 import { THEMES } from "../constants/themes.js";
+import { luminance, contrastRatio, isLight, textOn, mutedTextOn, buttonOn } from "../utils/colors.js";
 // Builds Elementor JSON for the site header (Theme Builder global template)
 export function buildHeaderJSON(brand) {
   const { primaryColor: pc, accentColor: ac, headingFont: hf, bodyFont: bf, headerStyle = "Editorial" } = brand;
