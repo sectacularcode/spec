@@ -77,12 +77,20 @@ export default async function handler(req, res) {
 
     if (action === "list") {
       if (requesterRole !== "admin") return res.status(403).json({ error: "Forbidden" });
-      const listRes = await fetch(`${KV_URL}/keys/spec:user:*`, {
-        headers: { Authorization: `Bearer ${KV_TOKEN}` },
-      });
-      const listData = await listRes.json();
-      const keys = listData.result || [];
-      const users = await Promise.all(keys.map(async (key) => {
+      // Use SCAN to find all spec:user:* keys (Upstash REST API)
+      let cursor = 0;
+      let allKeys = [];
+      do {
+        const scanRes = await fetch(
+          `${KV_URL}/scan/${cursor}?match=${encodeURIComponent("spec:user:*")}&count=100`,
+          { headers: { Authorization: `Bearer ${KV_TOKEN}` } }
+        );
+        const scanData = await scanRes.json();
+        const result = scanData.result || [];
+        cursor = result[0] ?? 0;
+        allKeys = allKeys.concat(result[1] || []);
+      } while (cursor !== 0 && cursor !== "0");
+      const users = await Promise.all(allKeys.map(async (key) => {
         const profile = await kvGet(key);
         return { userId: key.replace("spec:user:", ""), ...profile };
       }));
