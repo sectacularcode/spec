@@ -1,4 +1,5 @@
 // Website templates, brand defaults, and page scaffolding
+import { THEMES } from "./themes.js";
 // WEBSITE_TEMPLATES — industry-specific presets that pre-fill brand settings
 // PAGE_TEMPLATES — default section lists per page type
 // BLANK_BRAND — the clean-slate brand used for new projects
