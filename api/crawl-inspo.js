@@ -1,11 +1,24 @@
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  // Session auth
-  const _secret = process.env.SPEC_SESSION_SECRET;
-  const _cookie = req.headers.cookie || "";
-  const _sess   = _cookie.match(/(?:^|;\s*)spec_sess=([^;]+)/);
-  if (!_secret || !_sess || _sess[1] !== _secret) {
+  // Clerk auth — verify session token from Authorization header or __session cookie
+  const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+  if (!clerkSecretKey) return res.status(500).json({ error: "Auth not configured" });
+  const authHeader = req.headers.authorization || "";
+  const cookieHeader = req.headers.cookie || "";
+  const sessionToken =
+    (authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null) ||
+    (cookieHeader.match(/(?:^|;\s*)__session=([^;]+)/)?.[1]) ||
+    null;
+  if (!sessionToken) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const verifyRes = await fetch("https://api.clerk.com/v1/tokens/verify", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + clerkSecretKey, "Content-Type": "application/json" },
+      body: JSON.stringify({ token: sessionToken })
+    });
+    if (!verifyRes.ok) return res.status(401).json({ error: "Unauthorized" });
+  } catch {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
