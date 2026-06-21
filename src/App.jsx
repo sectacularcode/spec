@@ -1,7 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 
 // Lazy load each tool — browser only downloads what's needed for the active tab
-const ElementorBuilder = lazy(() => import("./elementor-builder"));
+const ElementorBuilder = lazy(() => import("./template-studio/index.jsx"));
 const CustomBuild      = lazy(() => import("./brief-to-blueprint/index.jsx"));
 
 function Spinner() {
