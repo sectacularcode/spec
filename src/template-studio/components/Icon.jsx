@@ -1,7 +1,7 @@
 // Lucide-style SVG icon component
 // name — key in UI_ICONS. size, color, strokeWidth, style — styling overrides.
 
-import { UI_ICONS } from "../constants/ui.js";
+import { UI_ICONS } from "../constants/ui.jsx";
 
 export const Icon = ({ name, size = 16, color = "currentColor", strokeWidth = 1.75, style = {} }) => {
   const renderPaths = UI_ICONS[name];
