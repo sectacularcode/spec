@@ -3,6 +3,7 @@
 
 const KV_URL   = process.env.KV_REST_API_URL;
 const KV_TOKEN = process.env.KV_REST_API_TOKEN;
+const CLERK_SECRET = process.env.CLERK_SECRET_KEY;
 
 async function kvGet(key) {
   const res = await fetch(`${KV_URL}/get/${encodeURIComponent(key)}`, {
@@ -22,6 +23,28 @@ async function kvDel(key) {
   await fetch(`${KV_URL}/del/${encodeURIComponent(key)}`, {
     headers: { Authorization: `Bearer ${KV_TOKEN}` },
   });
+}
+
+// Fetch user details (name, email) from Clerk for a list of user IDs
+async function clerkGetUsers(userIds) {
+  if (!CLERK_SECRET || !userIds.length) return {};
+  try {
+    const params = userIds.map(id => `user_id[]=${encodeURIComponent(id)}`).join("&");
+    const res = await fetch(`https://api.clerk.com/v1/users?${params}&limit=100`, {
+      headers: { Authorization: `Bearer ${CLERK_SECRET}` },
+    });
+    if (!res.ok) return {};
+    const data = await res.json();
+    const map = {};
+    for (const u of data) {
+      const primaryEmail = u.email_addresses?.find(e => e.id === u.primary_email_address_id);
+      const name = [u.first_name, u.last_name].filter(Boolean).join(" ") || null;
+      map[u.id] = { name, email: primaryEmail?.email_address || null };
+    }
+    return map;
+  } catch {
+    return {};
+  }
 }
 
 // For write operations, verify using bootstrap secret or existing admin check
@@ -77,7 +100,7 @@ export default async function handler(req, res) {
 
     if (action === "list") {
       if (requesterRole !== "admin") return res.status(403).json({ error: "Forbidden" });
-      // Use SCAN to find all spec:user:* keys (Upstash REST API)
+      // SCAN all spec:user:* keys from Upstash
       let cursor = 0;
       let allKeys = [];
       do {
@@ -90,10 +113,23 @@ export default async function handler(req, res) {
         cursor = result[0] ?? 0;
         allKeys = allKeys.concat(result[1] || []);
       } while (cursor !== 0 && cursor !== "0");
-      const users = await Promise.all(allKeys.map(async (key) => {
+
+      // Fetch Redis profiles for all keys
+      const profiles = await Promise.all(allKeys.map(async (key) => {
         const profile = await kvGet(key);
         return { userId: key.replace("spec:user:", ""), ...profile };
       }));
+
+      // Enrich with Clerk user details (name + email)
+      const userIds = profiles.map(p => p.userId);
+      const clerkDetails = await clerkGetUsers(userIds);
+
+      const users = profiles.map(p => ({
+        ...p,
+        name:  clerkDetails[p.userId]?.name  || null,
+        email: clerkDetails[p.userId]?.email || null,
+      }));
+
       return res.status(200).json({ users });
     }
 
