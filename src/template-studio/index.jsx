@@ -918,7 +918,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   // Styles (I) imported from ./styles.js
 
   const TabBtn = ({ id, label }) => (
-    <button onClick={() => setTab(id)} style={{ padding: "6px 12px", background: tab === id ? "rgba(255,255,255,0.18)" : "transparent", color: "#ffffff", border: "none", borderRadius: "7px", fontSize: "12px", fontWeight: 700, cursor: "pointer", margin: "2px", whiteSpace: "nowrap" }}>{label}</button>
+    <button onClick={() => setTab(id)} style={{ width: "100%", textAlign: "left", padding: "8px 12px", background: tab === id ? "#fef3e2" : "transparent", color: tab === id ? "#b45309" : "#6b635c", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: tab === id ? 600 : 400, cursor: "pointer", display: "block", whiteSpace: "nowrap" }}>{label}</button>
   );
 
   // Builder format toggle — applies to both Page and Footer downloads
@@ -1748,6 +1748,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         /* Mobile + tablet responsiveness */
         @media(max-width:900px){
           .main-grid{grid-template-columns:1fr !important;}
+          .sidebar-nav{display:none !important;}
           .right-panel{display:none}
           /* Force any fixed 2-col grid to collapse on mobile */
           .responsive-2col{grid-template-columns:1fr !important;}
@@ -1758,7 +1759,6 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         @media(max-width:600px){
           /* Tablet → mobile: full collapse */
           .responsive-2col, .responsive-4col{grid-template-columns:1fr !important;}
-          .tab-bar button{padding:8px 10px !important; font-size:11px !important;}
           .editor-padding{padding:24px 12px 40px !important;}
           .tab-panel-bg{background-image: radial-gradient(circle, #dddce3 1px, transparent 1px); background-size: 24px 24px;}
         }
@@ -1965,26 +1965,27 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         </div>
       )}
 
-      <div className="main-grid" style={{ display: "grid", gridTemplateColumns: "1fr", minHeight: "calc(100vh - 60px)" }}>
-        {/* LEFT — FORM */}
+      <div className="main-grid" style={{ display: "grid", gridTemplateColumns: "148px 1fr", minHeight: "calc(100vh - 60px)" }}>
+        {/* SIDEBAR — Workflow tabs */}
+        <div className="sidebar-nav" style={{ background: "#f5f4f7", borderRight: "1px solid #dde0e6", overflowY: "auto", display: "flex", flexDirection: "column", padding: "16px 8px" }}>
+          <div style={{ fontSize: "10px", fontWeight: 600, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px", padding: "0 4px" }}>Workflow</div>
+          <TabBtn id="discovery" label="Discovery" />
+          <TabBtn id="positioning" label="Positioning" />
+          <TabBtn id="brand" label="Visual" />
+          <TabBtn id="content" label="Content" />
+          <TabBtn id="social" label="Social" />
+          <TabBtn id="footer" label="Header & Footer" />
+          <TabBtn id="export" label="Export & Import" />
+        </div>
+
+        {/* RIGHT — Content area */}
         <div className="tab-panel-bg" style={{ padding: "0", overflowY: "auto", maxHeight: "calc(100vh - 60px)", background: "#eeedf1" }}>
 
-          {/* Tabs — full width warm stone bar */}
-          <div style={{ background: "rgba(107, 99, 92, 0.82)", width: "100%", paddingTop: "10px" }}>
+          {/* Stone bar — page pills + Add Page only */}
+          <div style={{ background: "rgba(107, 99, 92, 0.82)", width: "100%" }}>
             <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px" }}>
-              <div className="tab-bar" style={{ display: "flex", justifyContent: "center", overflowX: "auto", WebkitOverflowScrolling: "touch", paddingTop: "18px", paddingBottom: "16px" }}>
-                <TabBtn id="discovery" label="Discovery" />
-                <TabBtn id="positioning" label="Positioning" />
-                <TabBtn id="brand" label="Visual" />
-                <TabBtn id="content" label="Content" />
-                <TabBtn id="social" label="Social" />
-                <TabBtn id="footer" label="Header & Footer" />
-                <TabBtn id="export" label="Export & Import" />
-              </div>
-              {/* Divider between tabs and page pills */}
-              <div style={{ height: "1px", background: "rgba(255,255,255,0.15)", margin: "0 0 0 0" }} />
             {/* Page switcher row — pills centered, Add Page right */}
-            <div style={{ display: "flex", alignItems: "center", padding: "16px 0 20px", position: "relative" }}>
+            <div style={{ display: "flex", alignItems: "center", padding: "12px 0 12px", position: "relative" }}>
               <div style={{ flex: 1, display: "flex", justifyContent: "center", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
                 {project.pages.map((p, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: "3px" }}>
