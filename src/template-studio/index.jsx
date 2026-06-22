@@ -46,6 +46,7 @@ export default function App({ userId } = {}) {
   const [view, setView] = useState(function(){try{return localStorage.getItem("spec_view")||"projects";}catch(e){return "projects";}});
   useEffect(() => { const h = () => setView("projects"); window.addEventListener("spec-go-projects", h); return () => window.removeEventListener("spec-go-projects", h); }, []);
   const [mobilePreviewTS, setMobilePreviewTS] = useState(false);
+  const [showPagePanel, setShowPagePanel] = useState(false);
   const TAB_ORDER = [
   { id: "discovery",   label: "Discovery" },
   { id: "positioning", label: "Positioning" },
@@ -1219,33 +1220,103 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
 
   if (effectiveView === "preview" && project) return (
     <div style={{ position: "fixed", inset: 0, background: "#000", display: "flex", flexDirection: "column", zIndex: 1000 }}>
-      <div style={{ padding: "10px 16px", background: "#09090b", borderBottom: "1px solid #27272a", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div style={{ color: "#ffffff", fontSize: "14px", fontWeight: 500 }}>
-            Preview — {brand.name} / {page.name}
-            <span style={{ marginLeft: "12px", fontSize: "12px", color: "#a3a39e", fontWeight: 400 }}>Click any heading or paragraph to edit inline</span>
-          </div>
+
+      {/* Top bar */}
+      <div style={{ padding: "10px 16px", background: "#09090b", borderBottom: "1px solid #27272a", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <button
+            onClick={() => setShowPagePanel(v => !v)}
+            title="Pages"
+            style={{ padding: "5px 12px", background: showPagePanel ? "#b45309" : "transparent", color: "#ffffff", border: "1px solid rgba(255,255,255,0.25)", borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", whiteSpace: "nowrap" }}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            Pages
+          </button>
+          <div style={{ color: "#ffffff", fontSize: "13px", fontWeight: 500 }}>{brand.name} / {page.name}</div>
           <div style={{ display: "flex", border: "1px solid #3f3f46", borderRadius: "6px", overflow: "hidden", flexShrink: 0 }}>
             <button onClick={() => setMobilePreviewTS(false)} style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: !mobilePreviewTS ? "#b45309" : "transparent", color: !mobilePreviewTS ? "#ffffff" : "#a3a39e", borderRight: "1px solid rgba(255,255,255,0.15)" }}>Desktop</button>
             <button onClick={() => setMobilePreviewTS(true)} style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: mobilePreviewTS ? "#b45309" : "transparent", color: mobilePreviewTS ? "#ffffff" : "#a3a39e" }}>Mobile</button>
           </div>
         </div>
-        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
           <FormatToggle />
-          <button onClick={downloadPage} style={{ padding: "8px 14px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>Download Template</button>
-          <button onClick={downloadHeader} style={{ padding: "8px 14px", background: "transparent", color: "#ffffff", border: "1px solid rgba(255,255,255,0.25)", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>Header Template</button>
-          <button onClick={downloadFooter} style={{ padding: "8px 14px", background: "transparent", color: "#ffffff", border: "1px solid rgba(255,255,255,0.25)", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>Footer Template</button>
-          {project.pages.length > 1 && <button onClick={downloadAll} style={{ padding: "8px 14px", background: "transparent", color: "#ffffff", border: "1px solid rgba(255,255,255,0.25)", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>Download All (.zip)</button>}
-          <button onClick={() => setView("editor")} style={{ padding: "8px 14px", background: "transparent", color: "#ffffff", border: "1px solid rgba(255,255,255,0.25)", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>← Back to Editor</button>
+          <button onClick={downloadPage} style={{ padding: "7px 14px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap" }}>Download Template</button>
+          <button onClick={() => setView("editor")} style={{ padding: "7px 14px", background: "transparent", color: "#ffffff", border: "1px solid rgba(255,255,255,0.25)", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap" }}>← Back to Editor</button>
         </div>
       </div>
-      {mobilePreviewTS ? (
-        <div style={{ flex: 1, overflow: "auto", background: "#1a1a1a", display: "flex", justifyContent: "center", alignItems: "flex-start", padding: "24px 0" }}>
-          <iframe srcDoc={previewHTML(page, brand)} style={{ width: "390px", minHeight: "844px", border: "1px solid #3f3f46", borderRadius: "12px", flexShrink: 0, background: "#000", boxShadow: "0 8px 32px rgba(0,0,0,0.5)" }} title="Preview" sandbox="allow-same-origin allow-scripts" />
+
+      {/* Body: slide-in panel + iframe */}
+      <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative" }}>
+
+        {/* Left slide-in panel */}
+        <div style={{
+          width: showPagePanel ? "220px" : "0px",
+          minWidth: 0,
+          overflow: "hidden",
+          transition: "width 0.2s ease",
+          background: "#09090b",
+          borderRight: showPagePanel ? "1px solid #27272a" : "none",
+          display: "flex",
+          flexDirection: "column",
+          flexShrink: 0,
+          zIndex: 10,
+        }}>
+          <div style={{ width: "220px", display: "flex", flexDirection: "column", height: "100%" }}>
+            {/* Panel header */}
+            <div style={{ padding: "12px 14px 10px", borderBottom: "1px solid #27272a", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+              <span style={{ color: "#ffffff", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em" }}>Pages</span>
+              <button onClick={() => setShowPagePanel(false)} style={{ background: "none", border: "none", color: "#6b7280", cursor: "pointer", fontSize: "15px", lineHeight: 1, padding: "2px 4px" }}>✕</button>
+            </div>
+            {/* Page list */}
+            <div style={{ padding: "8px", flex: 1, overflowY: "auto" }}>
+              {project.pages.map((pg, i) => (
+                <button
+                  key={i}
+                  onClick={() => setPageIdx(i)}
+                  style={{
+                    width: "100%",
+                    textAlign: "left",
+                    padding: "9px 12px",
+                    background: i === pageIdx ? "#b45309" : "transparent",
+                    color: i === pageIdx ? "#ffffff" : "#a3a39e",
+                    border: i === pageIdx ? "none" : "1px solid transparent",
+                    borderRadius: "6px",
+                    fontSize: "13px",
+                    fontWeight: i === pageIdx ? 600 : 400,
+                    cursor: "pointer",
+                    marginBottom: "2px",
+                    display: "block",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    transition: "background 0.12s",
+                  }}
+                  onMouseOver={e => { if (i !== pageIdx) e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
+                  onMouseOut={e => { if (i !== pageIdx) e.currentTarget.style.background = "transparent"; }}
+                >{pg.name}</button>
+              ))}
+            </div>
+            {/* Downloads */}
+            <div style={{ borderTop: "1px solid #27272a", padding: "10px 8px", display: "flex", flexDirection: "column", gap: "5px", flexShrink: 0 }}>
+              <div style={{ fontSize: "10px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", padding: "0 4px 4px" }}>Downloads</div>
+              <button onClick={downloadHeader} style={{ width: "100%", padding: "8px 12px", background: "transparent", color: "#d4d4d8", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer", textAlign: "left", whiteSpace: "nowrap" }}>↓ Header Template</button>
+              <button onClick={downloadFooter} style={{ width: "100%", padding: "8px 12px", background: "transparent", color: "#d4d4d8", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer", textAlign: "left", whiteSpace: "nowrap" }}>↓ Footer Template</button>
+              {project.pages.length > 1 && (
+                <button onClick={downloadAll} style={{ width: "100%", padding: "8px 12px", background: "transparent", color: "#d4d4d8", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer", textAlign: "left", whiteSpace: "nowrap" }}>↓ All Pages (.zip)</button>
+              )}
+            </div>
+          </div>
         </div>
-      ) : (
-        <iframe srcDoc={previewHTML(page, brand)} style={{ flex: 1, border: "none", width: "100%", background: "#000" }} title="Preview" sandbox="allow-same-origin allow-scripts" />
-      )}
+
+        {/* Preview iframe */}
+        {mobilePreviewTS ? (
+          <div style={{ flex: 1, overflow: "auto", background: "#1a1a1a", display: "flex", justifyContent: "center", alignItems: "flex-start", padding: "24px 0" }}>
+            <iframe srcDoc={previewHTML(page, brand)} style={{ width: "390px", minHeight: "844px", border: "1px solid #3f3f46", borderRadius: "12px", flexShrink: 0, background: "#000", boxShadow: "0 8px 32px rgba(0,0,0,0.5)" }} title="Preview" sandbox="allow-same-origin allow-scripts" />
+          </div>
+        ) : (
+          <iframe srcDoc={previewHTML(page, brand)} style={{ flex: 1, border: "none", minWidth: 0, background: "#000" }} title="Preview" sandbox="allow-same-origin allow-scripts" />
+        )}
+      </div>
     </div>
   );
 
