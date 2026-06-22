@@ -61,3 +61,19 @@ export const FONT_OPTIONS = [
 // without requiring color theory knowledge. All meet 4.5:1 contrast minimum
 // for body text and 3:1 for large text/UI elements.
 // ──────────────────────────────────────────────────────────────────────────────
+
+export const PREMIUM_ACCENTS = [
+  { name: "Amber",      value: "#b45309" },
+  { name: "Gold",       value: "#c9a86a" },
+  { name: "Bronze",     value: "#b87333" },
+  { name: "Copper",     value: "#d4901a" },
+  { name: "Coral",      value: "#ed7464" },
+  { name: "Rose",       value: "#ff2d87" },
+  { name: "Rust",       value: "#b05e2a" },
+  { name: "Terracotta", value: "#a64f30" },
+  { name: "Sage",       value: "#4a5d44" },
+  { name: "Violet",     value: "#6b4fa0" },
+  { name: "Neon",       value: "#39ff14" },
+  { name: "Navy",       value: "#1f2940" },
+  { name: "Ink",        value: "#0a0a0a" },
+];
