@@ -4,7 +4,7 @@ import { I } from "../../styles.js";
 import { WEBSITE_TEMPLATES } from "../../constants/templates.js";
 
 export default function PositioningTab({ ctx }) {
-  const { brand, page, updBrand, updPage, generateStarterCopy, aiLoading } = ctx;
+  const { brand, page, updBrand, updPage, generateStarterCopy, aiLoading, briefDirty } = ctx;
   return (
             <div className="editor-padding" style={{ padding: "24px 20px 40px", maxWidth: "1080px", margin: "0 auto" }}>
 
@@ -138,3 +138,4 @@ export default function PositioningTab({ ctx }) {
             </div>
   );
 }
+
