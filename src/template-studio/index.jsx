@@ -1667,6 +1667,7 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
     showAllThemes, setShowAllThemes,
     downloadPage, downloadHeader, downloadFooter, downloadAll,
     exportBrief, shareBrief, exportFormat,
+    setProjects, activeId, briefDirty,
   };
 
   return (
