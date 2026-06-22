@@ -219,7 +219,6 @@ export default function AdminPanel({ isAdmin, isManager }) {
                   {u.email && u.name && (
                     <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "1px" }}>{u.email}</div>
                   )}
-                  <div style={{ fontFamily: "monospace", fontSize: "10px", color: "#a1a1aa", marginTop: "2px" }}>{u.userId}</div>
                 </td>
                 <td style={S.td}>
                   {editingId === u.userId ? (
@@ -276,4 +275,5 @@ export default function AdminPanel({ isAdmin, isManager }) {
     </div>
   );
 }
+
 
