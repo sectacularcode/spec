@@ -202,7 +202,7 @@ export default function AdminPanel({ isAdmin, isManager }) {
         <table style={S.table}>
           <thead>
             <tr>
-              <th style={S.th}>User ID</th>
+              <th style={S.th}>User</th>
               <th style={S.th}>Role</th>
               <th style={S.th}>Tools</th>
               <th style={S.th}>Last updated</th>
@@ -212,8 +212,14 @@ export default function AdminPanel({ isAdmin, isManager }) {
           <tbody>
             {users.map(u => (
               <tr key={u.userId} style={{ background: editingId === u.userId ? "#fffbf5" : "transparent" }}>
-                <td style={{ ...S.td, fontFamily: "monospace", fontSize: "11px", color: "#6b7280" }}>
-                  {u.userId}
+                <td style={S.td}>
+                  <div style={{ fontWeight: 500, color: "#09090b", fontSize: "13px" }}>
+                    {u.name || u.email || "Unknown"}
+                  </div>
+                  {u.email && u.name && (
+                    <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "1px" }}>{u.email}</div>
+                  )}
+                  <div style={{ fontFamily: "monospace", fontSize: "10px", color: "#a1a1aa", marginTop: "2px" }}>{u.userId}</div>
                 </td>
                 <td style={S.td}>
                   {editingId === u.userId ? (
@@ -270,3 +276,4 @@ export default function AdminPanel({ isAdmin, isManager }) {
     </div>
   );
 }
+
