@@ -27,74 +27,78 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
 
   var patterns = selectPatterns(brief, inspoContext || "");
 
+  // Strip timestamp suffix so custom pages (e.g. "faq-1718982345678") match
+  // the same pattern-setting logic as their base type (e.g. "faq")
+  var baseActivePage = activePage.replace(/-\d+$/, "");
+
   // Apply A/B variant overrides so the toggle actually changes the preview
-  if (activePage === "services") {
+  if (baseActivePage === "services") {
     patterns.services = (variant === "B") ? "alternating-rows" : "card-grid";
   }
-  if (activePage === "home") {
+  if (baseActivePage === "home") {
     patterns.hero = (variant === "B") ? "split-left" : "centered-bold";
   }
-  if (activePage === "about") {
+  if (baseActivePage === "about") {
     patterns.about = (variant === "B") ? "team-grid" : "split-image";
   }
-  if (activePage === "process") {
+  if (baseActivePage === "process") {
     patterns.process = (variant === "B") ? "horizontal-timeline" : "numbered-vertical";
   }
-  if (activePage === "contact") {
+  if (baseActivePage === "contact") {
     patterns.contact = (variant === "B") ? "split-form" : "centered-minimal";
   }
-  if (activePage === "work") {
+  if (baseActivePage === "work") {
     patterns.portfolio = (variant === "B") ? "case-study-cards" : "masonry-grid";
   }
-  if (activePage === "landing") {
+  if (baseActivePage === "landing") {
     patterns.landing = (variant === "B") ? "split-light" : "centered-dark";
   }
-  if (activePage === "team") {
+  if (baseActivePage === "team") {
     patterns.team = (variant === "B") ? "featured-founder" : "photo-grid";
   }
-  if (activePage === "blog") {
+  if (baseActivePage === "blog") {
     patterns.blog = (variant === "B") ? "featured-plus-grid" : "grid-3col";
   }
-  if (activePage === "testimonials") {
+  if (baseActivePage === "testimonials") {
     patterns.testimonials = (variant === "B") ? "single-feature" : "card-grid";
   }
-  if (activePage === "events") {
+  if (baseActivePage === "events") {
     patterns.events = (variant === "B") ? "event-cards" : "date-list";
   }
-  if (activePage === "careers") {
+  if (baseActivePage === "careers") {
     patterns.careers = (variant === "B") ? "values-first" : "job-list";
   }
-  if (activePage === "case-study") {
+  if (baseActivePage === "case-study") {
     patterns["case-study"] = (variant === "B") ? "editorial-light" : "dark-hero-metrics";
   }
-  if (activePage === "faq") {
+  if (baseActivePage === "faq") {
     patterns.faq = (variant === "B") ? "two-column" : "accordion";
   }
-  if (activePage === "pricing") {
+  if (baseActivePage === "pricing") {
     patterns.pricing = (variant === "B") ? "two-tier" : "three-tier";
   }
-  if (activePage === "portfolio") {
+  if (baseActivePage === "portfolio") {
     patterns.portfolio = (variant === "B") ? "editorial" : "dark-grid";
   }
-  if (activePage === "location") {
+  if (baseActivePage === "location") {
     patterns.location = (variant === "B") ? "centered" : "map-split";
   }
-  if (activePage === "press") {
+  if (baseActivePage === "press") {
     patterns.press = (variant === "B") ? "featured-hero" : "list";
   }
-  if (activePage === "partners") {
+  if (baseActivePage === "partners") {
     patterns.partners = (variant === "B") ? "description-list" : "logo-grid";
   }
-  if (activePage === "resources") {
+  if (baseActivePage === "resources") {
     patterns.resources = (variant === "B") ? "category-list" : "card-grid";
   }
-  if (activePage === "downloads") {
+  if (baseActivePage === "downloads") {
     patterns.downloads = (variant === "B") ? "card-grid" : "simple-list";
   }
-  if (activePage === "blog-post") {
+  if (baseActivePage === "blog-post") {
     patterns["blog-post"] = (variant === "B") ? "wide-editorial" : "narrow-centered";
   }
-  if (activePage === "event-single") {
+  if (baseActivePage === "event-single") {
     patterns["event-single"] = (variant === "B") ? "light-centered" : "dark-hero";
   }
   var C = brief.colors || {
