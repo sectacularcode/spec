@@ -1965,9 +1965,9 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         </div>
       )}
 
-      <div className="main-grid" style={{ display: "grid", gridTemplateColumns: "148px 1fr", minHeight: "calc(100vh - 60px)" }}>
+      <div className="main-grid" style={{ display: "grid", gridTemplateColumns: "200px 1fr", minHeight: "calc(100vh - 60px)" }}>
         {/* SIDEBAR — Workflow tabs */}
-        <div className="sidebar-nav" style={{ background: "#f5f4f7", borderRight: "1px solid #dde0e6", overflowY: "auto", display: "flex", flexDirection: "column", padding: "16px 8px" }}>
+        <div className="sidebar-nav" style={{ background: "#f5f4f7", borderRight: "1px solid #dde0e6", overflowY: "auto", display: "flex", flexDirection: "column", padding: "16px 8px", width: "200px" }}>
           <div style={{ fontSize: "10px", fontWeight: 600, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px", padding: "0 4px" }}>Workflow</div>
           <TabBtn id="discovery" label="Discovery" />
           <TabBtn id="positioning" label="Positioning" />
