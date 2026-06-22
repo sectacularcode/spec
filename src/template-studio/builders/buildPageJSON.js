@@ -37,12 +37,12 @@ export function buildPageJSON(page, brand) {
     section.elements.push(row);
   };
 
-  page.sections.forEach(s => {
+  (page.sections || []).forEach(s => {
     if (s === "Hero") {
       const hColor = textOn(pc);
       const bColor = mutedTextOn(pc);
       const heading = page.heroHeading || brand.tagline;
-      const subhead = page.heroSubhead || brand.keyMessages.split(".")[0];
+      const subhead = page.heroSubhead || (brand.keyMessages || "").split(".")[0];
       const eyebrow = eyebrowText(layout.eyebrowStyle, page.heroEyebrow || "Welcome");
       const heroImg = imgOrPlaceholder(page.heroImage, `${brand.name}-hero`, 1200, 900, brand.imageCategory);
       const v = layout.heroVariant || "left-standard";
