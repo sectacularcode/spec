@@ -1,20 +1,20 @@
 import { useState, useMemo, useEffect } from "react";
 
 // Constants
-import { PAGE_TYPES, SECTION_OPTIONS, TONES, FOOTER_STYLES, HEADER_STYLES, FONT_OPTIONS } from "./constants/ui.jsx";
+import { PAGE_TYPES } from "./constants/ui.jsx";
 import { THEMES } from "./constants/themes.js";
-import { LAYOUTS, getLayout, eyebrowText } from "./constants/layouts.js";
-import { WEBSITE_TEMPLATES, PAGE_TEMPLATES, BLANK_BRAND, newPage, applyWebsiteTemplate, applyTheme, layoutHeaderStyle, layoutFooterStyle } from "./constants/templates.js";
+import { LAYOUTS } from "./constants/layouts.js";
+import { WEBSITE_TEMPLATES, PAGE_TEMPLATES, BLANK_BRAND, newPage, applyWebsiteTemplate, applyTheme } from "./constants/templates.js";
 
 // Utils
-import { luminance, contrastRatio, isLight, textOn, mutedTextOn, subtleTextOn, buttonOn } from "./utils/colors.js";
-import { IMAGE_LIBRARY, pickImage, imgOrPlaceholder } from "./utils/images.js";
-import { SVG } from "./utils/svg.js";
+// Color utils used in tab components directly
+// Image utils used in buildPageJSON directly
+// SVG used in SocialTab directly
 import { auditBrand } from "./utils/audit.js";
 import { he } from "./utils/htmlEscape.js";
 
 // Builders
-import { uid, eContainer, eSection, eRow, eCol, rPx, eHead, eTxt, eBtn, eSpacer, eImg, eIconBox, eCounter, eAccordion, eSocial, eVideo, eCarousel, eForm, eNavMenu, eShortcode, eHTML, eMarquee } from "./builders/helpers.js";
+import { uid } from "./builders/helpers.js";
 import { buildPageJSON } from "./builders/buildPageJSON.js";
 import { buildHeaderJSON } from "./builders/buildHeaderJSON.js";
 import { buildFooterJSON } from "./builders/buildFooterJSON.js";
@@ -25,7 +25,7 @@ import { buildDiviFooter } from "./builders/buildDiviFooter.js";
 import { previewHTML } from "./preview/previewHTML.js";
 
 // Components
-import { Section } from "./components/Section.jsx";
+// Section component used in tab components directly
 import { Icon } from "./components/Icon.jsx";
 import { GenerateFromKeywordsModal } from "./components/GenerateFromKeywordsModal.jsx";
 
