@@ -9,9 +9,9 @@ export default function ContentTab({ ctx }) {
             <>
               <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%", padding: "24px 24px 40px" }}>
               {(!!(page.heroHeading || page.heroSubhead || page.aboutBody || page.services || page.process || page.testimonials || page.faq || page.portfolio || page.stats || page.pricing || page.blog || page.leaders)) && (
-                <div style={{ marginBottom: "16px", padding: "12px 16px", background: "#b45309", border: "none", borderRadius: "8px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
-                  <div style={{ fontSize: "13px", color: "#ffffff" }}>This page has demo content from the template. Clear it to start fresh with your client's copy.</div>
-                  <button onClick={clearDemoContent} style={{ padding: "6px 14px", background: "#ffffff", color: "#b45309", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>Clear demo content</button>
+                <div style={{ marginBottom: "16px", padding: "12px 16px", background: "#ffffff", border: "1px solid #dde0e6", borderLeft: "3px solid #b45309", borderRadius: "8px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
+                  <div style={{ fontSize: "13px", color: "#6b7280" }}>This page has demo content from the template. Clear it to start fresh with your client's copy.</div>
+                  <button onClick={clearDemoContent} style={{ padding: "6px 14px", background: "#ffffff", color: "#b45309", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>Clear demo content</button>
                 </div>
               )}
               <Section id="page-setup" title="Page Setup" icon="">
