@@ -2042,7 +2042,7 @@ Rules:
       )}
 
       {/* Header */}
-      <div style={{ background: "#ffffff", borderBottom: "1px solid #dde0e6", padding: "8px 24px", position: "sticky", top: "48px", zIndex: 50, display: "flex", alignItems: "center" }}>
+      <div style={{ background: "#ffffff", borderBottom: "1px solid #dde0e6", padding: "8px 24px 8px 304px", position: "sticky", top: "48px", zIndex: 50, display: "flex", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
           {/* Left: All Projects + project info */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
