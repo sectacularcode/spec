@@ -7,6 +7,7 @@ import { buildAboutPage } from "./about.js";
 import { buildProcessPage } from "./process.js";
 import { buildContactPage } from "./contact.js";
 import { buildGenericPage } from "./generic.js";
+import { buildLocationPageA, buildLocationPageB } from "./location.js";
 
 // Orchestrates all page builders into a list of page objects.
 // Each page object includes both variantA and variantB Elementor JSON
@@ -56,6 +57,13 @@ export function generatePages(brief, selectedPages, inspoContext, aiRecs, custom
 
     // Additional and custom page types
     if (!result) {
+      // Location pages — two layout variants (SEO vs conversion)
+      if (pid === "location" || pid.startsWith("location-")) {
+        var locData = brief.locationData || {};
+        var locA = buildLocationPageA(colors, brief, locData);
+        var locB = buildLocationPageB(colors, brief, locData);
+        return { id: pid, label: label, data: locA, variantA: locA, variantB: locB, recommended: "A", hasVariants: true };
+      }
       // Utility pages — no meaningful A/B variation
       var utilityPages = ["thank-you", "privacy", "terms", "404"];
       if (utilityPages.includes(pid)) {
