@@ -1103,7 +1103,7 @@ Rules:
   // Styles (I) imported from ./styles.js
 
   const TabBtn = ({ id, label }) => (
-    <button onClick={() => setTab(id)} style={{ width: "100%", textAlign: "left", padding: "8px 12px", background: tab === id ? "#fef3e2" : "transparent", color: tab === id ? "#b45309" : "#6b635c", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: tab === id ? 600 : 400, cursor: "pointer", display: "block", whiteSpace: "nowrap" }}>{label}</button>
+    <button onClick={() => setTab(id)} style={{ width: "100%", textAlign: "left", padding: "9px 14px", background: tab === id ? "#fef3e2" : "transparent", color: tab === id ? "#b45309" : "#6b635c", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: tab === id ? 600 : 400, cursor: "pointer", display: "block", whiteSpace: "nowrap" }}>{label}</button>
   );
 
   // Builder format toggle — applies to both Page and Footer downloads
@@ -2234,10 +2234,10 @@ Rules:
         </div>
       )}
 
-      <div className="main-grid" style={{ display: "grid", gridTemplateColumns: "200px 1fr", minHeight: "calc(100vh - 60px)" }}>
+      <div className="main-grid" style={{ display: "grid", gridTemplateColumns: "240px 1fr", minHeight: "calc(100vh - 60px)" }}>
         {/* SIDEBAR — Workflow tabs */}
-        <div className="sidebar-nav" style={{ background: "#f5f4f7", borderRight: "1px solid #dde0e6", overflowY: "auto", display: "flex", flexDirection: "column", padding: "16px 8px", width: "200px" }}>
-          <div style={{ fontSize: "10px", fontWeight: 600, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px", padding: "0 4px" }}>Workflow</div>
+        <div className="sidebar-nav" style={{ background: "#ffffff", borderRight: "1px solid #dde0e6", overflowY: "auto", display: "flex", flexDirection: "column", padding: "20px 12px", width: "240px", boxShadow: "2px 0 8px rgba(0,0,0,0.04)" }}>
+          <div style={{ fontSize: "11px", fontWeight: 600, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px", padding: "0 4px" }}>Workflow</div>
           <TabBtn id="discovery" label="Discovery" />
           <TabBtn id="positioning" label="Positioning" />
           <TabBtn id="brand" label="Visual" />
