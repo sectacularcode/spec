@@ -544,7 +544,7 @@ Return ONLY a valid JSON object — no preamble, no markdown fences:
   "layoutId": "from list below",
   "layoutReason": "1 short sentence",
   "themeId": "from list below OR null if customColors better",
-  "customColors": null OR {"background":"#hex","accent":"#hex","text":"#hex","card":"#hex"},
+  "customColors": null,
   "themeReason": "1 short sentence",
   "headingFont": "Manrope|Inter|Playfair Display|Cormorant Garamond|Yeseva One|Italiana|Oswald|Space Mono|Fraunces",
   "bodyFont": "Inter|DM Sans|Lato|Manrope|Space Mono",
@@ -573,11 +573,11 @@ Return ONLY a valid JSON object — no preamble, no markdown fences:
   "templateId": "from list below, OR null if isCustom is true",
   "templateReason": "1 short sentence, or null if isCustom",
   "isCustom": false,
-  "customThemeName": "null OR a short name for the custom theme (e.g. 'Ninja Turtle Collector')",
+  "customThemeName": "short name for the custom theme when isCustom is true, e.g. Ninja Turtle Collector, or null",
   "layoutId": "from list below",
   "layoutReason": "1 short sentence",
   "themeId": "from list below OR null if customColors better",
-  "customColors": null OR {"background":"#hex","accent":"#hex","text":"#hex","card":"#hex"},
+  "customColors": null,
   "themeReason": "1 short sentence",
   "headingFont": "Manrope|Inter|Playfair Display|Cormorant Garamond|Yeseva One|Italiana|Oswald|Space Mono|Fraunces",
   "bodyFont": "Inter|DM Sans|Lato|Manrope|Space Mono",
@@ -590,7 +590,7 @@ Return ONLY a valid JSON object — no preamble, no markdown fences:
   "heroHeading": "8-14 word hero headline in the theme's voice",
   "heroSubhead": "1-2 sentences. What this site is about, in the theme's authentic voice.",
   "aboutBody": "60-100 words of dummy body copy fully immersed in the theme's world.",
-  "sections": ["array of 5-8 section types from: Hero, About, Service Cards, Portfolio Carousel, Stats, Testimonials, Blog, FAQ, Form, CTA, Marquee, Pricing, Leadership, Process, Team, Logo Carousel, Video"],
+  "sections": ["Hero", "About", "CTA"],
   "projectName": "1-3 word project name"
 }
 
