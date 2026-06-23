@@ -47,6 +47,23 @@ export function buildPageJSON(page, brand) {
       const heroImg = imgOrPlaceholder(page.heroImage, `${brand.name}-hero`, 1200, 900, brand.imageCategory);
       const v = layout.heroVariant || "left-standard";
 
+      // CASE STUDY — editorial dark header with accent rule + metadata strip
+      // Intercept before layout variant handling so all Case Study pages get this treatment
+      if (page.pageType === "Case Study") {
+        const darkBg = isDark ? pc : "#0a0a0a";
+        const sec = eSection(darkBg, 120, 100);
+        const accentRule = eHTML(`<div style="display:flex;align-items:center;gap:12px;margin-bottom:32px;"><div style="width:32px;height:2px;background:${ac};"></div><span style="font-family:inherit;font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:${ac};">${eyebrow}</span></div>`);
+        const metaStrip = eHTML(`<div style="display:flex;gap:32px;flex-wrap:wrap;padding-top:28px;border-top:1px solid rgba(255,255,255,0.15);margin-top:40px;"><div><p style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:${ac};margin:0 0 6px;">Client</p><p style="font-size:14px;color:#ffffff;margin:0;font-weight:500;">${brand.name || "Client"}</p></div><div><p style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:${ac};margin:0 0 6px;">Industry</p><p style="font-size:14px;color:#ffffff;margin:0;font-weight:500;">${brand.industry || "Industry"}</p></div><div><p style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:${ac};margin:0 0 6px;">Year</p><p style="font-size:14px;color:#ffffff;margin:0;font-weight:500;">${new Date().getFullYear()}</p></div></div>`);
+        push(sec,
+          accentRule,
+          eHead(heading || page.name, "h1", "#ffffff", hf, 72, "left"),
+          subhead ? eTxt(subhead, "rgba(255,255,255,0.75)", bf, 19, "left") : eSpacer(0),
+          metaStrip,
+        );
+        sections.push(sec);
+        return;
+      }
+
       if (v === "split-image" || v === "split-image-rounded") {
         // Text on left 55%, image card on right 40%. Asymmetric editorial feel.
         const sec = eSection(pc, layout.heroPadding, layout.heroPadding);
