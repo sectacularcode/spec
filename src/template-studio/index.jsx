@@ -518,10 +518,14 @@ ${themeList}
 Rules: use customColors for unusual vibes (neon, earthy clay, navy+gold), serifs for editorial/wedding, sans for tech/agency, mono for indie/terminal. For goals, include EVERY goal the site naturally serves (an e-commerce site is usually Direct Sales + Newsletter Growth; a coaching site is Bookings + Lead Generation). Keep all reasons to ONE short sentence.`
       : `You recommend a website template, layout, palette, fonts, and brand brief from a user description.
 
+CRITICAL: If the description is for a hobby, fan site, collector, pop culture, entertainment, niche community, or anything that does not match any of the available industry templates below — set "isCustom": true and do NOT force a template match. Generate authentic colors, fonts, and copy from the actual theme instead.
+
 Return ONLY a valid JSON object — no preamble, no markdown fences:
 {
-  "templateId": "from list below",
-  "templateReason": "1 short sentence",
+  "templateId": "from list below, OR null if isCustom is true",
+  "templateReason": "1 short sentence, or null if isCustom",
+  "isCustom": false,
+  "customThemeName": "null OR a short name for the custom theme (e.g. 'Ninja Turtle Collector')",
   "layoutId": "from list below",
   "layoutReason": "1 short sentence",
   "themeId": "from list below OR null if customColors better",
@@ -533,8 +537,12 @@ Return ONLY a valid JSON object — no preamble, no markdown fences:
   "goals": ["array of 1-3 goals from this list — Lead Generation, Direct Sales / E-commerce, Bookings & Reservations, Awareness & Brand Building, Community & Newsletter Growth, Applications & Sign-ups, Donations & Fundraising"],
   "outcome": "1 specific sentence",
   "primaryKeywords": "5 comma-separated keywords",
-  "tagline": "5-9 word tagline",
+  "tagline": "5-9 word tagline — authentic to the theme",
   "heroEyebrow": "2-4 word eyebrow",
+  "heroHeading": "8-14 word hero headline in the theme's voice",
+  "heroSubhead": "1-2 sentences. What this site is about, in the theme's authentic voice.",
+  "aboutBody": "60-100 words of dummy body copy fully immersed in the theme's world.",
+  "sections": ["array of 5-8 section types from: Hero, About, Service Cards, Portfolio Carousel, Stats, Testimonials, Blog, FAQ, Form, CTA, Marquee, Pricing, Leadership, Process, Team, Logo Carousel, Video"],
   "projectName": "1-3 word project name"
 }
 
@@ -547,7 +555,12 @@ ${layoutList}
 Themes (or use customColors if vibe doesn't match):
 ${themeList}
 
-Rules: match template to niche, use customColors for unusual vibes (neon, earthy clay, navy+gold), serifs for editorial/wedding, sans for tech/agency, mono for indie/terminal. For goals, include EVERY goal the site naturally serves (an e-commerce site is usually Direct Sales + Newsletter Growth; a coaching site is Bookings + Lead Generation). Keep all reasons to ONE short sentence.`;
+Rules:
+- If the niche fits a template, match it and set isCustom: false
+- If the niche is hobby/fan/collector/pop culture/entertainment/creative/anything outside the template list — set isCustom: true, templateId: null, and generate AUTHENTIC colors from that world (Ninja Turtles = green/purple/orange, not generic blue)
+- customColors must always be filled in for isCustom projects — pull real colors from the theme
+- For goals, include EVERY goal the site naturally serves
+- Keep all reasons to ONE short sentence`;
     // Pull in everything the user has already filled out, so the recommendation
     // is informed by their existing context — business info, brand brief,
     // inspiration URLs, brand assets. Empty fields are simply skipped.
@@ -609,6 +622,64 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
   const applyBriefRecommendation = () => {
     if (!briefRec) return;
     const r = briefRec;
+
+    // ── Custom path: niche outside standard templates ──────────────────────
+    if (r.isCustom) {
+      let brand = { ...BLANK_BRAND, name: r.projectName || r.customThemeName || "Custom Project", industry: briefText.slice(0, 80) };
+      let page = newPage("Homepage", "Homepage");
+      // Apply AI copy to the page
+      page = {
+        ...page,
+        heroHeading: r.heroHeading || "",
+        heroSubhead: r.heroSubhead || "",
+        heroEyebrow: r.heroEyebrow || "",
+        aboutBody: r.aboutBody || "",
+        sections: r.sections && r.sections.length ? r.sections : page.sections,
+      };
+      // Layer AI brand settings
+      brand = {
+        ...brand,
+        layoutId: r.layoutId || brand.layoutId,
+        headingFont: r.headingFont || brand.headingFont,
+        bodyFont: r.bodyFont || brand.bodyFont,
+        goals: Array.isArray(r.goals) && r.goals.length ? r.goals : (brand.goals || []),
+        goal: Array.isArray(r.goals) && r.goals.length ? r.goals[0] : brand.goal,
+        outcome: r.outcome || brand.outcome,
+        primaryKeywords: r.primaryKeywords || brand.primaryKeywords,
+        tagline: r.tagline || brand.tagline,
+        description: briefText.slice(0, 200),
+      };
+      // Always use customColors for custom projects
+      if (r.customColors && r.customColors.background && r.customColors.accent) {
+        const bc = r.customColors;
+        const isDark = (() => {
+          const h = bc.background.replace("#", "");
+          const rr = parseInt(h.slice(0, 2), 16), gg = parseInt(h.slice(2, 4), 16), bb = parseInt(h.slice(4, 6), 16);
+          return (0.299 * rr + 0.587 * gg + 0.114 * bb) / 255 < 0.5;
+        })();
+        brand = {
+          ...brand,
+          brandColors: bc,
+          themeId: "custom-brand",
+          themeMode: isDark ? "dark" : "light",
+          primaryColor: bc.background,
+          cardBgColor: bc.card || (isDark ? "#181818" : "#f5f5f5"),
+          bodyTextColor: bc.text || (isDark ? "#a8a8a8" : "#4a4a4a"),
+          borderColor: isDark ? "#2a2a2a" : "#e5e5e5",
+          accentColor: bc.accent,
+        };
+      }
+      const newId = `proj-${Date.now()}`;
+      setProjects(ps => [...ps, { id: newId, name: brand.name, brand, pages: [page] }]);
+      setActiveId(newId);
+      setPageIdx(0);
+      setBriefRec(null);
+      setBriefText("");
+      setView("editor");
+      return;
+    }
+
+    // ── Standard path: matched industry template ───────────────────────────
     const template = WEBSITE_TEMPLATES.find(t => t.id === r.templateId);
     if (!template) { setBriefError("Recommended template not found. Try a manual start."); return; }
     // Start from BLANK_BRAND (no leftover EV content), then layer template, then layer AI overrides
@@ -1558,9 +1629,17 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
             {/* Header row — template name + action buttons */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "28px", gap: "16px", flexWrap: "wrap", paddingBottom: "24px", borderBottom: "1px solid #dde0e6" }}>
               <div style={{ flex: "1 1 280px" }}>
-                <div style={{ fontSize: "9px", color: "#09090b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "6px" }}>Recommended Template</div>
-                <div style={{ fontSize: "22px", fontWeight: 700, color: "#09090b", letterSpacing: "-0.02em", lineHeight: 1.2, marginBottom: briefRec.templateReason ? "8px" : 0 }}>{WEBSITE_TEMPLATES.find(t => t.id === briefRec.templateId)?.name || briefRec.templateId}</div>
-                {briefRec.templateReason && <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.55 }}>{briefRec.templateReason}</div>}
+                <div style={{ fontSize: "9px", color: "#09090b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "6px" }}>
+                  {briefRec.isCustom ? "Custom Generated Project" : "Recommended Template"}
+                  {briefRec.isCustom && <span style={{ marginLeft: "8px", fontSize: "9px", background: "#b45309", color: "#fff", padding: "2px 6px", borderRadius: "3px", fontWeight: 700, letterSpacing: "0.05em" }}>CUSTOM</span>}
+                </div>
+                <div style={{ fontSize: "22px", fontWeight: 700, color: "#09090b", letterSpacing: "-0.02em", lineHeight: 1.2, marginBottom: "8px" }}>
+                  {briefRec.isCustom ? (briefRec.customThemeName || briefRec.projectName || "Custom Project") : (WEBSITE_TEMPLATES.find(t => t.id === briefRec.templateId)?.name || briefRec.templateId)}
+                </div>
+                {briefRec.isCustom
+                  ? <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.55 }}>Generated from your description — colors, sections, and copy are themed to your niche.</div>
+                  : briefRec.templateReason && <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.55 }}>{briefRec.templateReason}</div>
+                }
               </div>
               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                 <button onClick={applyBriefRecommendation} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px", background: "#6b635c", color: "#fff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
