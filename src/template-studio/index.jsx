@@ -478,7 +478,7 @@ Return ONLY the new ${fieldName} value as plain text.`;
         method: "POST",
         headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) },
         body: JSON.stringify({
-          model: "claude-sonnet-4-5",
+          model: "claude-sonnet-4-6",
           max_tokens: 400,
           system: systemPrompt,
           messages: [{ role: "user", content: userPrompt }],
@@ -645,7 +645,7 @@ Rules:
         method: "POST",
         headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) },
         body: JSON.stringify({
-          model: "claude-sonnet-4-5",
+          model: "claude-sonnet-4-6",
           max_tokens: 800,
           system: systemPrompt,
           messages: [{ role: "user", content: briefText.trim()
