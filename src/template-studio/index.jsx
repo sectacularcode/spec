@@ -800,6 +800,8 @@ Rules:
     setPageIdx(0);
     setBriefRec(null);
     setBriefText("");
+    try { localStorage.removeItem("spec_tab"); } catch(e) {}
+    setTab("discovery");
     setView("editor");
   };
 
@@ -856,6 +858,7 @@ Rules:
     }));
     setBriefRec(null);
     setBriefText("");
+    try { localStorage.removeItem("spec_tab"); } catch(e) {}
     setTab("discovery"); // Return to Discovery so they can review and build forward from the start
   };
   const toggleSection = (s) => updPage("sections", page.sections.includes(s) ? page.sections.filter(x => x !== s) : [...page.sections, s]);
@@ -931,6 +934,7 @@ Rules:
     setActiveId(id);
     setView("editor");
     setPageIdx(0);
+    try { localStorage.removeItem("spec_tab"); } catch(e) {}
     setTab("discovery"); // Land on Discovery so they start by filling in the business info
   };
 
