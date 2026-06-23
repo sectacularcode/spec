@@ -555,10 +555,14 @@ ${layoutList}
 Themes (or use customColors if vibe doesn't match):
 ${themeList}
 
+Available templates cover ONLY these industries: Marketing/Creative Agency, Production Studio, E-commerce/Retail, Lifestyle/Travel Blog, Solo Filmmaker/Photographer, Solo Professional/Freelancer, Home Services/Trades, Automotive/Car Repair, Coaching/Consulting, Real Estate, Restaurant/Cafe, Medical/Dental, Law Firm, Event Photography, Fitness/Personal Training.
+
 Rules:
-- If the niche fits a template, match it and set isCustom: false
-- If the niche is hobby/fan/collector/pop culture/entertainment/creative/anything outside the template list — set isCustom: true, templateId: null, and generate AUTHENTIC colors from that world (Ninja Turtles = green/purple/orange, not generic blue)
-- customColors must always be filled in for isCustom projects — pull real colors from the theme
+- ONLY use a templateId if the user's description clearly matches one of the industries above
+- If it does NOT match — beauty salons, nail artists, spas, tattoo studios, barbershops, pet care, florists, bakeries, gaming, esports, comic books, collectors, fan sites, hobby niches, pop culture, entertainment, art studios, dance studios, yoga, pilates, music, podcasts, nonprofits, churches, or ANYTHING else not in the list above — set isCustom: true and templateId: null
+- For isCustom projects: generate AUTHENTIC colors from the actual theme (nail art = pastels/metallics/bold brights, not generic blue; Ninja Turtles = green/purple/orange)
+- customColors must ALWAYS be provided for isCustom projects — never leave it null when isCustom is true
+- sections should match what that type of site actually needs
 - For goals, include EVERY goal the site naturally serves
 - Keep all reasons to ONE short sentence`;
     // Pull in everything the user has already filled out, so the recommendation
