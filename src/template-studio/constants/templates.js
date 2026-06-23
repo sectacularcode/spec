@@ -997,7 +997,11 @@ export const BLANK_BRAND = {
   primaryMenu: "Home, About, Services, Contact",
   utilityMenu: "Privacy, Terms",
   socialHandle: "",
-  socialLinks: [],
+  socialLinks: [
+    { key: "instagram", label: "", url: "" },
+    { key: "facebook", label: "", url: "" },
+    { key: "linkedin", label: "", url: "" },
+  ],
   buttonRadius: "subtle",
   spacingDensity: "balanced",
   imageRadius: "subtle",
