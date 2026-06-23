@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useUser, UserButton } from "@clerk/clerk-react";
 import AdminPanel from "./AdminPanel.jsx";
 
@@ -39,6 +40,7 @@ export default function Dashboard({ onSelectTool, role, tools: allowedTools }) {
   const isManager = role === "manager" || role === "admin";
   const visibleTools = TOOLS.filter(t => allowedTools.includes(t.id));
   const roleColor = ROLE_COLORS[role] || ROLE_COLORS.staff;
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const S = {
     wrap: { minHeight: "100vh", background: "#eeedf1", fontFamily: "Inter, system-ui, sans-serif" },
@@ -56,12 +58,37 @@ export default function Dashboard({ onSelectTool, role, tools: allowedTools }) {
     card: { background: "#fff", border: "1px solid #dde0e6", borderRadius: "10px", padding: "28px", cursor: "pointer", transition: "box-shadow 0.15s", display: "flex", flexDirection: "column", gap: "12px" },
     cardLabel: { fontSize: "15px", fontWeight: 700, color: "#09090b" },
     cardDesc: { fontSize: "13px", color: "#6b7280", lineHeight: 1.5 },
-    sectionHead: { fontSize: "13px", fontWeight: 700, color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "4px" },
-    sectionSub: { fontSize: "13px", color: "#6b7280", marginBottom: "24px" },
+    manageBtn: { display: "inline-flex", alignItems: "center", gap: "8px", padding: "9px 18px", background: "#fff", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", fontWeight: 500, color: "#09090b", cursor: "pointer" },
+    // Drawer
+    overlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)", zIndex: 200, opacity: drawerOpen ? 1 : 0, pointerEvents: drawerOpen ? "auto" : "none", transition: "opacity 0.2s" },
+    drawer: { position: "fixed", top: 0, right: 0, width: "min(600px, 100vw)", height: "100vh", background: "#fff", borderLeft: "1px solid #dde0e6", zIndex: 201, display: "flex", flexDirection: "column", boxShadow: "-4px 0 32px rgba(0,0,0,0.1)", transform: drawerOpen ? "translateX(0)" : "translateX(100%)", transition: "transform 0.25s cubic-bezier(0.4,0,0.2,1)" },
+    drawerHead: { padding: "16px 24px", borderBottom: "1px solid #dde0e6", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 },
+    drawerTitle: { fontSize: "15px", fontWeight: 700, color: "#09090b" },
+    drawerSub: { fontSize: "12px", color: "#6b7280", marginTop: "2px" },
+    drawerClose: { background: "none", border: "none", fontSize: "20px", cursor: "pointer", color: "#6b7280", padding: "4px 8px", lineHeight: 1 },
+    drawerBody: { flex: 1, overflowY: "auto", padding: "0" },
   };
 
   return (
     <div style={S.wrap}>
+      {/* Overlay */}
+      <div style={S.overlay} onClick={() => setDrawerOpen(false)} />
+
+      {/* Slide-in drawer */}
+      <div style={S.drawer}>
+        <div style={S.drawerHead}>
+          <div>
+            <div style={S.drawerTitle}>{isAdmin ? "Admin Panel" : "Team Management"}</div>
+            <div style={S.drawerSub}>{isAdmin ? "Add users, update roles and tool access, or remove accounts." : "Add staff members and manage their tool access."}</div>
+          </div>
+          <button style={S.drawerClose} onClick={() => setDrawerOpen(false)}>×</button>
+        </div>
+        <div style={S.drawerBody}>
+          <AdminPanel isAdmin={isAdmin} isManager={isManager} />
+        </div>
+      </div>
+
+      {/* Nav */}
       <div style={S.nav}>
         <div style={{ display: "flex", alignItems: "center" }}>
           <span style={S.logo}>spec<span style={S.logoDot}>.</span></span>
@@ -74,6 +101,7 @@ export default function Dashboard({ onSelectTool, role, tools: allowedTools }) {
         </div>
       </div>
 
+      {/* Body */}
       <div style={S.body}>
         <div style={S.greeting}>Hey{user?.firstName ? `, ${user.firstName}` : ""}.</div>
         <div style={S.sub}>Here are the tools you have access to.</div>
@@ -95,15 +123,13 @@ export default function Dashboard({ onSelectTool, role, tools: allowedTools }) {
         </div>
 
         {isManager && (
-          <div>
-            <div style={S.sectionHead}>{isAdmin ? "Admin Panel" : "Team Management"}</div>
-            <div style={S.sectionSub}>
-              {isAdmin
-                ? "Add users, update roles and tool access, or remove accounts."
-                : "Add staff members and manage their tool access."}
-            </div>
-            <AdminPanel isAdmin={isAdmin} isManager={isManager} />
-          </div>
+          <button style={S.manageBtn} onClick={() => setDrawerOpen(true)}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            {isAdmin ? "Manage users" : "Manage team"}
+          </button>
         )}
       </div>
     </div>
