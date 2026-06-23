@@ -2042,8 +2042,8 @@ Rules:
       )}
 
       {/* Header */}
-      <div style={{ background: "#ffffff", borderBottom: "1px solid #dde0e6", padding: "8px 0", position: "sticky", top: "48px", zIndex: 50 }}>
-        <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px", display: "flex", alignItems: "center", position: "relative" }}>
+      <div style={{ background: "#ffffff", borderBottom: "1px solid #dde0e6", padding: "8px 24px", position: "sticky", top: "48px", zIndex: 50, display: "flex", alignItems: "center" }}>
+        <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
           {/* Left: All Projects + project info */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <button onClick={() => setView("projects")} style={{ padding: "7px 14px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "6px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", cursor: "pointer" }}>
@@ -2054,15 +2054,15 @@ Rules:
               <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "3px" }}>{project.pages.length} page{project.pages.length !== 1 ? "s" : ""} · {exportFormat === "divi" ? "Divi" : "Elementor"}</div>
             </div>
           </div>
-          {/* Right: Audit icon + Preview */}
-          <div style={{ display: "flex", gap: "6px", alignItems: "center", position: "absolute", right: "24px" }}>
+        </div>
+        {/* Right: Audit icon + Preview */}
+        <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
             <button onClick={() => setShowAudit(!showAudit)} title={`Audit — ${audit.length} item${audit.length !== 1 ? "s" : ""}`} style={{ background: "none", border: "none", padding: "7px 8px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", color: audit.length ? "#b45309" : "#a1a1aa", fontSize: "12px", fontWeight: 600, borderRadius: "6px" }}>
               <Icon name="alertTriangle" size={14} color={audit.length ? "#b45309" : "#a1a1aa"} /> {audit.length}
             </button>
             <button onClick={() => setView("preview")} style={{ padding: "7px 14px", background: "#3f3f46", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}>
               <Icon name="eye" size={13} color="#ffffff" /> Preview
             </button>
-          </div>
         </div>
       </div>
 
