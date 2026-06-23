@@ -85,6 +85,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
   const [importMsg, setImportMsg] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState(null); // project id pending delete confirmation
   const [savedBuilds, setSavedBuilds] = useState([]); // Blueprint builds saved to library
+  const [keywordBuilds, setKeywordBuilds] = useState([]); // Keyword-generated custom builds
   const [libraryFilter, setLibraryFilter] = useState({ visual: "", industry: "" }); // browser filters
 
   useEffect(() => {
@@ -206,6 +207,53 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
     const interval = setInterval(loadSavedBuilds, 10000);
     return () => clearInterval(interval);
   }, []);
+
+  // Load keyword builds history from storage
+  useEffect(() => {
+    async function loadKeywordBuilds() {
+      try {
+        const res = await fetch("/api/storage?key=spec-keyword-builds", { headers: userId ? { "x-spec-user-id": userId } : {} });
+        const data = res.ok ? await res.json() : {};
+        if (data.value) {
+          const parsed = JSON.parse(data.value);
+          if (Array.isArray(parsed)) setKeywordBuilds(parsed);
+        }
+      } catch(e) {}
+    }
+    loadKeywordBuilds();
+  }, []);
+
+  async function saveKeywordBuild(entry) {
+    try {
+      const res = await fetch("/api/storage?key=spec-keyword-builds", { headers: userId ? { "x-spec-user-id": userId } : {} });
+      const data = res.ok ? await res.json() : {};
+      let existing = [];
+      try { if (data.value) existing = JSON.parse(data.value); } catch(e) {}
+      // Dedup by keywords — replace if same keywords generated today
+      const today = new Date().toISOString().slice(0, 10);
+      const deduped = existing.filter(b => !(b.keywords === entry.keywords && b.date === today));
+      deduped.unshift(entry);
+      if (deduped.length > 50) deduped.length = 50;
+      await fetch("/api/storage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) },
+        body: JSON.stringify({ action: "set", key: "spec-keyword-builds", value: JSON.stringify(deduped) }),
+      });
+      setKeywordBuilds(deduped);
+    } catch(e) {}
+  }
+
+  async function deleteKeywordBuild(id) {
+    try {
+      const updated = keywordBuilds.filter(b => b.id !== id);
+      await fetch("/api/storage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) },
+        body: JSON.stringify({ action: "set", key: "spec-keyword-builds", value: JSON.stringify(updated) }),
+      });
+      setKeywordBuilds(updated);
+    } catch(e) {}
+  }
 
   const project = projects.find(p => p.id === activeId) || projects[0] || null;
   const brand = project ? project.brand : null;
@@ -677,6 +725,21 @@ Rules:
       setProjects(ps => [...ps, { id: newId, name: brand.name, brand, pages: [page] }]);
       setActiveId(newId);
       setPageIdx(0);
+
+      // Save to keyword builds history for recovery
+      saveKeywordBuild({
+        id: "kb-" + Date.now(),
+        type: "project",
+        keywords: briefText.slice(0, 200),
+        themeName: r.customThemeName || r.projectName || brand.name,
+        colors: r.customColors || {},
+        font: r.headingFont || "",
+        sections: r.sections || [],
+        date: new Date().toISOString().slice(0, 10),
+        projectId: newId,
+        projectName: brand.name,
+      });
+
       setBriefRec(null);
       setBriefText("");
       setView("editor");
@@ -819,6 +882,20 @@ Rules:
     setProjects(ps => ps.map(p => p.id === activeId ? { ...p, pages: [...p.pages, npWithContent] } : p));
     setPageIdx(project.pages.length);
     setShowKeywordsModal(false);
+
+    // Save to keyword builds history for recovery
+    saveKeywordBuild({
+      id: "kb-" + Date.now(),
+      type: "page",
+      keywords: pageConfig._keywords || "",
+      themeName: pageConfig._aiTheme || pageConfig.name || "",
+      colors: pageConfig._aiColors || {},
+      font: pageConfig._aiFont || "",
+      sections: pageConfig.sections || [],
+      date: new Date().toISOString().slice(0, 10),
+      projectId: activeId,
+      projectName: project?.name || "",
+    });
   };
 
   const addPage = (pageType = "Homepage") => {
@@ -1628,6 +1705,72 @@ Rules:
           </div>
         )}
 
+        {/* Keyword Builds — recovery history for custom keyword-generated builds */}
+        {keywordBuilds.length > 0 && (
+          <div style={{ marginTop: "40px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+              <div>
+                <div style={{ fontSize: "20px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>Keyword Builds</div>
+                <div style={{ fontSize: "13px", color: "#6b7280" }}>{keywordBuilds.length} saved · Regenerate or restore any keyword-generated build.</div>
+              </div>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "14px" }}>
+              {keywordBuilds.map(build => {
+                const colors = build.colors || {};
+                const colorValues = Object.values(colors).filter(Boolean);
+                return (
+                  <div key={build.id} style={{ background: "#fff", border: "1px solid #dde0e6", borderRadius: "10px", overflow: "hidden" }}>
+                    {/* Color bar */}
+                    <div style={{ height: "6px", background: colorValues.length >= 2 ? `linear-gradient(to right, ${colorValues[0]} 0%, ${colorValues[0]} 50%, ${colorValues[1]} 50%)` : colorValues[0] || "#dde0e6" }} />
+                    <div style={{ padding: "16px" }}>
+                      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "8px", marginBottom: "8px" }}>
+                        <div>
+                          <div style={{ fontSize: "13px", fontWeight: 700, color: "#09090b", marginBottom: "2px" }}>{build.themeName || build.keywords.slice(0, 40)}</div>
+                          <div style={{ fontSize: "11px", color: "#6b7280" }}>{build.date} · {build.type === "project" ? "Full project" : "Page in " + (build.projectName || "project")}</div>
+                        </div>
+                        <span style={{ fontSize: "9px", background: "#b45309", color: "#fff", padding: "2px 6px", borderRadius: "3px", fontWeight: 700, letterSpacing: "0.05em", whiteSpace: "nowrap", flexShrink: 0 }}>CUSTOM</span>
+                      </div>
+                      {build.keywords && (
+                        <div style={{ fontSize: "11px", color: "#9ca3af", marginBottom: "10px", lineHeight: 1.5, fontStyle: "italic" }}>"{build.keywords.slice(0, 80)}{build.keywords.length > 80 ? "…" : ""}"</div>
+                      )}
+                      {/* Color swatches */}
+                      {colorValues.length > 0 && (
+                        <div style={{ display: "flex", gap: "4px", marginBottom: "10px" }}>
+                          {colorValues.slice(0, 4).map((c, i) => (
+                            <div key={i} title={c} style={{ width: "18px", height: "18px", borderRadius: "50%", background: c, border: "1px solid rgba(0,0,0,0.1)" }} />
+                          ))}
+                          {build.font && <span style={{ fontSize: "10px", color: "#9ca3af", marginLeft: "4px", alignSelf: "center" }}>{build.font}</span>}
+                        </div>
+                      )}
+                      {/* Sections */}
+                      {(build.sections || []).length > 0 && (
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "3px", marginBottom: "12px" }}>
+                          {(build.sections || []).slice(0, 5).map(s => (
+                            <span key={s} style={{ fontSize: "9px", padding: "2px 6px", background: "rgba(180,83,9,0.08)", color: "#b45309", borderRadius: "8px", fontWeight: 500 }}>{s}</span>
+                          ))}
+                          {(build.sections || []).length > 5 && <span style={{ fontSize: "9px", color: "#9ca3af" }}>+{build.sections.length - 5}</span>}
+                        </div>
+                      )}
+                      <div style={{ display: "flex", gap: "6px" }}>
+                        <button
+                          onClick={() => { setBriefText(build.keywords); setShowKeywordsModal(true); }}
+                          style={{ flex: 1, padding: "8px 0", fontSize: "11px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer" }}>
+                          Regenerate
+                        </button>
+                        <button
+                          onClick={() => deleteKeywordBuild(build.id)}
+                          style={{ padding: "8px 10px", fontSize: "11px", background: "#fff", color: "#6b7280", border: "1px solid #dde0e6", borderRadius: "5px", cursor: "pointer" }}>
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {briefRec && (
           <div style={{ background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "12px", padding: "32px 36px", marginBottom: "28px" }}>
             {/* Header row — template name + action buttons */}
@@ -1884,7 +2027,8 @@ Rules:
       {showKeywordsModal && (
         <GenerateFromKeywordsModal
           brand={brand}
-          onClose={() => setShowKeywordsModal(false)}
+          initialKeywords={briefText}
+          onClose={() => { setShowKeywordsModal(false); setBriefText(""); }}
           onAddPage={addPageFromKeywords}
           userId={userId}
         />
