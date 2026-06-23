@@ -1540,7 +1540,7 @@ Rules:
             <select
               value={lockedTemplateId}
               onChange={e => setLockedTemplateId(e.target.value)}
-              style={{ width: "100%", padding: "10px 40px 10px 12px", background: "#ffffff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\") no-repeat right 14px center", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", cursor: "pointer", outline: "none", boxSizing: "border-box", appearance: "none", WebkitAppearance: "none" }}>
+              style={{ width: "100%", padding: "10px 40px 10px 12px", background: "#ffffff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%236b635c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\") no-repeat right 14px center", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", cursor: "pointer", outline: "none", boxSizing: "border-box", appearance: "none", WebkitAppearance: "none" }}>
               <option value="">Already know which template? Pick one (optional)</option>
               {WEBSITE_TEMPLATES.map(t => (
                 <option key={t.id} value={t.id}>{t.name} — {t.industry.split(/[,—]/)[0].trim().slice(0, 40)}</option>
@@ -1592,7 +1592,7 @@ Rules:
                 <select
                   value={libraryFilter.visual}
                   onChange={e => setLibraryFilter(f => ({ ...f, visual: e.target.value }))}
-                  style={{ padding: "8px 36px 8px 12px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\") no-repeat right 12px center", color: "#09090b", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none", boxSizing: "border-box" }}>
+                  style={{ padding: "8px 36px 8px 12px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%236b635c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\") no-repeat right 12px center", color: "#09090b", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none", boxSizing: "border-box" }}>
                   <option value="">All visual styles</option>
                   {[...new Set(savedBuilds.flatMap(b => b.visualTags || []))].map(tag => (
                     <option key={tag} value={tag}>{tag.replace(/-/g, " ")}</option>
@@ -1601,7 +1601,7 @@ Rules:
                 <select
                   value={libraryFilter.industry}
                   onChange={e => setLibraryFilter(f => ({ ...f, industry: e.target.value }))}
-                  style={{ padding: "8px 36px 8px 12px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\") no-repeat right 12px center", color: "#09090b", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none", boxSizing: "border-box" }}>
+                  style={{ padding: "8px 36px 8px 12px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%236b635c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\") no-repeat right 12px center", color: "#09090b", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none", boxSizing: "border-box" }}>
                   <option value="">All industries</option>
                   {[...new Set(savedBuilds.flatMap(b => b.industryFit || []))].sort().map(ind => (
                     <option key={ind} value={ind}>{ind.replace(/-/g, " ")}</option>
