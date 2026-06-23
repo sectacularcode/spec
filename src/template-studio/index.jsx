@@ -655,8 +655,11 @@ Rules:
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
-      if (!res.ok) throw new Error(`API returned ${res.status}`);
       const data = await res.json();
+      if (!res.ok) {
+        const detail = data?.error || data?.anthropic_error?.message || JSON.stringify(data).slice(0, 200);
+        throw new Error(`API ${res.status}: ${detail}`);
+      }
       const text = data.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
       const clean = text.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
       setBriefRec(JSON.parse(clean));
