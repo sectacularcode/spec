@@ -669,12 +669,12 @@ export default function CustomBuild({ userId, role } = {}) {
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               {isManager && (
-                <button onClick={() => setShowUserDrawer(true)} style={{ padding: "10px 16px", fontSize: "13px", fontWeight: 500, background: "#ffffff", color: "#6b635c", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                <button onClick={() => setShowUserDrawer(true)} style={{ padding: "10px 16px", fontSize: "13px", fontWeight: 500, background: "#ffffff", color: "#3f3f46", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                   {isAdmin ? "Manage users" : "Manage team"}
                 </button>
               )}
-              <button onClick={downloadIntakeForm} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 500, background: "#ffffff", color: "#6b635c", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              <button onClick={downloadIntakeForm} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 500, background: "#ffffff", color: "#3f3f46", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
                 ↓ Intake Form
               </button>
               <button
@@ -728,7 +728,7 @@ export default function CustomBuild({ userId, role } = {}) {
                       <div style={{ display: "flex", gap: "8px" }}>
                         <button
                           onClick={() => resumeDraft(draft)}
-                          style={{ flex: 1, padding: "8px 0", fontSize: "12px", fontWeight: 600, background: "#6b635c", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" }}>
+                          style={{ flex: 1, padding: "8px 0", fontSize: "12px", fontWeight: 600, background: "#3f3f46", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" }}>
                           Resume
                         </button>
                         <button
@@ -753,7 +753,7 @@ export default function CustomBuild({ userId, role } = {}) {
           <div style={{ maxWidth: generated ? "100%" : "1100px", margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
             <button onClick={() => setDraftsView(true)} style={{ padding: "7px 14px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "6px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", cursor: "pointer" }}>← Saved Builds</button>
-            <button onClick={() => setShowBulkLocation(true)} style={{ padding: "7px 14px", background: "#ffffff", color: "#6b635c", border: "1px solid #dde0e6", borderRadius: "6px", fontWeight: 500, fontSize: "13px", cursor: "pointer" }}>Bulk Location Pages</button>
+            <button onClick={() => setShowBulkLocation(true)} style={{ padding: "7px 14px", background: "#ffffff", color: "#3f3f46", border: "1px solid #dde0e6", borderRadius: "6px", fontWeight: 500, fontSize: "13px", cursor: "pointer" }}>Bulk Location Pages</button>
 
             {(brief || generated) && (
               <button
@@ -1057,7 +1057,7 @@ export default function CustomBuild({ userId, role } = {}) {
                 return (
                 <button key={p.id}
                   onClick={() => setPreviewPage(p.id)}
-                  style={{ padding: "6px 14px", fontSize: "13px", fontWeight: 500, cursor: "pointer", border: previewPage === p.id ? "1px solid #6b635c" : "1px solid #dde0e6", borderRadius: "20px", background: previewPage === p.id ? "#6b635c" : "#fff", color: previewPage === p.id ? "#fff" : "#09090b" }}>
+                  style={{ padding: "6px 14px", fontSize: "13px", fontWeight: 500, cursor: "pointer", border: previewPage === p.id ? "1px solid #3f3f46" : "1px solid #dde0e6", borderRadius: "20px", background: previewPage === p.id ? "#3f3f46" : "#fff", color: previewPage === p.id ? "#fff" : "#09090b" }}>
                   {cleanLabel}
                 </button>);
               })}
@@ -1082,7 +1082,7 @@ export default function CustomBuild({ userId, role } = {}) {
               {sectionLibrary.length > 0 && (
                 <button
                   onClick={() => { setSwapDrawer(previewPage); setSwapFilter(""); }}
-                  style={{ marginLeft: "8px", padding: "6px 14px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "20px", background: swapDrawer === previewPage ? "#6b635c" : "#fff", color: swapDrawer === previewPage ? "#fff" : "#09090b" }}>
+                  style={{ marginLeft: "8px", padding: "6px 14px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "20px", background: swapDrawer === previewPage ? "#3f3f46" : "#fff", color: swapDrawer === previewPage ? "#fff" : "#09090b" }}>
                   Swap sections
                 </button>
               )}
