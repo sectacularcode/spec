@@ -72,7 +72,7 @@ export default function BrandTab({ ctx }) {
                 </div>
               </Section>
 
-              <Section id="brand-layout" title="Layout Style" icon="">
+              <Section id="brand-layout" title="Font Pairings" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>
                   {brand.templateId
                     ? <>Your template applied a default layout, but you can swap to a different typographic personality without losing the template's sections, colors, or copy. Use this if you want, say, Agency sections with Magazine-style centered serif typography.</>
@@ -428,7 +428,7 @@ export default function BrandTab({ ctx }) {
                 <p style={{ fontSize: "12px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Pair a distinctive display font (heading) with a clean sans-serif (body). All fonts are Google Fonts and load automatically.</p>
               </Section>
 
-              <Section id="brand-details" title="Design Details" icon="">
+              <Section id="brand-details" title="Buttons" icon="">
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px" }}>
                   <div>
                     <label style={I.lbl}>Button Corners</label>
