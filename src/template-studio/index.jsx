@@ -27,6 +27,7 @@ import { previewHTML } from "./preview/previewHTML.js";
 // Components
 import { Section } from "./components/Section.jsx";
 import { Icon } from "./components/Icon.jsx";
+import { GenerateFromKeywordsModal } from "./components/GenerateFromKeywordsModal.jsx";
 
 // Tab components
 import DiscoveryTab from "./components/tabs/DiscoveryTab.jsx";
@@ -62,7 +63,8 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
   const [showAudit, setShowAudit] = useState(false);
   const [showAllThemes, setShowAllThemes] = useState(false);
   const [showAddPage, setShowAddPage] = useState(false);
-  const [exportFormat, setExportFormat] = useState("elementor"); // "elementor" or "divi"
+  const [exportFormat, setExportFormat] = useState("elementor");
+  const [showKeywordsModal, setShowKeywordsModal] = useState(false); // "elementor" or "divi"
   const [aiLoading, setAiLoading] = useState(false);
   const [aiDraft, setAiDraft] = useState(null); // null | { heroHeading, heroSubhead, aboutHeading, aboutBody, cta1, cta2, tagline, keyMessages }
   const [aiError, setAiError] = useState("");
@@ -716,6 +718,34 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
     setTab("brand"); // Send them to Brand tab to see what got applied
   };
   const toggleSection = (s) => updPage("sections", page.sections.includes(s) ? page.sections.filter(x => x !== s) : [...page.sections, s]);
+  const addPageFromKeywords = (pageConfig) => {
+    // pageConfig comes from GenerateFromKeywordsModal
+    // It carries _aiColors, _aiFont, sections, copy fields
+    const np = newPage(pageConfig.name || "Custom Page", pageConfig.pageType || "Custom");
+    // Apply AI content to the new page
+    const aiCopy = {};
+    if (pageConfig.heroHeading) aiCopy.heroHeading = pageConfig.heroHeading;
+    if (pageConfig.heroSubhead) aiCopy.heroSubhead = pageConfig.heroSubhead;
+    if (pageConfig.heroEyebrow) aiCopy.heroEyebrow = pageConfig.heroEyebrow;
+    if (pageConfig.aboutHeading) aiCopy.aboutHeading = pageConfig.aboutHeading;
+    if (pageConfig.aboutBody) aiCopy.aboutBody = pageConfig.aboutBody;
+    const npWithContent = { ...np, ...aiCopy, sections: pageConfig.sections || np.sections };
+
+    // Apply AI colors and font as brand overrides for this page context
+    // (stored as page-level metadata — does not overwrite the whole project brand)
+    if (pageConfig._aiColors || pageConfig._aiFont) {
+      npWithContent._aiColors = pageConfig._aiColors;
+      npWithContent._aiFont = pageConfig._aiFont;
+      npWithContent._aiTheme = pageConfig._aiTheme;
+      npWithContent._aiSlug = pageConfig._aiSlug;
+      npWithContent._keywords = pageConfig._keywords;
+    }
+
+    setProjects(ps => ps.map(p => p.id === activeId ? { ...p, pages: [...p.pages, npWithContent] } : p));
+    setPageIdx(project.pages.length);
+    setShowKeywordsModal(false);
+  };
+
   const addPage = (pageType = "Homepage") => {
     const np = newPage(pageType === "Homepage" ? `Page ${project.pages.length + 1}` : pageType, pageType);
     setProjects(ps => ps.map(p => p.id === activeId ? { ...p, pages: [...p.pages, np] } : p));
@@ -1768,6 +1798,15 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
         }
       `}</style>
 
+      {showKeywordsModal && (
+        <GenerateFromKeywordsModal
+          brand={brand}
+          onClose={() => setShowKeywordsModal(false)}
+          onAddPage={addPageFromKeywords}
+          userId={userId}
+        />
+      )}
+
       {/* Header */}
       <div style={{ background: "#ffffff", borderBottom: "1px solid #dde0e6", padding: "8px 0", position: "sticky", top: "48px", zIndex: 50 }}>
         <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
@@ -2007,6 +2046,17 @@ Rules: match template to niche, use customColors for unusual vibes (neon, earthy
                         <div style={{ fontSize: "12px", color: "#09090b", marginTop: "2px" }}>{(PAGE_TEMPLATES[pt]?.sections || []).slice(0, 4).join(" · ")}{PAGE_TEMPLATES[pt]?.sections?.length > 4 ? " ..." : ""}</div>
                       </button>
                     ))}
+                    <div style={{ borderTop: "1px solid #dde0e6", margin: "8px 0" }} />
+                    <button
+                      onClick={() => { setShowAddPage(false); setShowKeywordsModal(true); }}
+                      style={{ width: "100%", textAlign: "left", padding: "10px 12px", background: "transparent", border: "none", color: "#b45309", fontSize: "14px", cursor: "pointer", borderRadius: "4px" }}
+                      onMouseEnter={e => e.currentTarget.style.background = "#fef3e2"}
+                      onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                      <div style={{ fontWeight: 600, display: "flex", alignItems: "center", gap: "6px" }}>
+                        <span style={{ fontSize: "16px" }}>✦</span> Generate from keywords
+                      </div>
+                      <div style={{ fontSize: "12px", color: "#9ca3af", marginTop: "2px" }}>Type keywords — AI picks colors, sections, and drafts themed copy</div>
+                    </button>
                   </div>
                 )}
               </div>
