@@ -3,12 +3,10 @@ import { T } from "./styles.js";
 
 // Constants
 import { ALL_PAGES, ADDITIONAL_PAGE_TYPES } from "../constants/pages.js";
-import { LAYOUT_PATTERNS } from "../constants/patterns.js";
 
 // Utils
 import { kvStorageGet, kvStorageSet, kvStorageDel } from "./utils/storage.js";
 import { buildInspoContext } from "./utils/inspo.js";
-import { selectPatterns } from "./utils/patterns.js";
 import { saveToLibrary } from "./utils/library.js";
 import { extractBrief } from "./utils/extractBrief.js";
 import { he } from "./utils/htmlEscape.js";
