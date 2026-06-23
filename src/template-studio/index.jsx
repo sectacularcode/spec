@@ -2251,7 +2251,7 @@ Rules:
         <div className="tab-panel-bg" style={{ padding: "0", overflowY: "auto", maxHeight: "calc(100vh - 60px)", background: "#eeedf1" }}>
 
           {/* Stone bar — page pills + Add Page only */}
-          <div style={{ background: "#09090b", width: "100%" }}>
+          <div style={{ background: "#3f3f46", width: "100%" }}>
             <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px" }}>
             {/* Page switcher row — pills centered, Add Page right */}
             <div style={{ display: "flex", alignItems: "center", padding: "12px 0 12px", position: "relative" }}>
