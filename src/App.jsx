@@ -124,7 +124,7 @@ function AppShell() {
         <ToolNav view={view} setView={setView} tools={tools} user={user} />
         <Suspense fallback={<Spinner />}>
           {view === "template-studio"    && <ElementorBuilder userId={user?.id} />}
-          {view === "brief-to-blueprint" && <CustomBuild userId={user?.id} />}
+          {view === "brief-to-blueprint" && <CustomBuild userId={user?.id} role={role} />}
         </Suspense>
       </div>
     );
