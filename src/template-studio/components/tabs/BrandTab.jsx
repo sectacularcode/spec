@@ -341,7 +341,7 @@ export default function BrandTab({ ctx }) {
                 <div style={{ marginTop: "16px", padding: "20px 22px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "10px" }}>
                   <div style={{ fontSize: "12px", color: "#000000", textTransform: "uppercase", letterSpacing: "0.14em", fontWeight: 700, marginBottom: "6px" }}>Quick Accent Swap</div>
                   <p style={{ fontSize: "13px", color: "#09090b", margin: "0 0 16px", lineHeight: 1.55 }}>Override just the accent. Works with any theme.</p>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                  <div style={{ display: "flex", flexWrap: "nowrap", overflowX: "auto", gap: "10px", paddingBottom: "4px" }}>
                     {PREMIUM_ACCENTS.map(a => {
                       const active = brand.accentColor.toLowerCase() === a.value.toLowerCase();
                       const isLight = ["#ffffff", "#fafafa", "#f5f5f5"].includes(a.value.toLowerCase());
