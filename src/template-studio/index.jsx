@@ -2042,8 +2042,7 @@ Rules:
       )}
 
       {/* Header */}
-      <div style={{ background: "#ffffff", borderBottom: "1px solid #dde0e6", padding: "8px 24px 8px 304px", position: "sticky", top: "48px", zIndex: 50, display: "flex", alignItems: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
+      <div style={{ background: "#ffffff", borderBottom: "1px solid #dde0e6", padding: "8px 24px", position: "sticky", top: "48px", zIndex: 50 }}>
           {/* Left: All Projects + project info */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <button onClick={() => setView("projects")} style={{ padding: "7px 14px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "6px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", cursor: "pointer" }}>
@@ -2054,16 +2053,6 @@ Rules:
               <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "3px" }}>{project.pages.length} page{project.pages.length !== 1 ? "s" : ""} · {exportFormat === "divi" ? "Divi" : "Elementor"}</div>
             </div>
           </div>
-        </div>
-        {/* Right: Audit icon + Preview */}
-        <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-            <button onClick={() => setShowAudit(!showAudit)} title={`Audit — ${audit.length} item${audit.length !== 1 ? "s" : ""}`} style={{ background: "none", border: "none", padding: "7px 8px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", color: audit.length ? "#b45309" : "#a1a1aa", fontSize: "12px", fontWeight: 600, borderRadius: "6px" }}>
-              <Icon name="alertTriangle" size={14} color={audit.length ? "#b45309" : "#a1a1aa"} /> {audit.length}
-            </button>
-            <button onClick={() => setView("preview")} style={{ padding: "7px 14px", background: "#3f3f46", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}>
-              <Icon name="eye" size={13} color="#ffffff" /> Preview
-            </button>
-        </div>
       </div>
 
       {/* Audit panel — slides in from right */}
@@ -2267,7 +2256,14 @@ Rules:
                   </div>
                 ))}
               </div>
-              <div style={{ position: "relative" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <button onClick={() => setShowAudit(!showAudit)} title={`Audit — ${audit.length} item${audit.length !== 1 ? "s" : ""}`} style={{ background: "none", border: "none", padding: "5px 6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", color: audit.length ? "#f97316" : "rgba(255,255,255,0.6)", fontSize: "12px", fontWeight: 600, borderRadius: "6px" }}>
+                  <Icon name="alertTriangle" size={13} color={audit.length ? "#f97316" : "rgba(255,255,255,0.5)"} /> {audit.length}
+                </button>
+                <button onClick={() => setView("preview")} style={{ padding: "6px 14px", background: "#ffffff", color: "#3f3f46", border: "none", borderRadius: "999px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                  <Icon name="eye" size={13} color="#3f3f46" /> Preview
+                </button>
+                <div style={{ position: "relative" }}>
                 <button onClick={() => setShowAddPage(!showAddPage)} style={{ padding: "6px 14px", background: "transparent", color: "#ffffff", border: "1px solid rgba(255,255,255,0.5)", borderRadius: "999px", fontSize: "13px", fontWeight: 400, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}>
                   <Icon name="plus" size={11} color="#ffffff" /> Add Page
                 </button>
@@ -2293,6 +2289,7 @@ Rules:
                     </button>
                   </div>
                 )}
+                </div>
               </div>
             </div>
             </div>
