@@ -54,10 +54,32 @@ export function previewHTML(page, brand) {
       // INTERIOR PAGE HEADER — clean text-only header for non-homepage pages
       const interiorTypes = ["About / Studio", "Services", "Work / Portfolio", "Case Study", "Blog Index", "Blog Post", "Blog Post — Recipe", "Pricing", "Press / Awards", "Careers", "Contact", "Leadership / Founder"];
       if (interiorTypes.includes(page.pageType)) {
-        const darkHeader = ["Case Study", "Leadership / Founder", "Landing Page"].includes(page.pageType);
+        const isCaseStudy = page.pageType === "Case Study";
+        const darkHeader = isCaseStudy || ["Leadership / Founder"].includes(page.pageType);
         const headerBg = darkHeader ? (isDark ? pc : "#0a0a0a") : pc;
         const headerText = darkHeader ? "#ffffff" : headingColor;
         const headerSub = darkHeader ? "rgba(255,255,255,0.7)" : ts;
+
+        // Case Study — editorial dark header with accent rule, large display type, metadata strip
+        if (isCaseStudy) {
+          return `<section style="background:${headerBg};padding:clamp(80px,10vw,140px) clamp(24px,8vw,100px) clamp(48px,6vw,80px);">
+            <div style="max-width:900px;">
+              <div style="display:flex;align-items:center;gap:12px;margin:0 0 32px;">
+                <div style="width:32px;height:2px;background:${ac};flex-shrink:0;"></div>
+                <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0;">${eyebrow}</p>
+              </div>
+              <h1 data-edit="page.heroHeading" style="font-family:'${hf}',sans-serif;font-size:clamp(36px,5.5vw,80px);color:#ffffff;margin:0 0 28px;font-weight:400;line-height:1.05;">${heading || page.name}</h1>
+              ${subhead ? `<p data-edit="page.heroSubhead" style="font-family:'${bf}',sans-serif;font-size:clamp(15px,1.4vw,19px);color:rgba(255,255,255,0.7);max-width:640px;line-height:1.65;margin:0 0 40px;">${subhead}</p>` : ""}
+              <div style="display:flex;gap:32px;flex-wrap:wrap;padding-top:28px;border-top:1px solid rgba(255,255,255,0.15);">
+                <div><p style="font-family:'${bf}',sans-serif;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:${ac};margin:0 0 6px;">Client</p><p style="font-family:'${bf}',sans-serif;font-size:14px;color:#ffffff;margin:0;font-weight:500;">${brand.name || "Client Name"}</p></div>
+                <div><p style="font-family:'${bf}',sans-serif;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:${ac};margin:0 0 6px;">Industry</p><p style="font-family:'${bf}',sans-serif;font-size:14px;color:#ffffff;margin:0;font-weight:500;">${brand.industry || "Industry"}</p></div>
+                <div><p style="font-family:'${bf}',sans-serif;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:${ac};margin:0 0 6px;">Year</p><p style="font-family:'${bf}',sans-serif;font-size:14px;color:#ffffff;margin:0;font-weight:500;">${new Date().getFullYear()}</p></div>
+              </div>
+            </div>
+          </section>`;
+        }
+
+        // Standard interior pages (About/Studio, Services, etc.) — light, clean, left-aligned
         return `<section style="background:${headerBg};padding:clamp(60px,8vw,100px) clamp(24px,8vw,100px) clamp(40px,5vw,60px);">
           <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 20px;">${eyebrow}</p>
           <h1 data-edit="page.heroHeading" style="font-family:'${hf}',sans-serif;font-size:clamp(36px,5vw,${layout.heroHeading || 64}px);color:${headerText};margin:0 0 16px;font-weight:700;line-height:1.1;letter-spacing:-0.02em;">${heading}</h1>
