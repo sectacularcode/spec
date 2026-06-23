@@ -11,7 +11,6 @@ import { WEBSITE_TEMPLATES, PAGE_TEMPLATES, BLANK_BRAND, newPage, applyWebsiteTe
 // Image utils used in buildPageJSON directly
 // SVG used in SocialTab directly
 import { auditBrand } from "./utils/audit.js";
-import { he } from "./utils/htmlEscape.js";
 
 // Builders
 import { uid } from "./builders/helpers.js";
@@ -39,7 +38,6 @@ import HeaderFooterTab from "./components/tabs/HeaderFooterTab.jsx";
 import ExportTab from "./components/tabs/ExportTab.jsx";
 
 // Styles
-import { I } from "./styles.js";
 
 export default function App({ userId } = {}) {
   const [projects, setProjects] = useState([]);
@@ -81,7 +79,6 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
   const [storageLoaded, setStorageLoaded] = useState(false);
   const [showAdvancedColors, setShowAdvancedColors] = useState(false);
   const [briefDirty, setBriefDirty] = useState(false);
-  const [welcomeDismissed, setWelcomeDismissed] = useState(() => { try { return !!window.localStorage.getItem("sw"); } catch(e) { return false; } });
   const [importMsg, setImportMsg] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState(null); // project id pending delete confirmation
   const [savedBuilds, setSavedBuilds] = useState([]); // Blueprint builds saved to library
