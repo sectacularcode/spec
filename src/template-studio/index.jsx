@@ -2043,7 +2043,7 @@ Rules:
 
       {/* Header */}
       <div style={{ background: "#ffffff", borderBottom: "1px solid #dde0e6", padding: "8px 0", position: "sticky", top: "48px", zIndex: 50 }}>
-        <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
+        <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px", display: "flex", alignItems: "center", position: "relative" }}>
           {/* Left: All Projects + project info */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <button onClick={() => setView("projects")} style={{ padding: "7px 14px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "6px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", cursor: "pointer" }}>
@@ -2055,7 +2055,7 @@ Rules:
             </div>
           </div>
           {/* Right: Audit icon + Preview */}
-          <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+          <div style={{ display: "flex", gap: "6px", alignItems: "center", position: "absolute", right: "24px" }}>
             <button onClick={() => setShowAudit(!showAudit)} title={`Audit — ${audit.length} item${audit.length !== 1 ? "s" : ""}`} style={{ background: "none", border: "none", padding: "7px 8px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", color: audit.length ? "#b45309" : "#a1a1aa", fontSize: "12px", fontWeight: 600, borderRadius: "6px" }}>
               <Icon name="alertTriangle" size={14} color={audit.length ? "#b45309" : "#a1a1aa"} /> {audit.length}
             </button>
