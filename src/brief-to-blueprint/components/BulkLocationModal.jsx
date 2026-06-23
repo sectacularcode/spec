@@ -58,13 +58,13 @@ function LocationCard({ loc, idx, onChange, onRemove, total }) {
 
       <div style={S.field}>
         <label style={S.label}>Street address</label>
-        <input style={S.input} value={loc.address} onChange={e => set("address", e.target.value)} placeholder="e.g. 553 Lentz Rd, Statesville, NC 28625" />
+        <input style={S.input} value={loc.address} onChange={e => set("address", e.target.value)} placeholder="e.g. 123 Main Street, City, ST 00000" />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "14px" }}>
         <div>
           <label style={S.label}>Phone</label>
-          <input style={S.input} value={loc.phone} onChange={e => set("phone", e.target.value)} placeholder="e.g. (706) 936-3480" />
+          <input style={S.input} value={loc.phone} onChange={e => set("phone", e.target.value)} placeholder="e.g. (555) 000-0000" />
         </div>
         <div>
           <label style={S.label}>Hours</label>
@@ -74,7 +74,7 @@ function LocationCard({ loc, idx, onChange, onRemove, total }) {
 
       <div style={S.field}>
         <label style={S.label}>Page headline <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>(optional — auto-generated if blank)</span></label>
-        <input style={S.input} value={loc.headline} onChange={e => set("headline", e.target.value)} placeholder="e.g. Truck Repair in Statesville, NC" />
+        <input style={S.input} value={loc.headline} onChange={e => set("headline", e.target.value)} placeholder="e.g. [Your Service] in [City], [State] — leave blank to auto-generate" />
       </div>
 
       <div style={S.field}>
@@ -268,38 +268,38 @@ export function BulkLocationModal({ brief, onClose, onGenerate, userId }) {
   function downloadTemplate() {
     // Generate a JSON template the team can fill out and upload back
     const template = {
-      _note: "Fill in each location object and upload this file back into Spec to generate bulk location pages.",
+      _note: "Fill in each location object and upload this file back into Spec to generate bulk location pages. Replace all placeholder values with real information for each location.",
       locations: [
         {
-          locationName: "Statesville Shop",
-          city: "Statesville",
-          state: "NC",
-          address: "553 Lentz Rd, Statesville, NC 28625",
-          phone: "(706) 936-3480",
-          hours: "M–F: 8:00am – 5:00pm",
-          headline: "Truck Repair in Statesville, NC",
-          intro: "When a truck is down, work backs up. In Statesville, our team provides fast in-shop and mobile repair so you get back on the road with less disruption.",
+          locationName: "Location Name (e.g. Downtown Studio, Westside Shop)",
+          city: "City Name",
+          state: "ST",
+          address: "123 Main Street, City, ST 00000",
+          phone: "(555) 000-0000",
+          hours: "Mon–Fri: 9:00am – 5:00pm",
+          headline: "Your Service or Business in City, State (leave blank to auto-generate)",
+          intro: "A 1-2 sentence intro about what you offer at this location and who you serve. This appears at the top of the page below the headline.",
           services: [
-            "Diesel engine diagnostics and repair",
-            "Brake inspection and repair",
-            "DOT compliance checks",
-            "Preventative maintenance"
+            "Service or offering #1",
+            "Service or offering #2",
+            "Service or offering #3",
+            "Service or offering #4"
           ],
-          mapEmbed: "<iframe src=\"https://www.google.com/maps/embed?...\" width=\"100%\" height=\"400\" style=\"border:0;\" allowfullscreen loading=\"lazy\"></iframe>",
-          ctaText: "Request service",
+          mapEmbed: "<iframe src=\"https://www.google.com/maps/embed?pb=YOUR_EMBED_ID\" width=\"100%\" height=\"400\" style=\"border:0;\" allowfullscreen loading=\"lazy\"></iframe>",
+          ctaText: "Contact us (leave blank to use default from brand brief)",
         },
         {
-          locationName: "Cincinnati Location",
-          city: "Cincinnati",
-          state: "OH",
-          address: "[Street Address, Cincinnati, OH ZIP]",
-          phone: "[Phone Number]",
-          hours: "[Hours]",
+          locationName: "Second Location Name",
+          city: "City Name",
+          state: "ST",
+          address: "456 Example Ave, City, ST 00000",
+          phone: "(555) 000-0001",
+          hours: "Mon–Sat: 8:00am – 6:00pm",
           headline: "",
           intro: "",
           services: [
-            "[Service 1]",
-            "[Service 2]"
+            "Service or offering #1",
+            "Service or offering #2"
           ],
           mapEmbed: "",
           ctaText: "",
