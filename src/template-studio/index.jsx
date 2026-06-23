@@ -1107,7 +1107,7 @@ Rules:
   // Styles (I) imported from ./styles.js
 
   const TabBtn = ({ id, label }) => (
-    <button onClick={() => setTab(id)} style={{ width: "100%", textAlign: "left", padding: "9px 14px", background: tab === id ? "#fef3e2" : "transparent", color: tab === id ? "#b45309" : "#6b635c", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: tab === id ? 600 : 400, cursor: "pointer", display: "block", whiteSpace: "nowrap" }}>{label}</button>
+    <button onClick={() => setTab(id)} style={{ width: "100%", textAlign: "left", padding: "9px 14px", background: tab === id ? "#fef3e2" : "transparent", color: tab === id ? "#b45309" : "#3f3f46", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: tab === id ? 600 : 400, cursor: "pointer", display: "block", whiteSpace: "nowrap" }}>{label}</button>
   );
 
   // Builder format toggle — applies to both Page and Footer downloads
@@ -1796,7 +1796,7 @@ Rules:
                 }
               </div>
               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                <button onClick={applyBriefRecommendation} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px", background: "#6b635c", color: "#fff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
+                <button onClick={applyBriefRecommendation} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px", background: "#3f3f46", color: "#fff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
                   <Icon name="check" size={14} color="#fff" /> Create this project
                 </button>
                 <button onClick={describeMySite} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
@@ -1957,7 +1957,7 @@ Rules:
                     </>
                   ) : (
                     <>
-                      <button onClick={(e) => { e.stopPropagation(); setActiveId(p.id); setView("editor"); setPageIdx(0); }} style={{ flex: 1, padding: "8px 10px", background: "#6b635c", color: "#fff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Open</button>
+                      <button onClick={(e) => { e.stopPropagation(); setActiveId(p.id); setView("editor"); setPageIdx(0); }} style={{ flex: 1, padding: "8px 10px", background: "#3f3f46", color: "#fff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Open</button>
                       <button onClick={(e) => { e.stopPropagation(); duplicateProject(p.id); }} title="Duplicate this project" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
                         <Icon name="copy" size={14} color="#09090b" />
                       </button>
@@ -2059,7 +2059,7 @@ Rules:
             <button onClick={() => setShowAudit(!showAudit)} title={`Audit — ${audit.length} item${audit.length !== 1 ? "s" : ""}`} style={{ background: "none", border: "none", padding: "7px 8px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", color: audit.length ? "#b45309" : "#a1a1aa", fontSize: "12px", fontWeight: 600, borderRadius: "6px" }}>
               <Icon name="alertTriangle" size={14} color={audit.length ? "#b45309" : "#a1a1aa"} /> {audit.length}
             </button>
-            <button onClick={() => setView("preview")} style={{ padding: "7px 14px", background: "#6b635c", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}>
+            <button onClick={() => setView("preview")} style={{ padding: "7px 14px", background: "#3f3f46", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}>
               <Icon name="eye" size={13} color="#ffffff" /> Preview
             </button>
           </div>
@@ -2138,7 +2138,7 @@ Rules:
                 <div style={{ fontSize: "16px", fontWeight: 700, color: "#ef4444", marginBottom: "12px" }}>Couldn't draft copy</div>
                 <div style={{ fontSize: "14px", color: "#09090b", marginBottom: "20px", lineHeight: 1.6 }}>{aiError}</div>
                 <div style={{ display: "flex", gap: "10px" }}>
-                  <button onClick={() => { setAiError(""); generateStarterCopy(); }} style={{ padding: "10px 18px", background: "#6b635c", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}>Try again</button>
+                  <button onClick={() => { setAiError(""); generateStarterCopy(); }} style={{ padding: "10px 18px", background: "#3f3f46", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}>Try again</button>
                   <button onClick={() => setAiError("")} style={{ padding: "10px 18px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}>Cancel</button>
                 </div>
               </>
@@ -2224,7 +2224,7 @@ Rules:
                 })}
 
                 <div style={{ display: "flex", gap: "10px", marginTop: "20px", flexWrap: "wrap" }}>
-                  <button onClick={applyAiDraft} disabled={!!aiFieldRegen || aiLoading} style={{ padding: "12px 20px", background: "#6b635c", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: (aiFieldRegen || aiLoading) ? "not-allowed" : "pointer", opacity: (aiFieldRegen || aiLoading) ? 0.5 : 1, display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <button onClick={applyAiDraft} disabled={!!aiFieldRegen || aiLoading} style={{ padding: "12px 20px", background: "#3f3f46", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: (aiFieldRegen || aiLoading) ? "not-allowed" : "pointer", opacity: (aiFieldRegen || aiLoading) ? 0.5 : 1, display: "inline-flex", alignItems: "center", gap: "6px" }}>
                     <Icon name="check" size={14} color="#ffffff" /> Apply to brand & page
                   </button>
                   <button onClick={() => { setAiDraft(null); generateStarterCopy(); }} disabled={!!aiFieldRegen || aiLoading} style={{ padding: "12px 20px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "14px", fontWeight: 500, cursor: (aiFieldRegen || aiLoading) ? "not-allowed" : "pointer", opacity: (aiFieldRegen || aiLoading) ? 0.5 : 1, display: "inline-flex", alignItems: "center", gap: "6px" }}>
@@ -2330,7 +2330,7 @@ Rules:
               {prev ? (
                 <button
                   onClick={() => setTab(prev.id)}
-                  style={{ padding: "8px 16px", background: "#ffffff", color: "#6b635c", border: "1px solid #6b635c", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "flex", alignItems: "center", gap: "7px" }}>
+                  style={{ padding: "8px 16px", background: "#ffffff", color: "#3f3f46", border: "1px solid #3f3f46", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "flex", alignItems: "center", gap: "7px" }}>
                   <Icon name="arrowLeft" size={14} color="#000000" /> Back to {prev.label}
                 </button>
               ) : <div />}
@@ -2340,7 +2340,7 @@ Rules:
               {next ? (
                 <button
                   onClick={() => setTab(next.id)}
-                  style={{ padding: "8px 18px", background: "#6b635c", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "flex", alignItems: "center", gap: "7px" }}>
+                  style={{ padding: "8px 18px", background: "#3f3f46", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "flex", alignItems: "center", gap: "7px" }}>
                   Next: {next.label} <Icon name="arrowRight" size={14} color="#ffffff" />
                 </button>
               ) : (
