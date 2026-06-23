@@ -638,19 +638,21 @@ export default function CustomBuild({ userId } = {}) {
       {/* Drafts view — shown on load before starting a build */}
       {draftsView && !showIntake && (
         <div style={{ padding: "clamp(20px,3vw,40px)", maxWidth: "1100px", margin: "0 auto" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "32px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "32px", gap: "16px", flexWrap: "wrap" }}>
             <div>
               <div style={{ fontSize: "28px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>Blueprint builds</div>
               <div style={{ fontSize: "14px", color: "#6b7280" }}>Resume a saved build or start a new one.</div>
             </div>
-            <button
-              onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setDraftsView(false); }}
-              style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
-              + New build
-              </button>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <button onClick={downloadIntakeForm} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 500, background: "#ffffff", color: "#6b635c", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-              Download Intake Form
-            </button>
+                ↓ Intake Form
+              </button>
+              <button
+                onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setDraftsView(false); }}
+                style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
+                + New build
+              </button>
+            </div>
           </div>
 
           {drafts.length === 0 ? (
