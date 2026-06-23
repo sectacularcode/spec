@@ -2234,9 +2234,9 @@ Rules:
         </div>
       )}
 
-      <div className="main-grid" style={{ display: "grid", gridTemplateColumns: "240px 1fr", minHeight: "calc(100vh - 60px)" }}>
+      <div className="main-grid" style={{ display: "grid", gridTemplateColumns: "280px 1fr", minHeight: "calc(100vh - 60px)" }}>
         {/* SIDEBAR — Workflow tabs */}
-        <div className="sidebar-nav" style={{ background: "#ffffff", borderRight: "1px solid #dde0e6", overflowY: "auto", display: "flex", flexDirection: "column", padding: "20px 12px", width: "240px", boxShadow: "2px 0 8px rgba(0,0,0,0.04)" }}>
+        <div className="sidebar-nav" style={{ background: "#ffffff", borderRight: "1px solid #dde0e6", overflowY: "auto", display: "flex", flexDirection: "column", padding: "20px 12px", width: "280px", boxShadow: "2px 0 8px rgba(0,0,0,0.04)" }}>
           <div style={{ fontSize: "11px", fontWeight: 600, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px", padding: "0 4px" }}>Workflow</div>
           <TabBtn id="discovery" label="Discovery" />
           <TabBtn id="positioning" label="Positioning" />
