@@ -286,7 +286,7 @@ export default function BrandTab({ ctx }) {
               </div>}
             </div>
 
-              <Section id="brand-theme" title="Background Theme" icon="">
+              <Section id="brand-theme" title="Color Themes" icon="">
                 <p style={{ fontSize: "13px", color: "#09090b", margin: 0, lineHeight: 1.6 }}>Pick a palette. All themes are tested for WCAG AA contrast — text stays readable, accents pop, and the elements complement the background automatically.</p>
                 {(() => {
                   // Show a "Template default" indicator if the current theme matches the active template's theme
