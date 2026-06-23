@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 
 // Constants
 import { PAGE_TYPES } from "./constants/ui.jsx";
@@ -342,9 +342,10 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
 
   // Scroll to top whenever the tab changes — each tab is a workflow step, so users
   // should land at the top of the new section, not mid-scroll from the previous one.
+  const tabPanelRef = useRef(null);
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    if (tabPanelRef.current) {
+      tabPanelRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [tab]);
 
@@ -2241,7 +2242,7 @@ Rules:
         </div>
 
         {/* RIGHT — Content area */}
-        <div className="tab-panel-bg" style={{ padding: "0", overflowY: "auto", maxHeight: "calc(100vh - 60px)", background: "#eeedf1" }}>
+        <div ref={tabPanelRef} className="tab-panel-bg" style={{ padding: "0", overflowY: "auto", maxHeight: "calc(100vh - 60px)", background: "#eeedf1" }}>
 
           {/* Stone bar — page pills + Add Page only */}
           <div style={{ background: "#3f3f46", width: "100%" }}>
