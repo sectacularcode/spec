@@ -9,7 +9,6 @@ import { kvStorageGet, kvStorageSet, kvStorageDel } from "./utils/storage.js";
 import { buildInspoContext } from "./utils/inspo.js";
 import { saveToLibrary } from "./utils/library.js";
 import { extractBrief } from "./utils/extractBrief.js";
-import { he } from "./utils/htmlEscape.js";
 
 // Builders
 import { buildHeaderJSON } from "./builders/headerFooter.js";
