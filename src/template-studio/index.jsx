@@ -521,7 +521,7 @@ Return ONLY the new ${fieldName} value as plain text.`;
       } : pg),
     } : p));
     setAiDraft(null);
-    setTab("brand"); // Move to the next workflow step so they can see how copy looks with visual design
+    setTab("positioning"); // Advance to Positioning — next step after copy is drafted
   };
 
   // AI Site Brief — describe your site, get template/layout/theme/colors/fonts/brief recommendations
@@ -856,7 +856,7 @@ Rules:
     }));
     setBriefRec(null);
     setBriefText("");
-    setTab("brand"); // Send them to Brand tab to see what got applied
+    setTab("discovery"); // Return to Discovery so they can review and build forward from the start
   };
   const toggleSection = (s) => updPage("sections", page.sections.includes(s) ? page.sections.filter(x => x !== s) : [...page.sections, s]);
   const addPageFromKeywords = (pageConfig) => {
