@@ -301,7 +301,7 @@ export default function BrandTab({ ctx }) {
                   );
                 })()}
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: "10px" }}>
-                  {(showAllThemes ? THEMES : THEMES.slice(0, 10)).map(t => {
+                  {(showAllThemes ? THEMES : THEMES.slice(0, 12)).map(t => {
                     const active = brand.themeId === t.id;
                     return (
                       <button key={t.id} onClick={() => setProjects(ps => ps.map(p => p.id === activeId ? { ...p, brand: applyTheme(t, p.brand) } : p))} style={{ padding: 0, background: "#ffffff", border: active ? "2px solid #000000" : "1px solid #dde0e6", borderRadius: "10px", cursor: "pointer", overflow: "hidden", textAlign: "left", transition: "border-color .15s", display: "flex", flexDirection: "column", minHeight: "200px", position: "relative" }}
@@ -335,7 +335,7 @@ export default function BrandTab({ ctx }) {
                 </div>
                 {THEMES.length > 10 && (
                   <button onClick={() => setShowAllThemes(v => !v)} style={{ marginTop: "10px", padding: "8px 16px", background: "transparent", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "12px", fontWeight: 500, color: "#09090b", cursor: "pointer" }}>
-                    {showAllThemes ? "▲ Show less" : `▼ Show ${THEMES.length - 10} more themes`}
+                    {showAllThemes ? "▲ Show less" : `▼ Show ${THEMES.length - 12} more themes`}
                   </button>
                 )}
                 <div style={{ marginTop: "16px", padding: "20px 22px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "10px", overflow: "visible" }}>
