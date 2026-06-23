@@ -56,6 +56,11 @@ export default function PositioningTab({ ctx }) {
                   <div><label style={I.lbl}>Contact Email</label><input style={I.inp} value={brand.contactEmail} onChange={e => updBrand("contactEmail", e.target.value)} placeholder="e.g. hello@yourbrand.com" /></div>
                   <div><label style={I.lbl}>Phone</label><input style={I.inp} value={brand.contactPhone} onChange={e => updBrand("contactPhone", e.target.value)} placeholder="e.g. (555) 000-0000" /></div>
                 </div>
+                <div>
+                  <label style={I.lbl}>Address <span style={{ fontWeight: 400, color: "#9ca3af" }}>(optional)</span></label>
+                  <input style={I.inp} value={brand.address || ""} onChange={e => updBrand("address", e.target.value)} placeholder="e.g. 123 Main St, Tampa, FL 33601" />
+                  <div style={{ fontSize: "10px", color: "#6b7280", marginTop: "4px" }}>Only used if filled in — appears in the footer and contact page. Leave blank to omit.</div>
+                </div>
               </Section>
 
               <Section id="positioning-style-notes" title="Style Notes" icon="">
