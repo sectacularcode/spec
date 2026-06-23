@@ -5,7 +5,7 @@ const TOOLS = [
   {
     id: "template-studio",
     label: "Template Studio",
-    desc: "Start from a pre-built industry template. Customize your brand, preview live, and export clean Elementor or Divi JSON.",
+    desc: "Start from a pre-built industry template. Customize your brand, preview live, and export a ready-to-import page template.",
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b45309" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
