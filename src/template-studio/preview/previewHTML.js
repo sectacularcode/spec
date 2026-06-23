@@ -49,7 +49,7 @@ export function previewHTML(page, brand) {
       const subhead = page.heroSubhead || (brand.keyMessages || "").split(".")[0];
       const v = layout.heroVariant || "left-standard";
       const eyebrow = eyebrowText(layout.eyebrowStyle, page.heroEyebrow || page.pageType || "Welcome");
-      const btnTxtColor = luminance(ac) > 0.6 ? "#0a0a0a" : "#ffffff";
+      const btnTxtColor = textOn(ac);
 
       // INTERIOR PAGE HEADER — clean text-only header for non-homepage pages
       const interiorTypes = ["About / Studio", "Services", "Work / Portfolio", "Case Study", "Blog Index", "Blog Post", "Blog Post — Recipe", "Pricing", "Press / Awards", "Careers", "Contact", "Leadership / Founder"];
@@ -314,7 +314,7 @@ export function previewHTML(page, brand) {
             <h3 style="font-family:'${hf}',serif;font-size:22px;color:${headingColor};margin:0 0 16px;font-weight:400;">${tier || ""}</h3>
             <p style="font-family:'${hf}',serif;font-size:40px;color:${ac};margin:0 0 24px;font-weight:400;">${price || ""}</p>
             <p style="font-family:'${bf}',sans-serif;font-size:14px;color:${ts};line-height:1.7;margin:0 0 32px;">${desc || ""}</p>
-            <a href="#contact" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#fff;background:${ac};padding:14px 28px;text-decoration:none;display:inline-block;">${brand.cta1}</a>
+            <a href="#contact" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:${textOn(ac)};background:${ac};padding:14px 28px;text-decoration:none;display:inline-block;">${brand.cta1}</a>
           </div>`; }).join("")}
         </div>
       </section>`;
@@ -324,7 +324,7 @@ export function previewHTML(page, brand) {
       const items = (page.testimonials || "").split("\n").filter(Boolean);
       return `<section style="background:${pc};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
         <p data-edit="page.testimonialsEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 60px;">${page.testimonialsEyebrow || "Kind Words"}</p>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:64px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:32px;">
           ${items.map(line => { const [q, n, r] = line.split("|"); return `<div>
             <p style="font-family:'${hf}',serif;font-size:clamp(22px,2vw,28px);color:${headingColor};line-height:1.5;font-weight:400;margin:0 0 32px;">${q || ""}</p>
             <p style="font-family:'${bf}',sans-serif;font-size:13px;color:${ac};margin:0;letter-spacing:.05em;">— ${n || ""}, <span style="color:${ts};">${r || ""}</span></p>
@@ -592,24 +592,29 @@ export function previewHTML(page, brand) {
         section [style*="grid-template-columns: 80px"],section [style*="grid-template-columns:80px"]{grid-template-columns:1fr !important;gap:12px !important;}
         section [style*="grid-template-columns: 1fr 1fr"],section [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr !important;gap:20px !important;}
         [style*="display:flex"][style*="gap:48px"],[style*="display:flex"][style*="gap:64px"],[style*="display:flex"][style*="gap:80px"]{flex-direction:column !important;gap:20px !important;}
-        section{padding:44px 20px !important;}
+        section{padding:32px 18px !important;}
         section > div{padding-left:0 !important;padding-right:0 !important;}
+        section > div > *{margin-left:0 !important;margin-right:0 !important;}
         [style*="aspect-ratio:16/9"],[style*="aspect-ratio: 16/9"]{aspect-ratio:unset !important;height:180px !important;}
         [style*="aspect-ratio:4/3"],[style*="aspect-ratio: 4/3"]{aspect-ratio:unset !important;height:180px !important;}
         [style*="aspect-ratio:3/4"],[style*="aspect-ratio: 3/4"]{aspect-ratio:unset !important;height:200px !important;}
         [style*="aspect-ratio:1;"],[style*="aspect-ratio: 1;"]{aspect-ratio:unset !important;height:160px !important;}
-        div[style*="height:120px"]{height:40px !important;}
-        div[style*="height:96px"]{height:28px !important;}
-        div[style*="height:80px"]{height:24px !important;}
-        div[style*="height:64px"]{height:20px !important;}
-        div[style*="height:48px"]{height:16px !important;}
-        div[style*="height:40px"]{height:14px !important;}
-        div[style*="height:32px"]{height:10px !important;}
-        div[style*="height:24px"]{height:8px !important;}
-        h1{font-size:clamp(26px,7vw,38px) !important;line-height:1.15 !important;}
-        h2{font-size:clamp(22px,6vw,30px) !important;}
-        h3{font-size:17px !important;}
-        a[style*="display:inline-block"]{white-space:normal !important;text-align:center !important;width:100% !important;box-sizing:border-box !important;}
+        div[style*="height:120px"]{height:24px !important;}
+        div[style*="height:96px"]{height:20px !important;}
+        div[style*="height:80px"]{height:16px !important;}
+        div[style*="height:64px"]{height:14px !important;}
+        div[style*="height:48px"]{height:12px !important;}
+        div[style*="height:40px"]{height:10px !important;}
+        div[style*="height:32px"]{height:8px !important;}
+        div[style*="height:24px"]{height:6px !important;}
+        div[style*="height:16px"]{height:4px !important;}
+        h1{font-size:clamp(26px,7vw,38px) !important;line-height:1.15 !important;margin-bottom:16px !important;}
+        h2{font-size:clamp(22px,6vw,30px) !important;margin-bottom:14px !important;}
+        h3{font-size:17px !important;margin-bottom:10px !important;}
+        h2[style*="margin:0 0 80px"]{margin-bottom:24px !important;}
+        h2[style*="margin:0 0 60px"]{margin-bottom:20px !important;}
+        h2[style*="margin:0 0 40px"]{margin-bottom:16px !important;}
+        a[style*="display:inline-block"]{white-space:normal !important;text-align:center !important;width:100% !important;box-sizing:border-box !important;}box-sizing:border-box !important;
         nav{padding:14px 20px !important;}
         .cta-grid{grid-template-columns:1fr !important;}
         [style*="min-height:80vh"],[style*="min-height: 80vh"]{min-height:50vh !important;}
