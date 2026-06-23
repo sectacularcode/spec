@@ -83,4 +83,7 @@ export const PREMIUM_ACCENTS = [
   { name: "Slate",      value: "#475569" },
   { name: "Navy",       value: "#1f2940" },
   { name: "Ink",        value: "#0a0a0a" },
+  { name: "Crimson",    value: "#b91c1c" },
+  { name: "Emerald",    value: "#059669" },
+  { name: "Saffron",    value: "#d97706" },
 ];
