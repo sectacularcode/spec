@@ -685,7 +685,7 @@ export const WEBSITE_TEMPLATES = [
   },
   {
     id: "photo-portfolio",
-    name: "Commercial Photography Portfolio",
+    name: "Commercial Portfolio Photography",
     icon: "📷",
     industry: "Commercial photographers, product photographers, portrait photographers, editorial photographers, lifestyle photographers, brand photographers, advertising photographers, freelance photographers building a portfolio website. Keywords: portfolio, photography portfolio, photographer portfolio, product photography portfolio, commercial photography website, photo portfolio, photographer website, portfolio site.",
     goals: ["Lead Generation", "Awareness & Brand Building"],
@@ -717,7 +717,7 @@ export const WEBSITE_TEMPLATES = [
   },
   {
     id: "video-portfolio",
-    name: "Commercial Videography Portfolio",
+    name: "Commercial Portfolio Videography",
     icon: "🎥",
     industry: "Commercial videographers, filmmakers, directors, cinematographers, video producers, documentary filmmakers, brand film directors, content creators building a portfolio or reel website. Keywords: portfolio, videography portfolio, filmmaker portfolio, video producer portfolio, video editor portfolio, cinematographer portfolio, director portfolio, reel website, video portfolio, film portfolio.",
     goals: ["Lead Generation", "Awareness & Brand Building"],
