@@ -26,6 +26,22 @@ export function previewHTML(page, brand) {
   });
   page = safePage;
 
+  // Portfolio demo fallbacks for pages created before newPage() fix
+  const isVideoPortfolio = ["Portfolio — Video Home","Portfolio — Films","Portfolio — Video About","Portfolio — Video Contact"].includes(page.pageType);
+  const isPhotoPortfolio = ["Portfolio — Home","Portfolio — Gallery","Portfolio — About","Portfolio — Contact"].includes(page.pageType);
+  const PHOTO_DEMO_PORTFOLIO = "Campaign 01|Product|https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&h=1000&fit=crop&q=80\nCampaign 02|Lifestyle|https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&h=1000&fit=crop&q=80\nCampaign 03|Editorial|https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=800&h=1000&fit=crop&q=80\nCampaign 04|Brand|https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=1000&fit=crop&q=80\nCampaign 05|Portrait|https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&h=1000&fit=crop&q=80\nCampaign 06|Commercial|https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&h=1000&fit=crop&q=80";
+  const VIDEO_DEMO_PORTFOLIO = "Brand Film|Brand Film|https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=800&h=1000&fit=crop&q=80\nDocumentary|Documentary|https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=800&h=1000&fit=crop&q=80\nCommercial Spot|Commercial|https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&h=1000&fit=crop&q=80\nMusic Video|Music Video|https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&h=1000&fit=crop&q=80\nCorporate Film|Corporate|https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=1000&fit=crop&q=80\nSocial Series|Social|https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=1000&fit=crop&q=80";
+  const DEMO_PORTFOLIO = isVideoPortfolio ? VIDEO_DEMO_PORTFOLIO : PHOTO_DEMO_PORTFOLIO;
+  const PHOTO_DEMO_LEADER = "[Your name]|Commercial Photographer|https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&h=1000&fit=crop&q=80|The work speaks for itself.|Based in [City], working with consumer brands, agencies, and editorial clients on product, lifestyle, and campaign photography.";
+  const VIDEO_DEMO_LEADER = "[Your name]|Director & Cinematographer|https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=800&h=1000&fit=crop&q=80|Every frame is intentional.|Based in [City], directing brand films, documentaries, and commercial work for agencies and direct clients.";
+  const DEMO_LEADER = isVideoPortfolio ? VIDEO_DEMO_LEADER : PHOTO_DEMO_LEADER;
+  const PHOTO_DEMO_SERVICES = "Product Photography|Studio and on-location photography for e-commerce and advertising\nLifestyle & Editorial|Contextual brand imagery with art direction\nBrand Campaigns|Full campaign shoots for consumer and commercial clients\nPortrait & People|Executive portraits and team photography";
+  const VIDEO_DEMO_SERVICES = "Brand Films|Story-led brand films that go beyond the talking-head format\nDocumentary|Long-form documentary work for brands and independent projects\nCommercial|Advertising and commercial production for agencies and direct clients\nMusic Video|Music video production for independent and label artists";
+  const DEMO_SERVICES = isVideoPortfolio ? VIDEO_DEMO_SERVICES : PHOTO_DEMO_SERVICES;
+  const PHOTO_DEMO_TESTIMONIALS = "The images elevated our entire campaign. Exactly what we needed.|Brand Director|Consumer Brand\nClean, precise, and incredibly easy to work with.|Creative Lead|Agency";
+  const VIDEO_DEMO_TESTIMONIALS = "The reel cut our sales cycle in half. Clients show up to calls already sold.|Marketing Director|B2B Brand\nEvery frame felt intentional. Exactly the vibe we wanted.|Creative Director|Agency";
+  const DEMO_TESTIMONIALS = isVideoPortfolio ? VIDEO_DEMO_TESTIMONIALS : PHOTO_DEMO_TESTIMONIALS;
+
   const { primaryColor: pc, accentColor: ac, cardBgColor: card, bodyTextColor: body, borderColor: bdr, headingFont: hf, bodyFont: bf } = brand;
   const theme = THEMES.find(t => t.id === brand.themeId);
   const isDark = (brand.themeMode || (theme && theme.mode)) === "dark";
@@ -164,7 +180,7 @@ export function previewHTML(page, brand) {
     }
 
     if (s === "Services") {
-      const items = (page.services || "").split("\n").filter(Boolean);
+      const items = ((page.services && page.services.trim()) ? page.services : (isPhotoPortfolio || isVideoPortfolio ? DEMO_SERVICES : "")).split("\n").filter(Boolean);
       const v = layout.servicesVariant || "grid-numbered";
       const heading = page.servicesHeading || "Our services.";
       const eyebrow = eyebrowText(layout.eyebrowStyle, page.servicesEyebrow || "Services");
@@ -343,7 +359,7 @@ export function previewHTML(page, brand) {
     }
 
     if (s === "Testimonials") {
-      const items = (page.testimonials || "").split("\n").filter(Boolean);
+      const items = ((page.testimonials && page.testimonials.trim()) ? page.testimonials : (isPhotoPortfolio || isVideoPortfolio ? DEMO_TESTIMONIALS : "")).split("\n").filter(Boolean);
       return `<section style="background:${pc};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
         <p data-edit="page.testimonialsEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 60px;">${page.testimonialsEyebrow || "Kind Words"}</p>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:32px;">
@@ -406,7 +422,7 @@ export function previewHTML(page, brand) {
     }
 
     if (s === "Leadership") {
-      const leaders = (page.leaders || "").split("\n").filter(Boolean);
+      const leaders = ((page.leaders && page.leaders.trim()) ? page.leaders : (isPhotoPortfolio || isVideoPortfolio ? DEMO_LEADER : "")).split("\n").filter(Boolean);
       return leaders.map((line, idx) => {
         const [name, title, leaderImg, quote, bio] = line.split("|");
         const imgSrc = imgOrPlaceholder(leaderImg, `${brand.name}-leader-${name}-${idx}`, 700, 900, "portrait");
@@ -519,7 +535,7 @@ export function previewHTML(page, brand) {
 
 
     if (s === "Portfolio Masonry") {
-      const items = (page.portfolio || "").split("\n").filter(Boolean);
+      const items = ((page.portfolio && page.portfolio.trim()) ? page.portfolio : (isPhotoPortfolio || isVideoPortfolio ? DEMO_PORTFOLIO : "")).split("\n").filter(Boolean);
       // Assign mixed aspect ratios based on position for masonry feel
       const ratios = ["3/4","4/3","1/1","3/4","4/3","1/1","4/5","16/9","1/1"];
       const tiles = items.map((line, i) => {
@@ -566,7 +582,7 @@ export function previewHTML(page, brand) {
     }
 
     if (s === "Portfolio Grid") {
-      const items = (page.portfolio || "").split("\n").filter(Boolean);
+      const items = ((page.portfolio && page.portfolio.trim()) ? page.portfolio : (isPhotoPortfolio || isVideoPortfolio ? DEMO_PORTFOLIO : "")).split("\n").filter(Boolean);
       const tiles = items.map((line, i) => {
         const [t, c, img] = line.split("|");
         const portImg = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, 800, 800, brand.imageCategory);
