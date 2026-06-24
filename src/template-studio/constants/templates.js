@@ -690,7 +690,7 @@ export const WEBSITE_TEMPLATES = [
     industry: "Commercial photographers, product photographers, portrait photographers, editorial photographers, lifestyle photographers, brand photographers, advertising photographers, freelance photographers building a portfolio website. Keywords: portfolio, photography portfolio, photographer portfolio, product photography portfolio, commercial photography website, photo portfolio, photographer website, portfolio site.",
     goals: ["Lead Generation", "Awareness & Brand Building"],
     desc: "Clean white commercial portfolio. Full-bleed image hero, 3-col grid, split about page. Work-first, minimal copy.",
-    layoutId: "studio-modern", themeId: "pure-minimal", accentColor: "#111111",
+    layoutId: "studio-modern", themeId: "portfolio-clean", accentColor: "#111111",
     headingFont: "Inter", bodyFont: "Inter", imageCategory: "product",
     homepageSections: ["Hero", "Portfolio Carousel", "About", "CTA"],
     defaults: {
@@ -722,7 +722,7 @@ export const WEBSITE_TEMPLATES = [
     industry: "Commercial videographers, filmmakers, directors, cinematographers, video producers, documentary filmmakers, brand film directors, content creators building a portfolio or reel website. Keywords: portfolio, videography portfolio, filmmaker portfolio, video producer portfolio, video editor portfolio, cinematographer portfolio, director portfolio, reel website, video portfolio, film portfolio.",
     goals: ["Lead Generation", "Awareness & Brand Building"],
     desc: "Clean white commercial video portfolio. Showreel hero, film thumbnail grid, split about page with credits. Work-first, minimal copy.",
-    layoutId: "studio-modern", themeId: "pure-minimal", accentColor: "#111111",
+    layoutId: "studio-modern", themeId: "portfolio-clean", accentColor: "#111111",
     headingFont: "Inter", bodyFont: "Inter", imageCategory: "production",
     homepageSections: ["Hero", "Portfolio Carousel", "About", "CTA"],
     defaults: {
