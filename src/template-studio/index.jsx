@@ -2325,12 +2325,20 @@ Rules:
                 </button>
                 {showAddPage && (
                   <div style={{ position: "absolute", top: "36px", right: "0", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "8px", padding: "12px", zIndex: 30, minWidth: "280px", maxHeight: "420px", overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,0.08)" }}>
-                    <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "10px", padding: "0 4px", fontWeight: 600 }}>Start from a template</div>
-                    {PAGE_TYPES.map(pt => (
-                      <button key={pt} onClick={() => addPage(pt)} style={{ width: "100%", textAlign: "left", padding: "10px 12px", background: "transparent", border: "none", color: "#09090b", fontSize: "14px", cursor: "pointer", borderRadius: "4px", marginBottom: "2px" }} onMouseEnter={e => e.currentTarget.style.background = "#f0eff3"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                        <div style={{ fontWeight: 600, color: "#000000" }}>{pt}</div>
-                        <div style={{ fontSize: "12px", color: "#09090b", marginTop: "2px" }}>{(PAGE_TEMPLATES[pt]?.sections || []).slice(0, 4).join(" · ")}{PAGE_TEMPLATES[pt]?.sections?.length > 4 ? " ..." : ""}</div>
-                      </button>
+                    {[
+                      { label: "Portfolio Photography", types: ["Portfolio Photog — Home", "Portfolio Photog — Gallery", "Portfolio Photog — About", "Portfolio Photog — Contact"] },
+                      { label: "Portfolio Videography", types: ["Portfolio Video — Home", "Portfolio Video — Films", "Portfolio Video — About", "Portfolio Video — Contact"] },
+                      { label: "Standard Pages", types: ["Homepage", "About / Studio", "Services", "Work / Portfolio", "Contact", "Landing Page", "Pricing", "Blog Index", "Blog Post", "Case Study", "Press / Awards", "Careers", "Shop"] },
+                    ].map(group => (
+                      <div key={group.label}>
+                        <div style={{ fontSize: "10px", color: "#6b7280", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", padding: "10px 4px 4px", borderTop: "1px solid #dde0e6" }}>{group.label}</div>
+                        {group.types.map(pt => (
+                          <button key={pt} onClick={() => addPage(pt)} style={{ width: "100%", textAlign: "left", padding: "8px 12px", background: "transparent", border: "none", color: "#09090b", fontSize: "13px", cursor: "pointer", borderRadius: "4px", marginBottom: "2px" }} onMouseEnter={e => e.currentTarget.style.background = "#f0eff3"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                            <div style={{ fontWeight: 600, color: "#000000" }}>{pt}</div>
+                            <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "2px" }}>{(PAGE_TEMPLATES[pt]?.sections || []).slice(0, 4).join(" · ")}{PAGE_TEMPLATES[pt]?.sections?.length > 4 ? " ..." : ""}</div>
+                          </button>
+                        ))}
+                      </div>
                     ))}
                     <div style={{ borderTop: "1px solid #dde0e6", margin: "8px 0" }} />
                     <button
