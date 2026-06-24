@@ -5,7 +5,7 @@
 // ──────────────────────────────────────────────────────────────────────────────
 // CONSTANTS
 // ──────────────────────────────────────────────────────────────────────────────
-export const PAGE_TYPES = ["Homepage", "About / Studio", "Services", "Work / Portfolio", "Case Study", "Blog Index", "Blog Post", "Blog Post — Recipe", "Pricing", "Press / Awards", "Careers", "Landing Page", "Shop", "Contact"];
+export const PAGE_TYPES = ["Homepage", "About / Studio", "Services", "Work / Portfolio", "Case Study", "Blog Index", "Blog Post", "Blog Post — Recipe", "Pricing", "Press / Awards", "Careers", "Landing Page", "Shop", "Contact", "Portfolio — Home", "Portfolio — Gallery", "Portfolio — About", "Portfolio — Contact"];
 export const SECTION_OPTIONS = ["Promo Banner", "Hero", "Marquee", "About", "Leadership", "Services", "Service Cards", "Portfolio", "Portfolio Carousel", "Process", "Team", "Team Carousel", "Logo Carousel", "Stats", "Pricing", "Testimonials", "Blog", "Social", "Video", "FAQ", "Form", "CTA"];
 
 // Line-art UI icons (Lucide-style, 24px stroke 1.75). Use Icon({ name, size, color }).
