@@ -608,6 +608,7 @@ PORTFOLIO TEMPLATE RULES — read carefully:
 - Use "video-portfolio" when: user says videography portfolio, filmmaker portfolio, video producer portfolio, video editor portfolio, cinematographer portfolio, director portfolio, reel website, or any videographer/filmmaker wanting a clean minimal work-first site
 - Use "studio-portfolio" ONLY when: user explicitly wants a cinematic dark studio aesthetic, a full multi-page studio site, or describes a production company with a team — NOT for solo portfolio requests
 - When in doubt between photo-portfolio/video-portfolio and studio-portfolio, always prefer the portfolio templates for solo creator portfolio requests
+- When templateId is "photo-portfolio" or "video-portfolio": ALWAYS set themeId to "pure-minimal", headingFont to "Inter", bodyFont to "Inter". Do not override these — the commercial portfolio look requires pure white background and clean sans-serif. Never use Cormorant Garamond, Fraunces, Playfair Display, or any serif for portfolio templates.
 
 Rules:
 - ONLY use a templateId if the user's description clearly matches one of the industries above
