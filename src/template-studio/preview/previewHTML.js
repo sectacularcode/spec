@@ -541,10 +541,8 @@ export function previewHTML(page, brand) {
       const tiles = items.map((line, i) => {
         const [t, c, img] = line.split("|");
         const ratio = ratios[i % ratios.length];
-        const isLandscape = ratio === "4/3" || ratio === "16/9";
-        const portImg = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, isLandscape ? 1200 : 800, isLandscape ? 800 : 1200, brand.imageCategory);
-        const ratio = ratios[i % ratios.length];
         const isWide = ratio === "4/3" || ratio === "16/9";
+        const portImg = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, isWide ? 1200 : 800, isWide ? 800 : 1200, brand.imageCategory);
         return `<div style="min-width:0;${isWide ? "grid-column:span 2;" : ""}">
           <div style="aspect-ratio:${ratio};background:url('${portImg}') center/cover no-repeat;overflow:hidden;"></div>
           ${t ? `<p style="font-family:'${bf}',sans-serif;font-size:12px;color:${ts};margin:10px 0 2px;font-weight:500;">${t}</p>` : ""}
