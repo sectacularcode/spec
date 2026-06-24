@@ -798,12 +798,6 @@ Rules:
       const theme = THEMES.find(t => t.id === r.themeId);
       if (theme) brand = applyTheme(theme, brand);
     }
-    // Portfolio templates: enforce pure-minimal theme and Inter fonts regardless of AI suggestion
-    if (['photo-portfolio', 'video-portfolio'].includes(r.templateId)) {
-      const pureMinimal = THEMES.find(t => t.id === 'pure-minimal');
-      if (pureMinimal) brand = applyTheme(pureMinimal, brand);
-      brand = { ...brand, headingFont: 'Inter', bodyFont: 'Inter', themeId: 'pure-minimal' };
-    }
     page = { ...page, heroEyebrow: r.heroEyebrow || page.heroEyebrow };
     const newId = `proj-${Date.now()}`;
     setProjects(ps => [...ps, { id: newId, name: brand.name, brand, pages: [page] }]);
@@ -860,12 +854,6 @@ Rules:
       } else if (r.themeId) {
         const theme = THEMES.find(t => t.id === r.themeId);
         if (theme) newBrand = applyTheme(theme, newBrand);
-      }
-      // Portfolio templates: enforce pure-minimal theme and Inter fonts regardless of AI suggestion
-      if (['photo-portfolio', 'video-portfolio'].includes(r.templateId)) {
-        const pureMinimal = THEMES.find(t => t.id === 'pure-minimal');
-        if (pureMinimal) newBrand = applyTheme(pureMinimal, newBrand);
-        newBrand = { ...newBrand, headingFont: 'Inter', bodyFont: 'Inter', themeId: 'pure-minimal' };
       }
       newPage = { ...newPage, heroEyebrow: r.heroEyebrow || newPage.heroEyebrow };
       const newPages = p.pages.map((pg, i) => i === pageIdx ? newPage : pg);
