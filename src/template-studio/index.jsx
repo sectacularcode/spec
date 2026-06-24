@@ -1495,7 +1495,7 @@ Rules:
                           style={{ width: "100%", textAlign: "left", padding: "7px 12px", background: "transparent", border: "none", color: "#d4d4d8", fontSize: "12px", cursor: "pointer", display: "block" }}
                           onMouseOver={e => e.currentTarget.style.background = "rgba(255,255,255,0.06)"}
                           onMouseOut={e => e.currentTarget.style.background = "transparent"}
-                        >{pt.replace("Portfolio — ", "")}</button>
+                        >{pt}</button>
                       ))}
                     </div>
                   ))}
