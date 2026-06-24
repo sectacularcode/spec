@@ -1471,45 +1471,16 @@ Rules:
               <span style={{ color: "#ffffff", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em" }}>Pages</span>
               <button onClick={() => setShowPagePanel(false)} style={{ background: "none", border: "none", color: "#6b7280", cursor: "pointer", fontSize: "15px", lineHeight: 1, padding: "2px 4px" }}>✕</button>
             </div>
-            {/* Page list */}
-            <div style={{ padding: "8px", flex: 1, overflowY: "auto" }}>
-              {project.pages.map((pg, i) => (
-                <button
-                  key={i}
-                  onClick={() => setPageIdx(i)}
-                  style={{
-                    width: "100%",
-                    textAlign: "left",
-                    padding: "9px 12px",
-                    background: i === pageIdx ? "#b45309" : "transparent",
-                    color: i === pageIdx ? "#ffffff" : "#a3a39e",
-                    border: i === pageIdx ? "none" : "1px solid transparent",
-                    borderRadius: "6px",
-                    fontSize: "13px",
-                    fontWeight: i === pageIdx ? 600 : 400,
-                    cursor: "pointer",
-                    marginBottom: "2px",
-                    display: "block",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    transition: "background 0.12s",
-                  }}
-                  onMouseOver={e => { if (i !== pageIdx) e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
-                  onMouseOut={e => { if (i !== pageIdx) e.currentTarget.style.background = "transparent"; }}
-                >{pg.name}</button>
-              ))}
-            </div>
-            {/* Add Page */}
-            <div style={{ padding: "8px", borderTop: "1px solid #27272a", flexShrink: 0, position: "relative" }}>
+            {/* Add Page — at top */}
+            <div style={{ padding: "8px", borderBottom: "1px solid #27272a", flexShrink: 0, position: "relative" }}>
               <button
                 onClick={() => setShowPreviewAddPage(v => !v)}
-                style={{ width: "100%", padding: "8px 12px", background: "transparent", color: "#a3a39e", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: "6px" }}
+                style={{ width: "100%", padding: "7px 12px", background: "rgba(255,255,255,0.06)", color: "#a3a39e", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: "6px" }}
               >
-                <span style={{ fontSize: "14px", lineHeight: 1 }}>+</span> Add Page
+                <span style={{ fontSize: "14px", lineHeight: 1, color: "#b45309" }}>+</span> Add Page
               </button>
               {showPreviewAddPage && (
-                <div style={{ position: "absolute", bottom: "44px", left: "8px", right: "8px", background: "#18181b", border: "1px solid #27272a", borderRadius: "8px", zIndex: 20, maxHeight: "300px", overflowY: "auto" }}>
+                <div style={{ position: "absolute", top: "44px", left: "8px", right: "8px", background: "#18181b", border: "1px solid #27272a", borderRadius: "8px", zIndex: 20, maxHeight: "300px", overflowY: "auto" }}>
                   <div style={{ padding: "8px 12px 6px", fontSize: "10px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>Page type</div>
                   {PAGE_TYPES.map(pt => (
                     <button
@@ -1522,6 +1493,43 @@ Rules:
                   ))}
                 </div>
               )}
+            </div>
+            {/* Page list with delete X */}
+            <div style={{ padding: "8px", flex: 1, overflowY: "auto" }}>
+              {project.pages.map((pg, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: "4px", marginBottom: "2px" }}>
+                  <button
+                    onClick={() => setPageIdx(i)}
+                    style={{
+                      flex: 1,
+                      textAlign: "left",
+                      padding: "9px 12px",
+                      background: i === pageIdx ? "#b45309" : "transparent",
+                      color: i === pageIdx ? "#ffffff" : "#a3a39e",
+                      border: i === pageIdx ? "none" : "1px solid transparent",
+                      borderRadius: "6px",
+                      fontSize: "13px",
+                      fontWeight: i === pageIdx ? 600 : 400,
+                      cursor: "pointer",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      transition: "background 0.12s",
+                    }}
+                    onMouseOver={e => { if (i !== pageIdx) e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
+                    onMouseOut={e => { if (i !== pageIdx) e.currentTarget.style.background = "transparent"; }}
+                  >{pg.name}</button>
+                  {project.pages.length > 1 && (
+                    <button
+                      onClick={() => delPage(i)}
+                      title="Remove page"
+                      style={{ background: "none", border: "none", color: "#6b7280", cursor: "pointer", fontSize: "13px", lineHeight: 1, padding: "4px 6px", flexShrink: 0, borderRadius: "4px" }}
+                      onMouseOver={e => { e.currentTarget.style.color = "#ef4444"; e.currentTarget.style.background = "rgba(239,68,68,0.1)"; }}
+                      onMouseOut={e => { e.currentTarget.style.color = "#6b7280"; e.currentTarget.style.background = "none"; }}
+                    >✕</button>
+                  )}
+                </div>
+              ))}
             </div>
             {/* Downloads */}
             <div style={{ borderTop: "1px solid #27272a", padding: "10px 8px", display: "flex", flexDirection: "column", gap: "5px", flexShrink: 0 }}>
