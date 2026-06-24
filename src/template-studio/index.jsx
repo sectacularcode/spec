@@ -61,6 +61,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
   const [showAudit, setShowAudit] = useState(false);
   const [showAllThemes, setShowAllThemes] = useState(false);
   const [showAddPage, setShowAddPage] = useState(false);
+  const [showPreviewAddPage, setShowPreviewAddPage] = useState(false);
   const [exportFormat, setExportFormat] = useState("elementor");
   const [showKeywordsModal, setShowKeywordsModal] = useState(false); // "elementor" or "divi"
   const [aiLoading, setAiLoading] = useState(false);
@@ -1498,6 +1499,29 @@ Rules:
                   onMouseOut={e => { if (i !== pageIdx) e.currentTarget.style.background = "transparent"; }}
                 >{pg.name}</button>
               ))}
+            </div>
+            {/* Add Page */}
+            <div style={{ padding: "8px", borderTop: "1px solid #27272a", flexShrink: 0, position: "relative" }}>
+              <button
+                onClick={() => setShowPreviewAddPage(v => !v)}
+                style={{ width: "100%", padding: "8px 12px", background: "transparent", color: "#a3a39e", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: "6px" }}
+              >
+                <span style={{ fontSize: "14px", lineHeight: 1 }}>+</span> Add Page
+              </button>
+              {showPreviewAddPage && (
+                <div style={{ position: "absolute", bottom: "44px", left: "8px", right: "8px", background: "#18181b", border: "1px solid #27272a", borderRadius: "8px", zIndex: 20, maxHeight: "300px", overflowY: "auto" }}>
+                  <div style={{ padding: "8px 12px 6px", fontSize: "10px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>Page type</div>
+                  {PAGE_TYPES.map(pt => (
+                    <button
+                      key={pt}
+                      onClick={() => { addPage(pt); setShowPreviewAddPage(false); }}
+                      style={{ width: "100%", textAlign: "left", padding: "8px 12px", background: "transparent", border: "none", color: "#d4d4d8", fontSize: "12px", cursor: "pointer", display: "block" }}
+                      onMouseOver={e => e.currentTarget.style.background = "rgba(255,255,255,0.06)"}
+                      onMouseOut={e => e.currentTarget.style.background = "transparent"}
+                    >{pt}</button>
+                  ))}
+                </div>
+              )}
             </div>
             {/* Downloads */}
             <div style={{ borderTop: "1px solid #27272a", padding: "10px 8px", display: "flex", flexDirection: "column", gap: "5px", flexShrink: 0 }}>
