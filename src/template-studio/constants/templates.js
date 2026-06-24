@@ -1272,7 +1272,7 @@ export const PAGE_TEMPLATES = {
     forms: "Get in Touch|Name,Email,Phone,How can we help?|Send Message",
   },
 
-  "Portfolio — Home": {
+  "Portfolio Photog — Home": {
     sections: ["Hero", "Portfolio Masonry", "Stats", "CTA"],
     heroHeading: "The work speaks for itself.",
     heroSubhead: "[Your specialty] based in [City].",
@@ -1284,7 +1284,7 @@ export const PAGE_TEMPLATES = {
     ctaHeading: "Available for new projects.",
     forms: "Get in Touch|Name,Email,Project type,Message|Send it over",
   },
-  "Portfolio — Gallery": {
+  "Portfolio Photog — Gallery": {
     sections: ["Portfolio Masonry", "CTA"],
     heroHeading: "",
     heroSubhead: "",
@@ -1295,7 +1295,7 @@ export const PAGE_TEMPLATES = {
     ctaHeading: "Like what you see?",
     forms: "Start a Project|Name,Email,Project type,Message|Send it over",
   },
-  "Portfolio — About": {
+  "Portfolio Photog — About": {
     sections: ["Leadership", "Logo Carousel", "Services", "Testimonials", "CTA"],
     heroHeading: "",
     heroSubhead: "",
@@ -1308,14 +1308,14 @@ export const PAGE_TEMPLATES = {
     ctaHeading: "Want to work together?",
     forms: "Get in Touch|Name,Email,Project type,Message|Send it over",
   },
-  "Portfolio — Contact": {
+  "Portfolio Photog — Contact": {
     sections: ["Form"],
     heroHeading: "",
     heroSubhead: "",
     heroEyebrow: "",
     forms: "Get in Touch|Name,Email,Project type,Budget range (optional),Tell me about the project|Send it over",
   },
-  "Portfolio — Video Home": {
+  "Portfolio Video — Home": {
     sections: ["Reel", "Portfolio Grid", "Stats", "CTA"],
     heroHeading: "[Director / Filmmaker name]",
     heroSubhead: "",
@@ -1327,7 +1327,7 @@ export const PAGE_TEMPLATES = {
     ctaHeading: "Available for new projects.",
     forms: "Get in Touch|Name,Email,Project type,Budget range,Message|Send it over",
   },
-  "Portfolio — Films": {
+  "Portfolio Video — Films": {
     sections: ["Portfolio Grid", "CTA"],
     heroHeading: "",
     heroSubhead: "",
@@ -1338,7 +1338,7 @@ export const PAGE_TEMPLATES = {
     ctaHeading: "Let's make something.",
     forms: "Get in Touch|Name,Email,Project type,Budget range,Message|Send it over",
   },
-  "Portfolio — Video About": {
+  "Portfolio Video — About": {
     sections: ["Leadership", "Logo Carousel", "Services", "Testimonials", "CTA"],
     heroHeading: "",
     heroSubhead: "",
@@ -1351,7 +1351,7 @@ export const PAGE_TEMPLATES = {
     ctaHeading: "Available for new projects.",
     forms: "Get in Touch|Name,Email,Project type,Budget range,Message|Send it over",
   },
-  "Portfolio — Video Contact": {
+  "Portfolio Video — Contact": {
     sections: ["Form"],
     heroHeading: "",
     heroSubhead: "",
