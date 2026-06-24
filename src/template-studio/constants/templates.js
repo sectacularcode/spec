@@ -1206,4 +1206,44 @@ export const PAGE_TEMPLATES = {
     faqHeading: "Common questions.",
     forms: "Get in Touch|Name,Email,Phone,How can we help?|Send Message",
   },
+
+  "Portfolio — Home": {
+    sections: ["Hero", "Portfolio Carousel", "About", "CTA"],
+    heroHeading: "The work speaks for itself.",
+    heroSubhead: "[Your specialty] based in [City]. Select projects below.",
+    heroEyebrow: "",
+    aboutHeading: "About the work.",
+    aboutBody: "[Your name] is a [specialty] working with [client types]. [One sentence on what makes your work distinct.]",
+    portfolioHeading: "Selected work.",
+    ctaHeading: "Available for new projects.",
+    forms: "Get in Touch|Name,Email,Project type,Message|Send it over",
+  },
+  "Portfolio — Gallery": {
+    sections: ["Hero", "Portfolio", "CTA"],
+    heroHeading: "Selected work.",
+    heroSubhead: "[Specialty] — [categories, e.g. Product · Lifestyle · Editorial]",
+    heroEyebrow: "Work",
+    portfolioHeading: "All projects.",
+    ctaHeading: "Like what you see?",
+    forms: "Start a Project|Name,Email,Project type,Message|Send it over",
+  },
+  "Portfolio — About": {
+    sections: ["Hero", "About", "Logo Carousel", "Services", "CTA"],
+    heroHeading: "[Your name].",
+    heroSubhead: "[Specialty] based in [City].",
+    heroEyebrow: "About",
+    aboutHeading: "The work, the approach.",
+    aboutBody: "[Your name] is a [specialty] with [X] years working with [client types]. [What you care about in the work. Keep it to 2-3 sentences.]",
+    ctaHeading: "Want to work together?",
+    forms: "Get in Touch|Name,Email,Project type,Message|Send it over",
+  },
+  "Portfolio — Contact": {
+    sections: ["Hero", "Form"],
+    heroHeading: "Let's work together.",
+    heroSubhead: "Tell me about the project. You'll hear back within one business day.",
+    heroEyebrow: "Contact",
+    forms: "Get in Touch|Name,Email,Project type,Budget range (optional),Tell me about the project|Send it over",
+  },
+
+
 };
