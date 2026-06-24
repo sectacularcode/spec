@@ -45,7 +45,7 @@ export default function App({ userId } = {}) {
   const [view, setView] = useState(function(){try{return localStorage.getItem("spec_view")||"projects";}catch(e){return "projects";}});
   useEffect(() => { const h = () => setView("projects"); window.addEventListener("spec-go-projects", h); return () => window.removeEventListener("spec-go-projects", h); }, []);
   const [mobilePreviewTS, setMobilePreviewTS] = useState(false);
-  const [showPagePanel, setShowPagePanel] = useState(false);
+
   const TAB_ORDER = [
   { id: "discovery",   label: "Discovery" },
   { id: "positioning", label: "Positioning" },
@@ -1411,15 +1411,34 @@ Rules:
       {/* Top bar */}
       <div style={{ padding: "10px 16px", background: "#09090b", borderBottom: "1px solid #27272a", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <button
-            onClick={() => setShowPagePanel(v => !v)}
-            title="Pages"
-            style={{ padding: "5px 12px", background: showPagePanel ? "#b45309" : "transparent", color: "#ffffff", border: "1px solid rgba(255,255,255,0.25)", borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", whiteSpace: "nowrap" }}
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            Pages
-          </button>
-          <div style={{ color: "#ffffff", fontSize: "13px", fontWeight: 500 }}>{brand.name} / {page.name}</div>
+          <div style={{ color: "#ffffff", fontSize: "13px", fontWeight: 500, flexShrink: 0 }}>{brand.name}</div>
+          {project.pages.length > 1 && (
+            <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
+              {project.pages.map((pg, i) => (
+                <button
+                  key={i}
+                  onClick={() => setPageIdx(i)}
+                  style={{
+                    padding: "4px 12px",
+                    fontSize: "12px",
+                    fontWeight: i === pageIdx ? 600 : 400,
+                    background: i === pageIdx ? "#b45309" : "transparent",
+                    color: i === pageIdx ? "#ffffff" : "#a3a39e",
+                    border: i === pageIdx ? "none" : "1px solid rgba(255,255,255,0.2)",
+                    borderRadius: "20px",
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                    transition: "all 0.12s",
+                  }}
+                  onMouseOver={e => { if (i !== pageIdx) e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
+                  onMouseOut={e => { if (i !== pageIdx) e.currentTarget.style.background = "transparent"; }}
+                >{pg.name}</button>
+              ))}
+            </div>
+          )}
+          {project.pages.length === 1 && (
+            <div style={{ color: "#a3a39e", fontSize: "12px" }}>{page.name}</div>
+          )}
           <div style={{ display: "flex", border: "1px solid #3f3f46", borderRadius: "6px", overflow: "hidden", flexShrink: 0 }}>
             <button onClick={() => setMobilePreviewTS(false)} style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: !mobilePreviewTS ? "#b45309" : "transparent", color: !mobilePreviewTS ? "#ffffff" : "#a3a39e", borderRight: "1px solid rgba(255,255,255,0.15)" }}>Desktop</button>
             <button onClick={() => setMobilePreviewTS(true)} style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "none", background: mobilePreviewTS ? "#b45309" : "transparent", color: mobilePreviewTS ? "#ffffff" : "#a3a39e" }}>Mobile</button>
@@ -1434,66 +1453,6 @@ Rules:
 
       {/* Body: slide-in panel + iframe */}
       <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative" }}>
-
-        {/* Left slide-in panel */}
-        <div style={{
-          width: showPagePanel ? "220px" : "0px",
-          minWidth: 0,
-          overflow: "hidden",
-          transition: "width 0.2s ease",
-          background: "#09090b",
-          borderRight: showPagePanel ? "1px solid #27272a" : "none",
-          display: "flex",
-          flexDirection: "column",
-          flexShrink: 0,
-          zIndex: 10,
-        }}>
-          <div style={{ width: "220px", display: "flex", flexDirection: "column", height: "100%" }}>
-            {/* Panel header */}
-            <div style={{ padding: "12px 14px 10px", borderBottom: "1px solid #27272a", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
-              <span style={{ color: "#ffffff", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em" }}>Pages</span>
-              <button onClick={() => setShowPagePanel(false)} style={{ background: "none", border: "none", color: "#6b7280", cursor: "pointer", fontSize: "15px", lineHeight: 1, padding: "2px 4px" }}>✕</button>
-            </div>
-            {/* Page list */}
-            <div style={{ padding: "8px", flex: 1, overflowY: "auto" }}>
-              {project.pages.map((pg, i) => (
-                <button
-                  key={i}
-                  onClick={() => setPageIdx(i)}
-                  style={{
-                    width: "100%",
-                    textAlign: "left",
-                    padding: "9px 12px",
-                    background: i === pageIdx ? "#b45309" : "transparent",
-                    color: i === pageIdx ? "#ffffff" : "#a3a39e",
-                    border: i === pageIdx ? "none" : "1px solid transparent",
-                    borderRadius: "6px",
-                    fontSize: "13px",
-                    fontWeight: i === pageIdx ? 600 : 400,
-                    cursor: "pointer",
-                    marginBottom: "2px",
-                    display: "block",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    transition: "background 0.12s",
-                  }}
-                  onMouseOver={e => { if (i !== pageIdx) e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
-                  onMouseOut={e => { if (i !== pageIdx) e.currentTarget.style.background = "transparent"; }}
-                >{pg.name}</button>
-              ))}
-            </div>
-            {/* Downloads */}
-            <div style={{ borderTop: "1px solid #27272a", padding: "10px 8px", display: "flex", flexDirection: "column", gap: "5px", flexShrink: 0 }}>
-              <div style={{ fontSize: "10px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", padding: "0 4px 4px" }}>Downloads</div>
-              <button onClick={downloadHeader} style={{ width: "100%", padding: "8px 12px", background: "transparent", color: "#d4d4d8", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer", textAlign: "left", whiteSpace: "nowrap" }}>↓ Header Template</button>
-              <button onClick={downloadFooter} style={{ width: "100%", padding: "8px 12px", background: "transparent", color: "#d4d4d8", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer", textAlign: "left", whiteSpace: "nowrap" }}>↓ Footer Template</button>
-              {project.pages.length > 1 && (
-                <button onClick={downloadAll} style={{ width: "100%", padding: "8px 12px", background: "transparent", color: "#d4d4d8", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer", textAlign: "left", whiteSpace: "nowrap" }}>↓ All Pages (.zip)</button>
-              )}
-            </div>
-          </div>
-        </div>
 
         {/* Preview iframe */}
         {mobilePreviewTS ? (
