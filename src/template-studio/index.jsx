@@ -1847,12 +1847,14 @@ Rules:
                   <div style={{ fontSize: "9px", color: "#09090b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "8px" }}>Palette</div>
                   <div style={{ display: "flex", gap: "6px", alignItems: "center", marginBottom: "6px", flexWrap: "wrap" }}>
                     {(() => {
-                      // Build swatch list from custom colors or from the recommended theme
+                      // Portfolio templates lock to portfolio-clean — show that regardless of AI suggestion
+                      const portfolioLocked = ['photo-portfolio', 'video-portfolio'].includes(briefRec.templateId);
+                      const displayThemeId = portfolioLocked ? 'portfolio-clean' : briefRec.themeId;
                       let swatches = [];
-                      if (briefRec.customColors) {
+                      if (!portfolioLocked && briefRec.customColors) {
                         swatches = [briefRec.customColors.background, briefRec.customColors.accent, briefRec.customColors.text || briefRec.customColors.card].filter(Boolean);
                       } else {
-                        const theme = THEMES.find(t => t.id === briefRec.themeId);
+                        const theme = THEMES.find(t => t.id === displayThemeId);
                         if (theme) swatches = [theme.primaryColor, theme.accentColor, theme.cardBgColor];
                       }
                       return swatches.slice(0, 3).map((c, i) => (
@@ -1860,10 +1862,10 @@ Rules:
                       ));
                     })()}
                     <span style={{ fontSize: "16px", color: "#09090b", fontWeight: 700, marginLeft: "4px", letterSpacing: "-0.015em" }}>
-                      {briefRec.customColors ? "Custom colors" : (THEMES.find(t => t.id === briefRec.themeId)?.name || briefRec.themeId)}
+                      {['photo-portfolio', 'video-portfolio'].includes(briefRec.templateId) ? 'Portfolio Clean' : (briefRec.customColors ? 'Custom colors' : (THEMES.find(t => t.id === briefRec.themeId)?.name || briefRec.themeId))}
                     </span>
                   </div>
-                  {briefRec.themeReason && <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.55 }}>{briefRec.themeReason}</div>}
+                  {!['photo-portfolio', 'video-portfolio'].includes(briefRec.templateId) && briefRec.themeReason && <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.55 }}>{briefRec.themeReason}</div>}
                 </div>
               )}
 
