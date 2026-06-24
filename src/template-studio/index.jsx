@@ -1480,16 +1480,24 @@ Rules:
                 <span style={{ fontSize: "14px", lineHeight: 1, color: "#b45309" }}>+</span> Add Page
               </button>
               {showPreviewAddPage && (
-                <div style={{ position: "absolute", top: "44px", left: "8px", right: "8px", background: "#18181b", border: "1px solid #27272a", borderRadius: "8px", zIndex: 20, maxHeight: "300px", overflowY: "auto" }}>
-                  <div style={{ padding: "8px 12px 6px", fontSize: "10px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>Page type</div>
-                  {PAGE_TYPES.map(pt => (
-                    <button
-                      key={pt}
-                      onClick={() => { addPage(pt); setShowPreviewAddPage(false); }}
-                      style={{ width: "100%", textAlign: "left", padding: "8px 12px", background: "transparent", border: "none", color: "#d4d4d8", fontSize: "12px", cursor: "pointer", display: "block" }}
-                      onMouseOver={e => e.currentTarget.style.background = "rgba(255,255,255,0.06)"}
-                      onMouseOut={e => e.currentTarget.style.background = "transparent"}
-                    >{pt}</button>
+                <div style={{ position: "absolute", top: "44px", left: "8px", right: "8px", background: "#18181b", border: "1px solid #27272a", borderRadius: "8px", zIndex: 20, maxHeight: "420px", overflowY: "auto" }}>
+                  {[
+                    { label: "Portfolio — Photography", types: ["Portfolio — Home", "Portfolio — Gallery", "Portfolio — About", "Portfolio — Contact"] },
+                    { label: "Portfolio — Videography", types: ["Portfolio — Video Home", "Portfolio — Films", "Portfolio — Video About", "Portfolio — Video Contact"] },
+                    { label: "Standard Pages", types: ["Homepage", "About / Studio", "Services", "Work / Portfolio", "Contact", "Landing Page", "Pricing", "Blog Index", "Blog Post", "Case Study", "Careers", "Press / Awards", "Shop"] },
+                  ].map(group => (
+                    <div key={group.label}>
+                      <div style={{ padding: "8px 12px 4px", fontSize: "9px", color: "#6b7280", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", borderTop: "1px solid #27272a" }}>{group.label}</div>
+                      {group.types.map(pt => (
+                        <button
+                          key={pt}
+                          onClick={() => { addPage(pt); setShowPreviewAddPage(false); }}
+                          style={{ width: "100%", textAlign: "left", padding: "7px 12px", background: "transparent", border: "none", color: "#d4d4d8", fontSize: "12px", cursor: "pointer", display: "block" }}
+                          onMouseOver={e => e.currentTarget.style.background = "rgba(255,255,255,0.06)"}
+                          onMouseOut={e => e.currentTarget.style.background = "transparent"}
+                        >{pt.replace("Portfolio — ", "")}</button>
+                      ))}
+                    </div>
                   ))}
                 </div>
               )}
