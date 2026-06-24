@@ -29,8 +29,8 @@ export function previewHTML(page, brand) {
   // Portfolio demo fallbacks for pages created before newPage() fix
   const isVideoPortfolio = ["Portfolio — Video Home","Portfolio — Films","Portfolio — Video About","Portfolio — Video Contact"].includes(page.pageType);
   const isPhotoPortfolio = ["Portfolio — Home","Portfolio — Gallery","Portfolio — About","Portfolio — Contact"].includes(page.pageType);
-  const PHOTO_DEMO_PORTFOLIO = "Campaign 01|Product|https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&h=1000&fit=crop&q=80\nCampaign 02|Lifestyle|https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&h=1000&fit=crop&q=80\nCampaign 03|Editorial|https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=800&h=1000&fit=crop&q=80\nCampaign 04|Brand|https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=1000&fit=crop&q=80\nCampaign 05|Portrait|https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&h=1000&fit=crop&q=80\nCampaign 06|Commercial|https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&h=1000&fit=crop&q=80";
-  const VIDEO_DEMO_PORTFOLIO = "Brand Film|Brand Film|https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=800&h=1000&fit=crop&q=80\nDocumentary|Documentary|https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=800&h=1000&fit=crop&q=80\nCommercial Spot|Commercial|https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&h=1000&fit=crop&q=80\nMusic Video|Music Video|https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&h=1000&fit=crop&q=80\nCorporate Film|Corporate|https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=1000&fit=crop&q=80\nSocial Series|Social|https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=1000&fit=crop&q=80";
+  const PHOTO_DEMO_PORTFOLIO = "Campaign 01|Product|https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&h=1200&fit=crop&q=80\nCampaign 02|Lifestyle|https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1200&h=800&fit=crop&q=80\nCampaign 03|Editorial|https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=900&h=900&fit=crop&q=80\nCampaign 04|Brand|https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=1200&fit=crop&q=80\nCampaign 05|Portrait|https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=1200&h=800&fit=crop&q=80\nCampaign 06|Commercial|https://images.unsplash.com/photo-1583394838336-acd977736f90?w=900&h=900&fit=crop&q=80\nCampaign 07|Campaign|https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&h=1200&fit=crop&q=80\nCampaign 08|Studio|https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200&h=800&fit=crop&q=80\nCampaign 09|Fashion|https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=900&h=900&fit=crop&q=80";
+  const VIDEO_DEMO_PORTFOLIO = "Brand Film|Brand Film|https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=1600&h=900&fit=crop&q=80\nDocumentary|Documentary|https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=1600&h=900&fit=crop&q=80\nCommercial Spot|Commercial|https://images.unsplash.com/photo-1551434678-e076c223a692?w=1600&h=900&fit=crop&q=80\nMusic Video|Music Video|https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1600&h=900&fit=crop&q=80\nCorporate Film|Corporate|https://images.unsplash.com/photo-1485846234645-a62644f84728?w=1600&h=900&fit=crop&q=80\nSocial Series|Social|https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1600&h=900&fit=crop&q=80";
   const DEMO_PORTFOLIO = isVideoPortfolio ? VIDEO_DEMO_PORTFOLIO : PHOTO_DEMO_PORTFOLIO;
   const PHOTO_DEMO_LEADER = "[Your name]|Commercial Photographer|https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&h=1000&fit=crop&q=80|The work speaks for itself.|Based in [City], working with consumer brands, agencies, and editorial clients on product, lifestyle, and campaign photography.";
   const VIDEO_DEMO_LEADER = "[Your name]|Director & Cinematographer|https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=800&h=1000&fit=crop&q=80|Every frame is intentional.|Based in [City], directing brand films, documentaries, and commercial work for agencies and direct clients.";
@@ -540,7 +540,9 @@ export function previewHTML(page, brand) {
       const ratios = ["3/4","4/3","1/1","3/4","4/3","1/1","4/5","16/9","1/1"];
       const tiles = items.map((line, i) => {
         const [t, c, img] = line.split("|");
-        const portImg = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, 800, 1000, brand.imageCategory);
+        const ratio = ratios[i % ratios.length];
+        const isLandscape = ratio === "4/3" || ratio === "16/9";
+        const portImg = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, isLandscape ? 1200 : 800, isLandscape ? 800 : 1200, brand.imageCategory);
         const ratio = ratios[i % ratios.length];
         const isWide = ratio === "4/3" || ratio === "16/9";
         return `<div style="min-width:0;${isWide ? "grid-column:span 2;" : ""}">
@@ -585,9 +587,9 @@ export function previewHTML(page, brand) {
       const items = ((page.portfolio && page.portfolio.trim()) ? page.portfolio : (isPhotoPortfolio || isVideoPortfolio ? DEMO_PORTFOLIO : "")).split("\n").filter(Boolean);
       const tiles = items.map((line, i) => {
         const [t, c, img] = line.split("|");
-        const portImg = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, 800, 800, brand.imageCategory);
-        return `<div style="min-width:0;position:relative;group;">
-          <div style="aspect-ratio:1/1;background:url('${portImg}') center/cover no-repeat;overflow:hidden;">
+        const portImg = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, 1600, 900, brand.imageCategory);
+        return `<div style="min-width:0;position:relative;">
+          <div style="aspect-ratio:16/9;background:url('${portImg}') center/cover no-repeat;overflow:hidden;">
             <div style="position:absolute;inset:0;background:rgba(0,0,0,0);display:flex;align-items:center;justify-content:center;">
               <div style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;">
                 <div style="width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:12px solid rgba(255,255,255,0.9);margin-left:3px;"></div>
