@@ -1482,8 +1482,8 @@ Rules:
               {showPreviewAddPage && (
                 <div style={{ position: "absolute", top: "44px", left: "8px", right: "8px", background: "#18181b", border: "1px solid #27272a", borderRadius: "8px", zIndex: 20, maxHeight: "420px", overflowY: "auto" }}>
                   {[
-                    { label: "Portfolio — Photography", types: ["Portfolio — Home", "Portfolio — Gallery", "Portfolio — About", "Portfolio — Contact"] },
-                    { label: "Portfolio — Videography", types: ["Portfolio — Video Home", "Portfolio — Films", "Portfolio — Video About", "Portfolio — Video Contact"] },
+                    { label: "Portfolio — Photography", types: ["Portfolio Photog — Home", "Portfolio Photog — Gallery", "Portfolio Photog — About", "Portfolio Photog — Contact"] },
+                    { label: "Portfolio — Videography", types: ["Portfolio Video — Home", "Portfolio Video — Films", "Portfolio Video — About", "Portfolio Video — Contact"] },
                     { label: "Standard Pages", types: ["Homepage", "About / Studio", "Services", "Work / Portfolio", "Contact", "Landing Page", "Pricing", "Blog Index", "Blog Post", "Case Study", "Careers", "Press / Awards", "Shop"] },
                   ].map(group => (
                     <div key={group.label}>
