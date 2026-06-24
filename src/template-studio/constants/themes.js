@@ -182,6 +182,18 @@ export const THEMES = [
     borderColor: "#d4d8de",
     headingColor: "#1a1c20",
   },
+  {
+    id: "portfolio-clean",
+    name: "Portfolio Clean",
+    desc: "Pure white canvas, near-black text, neutral borders. Built for commercial portfolios where the work is the color.",
+    mode: "light",
+    primaryColor: "#ffffff",
+    cardBgColor: "#f8f8f8",
+    accentColor: "#111111",
+    bodyTextColor: "#555555",
+    borderColor: "#e4e4e4",
+    headingColor: "#111111",
+  },
 ];
 
 // ──────────────────────────────────────────────────────────────────────────────
