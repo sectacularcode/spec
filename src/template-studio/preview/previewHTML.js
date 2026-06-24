@@ -517,6 +517,86 @@ export function previewHTML(page, brand) {
       </section>`;
     }
 
+
+    if (s === "Portfolio Masonry") {
+      const items = (page.portfolio || "").split("\n").filter(Boolean);
+      // Assign mixed aspect ratios based on position for masonry feel
+      const ratios = ["3/4","4/3","1/1","3/4","4/3","1/1","4/5","16/9","1/1"];
+      const tiles = items.map((line, i) => {
+        const [t, c, img] = line.split("|");
+        const portImg = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, 800, 1000, brand.imageCategory);
+        const ratio = ratios[i % ratios.length];
+        const isWide = ratio === "4/3" || ratio === "16/9";
+        return `<div style="min-width:0;${isWide ? "grid-column:span 2;" : ""}">
+          <div style="aspect-ratio:${ratio};background:url('${portImg}') center/cover no-repeat;overflow:hidden;"></div>
+          ${t ? `<p style="font-family:'${bf}',sans-serif;font-size:12px;color:${ts};margin:10px 0 2px;font-weight:500;">${t}</p>` : ""}
+          ${c ? `<p style="font-family:'${bf}',sans-serif;font-size:11px;color:${ac};margin:0;letter-spacing:.05em;text-transform:uppercase;">${c}</p>` : ""}
+        </div>`;
+      }).join("");
+      const filterCats = [...new Set(items.map(l => l.split("|")[1]).filter(Boolean))];
+      const filters = filterCats.length > 1 ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 40px;">
+        <button style="padding:6px 16px;background:${headingColor};color:${pc};border:none;border-radius:20px;font-family:'${bf}',sans-serif;font-size:11px;font-weight:600;cursor:pointer;letter-spacing:.05em;">All</button>
+        ${filterCats.map(cat => `<button style="padding:6px 16px;background:transparent;color:${ts};border:1px solid ${bdr};border-radius:20px;font-family:'${bf}',sans-serif;font-size:11px;cursor:pointer;letter-spacing:.05em;">${cat}</button>`).join("")}
+      </div>` : "";
+      return `<section style="background:${pc};padding:clamp(60px,8vw,100px) clamp(24px,8vw,100px);">
+        <div style="margin:0 0 48px;">
+          ${page.portfolioEyebrow ? `<p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 12px;">${page.portfolioEyebrow}</p>` : ""}
+          <h2 style="font-family:'${hf}',sans-serif;font-size:clamp(28px,4vw,48px);color:${headingColor};margin:0;font-weight:700;letter-spacing:-.02em;">${page.portfolioHeading || "Selected work."}</h2>
+        </div>
+        ${filters}
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;grid-auto-rows:auto;">
+          ${tiles}
+        </div>
+      </section>`;
+    }
+
+    if (s === "Reel") {
+      return `<section style="background:#000;padding:0;position:relative;">
+        <div style="aspect-ratio:16/9;background:#111;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+          <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.2),rgba(0,0,0,0.5));"></div>
+          <div style="position:relative;z-index:2;text-align:center;">
+            <div style="width:60px;height:60px;border-radius:50%;border:2px solid rgba(255,255,255,0.7);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+              <div style="width:0;height:0;border-top:12px solid transparent;border-bottom:12px solid transparent;border-left:20px solid rgba(255,255,255,0.9);margin-left:4px;"></div>
+            </div>
+            <p style="font-family:'${bf}',sans-serif;font-size:12px;color:rgba(255,255,255,0.6);letter-spacing:.2em;text-transform:uppercase;margin:0;">${page.heroEyebrow || "Showreel"}</p>
+            <h2 style="font-family:'${hf}',sans-serif;font-size:clamp(28px,4vw,56px);color:#fff;margin:8px 0 0;font-weight:700;letter-spacing:-.02em;">${page.heroHeading || brand.name}</h2>
+          </div>
+        </div>
+      </section>`;
+    }
+
+    if (s === "Portfolio Grid") {
+      const items = (page.portfolio || "").split("\n").filter(Boolean);
+      const tiles = items.map((line, i) => {
+        const [t, c, img] = line.split("|");
+        const portImg = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, 800, 800, brand.imageCategory);
+        return `<div style="min-width:0;position:relative;group;">
+          <div style="aspect-ratio:1/1;background:url('${portImg}') center/cover no-repeat;overflow:hidden;">
+            <div style="position:absolute;inset:0;background:rgba(0,0,0,0);display:flex;align-items:center;justify-content:center;">
+              <div style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;">
+                <div style="width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:12px solid rgba(255,255,255,0.9);margin-left:3px;"></div>
+              </div>
+            </div>
+          </div>
+          ${t ? `<p style="font-family:'${bf}',sans-serif;font-size:13px;color:${headingColor};margin:10px 0 2px;font-weight:500;">${t}</p>` : ""}
+          ${c ? `<p style="font-family:'${bf}',sans-serif;font-size:11px;color:${ac};margin:0;letter-spacing:.05em;text-transform:uppercase;">${c}</p>` : ""}
+        </div>`;
+      }).join("");
+      const filterCats = [...new Set(items.map(l => l.split("|")[1]).filter(Boolean))];
+      const filters = filterCats.length > 1 ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 40px;">
+        <button style="padding:6px 16px;background:${headingColor};color:${pc};border:none;border-radius:20px;font-family:'${bf}',sans-serif;font-size:11px;font-weight:600;cursor:pointer;">All</button>
+        ${filterCats.map(cat => `<button style="padding:6px 16px;background:transparent;color:${ts};border:1px solid ${bdr};border-radius:20px;font-family:'${bf}',sans-serif;font-size:11px;cursor:pointer;">${cat}</button>`).join("")}
+      </div>` : "";
+      return `<section style="background:${pc};padding:clamp(60px,8vw,100px) clamp(24px,8vw,100px);">
+        <div style="margin:0 0 48px;">
+          ${page.portfolioEyebrow ? `<p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 12px;">${page.portfolioEyebrow}</p>` : ""}
+          <h2 style="font-family:'${hf}',sans-serif;font-size:clamp(28px,4vw,48px);color:${headingColor};margin:0;font-weight:700;letter-spacing:-.02em;">${page.portfolioHeading || "Selected films."}</h2>
+        </div>
+        ${filters}
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">${tiles}</div>
+      </section>`;
+    }
+
     return "";
   };
 
