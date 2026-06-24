@@ -776,7 +776,9 @@ Rules:
       tagline: r.tagline || brand.tagline,
     };
     // Apply custom colors if provided, else apply named theme
-    if (r.customColors && r.customColors.background && r.customColors.accent) {
+    // Skip theme override for templates that lock their own theme
+    const templateLocksTheme = ['photo-portfolio', 'video-portfolio'].includes(r.templateId);
+    if (!templateLocksTheme && r.customColors && r.customColors.background && r.customColors.accent) {
       const bc = r.customColors;
       const isDark = (() => {
         const h = bc.background.replace("#", "");
@@ -794,9 +796,12 @@ Rules:
         borderColor: isDark ? "#2a2a2a" : "#e5e5e5",
         accentColor: bc.accent,
       };
-    } else if (r.themeId) {
+    } else if (!templateLocksTheme && r.themeId) {
       const theme = THEMES.find(t => t.id === r.themeId);
       if (theme) brand = applyTheme(theme, brand);
+    }
+    if (templateLocksTheme) {
+      brand = { ...brand, headingFont: 'Inter', bodyFont: 'Inter' };
     }
     page = { ...page, heroEyebrow: r.heroEyebrow || page.heroEyebrow };
     const newId = `proj-${Date.now()}`;
@@ -833,7 +838,8 @@ Rules:
         tagline: r.tagline || newBrand.tagline,
       };
       // Apply custom colors if provided, else apply named theme
-      if (r.customColors && r.customColors.background && r.customColors.accent) {
+      const templateLocksTheme2 = ['photo-portfolio', 'video-portfolio'].includes(r.templateId);
+      if (!templateLocksTheme2 && r.customColors && r.customColors.background && r.customColors.accent) {
         const bc = r.customColors;
         const isDark = (() => {
           const h = bc.background.replace("#", "");
@@ -851,9 +857,12 @@ Rules:
           borderColor: isDark ? "#2a2a2a" : "#e5e5e5",
           accentColor: bc.accent,
         };
-      } else if (r.themeId) {
+      } else if (!templateLocksTheme2 && r.themeId) {
         const theme = THEMES.find(t => t.id === r.themeId);
         if (theme) newBrand = applyTheme(theme, newBrand);
+      }
+      if (templateLocksTheme2) {
+        newBrand = { ...newBrand, headingFont: 'Inter', bodyFont: 'Inter' };
       }
       newPage = { ...newPage, heroEyebrow: r.heroEyebrow || newPage.heroEyebrow };
       const newPages = p.pages.map((pg, i) => i === pageIdx ? newPage : pg);
