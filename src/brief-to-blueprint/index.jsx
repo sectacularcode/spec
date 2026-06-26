@@ -68,6 +68,7 @@ export default function CustomBuild({ userId, role } = {}) {
   const [swapFilter, setSwapFilter]         = useState(""); // filter by page type
   const [pageOverrides, setPageOverrides]   = useState({}); // {pageId: {sectionIndex: sectionData}}
   const [mobilePreview, setMobilePreview]   = useState(false); // desktop vs mobile preview toggle
+  const [panelCollapsed, setPanelCollapsed] = useState(false); // collapse left panel for full-width preview
   const fileRef = useRef();
   const [parsing, setParsing]           = useState(false);
   const canGenerate = !!brief && selectedPages.length > 0;
@@ -746,9 +747,9 @@ export default function CustomBuild({ userId, role } = {}) {
       )}
 
       {!draftsView && (
-      <div style={{ display: "grid", gridTemplateColumns: generated ? "520px 1fr" : "1fr", gap: "0", height: "calc(100vh - 57px)", overflow: "hidden" }}>
+      <div style={{ display: "grid", gridTemplateColumns: generated ? (panelCollapsed ? "0px 1fr" : "520px 1fr") : "1fr", gap: "0", height: "calc(100vh - 57px)", overflow: "hidden", transition: "grid-template-columns 0.2s ease" }}>
 
-        <div style={{ padding: "clamp(20px,3vw,40px) clamp(16px,3vw,40px)", borderRight: generated ? "1px solid #dde0e6" : "none", overflowY: "auto", flexShrink: 0, background: "#eeedf1", height: "100%", boxSizing: "border-box" }}>
+        <div style={{ padding: "clamp(20px,3vw,40px) clamp(16px,3vw,40px)", borderRight: generated ? "1px solid #dde0e6" : "none", overflowY: panelCollapsed ? "hidden" : "auto", overflowX: "hidden", flexShrink: 0, background: "#eeedf1", height: "100%", boxSizing: "border-box" }}>
           <div style={{ maxWidth: generated ? "100%" : "1100px", margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
             <button onClick={() => setDraftsView(true)} style={{ padding: "7px 14px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "6px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", cursor: "pointer" }}>← Saved Builds</button>
@@ -1086,7 +1087,16 @@ export default function CustomBuild({ userId, role } = {}) {
                 </button>
               )}
               {/* Desktop / Mobile toggle */}
-              <div style={{ marginLeft: "auto", display: "flex", border: "1px solid #dde0e6", borderRadius: "6px", overflow: "hidden" }}>
+              {/* Panel collapse toggle — only shown when preview is active */}
+              <button
+                onClick={() => setPanelCollapsed(c => !c)}
+                title={panelCollapsed ? "Show panel" : "Hide panel"}
+                style={{ marginLeft: "auto", padding: "6px 12px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "6px", background: panelCollapsed ? "#3f3f46" : "#fff", color: panelCollapsed ? "#fff" : "#6b7280", display: "flex", alignItems: "center", gap: "5px" }}>
+                {panelCollapsed
+                  ? <><span style={{ fontSize: "14px", lineHeight: 1 }}>▶</span> Show panel</>
+                  : <><span style={{ fontSize: "14px", lineHeight: 1 }}>◀</span> Hide panel</>}
+              </button>
+              <div style={{ display: "flex", border: "1px solid #dde0e6", borderRadius: "6px", overflow: "hidden" }}>
                 <button
                   onClick={() => setMobilePreview(false)}
                   title="Desktop preview"
