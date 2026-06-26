@@ -65,11 +65,15 @@ export function generatePages(brief, selectedPages, inspoContext, aiRecs, custom
         var locB = buildLocationPageB(colors, brief, locData);
         return { id: pid, label: label, data: locA, variantA: locA, variantB: locB, recommended: "A", hasVariants: true };
       }
-      // Landing pages — purpose-built ad/campaign layout
+      // Landing pages — three conversion-focused layouts
+      // A = Awareness/Feature, B = Lead Capture (form + testimonials), C = Minimal Retargeting
       if (pid === "landing" || pid.startsWith("landing-")) {
         var landA = buildLandingPage(colors, brief, inspoContext, "A");
         var landB = buildLandingPage(colors, brief, inspoContext, "B");
-        return { id: pid, label: label, data: landA, variantA: landA, variantB: landB, recommended: "A", hasVariants: true };
+        var landC = buildLandingPage(colors, brief, inspoContext, "C");
+        // Attach C as a named extra so the UI can expose it alongside A/B
+        var landResult = { id: pid, label: label, data: landA, variantA: landA, variantB: landB, variantC: landC, recommended: "A", hasVariants: true, hasVariantC: true };
+        return landResult;
       }
       // Utility pages — no meaningful A/B variation
       var utilityPages = ["thank-you", "privacy", "terms", "404"];
