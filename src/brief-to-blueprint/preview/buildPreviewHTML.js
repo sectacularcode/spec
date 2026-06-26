@@ -1441,12 +1441,19 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "section{padding:40px 20px !important;}" +
         "section > div{padding-left:0 !important;padding-right:0 !important;}" +
         "[style*='grid-template-columns']{grid-template-columns:1fr !important;gap:0 !important;}" +
-        ".landing-img{min-height:240px !important;}" +
+        "section[style*='display:grid']{display:flex !important;flex-direction:column !important;}" +
+        ".landing-img{min-height:240px !important;order:1 !important;}" +
+        ".feature-text{order:2 !important;}" +
         ".landing-img img{min-height:240px !important;height:240px !important;object-fit:cover !important;}" +
         "[style*='padding:60px 48px']{padding:32px 20px !important;}" +
         ".feature-text{padding-top:28px !important;}" +
         "[style*='padding:64px 56px']{padding:32px 20px !important;}" +
         "[style*='padding:40px 32px']{padding:24px 20px !important;}" +
+        "[style*='padding:48px 36px']{padding:20px !important;}" +
+        "[style*='padding:100px 40px']{padding:48px 20px !important;}" +
+        "[style*='padding:80px 40px']{padding:40px 20px !important;}" +
+        "[style*='padding:80px clamp']{padding:40px 20px !important;}" +
+        "[style*='border-right:1px solid']{border-right:none !important;border-bottom:1px solid rgba(0,0,0,0.06) !important;}" +
         "[style*='display:flex'][style*='gap:16px']{flex-direction:column !important;gap:10px !important;}" +
         "[style*='display:flex'][style*='gap:24px']{flex-direction:column !important;gap:12px !important;}" +
         "[style*='display:flex'][style*='gap:32px']{flex-direction:column !important;gap:14px !important;}" +
@@ -1477,6 +1484,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "footer{padding:32px 20px !important;}" +
         "footer > div{flex-direction:column !important;gap:16px !important;align-items:flex-start !important;}" +
         ".footer-nav{flex-direction:column !important;gap:12px !important;align-items:flex-start !important;}" +
+        "[style*='text-align:center'][style*='border-right']{text-align:left !important;}" +
       "}" +
     "</style>" +
     "</head><body>" +
