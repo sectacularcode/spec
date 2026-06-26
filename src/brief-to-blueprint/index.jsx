@@ -782,13 +782,13 @@ export default function CustomBuild({ userId, role } = {}) {
         <div style={{ padding: "clamp(20px,3vw,40px) clamp(16px,3vw,40px)", borderRight: generated ? "1px solid #dde0e6" : "none", overflowY: panelCollapsed ? "hidden" : "auto", overflowX: "hidden", flexShrink: 0, background: "#eeedf1", height: "100%", boxSizing: "border-box" }}>
           <div style={{ maxWidth: generated ? "100%" : "1100px", margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
-            <button onClick={() => setDraftsView(true)} style={{ padding: "5px 10px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "5px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "12px", cursor: "pointer" }}>← Builds</button>
-            <button onClick={() => setShowBulkLocation(true)} style={{ padding: "5px 10px", background: "#ffffff", color: "#3f3f46", border: "1px solid #dde0e6", borderRadius: "5px", fontWeight: 500, fontSize: "12px", cursor: "pointer" }}>Bulk Locations</button>
+            <button onClick={() => setDraftsView(true)} style={{ padding: "5px 10px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "5px", fontWeight: 500, display: "inline-flex", alignItems: "center", lineHeight: 1, gap: "4px", fontSize: "12px", cursor: "pointer" }}>← Builds</button>
+            <button onClick={() => setShowBulkLocation(true)} style={{ padding: "5px 10px", background: "#ffffff", color: "#3f3f46", border: "1px solid #dde0e6", borderRadius: "5px", fontWeight: 500, fontSize: "12px", cursor: "pointer", display: "inline-flex", alignItems: "center", lineHeight: 1 }}>Bulk Locations</button>
             {generated && (
               <button
                 onClick={() => setPanelCollapsed(c => !c)}
                 title={panelCollapsed ? "Show panel" : "Hide panel"}
-                style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 500, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "5px", background: panelCollapsed ? "#3f3f46" : "#ffffff", color: panelCollapsed ? "#fff" : "#6b7280", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 500, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "5px", background: panelCollapsed ? "#3f3f46" : "#ffffff", color: panelCollapsed ? "#fff" : "#6b7280", display: "inline-flex", alignItems: "center", lineHeight: 1, gap: "4px" }}>
                 {panelCollapsed ? "▶ Show panel" : "◀ Hide panel"}
               </button>
             )}
@@ -801,7 +801,7 @@ export default function CustomBuild({ userId, role } = {}) {
                   setPreviewPage("home"); setPageOverrides({}); setCustomPages([]);
                   { try { await kvStorageDel("spec-blueprint-draft", userId); } catch(e) {} }
                 }}
-                style={{ fontSize: "11px", color: "#6b7280", background: "none", border: "1px solid #dde0e6", borderRadius: "4px", padding: "4px 8px", cursor: "pointer" }}>
+                style={{ fontSize: "12px", color: "#6b7280", background: "none", border: "1px solid #dde0e6", borderRadius: "5px", padding: "5px 10px", cursor: "pointer", display: "inline-flex", alignItems: "center", lineHeight: 1 }}>
                 Clear draft
               </button>
             )}
