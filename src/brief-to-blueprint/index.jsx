@@ -780,13 +780,13 @@ export default function CustomBuild({ userId, role } = {}) {
         <div style={{ padding: "clamp(20px,3vw,40px) clamp(16px,3vw,40px)", borderRight: generated ? "1px solid #dde0e6" : "none", overflowY: panelCollapsed ? "hidden" : "auto", overflowX: "hidden", flexShrink: 0, background: "#eeedf1", height: "100%", boxSizing: "border-box" }}>
           <div style={{ maxWidth: generated ? "100%" : "1100px", margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
-            <button onClick={() => setDraftsView(true)} style={{ padding: "7px 14px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "6px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", cursor: "pointer" }}>← Saved Builds</button>
-            <button onClick={() => setShowBulkLocation(true)} style={{ padding: "7px 14px", background: "#ffffff", color: "#3f3f46", border: "1px solid #dde0e6", borderRadius: "6px", fontWeight: 500, fontSize: "13px", cursor: "pointer" }}>Bulk Location Pages</button>
+            <button onClick={() => setDraftsView(true)} style={{ padding: "5px 10px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "5px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "12px", cursor: "pointer" }}>← Builds</button>
+            <button onClick={() => setShowBulkLocation(true)} style={{ padding: "5px 10px", background: "#ffffff", color: "#3f3f46", border: "1px solid #dde0e6", borderRadius: "5px", fontWeight: 500, fontSize: "12px", cursor: "pointer" }}>Bulk Locations</button>
             {generated && (
               <button
                 onClick={() => setPanelCollapsed(c => !c)}
                 title={panelCollapsed ? "Show panel" : "Hide panel"}
-                style={{ padding: "7px 12px", fontSize: "13px", fontWeight: 500, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "6px", background: panelCollapsed ? "#3f3f46" : "#ffffff", color: panelCollapsed ? "#fff" : "#6b7280", display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 500, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "5px", background: panelCollapsed ? "#3f3f46" : "#ffffff", color: panelCollapsed ? "#fff" : "#6b7280", display: "inline-flex", alignItems: "center", gap: "4px" }}>
                 {panelCollapsed ? "▶ Show panel" : "◀ Hide panel"}
               </button>
             )}
@@ -799,7 +799,7 @@ export default function CustomBuild({ userId, role } = {}) {
                   setPreviewPage("home"); setPageOverrides({}); setCustomPages([]);
                   { try { await kvStorageDel("spec-blueprint-draft", userId); } catch(e) {} }
                 }}
-                style={{ fontSize: "12px", color: "#6b7280", background: "none", border: "1px solid #dde0e6", borderRadius: "4px", padding: "5px 10px", cursor: "pointer" }}>
+                style={{ fontSize: "11px", color: "#6b7280", background: "none", border: "1px solid #dde0e6", borderRadius: "4px", padding: "4px 8px", cursor: "pointer" }}>
                 Clear draft
               </button>
             )}
@@ -1144,19 +1144,22 @@ export default function CustomBuild({ userId, role } = {}) {
               {/* Layout variant dropdown */}
               {generated.pages.filter(p => p.id === previewPage && p.hasVariants).map(p => {
                 var variantLabels = p.hasVariantC
-                  ? { A: "Awareness", B: "Lead Form", C: "Minimal" }
+                  ? { A: "Awareness — Features + Checklist", B: "Lead Form — Quote Request + Testimonials", C: "Retargeting — Minimal Single CTA" }
                   : { A: "Layout A", B: "Layout B" };
                 var variants = p.hasVariantC ? ["A", "B", "C"] : ["A", "B"];
                 var current = layoutVariants[p.id] || p.recommended || "A";
                 return (
-                  <select key="variant-select"
-                    value={current}
-                    onChange={e => setLayoutVariants(prev => ({ ...prev, [p.id]: e.target.value }))}
-                    style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", marginLeft: "4px" }}>
-                    {variants.map(v => (
-                      <option key={v} value={v}>{variantLabels[v]}{v === p.recommended ? " ★" : ""}</option>
-                    ))}
-                  </select>
+                  <div key="variant-select" style={{ display: "flex", alignItems: "center", gap: "6px", marginLeft: "4px" }}>
+                    <span style={{ fontSize: "11px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>Layout</span>
+                    <select
+                      value={current}
+                      onChange={e => setLayoutVariants(prev => ({ ...prev, [p.id]: e.target.value }))}
+                      style={{ padding: "5px 8px", fontSize: "12px", fontWeight: 500, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", maxWidth: "220px" }}>
+                      {variants.map(v => (
+                        <option key={v} value={v}>{variantLabels[v]}</option>
+                      ))}
+                    </select>
+                  </div>
                 );
               })}
             </div>
