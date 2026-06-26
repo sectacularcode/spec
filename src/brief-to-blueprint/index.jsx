@@ -804,22 +804,13 @@ export default function CustomBuild({ userId, role } = {}) {
               </button>
             )}
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px", flexWrap: "nowrap", overflowX: "auto" }}>
-            {steps.map((s, i) => (
-              <div key={s.n} style={{ display: "flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
-                {s.done && <span style={{ color: "#b45309", fontSize: "12px", fontWeight: 700 }}>✓</span>}
-                <span style={{ fontSize: "12px", color: s.done ? "#09090b" : "#9ca3af", fontWeight: s.done ? 600 : 400 }}>{s.label}</span>
-                {i < steps.length - 1 && <span style={{ color: "#dde0e6", marginLeft: "8px" }}>·</span>}
-              </div>
-            ))}
-          </div>
+
 
           {/* STEP 1 */}
           <div style={{ marginBottom: "32px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
               <div style={T.stepNum(true, !!brief)}>1</div>
               <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Brand Brief</div>
-              {brief && <span style={{ fontSize: "12px", color: "#09090b", marginLeft: "auto" }}>✓ {briefName}</span>}
             </div>
             <div style={{ ...T.surface, border: brief ? "1px solid #dde0e6" : "1px solid #dde0e6" }}>
               {!brief ? (
@@ -1057,6 +1048,18 @@ export default function CustomBuild({ userId, role } = {}) {
                   </button>
                 </div>
               )}
+              {/* Swap sections — moved from preview header into panel */}
+              {sectionLibrary.length > 0 && (
+                <div style={{ marginBottom: "16px" }}>
+                  <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "6px" }}>Sections</div>
+                  <button
+                    onClick={() => { setSwapDrawer(swapDrawer === previewPage ? null : previewPage); setSwapFilter(""); }}
+                    style={{ ...T.btnGhost, width: "100%", justifyContent: "space-between" }}>
+                    <span>Swap sections</span>
+                    <span style={{ color: "#9ca3af" }}>↗</span>
+                  </button>
+                </div>
+              )}
               <div style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "12px" }}>Download</div>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 {generated.pages.map(p => (
@@ -1122,14 +1125,7 @@ export default function CustomBuild({ userId, role } = {}) {
                   </div>
                 )}
               </div>
-              {/* Swap sections button */}
-              {sectionLibrary.length > 0 && (
-                <button
-                  onClick={() => { setSwapDrawer(previewPage); setSwapFilter(""); }}
-                  style={{ marginLeft: "8px", padding: "6px 14px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "20px", background: swapDrawer === previewPage ? "#3f3f46" : "#fff", color: swapDrawer === previewPage ? "#fff" : "#09090b" }}>
-                  Swap sections
-                </button>
-              )}
+
               {/* Desktop / Mobile toggle */}
               <div style={{ marginLeft: "auto", display: "flex", border: "1px solid #dde0e6", borderRadius: "6px", overflow: "hidden" }}>
                 <button
@@ -1145,39 +1141,22 @@ export default function CustomBuild({ userId, role } = {}) {
                   Mobile
                 </button>
               </div>
-              {/* Layout variant switcher */}
+              {/* Layout variant dropdown */}
               {generated.pages.filter(p => p.id === previewPage && p.hasVariants).map(p => {
+                var variantLabels = p.hasVariantC
+                  ? { A: "Awareness", B: "Lead Form", C: "Minimal" }
+                  : { A: "Layout A", B: "Layout B" };
                 var variants = p.hasVariantC ? ["A", "B", "C"] : ["A", "B"];
-                var variantLabels = { A: "Awareness", B: "Lead Form", C: "Minimal" };
+                var current = layoutVariants[p.id] || p.recommended || "A";
                 return (
-                <div key="switcher" style={{ marginLeft: "auto", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "4px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span style={{ fontSize: "11px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>Layout</span>
+                  <select key="variant-select"
+                    value={current}
+                    onChange={e => setLayoutVariants(prev => ({ ...prev, [p.id]: e.target.value }))}
+                    style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", marginLeft: "4px" }}>
                     {variants.map(v => (
-                      <button key={v}
-                        onClick={() => setLayoutVariants(prev => ({ ...prev, [p.id]: v }))}
-                        title={p.hasVariantC ? variantLabels[v] : v}
-                        style={{
-                          padding: "5px 14px", fontSize: "12px", fontWeight: 600, cursor: "pointer",
-                          border: (layoutVariants[p.id] || p.recommended) === v ? "1px solid #000" : "1px solid #dde0e6",
-                          borderRadius: "4px",
-                          background: (layoutVariants[p.id] || p.recommended) === v ? "#000" : "#fff",
-                          color: (layoutVariants[p.id] || p.recommended) === v ? "#fff" : "#6b7280",
-                          position: "relative",
-                        }}>
-                        {v}
-                        {v === p.recommended && (
-                          <span style={{ position: "absolute", top: "-6px", right: "-6px", fontSize: "9px", background: "#C2A35B", color: "#1C1A17", borderRadius: "3px", padding: "1px 4px", fontWeight: 700, letterSpacing: "0.05em" }}>REC</span>
-                        )}
-                      </button>
+                      <option key={v} value={v}>{variantLabels[v]}{v === p.recommended ? " ★" : ""}</option>
                     ))}
-                  </div>
-                  {p.hasVariantC && (
-                    <div style={{ fontSize: "10px", color: "#9ca3af", letterSpacing: "0.04em" }}>
-                      {variantLabels[layoutVariants[p.id] || p.recommended]}
-                    </div>
-                  )}
-                </div>
+                  </select>
                 );
               })}
             </div>
