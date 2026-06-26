@@ -636,7 +636,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           "<section style='background:#ffffff;padding:0;'>" +
             "<div style='display:grid;grid-template-columns:repeat(3,1fr);'>" +
               [[b1,"✓"],[b2,"✓"],[b3,"✓"]].map(function(b,i) {
-                return "<div style='padding:48px 36px;text-align:center;" + (i<2?"border-right:1px solid #f0f0f0;":"") + "'><div style='font-size:32px;color:" + brass + ";font-weight:800;margin-bottom:12px;'>" + b[1] + "</div><p style='font-size:16px;font-weight:600;color:" + ink + ";line-height:1.4;margin:0;'>" + b[0] + "</p></div>";
+                return "<div class='grid-cell' style='padding:48px 36px;text-align:center;" + (i<2?"border-right:1px solid #f0f0f0;":"") + "'><div style='font-size:32px;color:" + brass + ";font-weight:800;margin-bottom:12px;'>" + b[1] + "</div><p style='font-size:16px;font-weight:600;color:" + ink + ";line-height:1.4;margin:0;'>" + b[0] + "</p></div>";
               }).join("") +
             "</div>" +
           "</section>" +
@@ -676,7 +676,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "<section style='background:#ffffff;padding:0;border-bottom:1px solid #f0f0f0;'>" +
           "<div style='display:grid;grid-template-columns:repeat(3,1fr);'>" +
             [{ s:s1,l:l1 },{ s:s2,l:l2 },{ s:s3,l:l3 }].map(function(t,i) {
-              return "<div style='padding:40px 32px;text-align:center;" + (i<2?"border-right:1px solid #f0f0f0;":"") + "'><div style='font-size:42px;font-weight:800;color:" + brass + ";line-height:1;margin-bottom:6px;'>" + t.s + "</div><div style='font-size:14px;color:" + stone + ";font-weight:500;letter-spacing:0.02em;'>" + t.l + "</div></div>";
+              return "<div class='grid-cell' style='padding:40px 32px;text-align:center;" + (i<2?"border-right:1px solid #f0f0f0;":"") + "'><div style='font-size:42px;font-weight:800;color:" + brass + ";line-height:1;margin-bottom:6px;'>" + t.s + "</div><div style='font-size:14px;color:" + stone + ";font-weight:500;letter-spacing:0.02em;'>" + t.l + "</div></div>";
             }).join("") +
           "</div>" +
         "</section>" +
@@ -1484,7 +1484,9 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "footer{padding:32px 20px !important;}" +
         "footer > div{flex-direction:column !important;gap:16px !important;align-items:flex-start !important;}" +
         ".footer-nav{flex-direction:column !important;gap:12px !important;align-items:flex-start !important;}" +
-        "[style*='text-align:center'][style*='border-right']{text-align:left !important;}" +
+        ".grid-cell{text-align:left !important;padding:20px !important;border-right:none !important;border-bottom:1px solid rgba(0,0,0,0.06) !important;}" +
+        ".grid-cell:last-child{border-bottom:none !important;}" +
+
       "}" +
     "</style>" +
     "</head><body>" +
