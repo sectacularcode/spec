@@ -622,21 +622,21 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
 
       // ── VARIANT C — Minimal Retargeting ────────────────────────────────────
       if (variant === "C") {
-        return "<section style='background:" + brass + ";padding:clamp(48px,8vh,80px) clamp(24px,6vw,80px);text-align:center;'>" +
-            "<div style='max-width:760px;margin:0 auto;'>" +
+        return "<section style='background:" + brass + ";padding:clamp(80px,12vh,140px) clamp(24px,6vw,80px);text-align:center;min-height:50vh;display:flex;align-items:center;'>" +
+            "<div style='max-width:760px;margin:0 auto;width:100%;'>" +
               "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-bottom:20px;'>" + (brief.brandName||"Brand") + "</div>" +
-              "<h1 style='font-weight:800;font-size:clamp(32px,5.5vw,60px);color:#ffffff;margin:0 0 20px;line-height:1.08;'>" + h1 + "</h1>" +
-              "<p style='font-size:clamp(13px,3vw,15px);color:rgba(255,255,255,0.85);margin:0 0 24px;line-height:1.5;max-width:480px;margin-left:auto;margin-right:auto;'>" + sub + "</p>" +
+              "<h1 style='font-weight:800;font-size:clamp(36px,6vw,72px);color:#ffffff;margin:0 0 20px;line-height:1.05;'>" + h1 + "</h1>" +
+              "<p style='font-size:clamp(14px,1.5vw,18px);color:rgba(255,255,255,0.85);margin:0 0 32px;line-height:1.55;max-width:520px;margin-left:auto;margin-right:auto;'>" + sub + "</p>" +
               "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
                 "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
                 "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
               "</div>" +
             "</div>" +
           "</section>" +
-          "<section style='background:#ffffff;padding:0;border-bottom:1px solid #f0f0f0;'>" +
-            "<div style='display:flex;flex-direction:column;max-width:600px;margin:0 auto;padding:20px 0;'>" +
+          "<section style='background:#ffffff;padding:60px clamp(24px,6vw,80px);border-bottom:1px solid #f0f0f0;'>" +
+            "<div style='display:flex;flex-direction:column;max-width:680px;margin:0 auto;'>" +
               [[b1,"✓"],[b2,"✓"],[b3,"✓"]].map(function(b,i) {
-                return "<div class='grid-cell benefit-row' style='padding:20px 24px;display:flex;align-items:center;gap:12px;text-align:left;border-bottom:1px solid rgba(0,0,0,0.06);'><span style='font-size:22px;color:" + brass + ";font-weight:800;flex-shrink:0;line-height:1;'>✓</span><p style='font-size:clamp(13px,3.5vw,15px);font-weight:600;color:" + ink + ";line-height:1.3;margin:0;'>" + b[0] + "</p></div>";
+                return "<div class='grid-cell benefit-row' style='padding:24px 0;display:flex;align-items:center;gap:20px;text-align:left;border-bottom:1px solid rgba(0,0,0,0.08);'><span style='font-size:28px;color:" + brass + ";font-weight:800;flex-shrink:0;line-height:1;'>✓</span><p style='font-size:clamp(15px,2vw,20px);font-weight:600;color:" + ink + ";line-height:1.3;margin:0;'>" + b[0] + "</p></div>";
               }).join("") +
             "</div>" +
           "</section>" +
