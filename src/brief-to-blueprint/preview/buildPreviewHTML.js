@@ -248,7 +248,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       } else { // card-grid
         testimonialsHTML = "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);'><div style='max-width:1160px;margin:0 auto;'>" +
           "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Kind words</div>" +
-          "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 40px;'>What our clients say</h2>" +
+          "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 28px;'>What our clients say</h2>" +
           "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;'>" +
             ["This changed everything for our business.", "Professional and genuinely cared about the outcome.", "We saw results within the first month."].map(function(q) {
               return "<div style='background:#ffffff;border-left:3px solid " + brass + ";padding:28px;'><p style='font-size:17px;color:" + ink + ";line-height:1.5;margin:0 0 16px;font-style:italic;'>" + q + "</p><div style='font-size:14px;font-weight:600;color:" + ink + ";'>Client Name</div><div style='font-size:13px;color:" + stone + ";'>Role, Company</div></div>";
@@ -507,7 +507,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         var svgLines = [
           "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" + w + "\" height=\"" + h + "\">",
           "<rect width=\"" + w + "\" height=\"" + h + "\" fill=\"" + bg + "\"/>",
-          "<text x=\"" + (w/2) + "\" y=\"" + (h/2 - 18) + "\" font-family=\"Inter,system-ui,sans-serif\" font-size=\"14\" font-weight=\"600\" fill=\"#9ca3af\" text-anchor=\"middle\">" + label.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") + "</text>",
+          "<text x=\"" + (w/2) + "\" y=\"" + (h/2 - 18) + "\" font-family=\"Inter,system-ui,sans-serif\" font-size=\"12\" font-weight=\"400\" fill=\"#c4c9d4\" text-anchor=\"middle\">" + label.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") + "</text>",
           "<text x=\"" + (w/2) + "\" y=\"" + (h/2 + 6) + "\" font-family=\"Inter,system-ui,sans-serif\" font-size=\"12\" fill=\"#b0b8c4\" text-anchor=\"middle\">" + (sublabel||"Add photo here").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") + "</text>",
           "<rect x=\"" + (w/2-28) + "\" y=\"" + (h/2+18) + "\" width=\"56\" height=\"2\" rx=\"1\" fill=\"#d1d5db\"/>",
           "</svg>"
@@ -563,7 +563,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
 
       // ── VARIANT B — Lead Form ──────────────────────────────────────────────
       if (variant === "B") {
-        return "<section style='background:" + brass + ";padding:80px clamp(24px,6vw,80px);position:relative;'>" +
+        return "<section style='background:" + brass + ";padding:clamp(48px,8vh,80px) clamp(24px,6vw,80px);position:relative;'>" +
             "<div style='max-width:1100px;margin:0 auto;text-align:center;'>" +
               "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:16px;'>" + (brief.brandName||"Brand") + "</div>" +
               "<h1 style='font-weight:800;font-size:clamp(32px,5vw,56px);color:#ffffff;margin:0 0 18px;line-height:1.08;'>" + h1 + "</h1>" +
@@ -622,11 +622,11 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
 
       // ── VARIANT C — Minimal Retargeting ────────────────────────────────────
       if (variant === "C") {
-        return "<section style='background:" + brass + ";padding:100px clamp(24px,6vw,80px);text-align:center;'>" +
+        return "<section style='background:" + brass + ";padding:clamp(48px,8vh,80px) clamp(24px,6vw,80px);text-align:center;'>" +
             "<div style='max-width:760px;margin:0 auto;'>" +
               "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-bottom:20px;'>" + (brief.brandName||"Brand") + "</div>" +
               "<h1 style='font-weight:800;font-size:clamp(32px,5.5vw,60px);color:#ffffff;margin:0 0 20px;line-height:1.08;'>" + h1 + "</h1>" +
-              "<p style='font-size:18px;color:rgba(255,255,255,0.85);margin:0 0 40px;line-height:1.65;'>" + sub + "</p>" +
+              "<p style='font-size:clamp(14px,3.5vw,17px);color:rgba(255,255,255,0.85);margin:0 0 28px;line-height:1.55;'>" + sub + "</p>" +
               "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
                 "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
                 "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
@@ -636,7 +636,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           "<section style='background:#ffffff;padding:0;'>" +
             "<div style='display:grid;grid-template-columns:repeat(3,1fr);'>" +
               [[b1,"✓"],[b2,"✓"],[b3,"✓"]].map(function(b,i) {
-                return "<div class='grid-cell' style='padding:48px 36px;text-align:center;" + (i<2?"border-right:1px solid #f0f0f0;":"") + "'><div style='font-size:32px;color:" + brass + ";font-weight:800;margin-bottom:12px;'>" + b[1] + "</div><p style='font-size:16px;font-weight:600;color:" + ink + ";line-height:1.4;margin:0;'>" + b[0] + "</p></div>";
+                return "<div class='grid-cell' style='padding:48px 36px;text-align:center;" + (i<2?"border-right:1px solid #f0f0f0;":"") + "'><div style='font-size:32px;color:" + brass + ";font-weight:800;margin-bottom:12px;'>" + b[1] + "</div><p style='font-size:clamp(13px,3.5vw,15px);font-weight:600;color:" + ink + ";line-height:1.35;margin:0;'>" + b[0] + "</p></div>";
               }).join("") +
             "</div>" +
           "</section>" +
@@ -658,7 +658,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       }
 
       // ── VARIANT A — Awareness / Feature (default) ──────────────────────────
-      return "<section style='position:relative;min-height:80vh;display:flex;align-items:center;padding:80px clamp(24px,6vw,80px);overflow:hidden;'>" +
+      return "<section style='position:relative;min-height:70vh;display:flex;align-items:center;padding:clamp(48px,8vh,80px) clamp(24px,6vw,80px);overflow:hidden;'>" +
           "<img src=\"" + heroImg + "\" alt='hero' style='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;'/>" +
           "<div style='position:absolute;inset:0;background:" + brass + ";opacity:0.85;z-index:1;'></div>" +
           "<div style='position:relative;z-index:2;width:100%;max-width:1100px;margin:0 auto;padding:0 clamp(16px,4vw,60px);'>" +
@@ -685,7 +685,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           var imgDiv  = "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>";
           return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + (f[3] ? imgDiv+textDiv : textDiv+imgDiv) + "</section>";
         }).join("") +
-        "<section style='background:#ffffff;padding:80px clamp(24px,6vw,80px);'>" +
+        "<section style='background:" + bone + ";padding:80px clamp(24px,6vw,80px);border-top:3px solid " + brass + ";'>" +
           "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 32px;'>" + (brief.servicesHeading||"What We Do") + "</h2>" +
           "<div style='display:grid;grid-template-columns:1fr 1fr;gap:0;max-width:900px;'>" +
             svcs.map(function(s) {
@@ -1443,7 +1443,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "[style*='grid-template-columns']{grid-template-columns:1fr !important;gap:0 !important;}" +
         "section[style*='display:grid']{display:flex !important;flex-direction:column !important;}" +
         ".landing-img{min-height:240px !important;order:1 !important;}" +
-        ".feature-text{order:2 !important;padding:32px 20px !important;}" +
+        ".feature-text{order:2 !important;padding:24px 20px 32px 20px !important;}" +
         ".landing-img img{min-height:240px !important;height:240px !important;object-fit:cover !important;}" +
         "[style*='padding:60px 48px']{padding:32px 20px !important;}" +
         ".feature-text{padding-top:28px !important;}" +
@@ -1460,7 +1460,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "[style*='display:flex'][style*='gap:40px']{flex-direction:column !important;gap:16px !important;}" +
         "[style*='display:flex'][style*='gap:48px'],[style*='display:flex'][style*='gap:64px'],[style*='display:flex'][style*='gap:80px']{flex-direction:column !important;gap:20px !important;}" +
         ".cta-btn{display:block !important;width:100% !important;box-sizing:border-box !important;text-align:center !important;margin-bottom:10px !important;}" +
-        ".row-btn{display:inline-block !important;width:auto !important;margin-top:8px !important;}" +
+        ".row-btn{display:inline-block !important;width:auto !important;max-width:fit-content !important;padding:10px 20px !important;font-size:12px !important;letter-spacing:0.08em !important;margin-top:8px !important;}" +
         ".footer-link{display:inline !important;width:auto !important;text-align:left !important;margin-bottom:0 !important;}" +
         "button[style*='padding:14px']{width:100% !important;box-sizing:border-box !important;}" +
         "h1{font-size:clamp(26px,7vw,36px) !important;line-height:1.15 !important;}" +
@@ -1478,7 +1478,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "div[style='height:40px']{height:12px !important;}" +
         "div[style='height:32px']{height:10px !important;}" +
         "div[style='height:24px']{height:8px !important;}" +
-        "[style*='min-height:80vh'],[style*='min-height:70vh']{min-height:55vh !important;}" +
+        "[style*='min-height:80vh'],[style*='min-height:70vh']{min-height:50vh !important;padding-top:36px !important;padding-bottom:36px !important;}" +
         "[style*='min-height:420px']{min-height:240px !important;}" +
         "[style*='min-height:400px']{min-height:240px !important;}" +
         "[style*='max-width:1100px'],[style*='max-width:1060px'],[style*='max-width:900px']{max-width:100% !important;}" +
