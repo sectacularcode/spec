@@ -466,15 +466,33 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
 
     landing: (function() {
       // Derive an Unsplash image keyword from the brief to get contextual imagery
-      var imgKeyword = (brief.valueProposition || brief.targetAudience || brief.brandName || "business")
-        .toLowerCase().replace(/[^a-z0-9 ]/g, " ").split(" ").filter(function(w) { return w.length > 3; }).slice(0,2).join(",") || "commercial,business";
-      // Use picsum for reliable placeholder images with a seed derived from brand name
-      var seed1 = (brief.brandName || "brand").split("").reduce(function(a,c){return a+c.charCodeAt(0);},0) % 900 + 100;
-      var seed2 = seed1 + 17; var seed3 = seed1 + 34;
-      var img1 = "https://picsum.photos/seed/" + seed1 + "/800/600";
-      var img2 = "https://picsum.photos/seed/" + seed2 + "/800/600";
-      var img3 = "https://picsum.photos/seed/" + seed3 + "/800/600";
-      var heroImg = "https://picsum.photos/seed/" + (seed1+50) + "/1400/700";
+      // Derive industry-relevant Unsplash keywords from the brief
+      // Priority: valueProposition > targetAudience > servicesHeading > brandName
+      var rawText = (brief.valueProposition || brief.targetAudience || brief.servicesHeading || brief.brandName || "business").toLowerCase();
+      // Map common industry signals to specific Unsplash-friendly photo keywords
+      var imgKeyword = "commercial,business";
+      if (/fleet|truck|semi|trailer|freight|transport|logistics/.test(rawText)) imgKeyword = "truck,fleet";
+      else if (/paint|body.?shop|collision|auto.?repair|vehicle.?repair/.test(rawText)) imgKeyword = "auto,repair,shop";
+      else if (/restaurant|food|cafe|kitchen|dining/.test(rawText)) imgKeyword = "restaurant,food";
+      else if (/medical|health|clinic|dental|physician/.test(rawText)) imgKeyword = "medical,healthcare";
+      else if (/construction|contractor|building|renovation/.test(rawText)) imgKeyword = "construction,building";
+      else if (/real.?estate|property|homes|realty/.test(rawText)) imgKeyword = "real,estate,house";
+      else if (/law|attorney|legal|firm/.test(rawText)) imgKeyword = "law,office,professional";
+      else if (/tech|software|saas|app|digital/.test(rawText)) imgKeyword = "technology,office";
+      else if (/fitness|gym|wellness|training/.test(rawText)) imgKeyword = "fitness,gym";
+      else if (/salon|beauty|spa|hair/.test(rawText)) imgKeyword = "beauty,salon";
+      else if (/landscape|lawn|garden/.test(rawText)) imgKeyword = "landscaping,garden";
+      else if (/plumb|electric|hvac|mechanical/.test(rawText)) imgKeyword = "plumbing,contractor";
+      else if (/hotel|hospitality|resort/.test(rawText)) imgKeyword = "hotel,hospitality";
+      // Build keyword variants for feature row images
+      var kw1 = imgKeyword;
+      var kw2 = imgKeyword.split(",").reverse().join(",");
+      var kw3 = imgKeyword + ",professional";
+      var kwHero = imgKeyword + ",wide";
+      var img1    = "https://source.unsplash.com/800x600/?" + encodeURIComponent(kw1);
+      var img2    = "https://source.unsplash.com/800x600/?" + encodeURIComponent(kw2);
+      var img3    = "https://source.unsplash.com/800x600/?" + encodeURIComponent(kw3);
+      var heroImg = "https://source.unsplash.com/1400x700/?" + encodeURIComponent(kwHero);
 
       var h1    = brief.heroHeadline  || "Your offer, clearly stated.";
       var sub   = brief.heroSubhead   || "One clear value proposition. One clear action.";
