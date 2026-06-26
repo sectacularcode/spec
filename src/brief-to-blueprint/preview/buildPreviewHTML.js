@@ -636,7 +636,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           "<section style='background:#ffffff;padding:0;border-bottom:1px solid #f0f0f0;'>" +
             "<div style='display:flex;flex-direction:column;max-width:600px;margin:0 auto;padding:20px 0;'>" +
               [[b1,"✓"],[b2,"✓"],[b3,"✓"]].map(function(b,i) {
-                return "<div class='grid-cell benefit-row' style='padding:20px 24px;display:flex;align-items:center;gap:16px;text-align:left;border-bottom:1px solid rgba(0,0,0,0.06);'><span style='font-size:22px;color:" + brass + ";font-weight:800;flex-shrink:0;line-height:1;'>✓</span><p style='font-size:clamp(13px,3.5vw,15px);font-weight:600;color:" + ink + ";line-height:1.3;margin:0;'>" + b[0] + "</p></div>";
+                return "<div class='grid-cell benefit-row' style='padding:20px 24px;display:flex;align-items:center;gap:12px;text-align:left;border-bottom:1px solid rgba(0,0,0,0.06);'><span style='font-size:22px;color:" + brass + ";font-weight:800;flex-shrink:0;line-height:1;'>✓</span><p style='font-size:clamp(13px,3.5vw,15px);font-weight:600;color:" + ink + ";line-height:1.3;margin:0;'>" + b[0] + "</p></div>";
               }).join("") +
             "</div>" +
           "</section>" +
