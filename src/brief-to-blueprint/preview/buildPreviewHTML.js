@@ -489,10 +489,10 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       var kw2 = imgKeyword.split(",").reverse().join(",");
       var kw3 = imgKeyword + ",professional";
       var kwHero = imgKeyword + ",wide";
-      var img1    = "https://source.unsplash.com/800x600/?" + encodeURIComponent(kw1);
-      var img2    = "https://source.unsplash.com/800x600/?" + encodeURIComponent(kw2);
-      var img3    = "https://source.unsplash.com/800x600/?" + encodeURIComponent(kw3);
-      var heroImg = "https://source.unsplash.com/1400x700/?" + encodeURIComponent(kwHero);
+      var img1    = "https://loremflickr.com/800/600/" + encodeURIComponent(kw1) + "?lock=1";
+      var img2    = "https://loremflickr.com/800/600/" + encodeURIComponent(kw2) + "?lock=2";
+      var img3    = "https://loremflickr.com/800/600/" + encodeURIComponent(kw3) + "?lock=3";
+      var heroImg = "https://loremflickr.com/1400/700/" + encodeURIComponent(kwHero) + "?lock=4";
 
       var h1    = brief.heroHeadline  || "Your offer, clearly stated.";
       var sub   = brief.heroSubhead   || "One clear value proposition. One clear action.";
