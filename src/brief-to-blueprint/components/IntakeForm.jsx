@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { INTAKE_TABS, DEFAULT_COLORS, DEFAULT_TIERS } from "../../constants/pages.js";
+import { INTAKE_TABS, DEFAULT_COLORS, DEFAULT_TIERS, ALL_PAGES, ADDITIONAL_PAGE_TYPES } from "../../constants/pages.js";
 
 // Multi-step intake form for manual brief entry.
 // Produces a brief object that gets passed to generatePages() and buildPreviewHTML().
