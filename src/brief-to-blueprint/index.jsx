@@ -567,7 +567,7 @@ export default function CustomBuild({ userId, role } = {}) {
 
   function getPageData(p) {
     var variant = layoutVariants[p.id] || "A";
-    var baseData = variant === "B" && p.variantB ? p.variantB : p.variantA || p.data;
+    var baseData = variant === "C" && p.variantC ? p.variantC : variant === "B" && p.variantB ? p.variantB : p.variantA || p.data;
     // Apply any section overrides for this page
     var overrides = pageOverrides[p.id];
     if (!overrides || Object.keys(overrides).length === 0) return baseData;
@@ -1146,13 +1146,17 @@ export default function CustomBuild({ userId, role } = {}) {
                 </button>
               </div>
               {/* Layout variant switcher */}
-              {generated.pages.filter(p => p.id === previewPage && p.hasVariants).map(p => (
+              {generated.pages.filter(p => p.id === previewPage && p.hasVariants).map(p => {
+                var variants = p.hasVariantC ? ["A", "B", "C"] : ["A", "B"];
+                var variantLabels = { A: "Awareness", B: "Lead Form", C: "Minimal" };
+                return (
                 <div key="switcher" style={{ marginLeft: "auto", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "4px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                     <span style={{ fontSize: "11px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>Layout</span>
-                    {["A", "B"].map(v => (
+                    {variants.map(v => (
                       <button key={v}
                         onClick={() => setLayoutVariants(prev => ({ ...prev, [p.id]: v }))}
+                        title={p.hasVariantC ? variantLabels[v] : v}
                         style={{
                           padding: "5px 14px", fontSize: "12px", fontWeight: 600, cursor: "pointer",
                           border: (layoutVariants[p.id] || p.recommended) === v ? "1px solid #000" : "1px solid #dde0e6",
@@ -1168,8 +1172,14 @@ export default function CustomBuild({ userId, role } = {}) {
                       </button>
                     ))}
                   </div>
+                  {p.hasVariantC && (
+                    <div style={{ fontSize: "10px", color: "#9ca3af", letterSpacing: "0.04em" }}>
+                      {variantLabels[layoutVariants[p.id] || p.recommended]}
+                    </div>
+                  )}
                 </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Swap drawer */}
