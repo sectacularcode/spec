@@ -846,7 +846,7 @@ export default function CustomBuild({ userId, role } = {}) {
                         }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                           <span style={{ fontSize: "12px", fontWeight: 700, color: active ? "#b45309" : "#09090b" }}>{labels[v]}</span>
-                          {isRec && <span style={{ fontSize: "9px", fontWeight: 700, background: "#b45309", color: "#fff", borderRadius: "3px", padding: "1px 5px", letterSpacing: "0.04em" }}>DEFAULT</span>}
+                          {isRec && <span style={{ fontSize: "9px", fontWeight: 700, background: "#b45309", color: "#fff", borderRadius: "3px", padding: "1px 5px", letterSpacing: "0.04em" }}>RECOMMENDED</span>}
                           {active && <span style={{ marginLeft: "auto", fontSize: "11px", color: "#b45309" }}>✓ Active</span>}
                         </div>
                         <span style={{ fontSize: "11px", color: "#6b7280", lineHeight: 1.45 }}>{descs[v]}</span>
@@ -1178,8 +1178,8 @@ export default function CustomBuild({ userId, role } = {}) {
                 )}
               </div>
 
-              {/* Desktop / Mobile toggle */}
-              <div style={{ display: "flex", border: "1px solid #dde0e6", borderRadius: "6px", overflow: "hidden" }}>
+              {/* Desktop / Mobile toggle — pushed to far right */}
+              <div style={{ marginLeft: "auto", display: "flex", border: "1px solid #dde0e6", borderRadius: "6px", overflow: "hidden" }}>
                 <button
                   onClick={() => setMobilePreview(false)}
                   title="Desktop preview"
