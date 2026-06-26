@@ -564,7 +564,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       // ── VARIANT B — Lead Form ──────────────────────────────────────────────
       if (variant === "B") {
         return "<section style='background:" + brass + ";padding:clamp(48px,8vh,80px) clamp(24px,6vw,80px);position:relative;'>" +
-            "<div style='max-width:1100px;margin:0 auto;text-align:center;'>" +
+            "<div class='var-b-hero' style='max-width:1100px;margin:0 auto;text-align:center;'>" +
               "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:16px;'>" + (brief.brandName||"Brand") + "</div>" +
               "<h1 style='font-weight:800;font-size:clamp(32px,5vw,56px);color:#ffffff;margin:0 0 18px;line-height:1.08;'>" + h1 + "</h1>" +
               (hook ? "<p style='font-size:18px;color:rgba(255,255,255,0.85);margin:0 0 12px;line-height:1.6;font-style:italic;'>" + hook + "</p>" : "") +
@@ -573,7 +573,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             "</div>" +
           "</section>" +
           "<section style='background:" + bone + ";padding:80px clamp(24px,6vw,80px);'>" +
-            "<div style='max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;'>" +
+            "<div class='var-b-body' style='max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;'>" +
               "<div>" +
                 "<h2 style='font-size:clamp(24px,3vw,36px);font-weight:700;color:" + ink + ";margin:0 0 32px;'>Why " + (brief.brandName||"us") + "?</h2>" +
                 "<div style='display:flex;flex-direction:column;gap:28px;'>" +
@@ -594,7 +594,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             "</div>" +
           "</section>" +
           "<section style='background:#ffffff;padding:80px clamp(24px,6vw,80px);'>" +
-            "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";text-align:center;margin:0 0 48px;'>What our clients say</h2>" +
+            "<h2 class='var-b-testi-h' style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";text-align:center;margin:0 0 48px;'>What our clients say</h2>" +
             "<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:32px;max-width:1100px;margin:0 auto;'>" +
               [[tq1,tn1,tt1],[tq2,tn2,tt2],[tq3,tn3,tt3]].map(function(t) {
                 return "<div style='background:#ffffff;border-radius:6px;padding:28px;box-shadow:0 1px 4px rgba(0,0,0,0.06);'><p style='font-size:16px;font-style:italic;color:" + ink + ";line-height:1.7;margin:0 0 20px;'>&#8220;" + t[0] + "&#8221;</p><div style='width:32px;height:2px;background:" + brass + ";margin-bottom:12px;'></div><div style='font-size:14px;font-weight:600;color:" + ink + ";'>" + t[1] + "</div><div style='font-size:13px;color:" + stone + ";'>" + t[2] + "</div></div>";
@@ -661,7 +661,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       return "<section style='position:relative;min-height:70vh;display:flex;align-items:center;padding:clamp(48px,8vh,80px) clamp(24px,6vw,80px);overflow:hidden;'>" +
           "<img src=\"" + heroImg + "\" alt='hero' style='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;'/>" +
           "<div style='position:absolute;inset:0;background:" + brass + ";opacity:0.85;z-index:1;'></div>" +
-          "<div style='position:relative;z-index:2;width:100%;max-width:1100px;margin:0 auto;padding:0 clamp(16px,4vw,60px);'>" +
+          "<div class='var-a-wrap' style='position:relative;z-index:2;width:100%;max-width:1100px;margin:0 auto;padding:0 clamp(16px,4vw,60px);'>" +
           "<div style='max-width:660px;'>" +
             "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:20px;'>" + (brief.brandName||"Brand") + "</div>" +
             "<h1 style='font-weight:800;font-size:clamp(32px,5.5vw,62px);color:#ffffff;margin:0 0 20px;line-height:1.08;'>" + h1 + "</h1>" +
@@ -1492,6 +1492,19 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "[style*=\"box-shadow:0 1px 4px\"]{margin-bottom:12px !important;}" +
         "[style*='min-height:50vh']{min-height:0 !important;}" +
         "[style*='padding:80px clamp(24px,6vw,80px)']{padding:36px 20px !important;}" +
+        "" +
+        /* VARIANT A — fully left aligned on mobile */
+        ".var-a-wrap,.var-a-wrap *{text-align:left !important;}" +
+        ".var-a-wrap .cta-btn{text-align:center !important;}" +
+        ".feature-text h2,.feature-text p{text-align:left !important;}" +
+        ".feature-text .row-btn{align-self:flex-start !important;}" +
+        /* VARIANT B — fully center aligned on mobile */
+        ".var-b-hero,.var-b-hero *{text-align:center !important;}" +
+        ".var-b-body{text-align:center !important;}" +
+        ".var-b-body h2,.var-b-body p,.var-b-body div{text-align:center !important;}" +
+        ".var-b-testi-h{text-align:center !important;}" +
+        /* VARIANT C — center hero (default), left body */
+        ".benefit-row,.benefit-row *{text-align:left !important;}" +
 
       "}" +
     "a.cta-btn,a.row-btn{transition:opacity 0.15s ease,transform 0.15s ease,background-color 0.15s ease,color 0.15s ease;}" +
