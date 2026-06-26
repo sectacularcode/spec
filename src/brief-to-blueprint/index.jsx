@@ -550,6 +550,17 @@ export default function CustomBuild({ userId, role } = {}) {
     a.click(); URL.revokeObjectURL(a.href);
   }
 
+  function downloadPreview(pageId, variant) {
+    if (!brief) return;
+    var html = buildPreviewHTML(brief, pageId, variant || layoutVariants[pageId] || "A", generated?.inspoContext || "");
+    var blob = new Blob([html], { type: "text/html" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = slugify(clientName || brief?.brandName) + "-" + pageId + "-preview.html";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
   function slugify(name) {
     return (name || "client").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
   }
@@ -1040,6 +1051,14 @@ export default function CustomBuild({ userId, role } = {}) {
                   <span>Footer</span><span style={{ color: "#9ca3af" }}>↓ .json</span>
                 </button>
               </div>
+              <div style={{ height: "1px", background: "#dde0e6", margin: "8px 0" }} />
+              <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "4px" }}>Preview</div>
+              {generated.pages.map(p => (
+                <button key={p.id + "-preview"} onClick={() => downloadPreview(p.id, layoutVariants[p.id] || "A")} style={{ ...T.btnGhost, textAlign: "left", display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                  <span>{(p.label || p.id).replace(/-\d{5,}$/, "")}</span><span style={{ color: "#9ca3af" }}>↓ .html</span>
+                </button>
+              ))}
+              <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "6px", lineHeight: 1.5 }}>Open in browser to scroll and screenshot the full page.</div>
               <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "12px" }}>
                 Import via WordPress → Templates → Saved Templates → Import Templates.
               </div>
