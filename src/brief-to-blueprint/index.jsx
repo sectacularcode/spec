@@ -1128,8 +1128,29 @@ export default function CustomBuild({ userId, role } = {}) {
                 )}
               </div>
 
+              {/* Layout variant dropdown — left of desktop/mobile toggle */}
+              {generated.pages.filter(p => p.id === previewPage && p.hasVariants).map(p => {
+                var variantLabels = p.hasVariantC
+                  ? { A: "Awareness — Features + Checklist", B: "Lead Form — Quote Request + Testimonials", C: "Retargeting — High-Contrast Single CTA for Warm Audiences" }
+                  : { A: "Layout A", B: "Layout B" };
+                var variants = p.hasVariantC ? ["A", "B", "C"] : ["A", "B"];
+                var current = layoutVariants[p.id] || p.recommended || "A";
+                return (
+                  <div key="variant-select" style={{ display: "flex", alignItems: "center", gap: "6px", marginLeft: "auto" }}>
+                    <span style={{ fontSize: "11px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>Layout</span>
+                    <select
+                      value={current}
+                      onChange={e => setLayoutVariants(prev => ({ ...prev, [p.id]: e.target.value }))}
+                      style={{ padding: "5px 8px", fontSize: "12px", fontWeight: 500, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", maxWidth: "260px" }}>
+                      {variants.map(v => (
+                        <option key={v} value={v}>{variantLabels[v]}{v === (p.recommended || "A") ? " — recommended" : ""}</option>
+                      ))}
+                    </select>
+                  </div>
+                );
+              })}
               {/* Desktop / Mobile toggle */}
-              <div style={{ marginLeft: "auto", display: "flex", border: "1px solid #dde0e6", borderRadius: "6px", overflow: "hidden" }}>
+              <div style={{ display: "flex", border: "1px solid #dde0e6", borderRadius: "6px", overflow: "hidden" }}>
                 <button
                   onClick={() => setMobilePreview(false)}
                   title="Desktop preview"
@@ -1143,27 +1164,6 @@ export default function CustomBuild({ userId, role } = {}) {
                   Mobile
                 </button>
               </div>
-              {/* Layout variant dropdown */}
-              {generated.pages.filter(p => p.id === previewPage && p.hasVariants).map(p => {
-                var variantLabels = p.hasVariantC
-                  ? { A: "Awareness — Features + Checklist", B: "Lead Form — Quote Request + Testimonials", C: "Retargeting — Minimal Single CTA" }
-                  : { A: "Layout A", B: "Layout B" };
-                var variants = p.hasVariantC ? ["A", "B", "C"] : ["A", "B"];
-                var current = layoutVariants[p.id] || p.recommended || "A";
-                return (
-                  <div key="variant-select" style={{ display: "flex", alignItems: "center", gap: "6px", marginLeft: "4px" }}>
-                    <span style={{ fontSize: "11px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>Layout</span>
-                    <select
-                      value={current}
-                      onChange={e => setLayoutVariants(prev => ({ ...prev, [p.id]: e.target.value }))}
-                      style={{ padding: "5px 8px", fontSize: "12px", fontWeight: 500, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", maxWidth: "220px" }}>
-                      {variants.map(v => (
-                        <option key={v} value={v}>{variantLabels[v]}</option>
-                      ))}
-                    </select>
-                  </div>
-                );
-              })}
             </div>
 
             {/* Swap drawer */}
