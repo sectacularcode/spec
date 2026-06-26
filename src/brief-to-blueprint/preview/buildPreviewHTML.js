@@ -559,7 +559,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       var btnStyle = "display:inline-block;padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:700;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:3px;";
       var btnClass = "cta-btn";
       var btnOutline = "display:inline-block;padding:13px 28px;background:transparent;color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:2px solid rgba(255,255,255,0.6);border-radius:3px;";
-      var btnDark = "display:inline-block;padding:10px 24px;background:transparent;color:" + ink + ";font-weight:600;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border:2px solid " + brass + ";border-radius:3px;align-self:flex-start;";
+      var btnDark = "display:inline-block;padding:10px 24px;background:transparent;color:" + ink + ";font-weight:600;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border:2px solid " + brass + ";border-radius:3px;align-self:flex-start;width:fit-content;";
 
       // ── VARIANT B — Lead Form ──────────────────────────────────────────────
       if (variant === "B") {
@@ -666,7 +666,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:20px;'>" + (brief.brandName||"Brand") + "</div>" +
             "<h1 style='font-weight:800;font-size:clamp(32px,5.5vw,62px);color:#ffffff;margin:0 0 20px;line-height:1.08;'>" + h1 + "</h1>" +
             (hook ? "<p style='font-size:18px;color:rgba(255,255,255,0.9);margin:0 0 12px;line-height:1.6;font-style:italic;'>" + hook + "</p>" : "") +
-            "<p style='font-size:clamp(14px,3.5vw,16px);color:rgba(255,255,255,0.82);margin:0 0 28px;line-height:1.55;max-width:560px;'>" + sub + "</p>" +
+            "<p style='font-size:clamp(13px,3.5vw,16px);color:rgba(255,255,255,0.82);margin:0 0 28px;line-height:1.55;max-width:560px;'>" + sub + "</p>" +
             "<div style='display:flex;gap:16px;flex-wrap:wrap;align-items:center;'>" +
               "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "display:inline-block;'>" + cta1 + "</a>" +
               "<a class='cta-btn' style='" + btnOutline + "display:inline-block;'>" + cta2 + "</a>" +
@@ -1485,8 +1485,9 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "footer{padding:32px 20px !important;}" +
         "footer > div{flex-direction:column !important;gap:16px !important;align-items:flex-start !important;}" +
         ".footer-nav{flex-direction:column !important;gap:12px !important;align-items:flex-start !important;}" +
-        ".benefit-row{padding:16px 20px !important;}" +
+        ".benefit-row{padding:16px 20px !important;display:flex !important;flex-direction:row !important;align-items:center !important;}" +
         ".benefit-row:last-child{border-bottom:none !important;}" +
+        "[style*=\"box-shadow:0 1px 4px\"]{margin-bottom:16px !important;}" +
 
       "}" +
     "a.cta-btn,a.row-btn{transition:opacity 0.15s ease,transform 0.15s ease,background-color 0.15s ease,color 0.15s ease;}" +
