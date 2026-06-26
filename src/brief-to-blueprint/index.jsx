@@ -808,6 +808,56 @@ export default function CustomBuild({ userId, role } = {}) {
           </div>
 
 
+          {/* Layout variant picker — shown when generated page has variants */}
+          {generated && (() => {
+            const activePage = generated.pages.find(p => p.id === previewPage);
+            if (!activePage || !activePage.hasVariants) return null;
+            const isLanding = activePage.hasVariantC;
+            const variants = isLanding ? ["A","B","C"] : ["A","B"];
+            const labels = isLanding
+              ? { A: "Awareness", B: "Lead Form", C: "Retargeting" }
+              : { A: "Layout A", B: "Layout B" };
+            const descs = isLanding
+              ? {
+                  A: "Feature rows + services checklist with dual phone and contact CTAs. Best for cold traffic and brand awareness.",
+                  B: "Inline quote request form with testimonials and feature rows. Best for high-intent traffic ready to convert.",
+                  C: "Tight hero, three outcome bullets, single testimonial, one CTA. Best for retargeting warm audiences.",
+                }
+              : { A: "Primary layout for this page type.", B: "Alternate layout with a different section structure." };
+            const current = layoutVariants[previewPage] || activePage.recommended || "A";
+            return (
+              <div style={{ marginBottom: "28px" }}>
+                <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>
+                  Layout — {(activePage.label || previewPage).replace(/-\d+$/, "")}
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {variants.map(v => {
+                    const active = current === v;
+                    const isRec  = v === (activePage.recommended || "A");
+                    return (
+                      <div
+                        key={v}
+                        onClick={() => setLayoutVariants(prev => ({ ...prev, [previewPage]: v }))}
+                        style={{
+                          padding: "10px 14px", borderRadius: "6px", cursor: "pointer",
+                          border: active ? "1px solid #b45309" : "1px solid #dde0e6",
+                          background: active ? "rgba(180,83,9,0.04)" : "#ffffff",
+                          display: "flex", flexDirection: "column", gap: "3px",
+                        }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <span style={{ fontSize: "12px", fontWeight: 700, color: active ? "#b45309" : "#09090b" }}>{labels[v]}</span>
+                          {isRec && <span style={{ fontSize: "9px", fontWeight: 700, background: "#b45309", color: "#fff", borderRadius: "3px", padding: "1px 5px", letterSpacing: "0.04em" }}>DEFAULT</span>}
+                          {active && <span style={{ marginLeft: "auto", fontSize: "11px", color: "#b45309" }}>✓ Active</span>}
+                        </div>
+                        <span style={{ fontSize: "11px", color: "#6b7280", lineHeight: 1.45 }}>{descs[v]}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+
           {/* STEP 1 */}
           <div style={{ marginBottom: "32px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
@@ -1128,35 +1178,6 @@ export default function CustomBuild({ userId, role } = {}) {
                 )}
               </div>
 
-              {/* Layout variant dropdown — compact labels, description shown below */}
-              {generated.pages.filter(p => p.id === previewPage && p.hasVariants).map(p => {
-                var shortLabels = p.hasVariantC
-                  ? { A: "Awareness", B: "Lead Form", C: "Retargeting" }
-                  : { A: "Layout A", B: "Layout B" };
-                var descriptions = p.hasVariantC
-                  ? { A: "Features + checklist, dual CTA", B: "Quote form + testimonials", C: "High-contrast single CTA for warm audiences" }
-                  : { A: "", B: "" };
-                var variants = p.hasVariantC ? ["A", "B", "C"] : ["A", "B"];
-                var current = layoutVariants[p.id] || p.recommended || "A";
-                return (
-                  <div key="variant-select" style={{ display: "flex", alignItems: "center", gap: "6px", marginLeft: "auto" }}>
-                    <span style={{ fontSize: "11px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>Layout</span>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                      <select
-                        value={current}
-                        onChange={e => setLayoutVariants(prev => ({ ...prev, [p.id]: e.target.value }))}
-                        style={{ padding: "5px 8px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", minWidth: "120px" }}>
-                        {variants.map(v => (
-                          <option key={v} value={v}>{shortLabels[v]}{v === (p.recommended || "A") ? " ↩" : ""}</option>
-                        ))}
-                      </select>
-                      {p.hasVariantC && descriptions[current] && (
-                        <span style={{ fontSize: "10px", color: "#9ca3af", lineHeight: 1.3, maxWidth: "160px" }}>{descriptions[current]}</span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
               {/* Desktop / Mobile toggle */}
               <div style={{ display: "flex", border: "1px solid #dde0e6", borderRadius: "6px", overflow: "hidden" }}>
                 <button
