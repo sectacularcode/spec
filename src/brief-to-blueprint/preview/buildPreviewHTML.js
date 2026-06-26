@@ -466,33 +466,59 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
 
     landing: (function() {
       // Derive an Unsplash image keyword from the brief to get contextual imagery
-      // Derive industry-relevant Unsplash keywords from the brief
-      // Priority: valueProposition > targetAudience > servicesHeading > brandName
+      // Curated Unsplash photo IDs per industry — clean, logo-free, relevant
+      // Each industry gets 4 specific photos: hero, feature1, feature2, feature3
+      // IDs chosen to be generic enough to work across brands in that category
       var rawText = (brief.valueProposition || brief.targetAudience || brief.servicesHeading || brief.brandName || "business").toLowerCase();
-      // Map common industry signals to specific Unsplash-friendly photo keywords
-      var imgKeyword = "commercial,business";
-      if (/fleet|truck|semi|trailer|freight|transport|logistics/.test(rawText)) imgKeyword = "truck,fleet";
-      else if (/paint|body.?shop|collision|auto.?repair|vehicle.?repair/.test(rawText)) imgKeyword = "auto,repair,shop";
-      else if (/restaurant|food|cafe|kitchen|dining/.test(rawText)) imgKeyword = "restaurant,food";
-      else if (/medical|health|clinic|dental|physician/.test(rawText)) imgKeyword = "medical,healthcare";
-      else if (/construction|contractor|building|renovation/.test(rawText)) imgKeyword = "construction,building";
-      else if (/real.?estate|property|homes|realty/.test(rawText)) imgKeyword = "real,estate,house";
-      else if (/law|attorney|legal|firm/.test(rawText)) imgKeyword = "law,office,professional";
-      else if (/tech|software|saas|app|digital/.test(rawText)) imgKeyword = "technology,office";
-      else if (/fitness|gym|wellness|training/.test(rawText)) imgKeyword = "fitness,gym";
-      else if (/salon|beauty|spa|hair/.test(rawText)) imgKeyword = "beauty,salon";
-      else if (/landscape|lawn|garden/.test(rawText)) imgKeyword = "landscaping,garden";
-      else if (/plumb|electric|hvac|mechanical/.test(rawText)) imgKeyword = "plumbing,contractor";
-      else if (/hotel|hospitality|resort/.test(rawText)) imgKeyword = "hotel,hospitality";
-      // Build keyword variants for feature row images
-      var kw1 = imgKeyword;
-      var kw2 = imgKeyword.split(",").reverse().join(",");
-      var kw3 = imgKeyword + ",professional";
-      var kwHero = imgKeyword + ",wide";
-      var img1    = "https://loremflickr.com/800/600/" + encodeURIComponent(kw1) + "?lock=1";
-      var img2    = "https://loremflickr.com/800/600/" + encodeURIComponent(kw2) + "?lock=2";
-      var img3    = "https://loremflickr.com/800/600/" + encodeURIComponent(kw3) + "?lock=3";
-      var heroImg = "https://loremflickr.com/1400/700/" + encodeURIComponent(kwHero) + "?lock=4";
+      var photos = {
+        // Semi trucks, fleet vehicles, mechanics at work — no logos
+        fleet:        ["1558618666-fcd25c85cd64","1473321473278-45b97524c5e5","1581091226825-a6a2a5aee158","1504270997636-5d1c9e6f9e53"],
+        // Auto body work, paint booths, spray painting, vehicle repair
+        autoshop:     ["1503376780353-7e6692767b70","1565043589-b6e8c5e5bc8e","1551698618-1dfe5d97d256","1606577924006-27d39b132ae2"],
+        // Restaurant kitchens, plated food, dining rooms
+        restaurant:   ["1414235077428-338989a2e8c0","1504674900247-0877df9cc836","1555396273-367ea4eb4db5","1466637574441-749b8f19452f"],
+        // Medical offices, clinics, healthcare professionals
+        medical:      ["1551190822-a9333d879b1f","1576091160399-112ba8d25d1d","1559757148-5c350d0d3c56","1538108149393-dbbd82b42b08"],
+        // Construction sites, workers, building frames
+        construction: ["1504307651254-35680f356dfd","1504328345606-18bbc8c9d7d1","1503387762-592deb58ef4e","1541888757-3e8a5d9c9c89"],
+        // Real estate, modern homes, property
+        realestate:   ["1570129477492-45c003edd2be","1560518883-ce09059eeffa","1449844908441-8829872d2725","1512917774080-9991f1c4c750"],
+        // Law offices, courtrooms, professional settings
+        legal:        ["1589829545856-d10d557cf95f","1521791055366-0d553381ad47","1450101215322-bf5cd27642fc","1479142506502-19583a813bd0"],
+        // Tech offices, computers, modern workspace
+        tech:         ["1518770660439-4636190af475","1497366216548-37526070297c","1531482615713-2afd69097998","1504384308090-c894fdcc538d"],
+        // Gym equipment, fitness, training
+        fitness:      ["1517836357463-d25dfeac3438","1534438327979-b07bc5e37346","1571019613454-1cb2f99b2d8b","1549060279-7e168fcee0c2"],
+        // Salon chairs, hair styling, beauty
+        beauty:       ["1560066984-138daab7b8e3","1522337360788-8b13dee7a37e","1521590832167-7bcbfaa6381f","1562322140-8baeececf3df"],
+        // Landscaping, gardens, outdoor work
+        landscape:    ["1416879595882-3373a0480b5b","1558618666-fcd25c85cd64","1466692476868-9ee5a3a3d3e4","1416339134316-0e91dc9ded92"],
+        // Plumbing/electrical tools, pipes, professional trade work  
+        trades:       ["1504328345606-18bbc8c9d7d1","1581091226825-a6a2a5aee158","1558618666-fcd25c85cd64","1503376780353-7e6692767b70"],
+        // Hotel lobbies, hospitality, service
+        hotel:        ["1566073771259-6a8506099945","1582719508461-905c673536f6","1520250497591-112ba8d25d1d","1571003123894-1ead586e6647"],
+        // Generic professional business — office, teamwork
+        business:     ["1497366216548-37526070297c","1521791055366-0d553381ad47","1531482615713-2afd69097998","1450101215322-bf5cd27642fc"],
+      };
+      var photoSet = photos.business;
+      if (/fleet|truck|semi|trailer|freight|transport|logistics/.test(rawText)) photoSet = photos.fleet;
+      else if (/paint|body.?shop|collision|auto.?repair|vehicle.?repair/.test(rawText)) photoSet = photos.autoshop;
+      else if (/restaurant|food|cafe|kitchen|dining/.test(rawText)) photoSet = photos.restaurant;
+      else if (/medical|health|clinic|dental|physician/.test(rawText)) photoSet = photos.medical;
+      else if (/construction|contractor|building|renovation/.test(rawText)) photoSet = photos.construction;
+      else if (/real.?estate|property|homes|realty/.test(rawText)) photoSet = photos.realestate;
+      else if (/law|attorney|legal|firm/.test(rawText)) photoSet = photos.legal;
+      else if (/tech|software|saas|app|digital/.test(rawText)) photoSet = photos.tech;
+      else if (/fitness|gym|wellness|training/.test(rawText)) photoSet = photos.fitness;
+      else if (/salon|beauty|spa|hair/.test(rawText)) photoSet = photos.beauty;
+      else if (/landscape|lawn|garden/.test(rawText)) photoSet = photos.landscape;
+      else if (/plumb|electric|hvac|mechanical|trade/.test(rawText)) photoSet = photos.trades;
+      else if (/hotel|hospitality|resort/.test(rawText)) photoSet = photos.hotel;
+      var UB = "https://images.unsplash.com/photo-";
+      var heroImg = UB + photoSet[0] + "?w=1400&h=700&fit=crop&auto=format&q=80";
+      var img1    = UB + photoSet[1] + "?w=800&h=600&fit=crop&auto=format&q=80";
+      var img2    = UB + photoSet[2] + "?w=800&h=600&fit=crop&auto=format&q=80";
+      var img3    = UB + photoSet[3] + "?w=800&h=600&fit=crop&auto=format&q=80";
 
       var h1    = brief.heroHeadline  || "Your offer, clearly stated.";
       var sub   = brief.heroSubhead   || "One clear value proposition. One clear action.";
