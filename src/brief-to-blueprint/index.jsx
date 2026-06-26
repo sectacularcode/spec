@@ -126,10 +126,12 @@ export default function CustomBuild({ userId, role } = {}) {
             label: p.label,
             recommended: p.recommended,
             hasVariants: p.hasVariants,
+            hasVariantC: p.hasVariantC,
             // store full data so preview and download work on return
             data: p.data,
             variantA: p.variantA,
             variantB: p.variantB,
+            variantC: p.variantC,
           }))
         } : null,
       };
@@ -1156,7 +1158,7 @@ export default function CustomBuild({ userId, role } = {}) {
                       onChange={e => setLayoutVariants(prev => ({ ...prev, [p.id]: e.target.value }))}
                       style={{ padding: "5px 8px", fontSize: "12px", fontWeight: 500, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", maxWidth: "220px" }}>
                       {variants.map(v => (
-                        <option key={v} value={v}>{variantLabels[v]}{v === p.recommended ? " — recommended" : ""}</option>
+                        <option key={v} value={v}>{variantLabels[v]}</option>
                       ))}
                     </select>
                   </div>
