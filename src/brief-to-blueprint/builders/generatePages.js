@@ -8,6 +8,7 @@ import { buildProcessPage } from "./process.js";
 import { buildContactPage } from "./contact.js";
 import { buildGenericPage } from "./generic.js";
 import { buildLocationPageA, buildLocationPageB } from "./location.js";
+import { buildLandingPage } from "./landing.js";
 
 // Orchestrates all page builders into a list of page objects.
 // Each page object includes both variantA and variantB Elementor JSON
@@ -63,6 +64,12 @@ export function generatePages(brief, selectedPages, inspoContext, aiRecs, custom
         var locA = buildLocationPageA(colors, brief, locData);
         var locB = buildLocationPageB(colors, brief, locData);
         return { id: pid, label: label, data: locA, variantA: locA, variantB: locB, recommended: "A", hasVariants: true };
+      }
+      // Landing pages — purpose-built ad/campaign layout
+      if (pid === "landing" || pid.startsWith("landing-")) {
+        var landA = buildLandingPage(colors, brief, inspoContext, "A");
+        var landB = buildLandingPage(colors, brief, inspoContext, "B");
+        return { id: pid, label: label, data: landA, variantA: landA, variantB: landB, recommended: "A", hasVariants: true };
       }
       // Utility pages — no meaningful A/B variation
       var utilityPages = ["thank-you", "privacy", "terms", "404"];
