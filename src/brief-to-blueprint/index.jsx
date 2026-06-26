@@ -758,6 +758,23 @@ export default function CustomBuild({ userId, role } = {}) {
       )}
 
       {!draftsView && (
+      <>
+      {/* Floating tab to restore panel when collapsed */}
+      {panelCollapsed && generated && (
+        <button
+          onClick={() => setPanelCollapsed(false)}
+          title="Show panel"
+          style={{
+            position: "fixed", top: "50%", left: 0, transform: "translateY(-50%)",
+            zIndex: 200, background: "#3f3f46", color: "#fff", border: "none",
+            borderRadius: "0 6px 6px 0", padding: "12px 6px", cursor: "pointer",
+            fontSize: "13px", fontWeight: 600, writingMode: "vertical-rl",
+            textOrientation: "mixed", letterSpacing: "0.05em", boxShadow: "2px 0 8px rgba(0,0,0,0.15)",
+            display: "flex", alignItems: "center", gap: "6px"
+          }}>
+          ▶ Panel
+        </button>
+      )}
       <div style={{ display: "grid", gridTemplateColumns: generated ? (panelCollapsed ? "0px 1fr" : "520px 1fr") : "1fr", gap: "0", height: "calc(100vh - 57px)", overflow: "hidden", transition: "grid-template-columns 0.2s ease" }}>
 
         <div style={{ padding: "clamp(20px,3vw,40px) clamp(16px,3vw,40px)", borderRight: generated ? "1px solid #dde0e6" : "none", overflowY: panelCollapsed ? "hidden" : "auto", overflowX: "hidden", flexShrink: 0, background: "#eeedf1", height: "100%", boxSizing: "border-box" }}>
@@ -1240,6 +1257,7 @@ export default function CustomBuild({ userId, role } = {}) {
           </div>
         )}
       </div>
+      </>
       )} {/* end !draftsView grid */}
     </div>
   );
