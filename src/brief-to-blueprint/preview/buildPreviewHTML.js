@@ -658,7 +658,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       }
 
       // ── VARIANT A — Awareness / Feature (default) ──────────────────────────
-      return "<section style='position:relative;min-height:70vh;display:flex;align-items:center;padding:clamp(48px,8vh,80px) clamp(24px,6vw,80px);overflow:hidden;'>" +
+      return "<section class='va-hero' style='position:relative;min-height:70vh;display:flex;align-items:center;padding:clamp(48px,8vh,80px) clamp(24px,6vw,80px);overflow:hidden;'>" +
           "<img src=\"" + heroImg + "\" alt='hero' style='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;'/>" +
           "<div style='position:absolute;inset:0;background:" + brass + ";opacity:0.85;z-index:1;'></div>" +
           "<div class='var-a-wrap' style='position:relative;z-index:2;width:100%;max-width:1100px;margin:0 auto;padding:0 clamp(16px,4vw,60px);'>" +
@@ -693,7 +693,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             }).join("") +
           "</div>" +
         "</section>" +
-        "<section style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
+        "<section class='va-cta' style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
           "<h2 style='font-size:clamp(26px,4vw,42px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
           "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:540px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
           "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
@@ -1494,6 +1494,11 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "[style*='padding:80px clamp(24px,6vw,80px)']{padding:36px 20px !important;}" +
         "" +
         /* VARIANT A — fully left aligned on mobile */
+        ".va-hero,.va-hero *{text-align:left !important;}" +
+        ".va-cta{text-align:left !important;}" +
+        ".va-cta h2,.va-cta p{text-align:left !important;}" +
+        ".va-cta div[style*='justify-content:center']{justify-content:flex-start !important;}" +
+        ".va-cta p[style*='margin-left:auto']{margin-left:0 !important;margin-right:0 !important;}" +
         ".var-a-wrap,.var-a-wrap *{text-align:left !important;}" +
         ".var-a-wrap .cta-btn{text-align:center !important;}" +
         ".feature-text h2,.feature-text p{text-align:left !important;}" +
