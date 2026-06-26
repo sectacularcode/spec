@@ -673,7 +673,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             "</div>" +
           "</div></div>" +
         "</section>" +
-        "<section style='background:#ffffff;padding:0;border-bottom:1px solid #f0f0f0;'>" +
+        "<section class='va-trust' style='background:#ffffff;padding:0;border-bottom:1px solid #f0f0f0;'>" +
           "<div style='display:grid;grid-template-columns:repeat(3,1fr);'>" +
             [{ s:s1,l:l1 },{ s:s2,l:l2 },{ s:s3,l:l3 }].map(function(t,i) {
               return "<div class='grid-cell' style='padding:40px 32px;text-align:center;" + (i<2?"border-right:1px solid #f0f0f0;":"") + "'><div style='font-size:42px;font-weight:800;color:" + brass + ";line-height:1;margin-bottom:6px;'>" + t.s + "</div><div style='font-size:14px;color:" + stone + ";font-weight:500;letter-spacing:0.02em;'>" + t.l + "</div></div>";
@@ -1495,12 +1495,12 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "" +
         /* VARIANT A — fully left aligned on mobile */
         ".va-hero,.va-hero *{text-align:left !important;}" +
+        ".va-trust .grid-cell{text-align:left !important;}" +
         ".va-cta{text-align:left !important;}" +
         ".va-cta h2,.va-cta p{text-align:left !important;}" +
         ".va-cta div[style*='justify-content:center']{justify-content:flex-start !important;}" +
         ".va-cta p[style*='margin-left:auto']{margin-left:0 !important;margin-right:0 !important;}" +
         ".var-a-wrap,.var-a-wrap *{text-align:left !important;}" +
-        ".var-a-wrap .cta-btn{text-align:center !important;}" +
         ".feature-text h2,.feature-text p{text-align:left !important;}" +
         ".feature-text .row-btn{align-self:flex-start !important;}" +
         /* VARIANT B — fully center aligned on mobile */
