@@ -1128,24 +1128,32 @@ export default function CustomBuild({ userId, role } = {}) {
                 )}
               </div>
 
-              {/* Layout variant dropdown — left of desktop/mobile toggle */}
+              {/* Layout variant dropdown — compact labels, description shown below */}
               {generated.pages.filter(p => p.id === previewPage && p.hasVariants).map(p => {
-                var variantLabels = p.hasVariantC
-                  ? { A: "Awareness — Features + Checklist", B: "Lead Form — Quote Request + Testimonials", C: "Retargeting — High-Contrast Single CTA for Warm Audiences" }
+                var shortLabels = p.hasVariantC
+                  ? { A: "Awareness", B: "Lead Form", C: "Retargeting" }
                   : { A: "Layout A", B: "Layout B" };
+                var descriptions = p.hasVariantC
+                  ? { A: "Features + checklist, dual CTA", B: "Quote form + testimonials", C: "High-contrast single CTA for warm audiences" }
+                  : { A: "", B: "" };
                 var variants = p.hasVariantC ? ["A", "B", "C"] : ["A", "B"];
                 var current = layoutVariants[p.id] || p.recommended || "A";
                 return (
                   <div key="variant-select" style={{ display: "flex", alignItems: "center", gap: "6px", marginLeft: "auto" }}>
                     <span style={{ fontSize: "11px", color: "#6b7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>Layout</span>
-                    <select
-                      value={current}
-                      onChange={e => setLayoutVariants(prev => ({ ...prev, [p.id]: e.target.value }))}
-                      style={{ padding: "5px 8px", fontSize: "12px", fontWeight: 500, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", maxWidth: "260px" }}>
-                      {variants.map(v => (
-                        <option key={v} value={v}>{variantLabels[v]}{v === (p.recommended || "A") ? " — recommended" : ""}</option>
-                      ))}
-                    </select>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                      <select
+                        value={current}
+                        onChange={e => setLayoutVariants(prev => ({ ...prev, [p.id]: e.target.value }))}
+                        style={{ padding: "5px 8px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", minWidth: "120px" }}>
+                        {variants.map(v => (
+                          <option key={v} value={v}>{shortLabels[v]}{v === (p.recommended || "A") ? " ↩" : ""}</option>
+                        ))}
+                      </select>
+                      {p.hasVariantC && descriptions[current] && (
+                        <span style={{ fontSize: "10px", color: "#9ca3af", lineHeight: 1.3, maxWidth: "160px" }}>{descriptions[current]}</span>
+                      )}
+                    </div>
                   </div>
                 );
               })}
