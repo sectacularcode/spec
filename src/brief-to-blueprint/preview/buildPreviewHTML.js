@@ -503,13 +503,18 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       // Build SVG placeholder as a data URI — consistent dimensions, industry label
       function makeSvgPh(w, h, label, sublabel, bg) {
         bg = bg || "#e8eaed";
-        var svg = "<svg xmlns='http://www.w3.org/2000/svg' width='" + w + "' height='" + h + "'>" +
-          "<rect width='" + w + "' height='" + h + "' fill='" + bg + "'/>" +
-          "<text x='" + (w/2) + "' y='" + (h/2 - 14) + "' font-family='Inter,system-ui,sans-serif' font-size='13' font-weight='600' fill='#9ca3af' text-anchor='middle'>" + label + "</text>" +
-          "<text x='" + (w/2) + "' y='" + (h/2 + 6) + "' font-family='Inter,system-ui,sans-serif' font-size='11' fill='#c4c9d4' text-anchor='middle'>" + (sublabel||"Add your photo here") + "</text>" +
-          "<rect x='" + (w/2-24) + "' y='" + (h/2+18) + "' width='48' height='2' rx='1' fill='#d1d5db'/>" +
-        "</svg>";
-        return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+        // Use btoa (base64) so no quote characters appear in the data URI — prevents attribute termination
+        var svgLines = [
+          "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" + w + "\" height=\"" + h + "\">",
+          "<rect width=\"" + w + "\" height=\"" + h + "\" fill=\"" + bg + "\"/>",
+          "<text x=\"" + (w/2) + "\" y=\"" + (h/2 - 18) + "\" font-family=\"Inter,system-ui,sans-serif\" font-size=\"14\" font-weight=\"600\" fill=\"#9ca3af\" text-anchor=\"middle\">" + label.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") + "</text>",
+          "<text x=\"" + (w/2) + "\" y=\"" + (h/2 + 6) + "\" font-family=\"Inter,system-ui,sans-serif\" font-size=\"12\" fill=\"#b0b8c4\" text-anchor=\"middle\">" + (sublabel||"Add photo here").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") + "</text>",
+          "<rect x=\"" + (w/2-28) + "\" y=\"" + (h/2+18) + "\" width=\"56\" height=\"2\" rx=\"1\" fill=\"#d1d5db\"/>",
+          "</svg>"
+        ].join("");
+        // btoa needs ASCII — strip non-ASCII chars
+        var safe = svgLines.replace(/[^\x00-\x7F]/g, "");
+        return "data:image/svg+xml;base64," + btoa(safe);
       }
       var phBg = (brass && brass !== "undefined") ? brass + "18" : "#e8f4ea";
       var img1    = makeSvgPh(800, 600, industryMeta.label, brief.feature1Heading || "Feature image", phBg);
@@ -598,10 +603,10 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           [[f1h,f1b,img1],[f2h,f2b,img2],[f3h,f3b,img3]].map(function(f,i) {
             var imgLeft = i%2!==0;
             var cols = imgLeft
-              ? "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src='" + f[2] + "' alt='" + f[0] + "' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div><div style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'>"
+              ? "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div><div style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'>"
               : "<div style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'>";
             var textContent = "<h2 style='font-size:clamp(22px,3vw,34px);font-weight:700;color:" + brass + ";margin:0 0 16px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p><a style='" + btnDark + "'>" + cta2 + "</a></div>";
-            var imgRight = !imgLeft ? "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src='" + f[2] + "' alt='" + f[0] + "' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>" : "";
+            var imgRight = !imgLeft ? "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>" : "";
             return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + cols + textContent + imgRight + "</section>";
           }).join("") +
           "<section style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
@@ -635,7 +640,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             "</div>" +
           "</section>" +
           "<section style='background:" + bone + ";padding:0;display:grid;grid-template-columns:1fr 1fr;'>" +
-            "<div class='landing-img' style='min-height:420px;height:100%;overflow:hidden;'><img src='" + img1 + "' alt='" + (brief.feature1Heading||industryMeta.label) + "' style='width:100%;height:100%;object-fit:cover;display:block;min-height:420px;'/></div>" +
+            "<div class='landing-img' style='min-height:420px;height:100%;overflow:hidden;'><img src=\"" + img1 + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:420px;'/></div>" +
             "<div style='padding:64px 56px;display:flex;flex-direction:column;justify-content:center;'>" +
               "<p style='font-size:20px;font-style:italic;color:" + ink + ";line-height:1.65;margin:0 0 24px;'>&#8220;" + tq1 + "&#8221;</p>" +
               "<div style='width:36px;height:2px;background:" + brass + ";margin-bottom:14px;'></div>" +
@@ -653,7 +658,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
 
       // ── VARIANT A — Awareness / Feature (default) ──────────────────────────
       return "<section style='position:relative;min-height:80vh;display:flex;align-items:center;padding:80px clamp(24px,6vw,80px);overflow:hidden;'>" +
-          "<img src='" + heroImg + "' alt='Hero' style='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;'/>" +
+          "<img src=\"" + heroImg + "\" alt='hero' style='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;'/>" +
           "<div style='position:absolute;inset:0;background:" + brass + ";opacity:0.85;z-index:1;'></div>" +
           "<div style='position:relative;z-index:2;width:100%;max-width:1100px;margin:0 auto;padding:0 clamp(16px,4vw,60px);'>" +
           "<div style='max-width:660px;'>" +
@@ -676,7 +681,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "</section>" +
         [[f1h,f1b,img1,false],[f2h,f2b,img2,true],[f3h,f3b,img3,false]].map(function(f,i) {
           var textDiv = "<div style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'><h2 style='font-size:clamp(20px,2.5vw,32px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p><a style='" + btnDark + "'>" + cta2 + "</a></div>";
-          var imgDiv  = "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src='" + f[2] + "' alt='" + f[0] + "' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>";
+          var imgDiv  = "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>";
           return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + (f[3] ? imgDiv+textDiv : textDiv+imgDiv) + "</section>";
         }).join("") +
         "<section style='background:#ffffff;padding:80px clamp(24px,6vw,80px);'>" +
