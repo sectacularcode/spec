@@ -472,7 +472,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       var rawText = ([brief.valueProposition, brief.targetAudience, brief.heroHeadline, brief.hookStatement, brief.servicesHeading, brief.tagline, brief.brandName].filter(Boolean).join(" ") || "business").toLowerCase();
       var photos = {
         // Fleet/trucking/transport — semi trucks, fleet yards, cargo, drivers
-        fleet:        ["1601584589616-9853df05a08e","1592838076506-ad2e7b318e72","1519003300-8d8b4b5bbf8c","1517524008697-84bbe3c3fd98"],
+        fleet:        ["1519003300-8d8b4b5bbf8c","1601584589616-9853df05a08e","1558618666-fcd25c85cd64","1592838076506-ad2e7b318e72"],
         // Auto body/paint shop — spray booths, bodywork, painting, garage
         autoshop:     ["1486262322726-88fd9febbbb7","1607860108005-6f6b0b61e5dd","1631467026313-32440d04f9b6","1558618666-fcd25c85cd64"],
         // Restaurant — plated food, kitchen, dining atmosphere
@@ -601,10 +601,10 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           [[f1h,f1b,img1],[f2h,f2b,img2],[f3h,f3b,img3]].map(function(f,i) {
             var imgLeft = i%2!==0;
             var cols = imgLeft
-              ? "<div style='background:url(" + f[2] + ") center/cover no-repeat;min-height:400px;'></div><div style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'>"
+              ? "<div class='landing-img' style='background:url(" + f[2] + ") center/cover no-repeat;min-height:400px;height:100%;'></div><div style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'>"
               : "<div style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'>";
             var textContent = "<h2 style='font-size:clamp(22px,3vw,34px);font-weight:700;color:" + brass + ";margin:0 0 16px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p><a style='" + btnDark + "'>" + cta2 + "</a></div>";
-            var imgRight = !imgLeft ? "<div style='background:url(" + f[2] + ") center/cover no-repeat;min-height:400px;'></div>" : "";
+            var imgRight = !imgLeft ? "<div class='landing-img' style='background:url(" + f[2] + ") center/cover no-repeat;min-height:400px;height:100%;'></div>" : "";
             return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + cols + textContent + imgRight + "</section>";
           }).join("") +
           "<section style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
@@ -638,7 +638,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             "</div>" +
           "</section>" +
           "<section style='background:" + bone + ";padding:0;display:grid;grid-template-columns:1fr 1fr;'>" +
-            "<div style='background:url(" + img1 + ") center/cover no-repeat;min-height:420px;'></div>" +
+            "<div class='landing-img' style='background:url(" + img1 + ") center/cover no-repeat;min-height:420px;height:100%;'></div>" +
             "<div style='padding:64px 56px;display:flex;flex-direction:column;justify-content:center;'>" +
               "<p style='font-size:20px;font-style:italic;color:" + ink + ";line-height:1.65;margin:0 0 24px;'>&#8220;" + tq1 + "&#8221;</p>" +
               "<div style='width:36px;height:2px;background:" + brass + ";margin-bottom:14px;'></div>" +
@@ -655,9 +655,10 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       }
 
       // ── VARIANT A — Awareness / Feature (default) ──────────────────────────
-      return "<section style='background:url(" + heroImg + ") center/cover no-repeat;position:relative;min-height:80vh;display:flex;align-items:center;padding:100px clamp(24px,6vw,80px);'>" +
-          "<div style='position:absolute;inset:0;background:" + brass + ";opacity:0.82;'></div>" +
-          "<div style='position:relative;max-width:800px;'>" +
+      return "<section style='background:url(" + heroImg + ") center/cover no-repeat;position:relative;min-height:80vh;display:flex;align-items:center;padding:80px clamp(24px,6vw,80px);'>" +
+          "<div style='position:absolute;inset:0;background:" + brass + ";opacity:0.85;'></div>" +
+          "<div style='position:relative;width:100%;max-width:1100px;margin:0 auto;padding:0 clamp(16px,4vw,60px);'>" +
+          "<div style='max-width:660px;'>" +
             "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:20px;'>" + (brief.brandName||"Brand") + "</div>" +
             "<h1 style='font-weight:800;font-size:clamp(32px,5.5vw,62px);color:#ffffff;margin:0 0 20px;line-height:1.08;'>" + h1 + "</h1>" +
             (hook ? "<p style='font-size:18px;color:rgba(255,255,255,0.9);margin:0 0 12px;line-height:1.6;font-style:italic;'>" + hook + "</p>" : "") +
@@ -666,7 +667,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
               "<a style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
               "<a style='" + btnOutline + "'>" + cta2 + "</a>" +
             "</div>" +
-          "</div>" +
+          "</div></div>" +
         "</section>" +
         "<section style='background:#ffffff;padding:0;border-bottom:1px solid #f0f0f0;'>" +
           "<div style='display:grid;grid-template-columns:repeat(3,1fr);'>" +
@@ -677,7 +678,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "</section>" +
         [[f1h,f1b,img1,false],[f2h,f2b,img2,true],[f3h,f3b,img3,false]].map(function(f,i) {
           var textDiv = "<div style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'><h2 style='font-size:clamp(20px,2.5vw,32px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p><a style='" + btnDark + "'>" + cta2 + "</a></div>";
-          var imgDiv  = "<div style='background:url(" + f[2] + ") center/cover no-repeat;min-height:400px;'></div>";
+          var imgDiv  = "<div class='landing-img' style='background:url(" + f[2] + ") center/cover no-repeat;min-height:400px;height:100%;'></div>";
           return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + (f[3] ? imgDiv+textDiv : textDiv+imgDiv) + "</section>";
         }).join("") +
         "<section style='background:#ffffff;padding:80px clamp(24px,6vw,80px);'>" +
@@ -1433,21 +1434,19 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         ".nav-links{display:none !important;}" +
         ".hamburger{display:flex !important;}" +
         "#mobile-nav.open{display:block !important;}" +
-        // Section padding — catch all patterns including clamp() values
         "section{padding:44px 20px !important;}" +
-        // Kill inner div horizontal padding so content isn't double-indented
         "section > div{padding-left:0 !important;padding-right:0 !important;}" +
-        // Grid: force single column
-        "[style*='grid-template-columns']{grid-template-columns:1fr !important;gap:16px !important;}" +
-        // Flex rows that should stack
+        "[style*='grid-template-columns']{grid-template-columns:1fr !important;gap:0 !important;}" +
+        ".landing-img{min-height:260px !important;height:260px !important;}" +
+        "[style*='display:flex'][style*='gap:16px']{flex-direction:column !important;gap:12px !important;}" +
         "[style*='display:flex'][style*='gap:48px'],[style*='display:flex'][style*='gap:64px'],[style*='display:flex'][style*='gap:80px']{flex-direction:column !important;gap:20px !important;}" +
         "[style*='display:flex'][style*='gap:40px']{flex-direction:column !important;gap:16px !important;}" +
-        // Image placeholders — cap height so they don't eat the whole screen
+        "[style*='padding:60px 48px']{padding:36px 24px !important;}" +
+        "[style*='padding:64px 56px']{padding:36px 24px !important;}" +
         "[style*='aspect-ratio:16/9']{aspect-ratio:unset !important;height:180px !important;}" +
         "[style*='aspect-ratio:4/3']{aspect-ratio:unset !important;height:180px !important;}" +
         "[style*='aspect-ratio:3/4']{aspect-ratio:unset !important;height:200px !important;}" +
         "[style*='aspect-ratio:1']{aspect-ratio:unset !important;height:160px !important;}" +
-        // Spacers — halve them all
         "div[style='height:120px']{height:40px !important;}" +
         "div[style='height:112px']{height:36px !important;}" +
         "div[style='height:96px']{height:32px !important;}" +
@@ -1461,15 +1460,12 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "div[style='height:32px']{height:12px !important;}" +
         "div[style='height:28px']{height:10px !important;}" +
         "div[style='height:24px']{height:8px !important;}" +
-        // Headings
         "h1{font-size:clamp(26px,7vw,38px) !important;line-height:1.15 !important;}" +
         "h2{font-size:clamp(22px,6vw,30px) !important;}" +
         "h3{font-size:17px !important;}" +
-        // Buttons full width on mobile
-        "a[style*='padding:14px'],a[style*='padding:16px']{display:block !important;text-align:center !important;width:100% !important;box-sizing:border-box !important;}" +
-        // Min-height sections (heroes) — less tall on mobile
+        "a[style*='padding:14px'],a[style*='padding:16px'],button[style*='padding:14px'],button[style*='padding:16px']{display:block !important;text-align:center !important;width:100% !important;box-sizing:border-box !important;margin-bottom:10px !important;}" +
         "[style*='min-height:80vh'],[style*='min-height:70vh']{min-height:50vh !important;}" +
-        // Footer
+        "[style*='min-height:420px']{min-height:260px !important;}" +
         "footer{padding:32px 20px !important;}" +
         "footer > div{flex-direction:column !important;gap:16px !important;}" +
       "}" +
