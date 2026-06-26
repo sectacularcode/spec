@@ -557,6 +557,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       var formR = brief.formReassurance|| "No sales team. A real reply.";
 
       var btnStyle = "display:inline-block;padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:700;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:3px;";
+      var btnClass = "cta-btn";
       var btnOutline = "display:inline-block;padding:13px 28px;background:transparent;color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:2px solid rgba(255,255,255,0.6);border-radius:3px;";
       var btnDark = "display:inline-block;padding:13px 28px;background:transparent;color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:2px solid " + brass + ";border-radius:3px;";
 
@@ -613,8 +614,8 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             "<h2 style='font-size:clamp(26px,4vw,40px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
             "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:560px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
             "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
-              "<a style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
-              "<a style='" + btnOutline + "'>" + cta2 + "</a>" +
+              "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
+              "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
             "</div>" +
           "</section>";
       }
@@ -627,8 +628,8 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
               "<h1 style='font-weight:800;font-size:clamp(32px,5.5vw,60px);color:#ffffff;margin:0 0 20px;line-height:1.08;'>" + h1 + "</h1>" +
               "<p style='font-size:18px;color:rgba(255,255,255,0.85);margin:0 0 40px;line-height:1.65;'>" + sub + "</p>" +
               "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
-                "<a style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
-                "<a style='" + btnOutline + "'>" + cta2 + "</a>" +
+                "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
+                "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
               "</div>" +
             "</div>" +
           "</section>" +
@@ -651,7 +652,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           "<section style='background:" + brass + ";padding:100px 40px;text-align:center;'>" +
             "<h2 style='font-size:clamp(26px,4vw,44px);font-weight:800;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
             "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 36px;max-width:480px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
-            "<a style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "display:block;max-width:280px;margin:0 auto;text-align:center;'>" + cta1 + "</a>" +
+            "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "display:block;max-width:280px;margin:0 auto;text-align:center;'>" + cta1 + "</a>" +
             "<p style='font-size:13px;color:rgba(255,255,255,0.6);margin:16px 0 0;'>" + formR + "</p>" +
           "</section>";
       }
@@ -667,8 +668,8 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             (hook ? "<p style='font-size:18px;color:rgba(255,255,255,0.9);margin:0 0 12px;line-height:1.6;font-style:italic;'>" + hook + "</p>" : "") +
             "<p style='font-size:17px;color:rgba(255,255,255,0.82);margin:0 0 36px;line-height:1.65;max-width:580px;'>" + sub + "</p>" +
             "<div style='display:flex;gap:16px;flex-wrap:wrap;align-items:center;'>" +
-              "<a style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "display:inline-block;'>" + cta1 + "</a>" +
-              "<a style='" + btnOutline + "display:inline-block;'>" + cta2 + "</a>" +
+              "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "display:inline-block;'>" + cta1 + "</a>" +
+              "<a class='cta-btn' style='" + btnOutline + "display:inline-block;'>" + cta2 + "</a>" +
             "</div>" +
           "</div></div>" +
         "</section>" +
@@ -680,7 +681,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           "</div>" +
         "</section>" +
         [[f1h,f1b,img1,false],[f2h,f2b,img2,true],[f3h,f3b,img3,false]].map(function(f,i) {
-          var textDiv = "<div style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'><h2 style='font-size:clamp(20px,2.5vw,32px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p><a style='" + btnDark + "'>" + cta2 + "</a></div>";
+          var textDiv = "<div class='feature-text' style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'><h2 style='font-size:clamp(20px,2.5vw,32px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p><a style='" + btnDark + "'>" + cta2 + "</a></div>";
           var imgDiv  = "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>";
           return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + (f[3] ? imgDiv+textDiv : textDiv+imgDiv) + "</section>";
         }).join("") +
@@ -696,8 +697,8 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           "<h2 style='font-size:clamp(26px,4vw,42px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
           "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:540px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
           "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
-            "<a style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
-            "<a style='" + btnOutline + "'>" + cta2 + "</a>" +
+            "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
+            "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
           "</div>" +
         "</section>";
     })(),
@@ -1443,6 +1444,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         ".landing-img{min-height:240px !important;}" +
         ".landing-img img{min-height:240px !important;height:240px !important;object-fit:cover !important;}" +
         "[style*='padding:60px 48px']{padding:32px 20px !important;}" +
+        ".feature-text{padding-top:28px !important;}" +
         "[style*='padding:64px 56px']{padding:32px 20px !important;}" +
         "[style*='padding:40px 32px']{padding:24px 20px !important;}" +
         "[style*='display:flex'][style*='gap:16px']{flex-direction:column !important;gap:10px !important;}" +
@@ -1450,7 +1452,8 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "[style*='display:flex'][style*='gap:32px']{flex-direction:column !important;gap:14px !important;}" +
         "[style*='display:flex'][style*='gap:40px']{flex-direction:column !important;gap:16px !important;}" +
         "[style*='display:flex'][style*='gap:48px'],[style*='display:flex'][style*='gap:64px'],[style*='display:flex'][style*='gap:80px']{flex-direction:column !important;gap:20px !important;}" +
-        "a[style]{display:block !important;width:100% !important;box-sizing:border-box !important;text-align:center !important;margin-bottom:10px !important;}" +
+        ".cta-btn{display:block !important;width:100% !important;box-sizing:border-box !important;text-align:center !important;margin-bottom:10px !important;}" +
+        ".footer-link{display:inline !important;width:auto !important;text-align:left !important;margin-bottom:0 !important;}" +
         "button[style*='padding:14px']{width:100% !important;box-sizing:border-box !important;}" +
         "h1{font-size:clamp(26px,7vw,36px) !important;line-height:1.15 !important;}" +
         "h2{font-size:clamp(20px,5vw,28px) !important;line-height:1.2 !important;}" +
@@ -1472,7 +1475,8 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "[style*='min-height:400px']{min-height:240px !important;}" +
         "[style*='max-width:1100px'],[style*='max-width:1060px'],[style*='max-width:900px']{max-width:100% !important;}" +
         "footer{padding:32px 20px !important;}" +
-        "footer > div{flex-direction:column !important;gap:14px !important;}" +
+        "footer > div{flex-direction:column !important;gap:16px !important;align-items:flex-start !important;}" +
+        ".footer-nav{flex-direction:column !important;gap:12px !important;align-items:flex-start !important;}" +
       "}" +
     "</style>" +
     "</head><body>" +
@@ -1499,11 +1503,12 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
     "</div>" +
     body +
     "<footer style='background:" + ink + ";padding:48px clamp(20px,5vw,60px);'>" +
-      "<div style='display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:32px;'>" +
-        "<div><div style='font-family:Inter,sans-serif;font-weight:800;font-size:18px;color:" + warmWhite + ";margin-bottom:8px;'>" + (brief.brandName || "Brand") + "</div>" +
-        "<div style='font-size:13px;color:" + stone + ";'>" + (brief.tagline || "") + "</div></div>" +
-        "<div style='display:flex;gap:20px;flex-wrap:wrap;'>" + navItems.map(function(l) { return "<a style='color:" + stone + ";text-decoration:none;font-size:13px;'>" + l + "</a>"; }).join("") + "</div>" +
-        "<div style='font-size:13px;color:" + stone + ";'>" + (brief.contactEmail || "") + "</div>" +
+      "<div style='display:flex;flex-direction:column;align-items:flex-start;gap:24px;max-width:1100px;margin:0 auto;'>" +
+        "<div style='font-family:Inter,sans-serif;font-weight:800;font-size:18px;color:" + warmWhite + ";'>" + (brief.brandName || "Brand") + "</div>" +
+        (brief.tagline ? "<div style='font-size:13px;color:rgba(255,255,255,0.65);margin-top:-16px;'>" + brief.tagline + "</div>" : "") +
+        "<div class='footer-nav' style='display:flex;gap:24px;flex-wrap:wrap;'>" + navItems.map(function(l) { return "<a class='footer-link' style='color:rgba(255,255,255,0.8);text-decoration:none;font-size:13px;font-weight:500;'>" + l + "</a>"; }).join("") + "</div>" +
+        (brief.contactEmail ? "<div style='font-size:13px;color:rgba(255,255,255,0.6);'>" + (brief.contactEmail || "") + "</div>" : "") +
+        "<div style='font-size:12px;color:rgba(255,255,255,0.35);padding-top:8px;border-top:1px solid rgba(255,255,255,0.1);width:100%;'>" + (brief.brandName || "Brand") + " &copy; " + new Date().getFullYear() + " &nbsp;&middot;&nbsp; <a class='footer-link' href='#' style='color:rgba(255,255,255,0.45);text-decoration:none;font-size:12px;'>Privacy Policy</a> &nbsp;&middot;&nbsp; <a class='footer-link' href='#' style='color:rgba(255,255,255,0.45);text-decoration:none;font-size:12px;'>Cookie Policy</a></div>" +
       "</div>" +
     "</footer>" +
     "<script>" +
