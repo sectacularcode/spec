@@ -181,7 +181,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       var svcCards = (brief.serviceCards || [["Service One","Description of what this service provides."],["Service Two","Description of what this service provides."],["Service Three","Description of what this service provides."]]);
       var servicesHTML = "";
       if (sp === "alternating-rows") {
-        servicesHTML = "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);'><div style='max-width:1160px;margin:0 auto;'>" +
+        servicesHTML = "<section style='background:" + bone + ";padding:48px clamp(24px,6vw,80px);border-top:1px solid #e5e7eb;'><div style='max-width:1100px;margin:0 auto;'>" +
           "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>What we do</div>" +
           "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 48px;'>" + (brief.servicesHeading || "Our services") + "</h2>" +
           svcCards.map(function(pair, idx) {
@@ -205,7 +205,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           }).join("") +
         "</div></section>";
       } else { // card-grid
-        servicesHTML = "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);'><div style='max-width:1160px;margin:0 auto;'>" +
+        servicesHTML = "<section style='background:" + bone + ";padding:48px clamp(24px,6vw,80px);border-top:1px solid #e5e7eb;'><div style='max-width:1100px;margin:0 auto;'>" +
           "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>What we do</div>" +
           "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 40px;'>" + (brief.servicesHeading || "Our services") + "</h2>" +
           "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;'>" +
@@ -226,7 +226,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           "<p style='font-size:17px;color:" + text + ";line-height:1.8;margin:0;text-align:left;'>" + (brief.aboutBody || "Your company story goes here.") + "</p>" +
         "</div></section>";
       } else { // split-image
-        aboutHTML = "<section style='background:#ffffff;padding:80px clamp(24px,8vw,80px);'><div style='display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1160px;margin:0 auto;'>" +
+        aboutHTML = "<section style='background:#ffffff;padding:48px clamp(24px,6vw,80px);border-top:1px solid #e5e7eb;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1100px;margin:0 auto;'>" +
           "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>About image</div>" +
           "<div>" +
             "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>About</div>" +
@@ -246,7 +246,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           "<div style='font-size:14px;font-weight:600;color:" + ink + ";'>Client Name</div><div style='font-size:13px;color:" + stone + ";'>CEO, Company</div>" +
         "</div></section>";
       } else { // card-grid
-        testimonialsHTML = "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);'><div style='max-width:1160px;margin:0 auto;'>" +
+        testimonialsHTML = "<section style='background:" + bone + ";padding:48px clamp(24px,6vw,80px);border-top:1px solid #e5e7eb;'><div style='max-width:1100px;margin:0 auto;'>" +
           "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Kind words</div>" +
           "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 28px;'>What our clients say</h2>" +
           "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;'>" +
@@ -559,7 +559,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       var btnStyle = "display:inline-block;padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:700;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:3px;";
       var btnClass = "cta-btn";
       var btnOutline = "display:inline-block;padding:13px 28px;background:transparent;color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:2px solid rgba(255,255,255,0.6);border-radius:3px;";
-      var btnDark = "display:inline-block;padding:13px 28px;background:transparent;color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:2px solid " + brass + ";border-radius:3px;";
+      var btnDark = "display:inline-block;padding:10px 24px;background:transparent;color:" + ink + ";font-weight:600;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border:2px solid " + brass + ";border-radius:3px;align-self:flex-start;";
 
       // ── VARIANT B — Lead Form ──────────────────────────────────────────────
       if (variant === "B") {
@@ -568,7 +568,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
               "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:16px;'>" + (brief.brandName||"Brand") + "</div>" +
               "<h1 style='font-weight:800;font-size:clamp(32px,5vw,56px);color:#ffffff;margin:0 0 18px;line-height:1.08;'>" + h1 + "</h1>" +
               (hook ? "<p style='font-size:18px;color:rgba(255,255,255,0.85);margin:0 0 12px;line-height:1.6;font-style:italic;'>" + hook + "</p>" : "") +
-              "<p style='font-size:17px;color:rgba(255,255,255,0.8);margin:0 0 32px;line-height:1.65;max-width:640px;margin-left:auto;margin-right:auto;'>" + sub + "</p>" +
+              "<p style='font-size:clamp(14px,3.5vw,16px);color:rgba(255,255,255,0.8);margin:0 0 24px;line-height:1.55;max-width:580px;margin-left:auto;margin-right:auto;'>" + sub + "</p>" +
               "<a style='" + btnStyle.replace("background:"+brass, "background:#ffffff").replace("color:#ffffff", "color:"+brass) + "'>" + cta1 + "</a>" +
             "</div>" +
           "</section>" +
@@ -597,7 +597,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";text-align:center;margin:0 0 48px;'>What our clients say</h2>" +
             "<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:32px;max-width:1100px;margin:0 auto;'>" +
               [[tq1,tn1,tt1],[tq2,tn2,tt2],[tq3,tn3,tt3]].map(function(t) {
-                return "<div style='background:" + bone + ";border-radius:6px;padding:32px;'><p style='font-size:16px;font-style:italic;color:" + ink + ";line-height:1.7;margin:0 0 20px;'>&#8220;" + t[0] + "&#8221;</p><div style='width:32px;height:2px;background:" + brass + ";margin-bottom:12px;'></div><div style='font-size:14px;font-weight:600;color:" + ink + ";'>" + t[1] + "</div><div style='font-size:13px;color:" + stone + ";'>" + t[2] + "</div></div>";
+                return "<div style='background:#ffffff;border-radius:6px;padding:28px;box-shadow:0 1px 4px rgba(0,0,0,0.06);'><p style='font-size:16px;font-style:italic;color:" + ink + ";line-height:1.7;margin:0 0 20px;'>&#8220;" + t[0] + "&#8221;</p><div style='width:32px;height:2px;background:" + brass + ";margin-bottom:12px;'></div><div style='font-size:14px;font-weight:600;color:" + ink + ";'>" + t[1] + "</div><div style='font-size:13px;color:" + stone + ";'>" + t[2] + "</div></div>";
               }).join("") +
             "</div>" +
           "</section>" +
@@ -626,17 +626,17 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             "<div style='max-width:760px;margin:0 auto;'>" +
               "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-bottom:20px;'>" + (brief.brandName||"Brand") + "</div>" +
               "<h1 style='font-weight:800;font-size:clamp(32px,5.5vw,60px);color:#ffffff;margin:0 0 20px;line-height:1.08;'>" + h1 + "</h1>" +
-              "<p style='font-size:clamp(14px,3.5vw,17px);color:rgba(255,255,255,0.85);margin:0 0 28px;line-height:1.55;'>" + sub + "</p>" +
+              "<p style='font-size:clamp(13px,3vw,15px);color:rgba(255,255,255,0.85);margin:0 0 24px;line-height:1.5;max-width:480px;margin-left:auto;margin-right:auto;'>" + sub + "</p>" +
               "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
                 "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
                 "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
               "</div>" +
             "</div>" +
           "</section>" +
-          "<section style='background:#ffffff;padding:0;'>" +
-            "<div style='display:grid;grid-template-columns:repeat(3,1fr);'>" +
+          "<section style='background:#ffffff;padding:0;border-bottom:1px solid #f0f0f0;'>" +
+            "<div style='display:flex;flex-direction:column;max-width:600px;margin:0 auto;padding:20px 0;'>" +
               [[b1,"✓"],[b2,"✓"],[b3,"✓"]].map(function(b,i) {
-                return "<div class='grid-cell' style='padding:48px 36px;text-align:center;" + (i<2?"border-right:1px solid #f0f0f0;":"") + "'><div style='font-size:32px;color:" + brass + ";font-weight:800;margin-bottom:12px;'>" + b[1] + "</div><p style='font-size:clamp(13px,3.5vw,15px);font-weight:600;color:" + ink + ";line-height:1.35;margin:0;'>" + b[0] + "</p></div>";
+                return "<div class='grid-cell benefit-row' style='padding:20px 24px;display:flex;align-items:center;gap:16px;text-align:left;border-bottom:1px solid rgba(0,0,0,0.06);'><span style='font-size:22px;color:" + brass + ";font-weight:800;flex-shrink:0;line-height:1;'>✓</span><p style='font-size:clamp(13px,3.5vw,15px);font-weight:600;color:" + ink + ";line-height:1.3;margin:0;'>" + b[0] + "</p></div>";
               }).join("") +
             "</div>" +
           "</section>" +
@@ -666,7 +666,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:20px;'>" + (brief.brandName||"Brand") + "</div>" +
             "<h1 style='font-weight:800;font-size:clamp(32px,5.5vw,62px);color:#ffffff;margin:0 0 20px;line-height:1.08;'>" + h1 + "</h1>" +
             (hook ? "<p style='font-size:18px;color:rgba(255,255,255,0.9);margin:0 0 12px;line-height:1.6;font-style:italic;'>" + hook + "</p>" : "") +
-            "<p style='font-size:17px;color:rgba(255,255,255,0.82);margin:0 0 36px;line-height:1.65;max-width:580px;'>" + sub + "</p>" +
+            "<p style='font-size:clamp(14px,3.5vw,16px);color:rgba(255,255,255,0.82);margin:0 0 28px;line-height:1.55;max-width:560px;'>" + sub + "</p>" +
             "<div style='display:flex;gap:16px;flex-wrap:wrap;align-items:center;'>" +
               "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "display:inline-block;'>" + cta1 + "</a>" +
               "<a class='cta-btn' style='" + btnOutline + "display:inline-block;'>" + cta2 + "</a>" +
@@ -1485,8 +1485,8 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "footer{padding:32px 20px !important;}" +
         "footer > div{flex-direction:column !important;gap:16px !important;align-items:flex-start !important;}" +
         ".footer-nav{flex-direction:column !important;gap:12px !important;align-items:flex-start !important;}" +
-        ".grid-cell{text-align:left !important;padding:20px !important;border-right:none !important;border-bottom:1px solid rgba(0,0,0,0.06) !important;}" +
-        ".grid-cell:last-child{border-bottom:none !important;}" +
+        ".benefit-row{padding:16px 20px !important;}" +
+        ".benefit-row:last-child{border-bottom:none !important;}" +
 
       "}" +
     "a.cta-btn,a.row-btn{transition:opacity 0.15s ease,transform 0.15s ease,background-color 0.15s ease,color 0.15s ease;}" +
