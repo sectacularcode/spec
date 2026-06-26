@@ -470,55 +470,52 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       // Each industry gets 4 specific photos: hero, feature1, feature2, feature3
       // IDs chosen to be generic enough to work across brands in that category
       var rawText = ([brief.valueProposition, brief.targetAudience, brief.heroHeadline, brief.hookStatement, brief.servicesHeading, brief.tagline, brief.brandName].filter(Boolean).join(" ") || "business").toLowerCase();
-      var photos = {
-        // Fleet/trucking/transport — semi trucks, fleet yards, cargo, drivers
-        fleet:        ["1519003300-8d8b4b5bbf8c","1601584589616-9853df05a08e","1558618666-fcd25c85cd64","1592838076506-ad2e7b318e72"],
-        // Auto body/paint shop — spray booths, bodywork, painting, garage
-        autoshop:     ["1486262322726-88fd9febbbb7","1607860108005-6f6b0b61e5dd","1631467026313-32440d04f9b6","1558618666-fcd25c85cd64"],
-        // Restaurant — plated food, kitchen, dining atmosphere
-        restaurant:   ["1414235077428-338989a2e8c0","1504674900247-0877df9cc836","1555396273-367ea4eb4db5","1466637574441-749b8f19452f"],
-        // Medical — clean clinic, doctor, healthcare professional
-        medical:      ["1576091160399-112ba8d25d1d","1551190822-a9333d879b1f","1538108149393-dbbd82b42b08","1559757148-5c350d0d3c56"],
-        // Construction — job site, workers, framing, hard hats
-        construction: ["1504307651254-35680f356dfd","1503387762-592deb58ef4e","1541888757-3e8a5d9c9c89","1504328345606-18bbc8c9d7d1"],
-        // Real estate — modern home exterior, interior, property
-        realestate:   ["1570129477492-45c003edd2be","1449844908441-8829872d2725","1560518883-ce09059eeffa","1512917774080-9991f1c4c750"],
-        // Legal — professional office, desk, law books, suited professional
-        legal:        ["1521791055366-0d553381ad47","1450101215322-bf5cd27642fc","1589829545856-d10d557cf95f","1479142506502-19583a813bd0"],
-        // Tech — modern office, laptop, developer, clean workspace
-        tech:         ["1497366216548-37526070297c","1518770660439-4636190af475","1531482615713-2afd69097998","1504384308090-c894fdcc538d"],
-        // Fitness — gym floor, equipment, training, athlete
-        fitness:      ["1534438327979-b07bc5e37346","1517836357463-d25dfeac3438","1549060279-7e168fcee0c2","1571019613454-1cb2f99b2d8b"],
-        // Beauty/salon — styling chair, hair, salon interior
-        beauty:       ["1522337360788-8b13dee7a37e","1560066984-138daab7b8e3","1521590832167-7bcbfaa6381f","1562322140-8baeececf3df"],
-        // Landscaping — garden, outdoor crew, lawn, plants
-        landscape:    ["1466692476868-9ee5a3a3d3e4","1416879595882-3373a0480b5b","1416339134316-0e91dc9ded92","1558618666-fcd25c85cd64"],
-        // Trades — tools, pipe work, electrical panel, hands on equipment
-        trades:       ["1504328345606-18bbc8c9d7d1","1503376780353-7e6692767b70","1581091226825-a6a2a5aee158","1607860108005-6f6b0b61e5dd"],
-        // Hotel/hospitality — lobby, clean room, service, front desk
-        hotel:        ["1566073771259-6a8506099945","1520250497591-112ba8d25d1d","1582719508461-905c673536f6","1571003123894-1ead586e6647"],
-        // Generic business — professional people, office, meeting
-        business:     ["1497366216548-37526070297c","1521791055366-0d553381ad47","1531482615713-2afd69097998","1450101215322-bf5cd27642fc"],
-      };
-      var photoSet = photos.business;
-      if (/fleet|truck|semi|trailer|freight|transport|logistics/.test(rawText)) photoSet = photos.fleet;
-      else if (/paint|body.?shop|collision|auto.?repair|vehicle.?repair/.test(rawText)) photoSet = photos.autoshop;
-      else if (/restaurant|food|cafe|kitchen|dining/.test(rawText)) photoSet = photos.restaurant;
-      else if (/medical|health|clinic|dental|physician/.test(rawText)) photoSet = photos.medical;
-      else if (/construction|contractor|building|renovation/.test(rawText)) photoSet = photos.construction;
-      else if (/real.?estate|property|homes|realty/.test(rawText)) photoSet = photos.realestate;
-      else if (/law|attorney|legal|firm/.test(rawText)) photoSet = photos.legal;
-      else if (/tech|software|saas|app|digital/.test(rawText)) photoSet = photos.tech;
-      else if (/fitness|gym|wellness|training/.test(rawText)) photoSet = photos.fitness;
-      else if (/salon|beauty|spa|hair/.test(rawText)) photoSet = photos.beauty;
-      else if (/landscape|lawn|garden/.test(rawText)) photoSet = photos.landscape;
-      else if (/plumb|electric|hvac|mechanical|trade/.test(rawText)) photoSet = photos.trades;
-      else if (/hotel|hospitality|resort/.test(rawText)) photoSet = photos.hotel;
-      var UB = "https://images.unsplash.com/photo-";
-      var heroImg = UB + photoSet[0] + "?w=1400&h=700&fit=crop&auto=format&q=80";
-      var img1    = UB + photoSet[1] + "?w=800&h=600&fit=crop&auto=format&q=80";
-      var img2    = UB + photoSet[2] + "?w=800&h=600&fit=crop&auto=format&q=80";
-      var img3    = UB + photoSet[3] + "?w=800&h=600&fit=crop&auto=format&q=80";
+      // Industry-specific SVG image placeholders — inline, no HTTP requests, always renders
+      // Each returns an SVG data URI with a relevant icon + label for the industry
+      var industryMeta = { label: "Commercial Business", icon: "M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5", color: "#6b7280" };
+      if (/fleet|truck|semi|trailer|freight|transport|logistics/.test(rawText))
+        industryMeta = { label: "Fleet & Trucking", icon: "M1 3h15v13H1zM16 8h4l3 3v5h-7V8zM5.5 19a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM18.5 19a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z", color: "#374151" };
+      else if (/paint|body.?shop|collision|auto.?repair|vehicle.?repair/.test(rawText))
+        industryMeta = { label: "Auto Body & Paint", icon: "M7 8h10l2 4H5L7 8zM3 12h18v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4zM7 16a1 1 0 1 0 0 2 1 1 0 0 0 0-2zM15 16a1 1 0 1 0 0 2 1 1 0 0 0 0-2z", color: "#374151" };
+      else if (/restaurant|food|cafe|kitchen|dining/.test(rawText))
+        industryMeta = { label: "Restaurant & Food", icon: "M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3", color: "#374151" };
+      else if (/medical|health|clinic|dental|physician/.test(rawText))
+        industryMeta = { label: "Healthcare", icon: "M22 12h-4l-3 9L9 3l-3 9H2", color: "#374151" };
+      else if (/construction|contractor|building|renovation/.test(rawText))
+        industryMeta = { label: "Construction", icon: "M2 20h20M4 20V10l8-6 8 6v10M10 20v-6h4v6", color: "#374151" };
+      else if (/real.?estate|property|homes|realty/.test(rawText))
+        industryMeta = { label: "Real Estate", icon: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10", color: "#374151" };
+      else if (/law|attorney|legal|firm/.test(rawText))
+        industryMeta = { label: "Legal Services", icon: "M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6", color: "#374151" };
+      else if (/tech|software|saas|app|digital/.test(rawText))
+        industryMeta = { label: "Technology", icon: "M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18", color: "#374151" };
+      else if (/fitness|gym|wellness|training/.test(rawText))
+        industryMeta = { label: "Fitness & Wellness", icon: "M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v5a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z", color: "#374151" };
+      else if (/salon|beauty|spa|hair/.test(rawText))
+        industryMeta = { label: "Salon & Beauty", icon: "M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z", color: "#374151" };
+      else if (/landscape|lawn|garden/.test(rawText))
+        industryMeta = { label: "Landscaping", icon: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10", color: "#374151" };
+      else if (/plumb|electric|hvac|mechanical|trade/.test(rawText))
+        industryMeta = { label: "Trades & Service", icon: "M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z", color: "#374151" };
+      else if (/hotel|hospitality|resort/.test(rawText))
+        industryMeta = { label: "Hospitality", icon: "M3 22V12l9-9 9 9v10M12 22v-7", color: "#374151" };
+
+      // Build SVG placeholder as a data URI — consistent dimensions, industry label
+      function makeSvgPh(w, h, label, sublabel, bg) {
+        bg = bg || "#e8eaed";
+        var svg = "<svg xmlns='http://www.w3.org/2000/svg' width='" + w + "' height='" + h + "'>" +
+          "<rect width='" + w + "' height='" + h + "' fill='" + bg + "'/>" +
+          "<text x='" + (w/2) + "' y='" + (h/2 - 14) + "' font-family='Inter,system-ui,sans-serif' font-size='13' font-weight='600' fill='#9ca3af' text-anchor='middle'>" + label + "</text>" +
+          "<text x='" + (w/2) + "' y='" + (h/2 + 6) + "' font-family='Inter,system-ui,sans-serif' font-size='11' fill='#c4c9d4' text-anchor='middle'>" + (sublabel||"Add your photo here") + "</text>" +
+          "<rect x='" + (w/2-24) + "' y='" + (h/2+18) + "' width='48' height='2' rx='1' fill='#d1d5db'/>" +
+        "</svg>";
+        return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+      }
+      var phBg = (brass && brass !== "undefined") ? brass + "18" : "#e8f4ea";
+      var img1    = makeSvgPh(800, 600, industryMeta.label, brief.feature1Heading || "Feature image", phBg);
+      var img2    = makeSvgPh(800, 600, industryMeta.label, brief.feature2Heading || "Feature image", phBg);
+      var img3    = makeSvgPh(800, 600, industryMeta.label, brief.feature3Heading || "Feature image", phBg);
+      var heroImg = makeSvgPh(1400, 700, industryMeta.label, "Hero background — replace with your photo", phBg);
 
       var h1    = brief.heroHeadline  || "Your offer, clearly stated.";
       var sub   = brief.heroSubhead   || "One clear value proposition. One clear action.";
@@ -560,7 +557,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
 
       // ── VARIANT B — Lead Form ──────────────────────────────────────────────
       if (variant === "B") {
-        return "<section style='background:" + brass + ";padding:80px clamp(24px,6vw,80px);'>" +
+        return "<section style='background:" + brass + ";padding:80px clamp(24px,6vw,80px);position:relative;'>" +
             "<div style='max-width:1100px;margin:0 auto;text-align:center;'>" +
               "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:16px;'>" + (brief.brandName||"Brand") + "</div>" +
               "<h1 style='font-weight:800;font-size:clamp(32px,5vw,56px);color:#ffffff;margin:0 0 18px;line-height:1.08;'>" + h1 + "</h1>" +
@@ -601,10 +598,10 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           [[f1h,f1b,img1],[f2h,f2b,img2],[f3h,f3b,img3]].map(function(f,i) {
             var imgLeft = i%2!==0;
             var cols = imgLeft
-              ? "<div class='landing-img' style='background:url(" + f[2] + ") center/cover no-repeat;min-height:400px;height:100%;'></div><div style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'>"
+              ? "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src='" + f[2] + "' alt='" + f[0] + "' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div><div style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'>"
               : "<div style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'>";
             var textContent = "<h2 style='font-size:clamp(22px,3vw,34px);font-weight:700;color:" + brass + ";margin:0 0 16px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p><a style='" + btnDark + "'>" + cta2 + "</a></div>";
-            var imgRight = !imgLeft ? "<div class='landing-img' style='background:url(" + f[2] + ") center/cover no-repeat;min-height:400px;height:100%;'></div>" : "";
+            var imgRight = !imgLeft ? "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src='" + f[2] + "' alt='" + f[0] + "' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>" : "";
             return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + cols + textContent + imgRight + "</section>";
           }).join("") +
           "<section style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
@@ -638,7 +635,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             "</div>" +
           "</section>" +
           "<section style='background:" + bone + ";padding:0;display:grid;grid-template-columns:1fr 1fr;'>" +
-            "<div class='landing-img' style='background:url(" + img1 + ") center/cover no-repeat;min-height:420px;height:100%;'></div>" +
+            "<div class='landing-img' style='min-height:420px;height:100%;overflow:hidden;'><img src='" + img1 + "' alt='" + (brief.feature1Heading||industryMeta.label) + "' style='width:100%;height:100%;object-fit:cover;display:block;min-height:420px;'/></div>" +
             "<div style='padding:64px 56px;display:flex;flex-direction:column;justify-content:center;'>" +
               "<p style='font-size:20px;font-style:italic;color:" + ink + ";line-height:1.65;margin:0 0 24px;'>&#8220;" + tq1 + "&#8221;</p>" +
               "<div style='width:36px;height:2px;background:" + brass + ";margin-bottom:14px;'></div>" +
@@ -655,17 +652,18 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       }
 
       // ── VARIANT A — Awareness / Feature (default) ──────────────────────────
-      return "<section style='background:url(" + heroImg + ") center/cover no-repeat;position:relative;min-height:80vh;display:flex;align-items:center;padding:80px clamp(24px,6vw,80px);'>" +
-          "<div style='position:absolute;inset:0;background:" + brass + ";opacity:0.85;'></div>" +
-          "<div style='position:relative;width:100%;max-width:1100px;margin:0 auto;padding:0 clamp(16px,4vw,60px);'>" +
+      return "<section style='position:relative;min-height:80vh;display:flex;align-items:center;padding:80px clamp(24px,6vw,80px);overflow:hidden;'>" +
+          "<img src='" + heroImg + "' alt='Hero' style='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;'/>" +
+          "<div style='position:absolute;inset:0;background:" + brass + ";opacity:0.85;z-index:1;'></div>" +
+          "<div style='position:relative;z-index:2;width:100%;max-width:1100px;margin:0 auto;padding:0 clamp(16px,4vw,60px);'>" +
           "<div style='max-width:660px;'>" +
             "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:20px;'>" + (brief.brandName||"Brand") + "</div>" +
             "<h1 style='font-weight:800;font-size:clamp(32px,5.5vw,62px);color:#ffffff;margin:0 0 20px;line-height:1.08;'>" + h1 + "</h1>" +
             (hook ? "<p style='font-size:18px;color:rgba(255,255,255,0.9);margin:0 0 12px;line-height:1.6;font-style:italic;'>" + hook + "</p>" : "") +
             "<p style='font-size:17px;color:rgba(255,255,255,0.82);margin:0 0 36px;line-height:1.65;max-width:580px;'>" + sub + "</p>" +
-            "<div style='display:flex;gap:16px;flex-wrap:wrap;'>" +
-              "<a style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
-              "<a style='" + btnOutline + "'>" + cta2 + "</a>" +
+            "<div style='display:flex;gap:16px;flex-wrap:wrap;align-items:center;'>" +
+              "<a style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "display:inline-block;'>" + cta1 + "</a>" +
+              "<a style='" + btnOutline + "display:inline-block;'>" + cta2 + "</a>" +
             "</div>" +
           "</div></div>" +
         "</section>" +
@@ -678,7 +676,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "</section>" +
         [[f1h,f1b,img1,false],[f2h,f2b,img2,true],[f3h,f3b,img3,false]].map(function(f,i) {
           var textDiv = "<div style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'><h2 style='font-size:clamp(20px,2.5vw,32px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p><a style='" + btnDark + "'>" + cta2 + "</a></div>";
-          var imgDiv  = "<div class='landing-img' style='background:url(" + f[2] + ") center/cover no-repeat;min-height:400px;height:100%;'></div>";
+          var imgDiv  = "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src='" + f[2] + "' alt='" + f[0] + "' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>";
           return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + (f[3] ? imgDiv+textDiv : textDiv+imgDiv) + "</section>";
         }).join("") +
         "<section style='background:#ffffff;padding:80px clamp(24px,6vw,80px);'>" +
@@ -1434,40 +1432,42 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         ".nav-links{display:none !important;}" +
         ".hamburger{display:flex !important;}" +
         "#mobile-nav.open{display:block !important;}" +
-        "section{padding:44px 20px !important;}" +
+        "section{padding:40px 20px !important;}" +
         "section > div{padding-left:0 !important;padding-right:0 !important;}" +
         "[style*='grid-template-columns']{grid-template-columns:1fr !important;gap:0 !important;}" +
-        ".landing-img{min-height:260px !important;height:260px !important;}" +
-        "[style*='display:flex'][style*='gap:16px']{flex-direction:column !important;gap:12px !important;}" +
-        "[style*='display:flex'][style*='gap:48px'],[style*='display:flex'][style*='gap:64px'],[style*='display:flex'][style*='gap:80px']{flex-direction:column !important;gap:20px !important;}" +
+        ".landing-img{min-height:240px !important;}" +
+        ".landing-img img{min-height:240px !important;height:240px !important;object-fit:cover !important;}" +
+        "[style*='padding:60px 48px']{padding:32px 20px !important;}" +
+        "[style*='padding:64px 56px']{padding:32px 20px !important;}" +
+        "[style*='padding:40px 32px']{padding:24px 20px !important;}" +
+        "[style*='display:flex'][style*='gap:16px']{flex-direction:column !important;gap:10px !important;}" +
+        "[style*='display:flex'][style*='gap:24px']{flex-direction:column !important;gap:12px !important;}" +
+        "[style*='display:flex'][style*='gap:32px']{flex-direction:column !important;gap:14px !important;}" +
         "[style*='display:flex'][style*='gap:40px']{flex-direction:column !important;gap:16px !important;}" +
-        "[style*='padding:60px 48px']{padding:36px 24px !important;}" +
-        "[style*='padding:64px 56px']{padding:36px 24px !important;}" +
+        "[style*='display:flex'][style*='gap:48px'],[style*='display:flex'][style*='gap:64px'],[style*='display:flex'][style*='gap:80px']{flex-direction:column !important;gap:20px !important;}" +
+        "a[style]{display:block !important;width:100% !important;box-sizing:border-box !important;text-align:center !important;margin-bottom:10px !important;}" +
+        "button[style*='padding:14px']{width:100% !important;box-sizing:border-box !important;}" +
+        "h1{font-size:clamp(26px,7vw,36px) !important;line-height:1.15 !important;}" +
+        "h2{font-size:clamp(20px,5vw,28px) !important;line-height:1.2 !important;}" +
+        "h3{font-size:17px !important;}" +
         "[style*='aspect-ratio:16/9']{aspect-ratio:unset !important;height:180px !important;}" +
         "[style*='aspect-ratio:4/3']{aspect-ratio:unset !important;height:180px !important;}" +
         "[style*='aspect-ratio:3/4']{aspect-ratio:unset !important;height:200px !important;}" +
         "[style*='aspect-ratio:1']{aspect-ratio:unset !important;height:160px !important;}" +
-        "div[style='height:120px']{height:40px !important;}" +
-        "div[style='height:112px']{height:36px !important;}" +
-        "div[style='height:96px']{height:32px !important;}" +
-        "div[style='height:88px']{height:28px !important;}" +
-        "div[style='height:80px']{height:28px !important;}" +
-        "div[style='height:72px']{height:24px !important;}" +
+        "div[style='height:120px']{height:36px !important;}" +
+        "div[style='height:96px']{height:28px !important;}" +
+        "div[style='height:80px']{height:24px !important;}" +
         "div[style='height:64px']{height:20px !important;}" +
-        "div[style='height:56px']{height:16px !important;}" +
-        "div[style='height:48px']{height:16px !important;}" +
-        "div[style='height:40px']{height:14px !important;}" +
-        "div[style='height:32px']{height:12px !important;}" +
-        "div[style='height:28px']{height:10px !important;}" +
+        "div[style='height:48px']{height:14px !important;}" +
+        "div[style='height:40px']{height:12px !important;}" +
+        "div[style='height:32px']{height:10px !important;}" +
         "div[style='height:24px']{height:8px !important;}" +
-        "h1{font-size:clamp(26px,7vw,38px) !important;line-height:1.15 !important;}" +
-        "h2{font-size:clamp(22px,6vw,30px) !important;}" +
-        "h3{font-size:17px !important;}" +
-        "a[style*='padding:14px'],a[style*='padding:16px'],button[style*='padding:14px'],button[style*='padding:16px']{display:block !important;text-align:center !important;width:100% !important;box-sizing:border-box !important;margin-bottom:10px !important;}" +
-        "[style*='min-height:80vh'],[style*='min-height:70vh']{min-height:50vh !important;}" +
-        "[style*='min-height:420px']{min-height:260px !important;}" +
+        "[style*='min-height:80vh'],[style*='min-height:70vh']{min-height:55vh !important;}" +
+        "[style*='min-height:420px']{min-height:240px !important;}" +
+        "[style*='min-height:400px']{min-height:240px !important;}" +
+        "[style*='max-width:1100px'],[style*='max-width:1060px'],[style*='max-width:900px']{max-width:100% !important;}" +
         "footer{padding:32px 20px !important;}" +
-        "footer > div{flex-direction:column !important;gap:16px !important;}" +
+        "footer > div{flex-direction:column !important;gap:14px !important;}" +
       "}" +
     "</style>" +
     "</head><body>" +
