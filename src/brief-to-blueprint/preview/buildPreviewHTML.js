@@ -604,8 +604,8 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           [[f1h,f1b,img1],[f2h,f2b,img2],[f3h,f3b,img3]].map(function(f,i) {
             var imgLeft = i%2!==0;
             var cols = imgLeft
-              ? "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div><div style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'>"
-              : "<div style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'>";
+              ? "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div><div style='padding:72px 64px;display:flex;flex-direction:column;justify-content:center;'>"
+              : "<div style='padding:72px 64px;display:flex;flex-direction:column;justify-content:center;'>";
             var textContent = "<h2 style='font-size:clamp(22px,3vw,34px);font-weight:700;color:" + brass + ";margin:0 0 16px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p><a class='row-btn' style='" + btnDark + "'>" + cta2 + "</a></div>";
             var imgRight = !imgLeft ? "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>" : "";
             return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + cols + textContent + imgRight + "</section>";
@@ -633,10 +633,10 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
               "</div>" +
             "</div>" +
           "</section>" +
-          "<section style='background:#ffffff;padding:60px clamp(24px,6vw,80px);border-bottom:1px solid #f0f0f0;'>" +
-            "<div style='display:flex;flex-direction:column;max-width:680px;margin:0 auto;'>" +
+          "<section style='background:#ffffff;padding:72px clamp(24px,6vw,80px);border-bottom:1px solid rgba(0,0,0,0.06);'>" +
+            "<div style='max-width:860px;margin:0 auto;'>" +
               [[b1,"✓"],[b2,"✓"],[b3,"✓"]].map(function(b,i) {
-                return "<div class='grid-cell benefit-row' style='padding:24px 0;display:flex;align-items:center;gap:20px;text-align:left;border-bottom:1px solid rgba(0,0,0,0.08);'><span style='font-size:28px;color:" + brass + ";font-weight:800;flex-shrink:0;line-height:1;'>✓</span><p style='font-size:clamp(15px,2vw,20px);font-weight:600;color:" + ink + ";line-height:1.3;margin:0;'>" + b[0] + "</p></div>";
+                return "<div class='grid-cell benefit-row' style='padding:28px 0;display:flex;align-items:center;gap:24px;text-align:left;border-bottom:1px solid rgba(0,0,0,0.06);'><span class='benefit-check' style='font-size:32px;color:" + brass + ";font-weight:800;flex-shrink:0;line-height:1;'>✓</span><p class='benefit-text' style='font-size:clamp(14px,1.8vw,22px);font-weight:600;color:" + ink + ";line-height:1.25;margin:0;'>" + b[0] + "</p></div>";
               }).join("") +
             "</div>" +
           "</section>" +
@@ -681,11 +681,11 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           "</div>" +
         "</section>" +
         [[f1h,f1b,img1,false],[f2h,f2b,img2,true],[f3h,f3b,img3,false]].map(function(f,i) {
-          var textDiv = "<div class='feature-text' style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'><h2 style='font-size:clamp(20px,2.5vw,32px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p><a class='row-btn' style='" + btnDark + "'>" + cta2 + "</a></div>";
+          var textDiv = "<div class='feature-text' style='padding:72px 64px;display:flex;flex-direction:column;justify-content:center;'><h2 style='font-size:clamp(20px,2.5vw,32px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p><a class='row-btn' style='" + btnDark + "'>" + cta2 + "</a></div>";
           var imgDiv  = "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>";
           return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + (f[3] ? imgDiv+textDiv : textDiv+imgDiv) + "</section>";
         }).join("") +
-        "<section style='background:" + bone + ";padding:80px clamp(24px,6vw,80px);border-top:3px solid " + brass + ";'>" +
+        "<section style='background:" + bone + ";padding:80px clamp(24px,6vw,80px);border-top:1px solid rgba(0,0,0,0.08);'>" +
           "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 32px;'>" + (brief.servicesHeading||"What We Do") + "</h2>" +
           "<div style='display:grid;grid-template-columns:1fr 1fr;gap:0;max-width:900px;'>" +
             svcs.map(function(s) {
@@ -1445,12 +1445,12 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         ".landing-img{min-height:240px !important;order:1 !important;}" +
         ".feature-text{order:2 !important;padding:24px 20px 32px 20px !important;}" +
         ".landing-img img{min-height:240px !important;height:240px !important;object-fit:cover !important;}" +
-        "[style*='padding:60px 48px']{padding:32px 20px !important;}" +
+        "[style*='padding:72px 64px']{padding:28px 20px !important;}" +
         ".feature-text{padding-top:28px !important;}" +
         "[style*='padding:64px 56px']{padding:32px 20px !important;}" +
         "[style*='padding:40px 32px']{padding:24px 20px !important;}" +
         "[style*='padding:48px 36px']{padding:20px !important;}" +
-        "[style*='padding:100px 40px']{padding:48px 20px !important;}" +
+        "[style*='padding:100px 40px']{padding:32px 20px !important;}" +
         "[style*='padding:80px 40px']{padding:40px 20px !important;}" +
         "[style*='padding:80px clamp']{padding:40px 20px !important;}" +
         "[style*='border-right:1px solid']{border-right:none !important;border-bottom:1px solid rgba(0,0,0,0.06) !important;}" +
@@ -1485,9 +1485,13 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "footer{padding:32px 20px !important;}" +
         "footer > div{flex-direction:column !important;gap:16px !important;align-items:flex-start !important;}" +
         ".footer-nav{flex-direction:column !important;gap:12px !important;align-items:flex-start !important;}" +
-        ".benefit-row{padding:16px 20px !important;display:flex !important;flex-direction:row !important;align-items:center !important;}" +
+        ".benefit-row{padding:14px 0 !important;display:flex !important;flex-direction:row !important;align-items:center !important;gap:14px !important;}" +
         ".benefit-row:last-child{border-bottom:none !important;}" +
-        "[style*=\"box-shadow:0 1px 4px\"]{margin-bottom:16px !important;}" +
+        ".benefit-check{font-size:20px !important;}" +
+        ".benefit-text{font-size:13px !important;line-height:1.2 !important;}" +
+        "[style*=\"box-shadow:0 1px 4px\"]{margin-bottom:12px !important;}" +
+        "[style*='min-height:50vh']{min-height:0 !important;}" +
+        "[style*='padding:80px clamp(24px,6vw,80px)']{padding:36px 20px !important;}" +
 
       "}" +
     "a.cta-btn,a.row-btn{transition:opacity 0.15s ease,transform 0.15s ease,background-color 0.15s ease,color 0.15s ease;}" +
