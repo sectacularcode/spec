@@ -765,6 +765,14 @@ export default function CustomBuild({ userId, role } = {}) {
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
             <button onClick={() => setDraftsView(true)} style={{ padding: "7px 14px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "6px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", cursor: "pointer" }}>← Saved Builds</button>
             <button onClick={() => setShowBulkLocation(true)} style={{ padding: "7px 14px", background: "#ffffff", color: "#3f3f46", border: "1px solid #dde0e6", borderRadius: "6px", fontWeight: 500, fontSize: "13px", cursor: "pointer" }}>Bulk Location Pages</button>
+            {generated && (
+              <button
+                onClick={() => setPanelCollapsed(c => !c)}
+                title={panelCollapsed ? "Show panel" : "Hide panel"}
+                style={{ padding: "7px 12px", fontSize: "13px", fontWeight: 500, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "6px", background: panelCollapsed ? "#3f3f46" : "#ffffff", color: panelCollapsed ? "#fff" : "#6b7280", display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                {panelCollapsed ? "▶ Show panel" : "◀ Hide panel"}
+              </button>
+            )}
 
             {(brief || generated) && (
               <button
@@ -1106,16 +1114,7 @@ export default function CustomBuild({ userId, role } = {}) {
                 </button>
               )}
               {/* Desktop / Mobile toggle */}
-              {/* Panel collapse toggle — only shown when preview is active */}
-              <button
-                onClick={() => setPanelCollapsed(c => !c)}
-                title={panelCollapsed ? "Show panel" : "Hide panel"}
-                style={{ marginLeft: "auto", padding: "6px 12px", fontSize: "12px", fontWeight: 600, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "6px", background: panelCollapsed ? "#3f3f46" : "#fff", color: panelCollapsed ? "#fff" : "#6b7280", display: "flex", alignItems: "center", gap: "5px" }}>
-                {panelCollapsed
-                  ? <><span style={{ fontSize: "14px", lineHeight: 1 }}>▶</span> Show panel</>
-                  : <><span style={{ fontSize: "14px", lineHeight: 1 }}>◀</span> Hide panel</>}
-              </button>
-              <div style={{ display: "flex", border: "1px solid #dde0e6", borderRadius: "6px", overflow: "hidden" }}>
+              <div style={{ marginLeft: "auto", display: "flex", border: "1px solid #dde0e6", borderRadius: "6px", overflow: "hidden" }}>
                 <button
                   onClick={() => setMobilePreview(false)}
                   title="Desktop preview"
