@@ -465,93 +465,193 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
     })(),
 
     landing: (function() {
-      var lp = patterns.landing || "centered-dark";
-      var benefits = [
-        { num: "01", title: "Benefit one", body: "Explain the first key benefit clearly." },
-        { num: "02", title: "Benefit two", body: "What makes this worth their time." },
-        { num: "03", title: "Benefit three", body: "The final push to convert." },
-      ];
-      if (lp === "split-light") {
-        return "<section style='background:" + bone + ";padding:clamp(60px,10vw,100px) clamp(24px,8vw,80px);'>" +
-          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;max-width:1160px;margin:0 auto;'>" +
-            "<div>" +
-              "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:20px;'>" + (brief.brandName || "Brand") + "</div>" +
-              "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(32px,5vw,56px);color:" + ink + ";margin:0 0 20px;line-height:1.1;'>" + (brief.heroHeadline || "Your offer, front and center.") + "</h1>" +
-              "<p style='font-size:17px;color:" + text + ";margin:0 0 36px;line-height:1.7;'>" + (brief.heroSubhead || "One clear message. One clear action.") + "</p>" +
-              "<div style='display:flex;gap:16px;flex-wrap:wrap;'>" +
-                "<a style='padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
-                "<a style='padding:14px 32px;background:transparent;color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border:1px solid " + ink + ";border-radius:4px;'>" + (brief.heroCta2 || "Learn more") + "</a>" +
+      // Derive an Unsplash image keyword from the brief to get contextual imagery
+      var imgKeyword = (brief.valueProposition || brief.targetAudience || brief.brandName || "business")
+        .toLowerCase().replace(/[^a-z0-9 ]/g, " ").split(" ").filter(function(w) { return w.length > 3; }).slice(0,2).join(",") || "commercial,business";
+      // Use picsum for reliable placeholder images with a seed derived from brand name
+      var seed1 = (brief.brandName || "brand").split("").reduce(function(a,c){return a+c.charCodeAt(0);},0) % 900 + 100;
+      var seed2 = seed1 + 17; var seed3 = seed1 + 34;
+      var img1 = "https://picsum.photos/seed/" + seed1 + "/800/600";
+      var img2 = "https://picsum.photos/seed/" + seed2 + "/800/600";
+      var img3 = "https://picsum.photos/seed/" + seed3 + "/800/600";
+      var heroImg = "https://picsum.photos/seed/" + (seed1+50) + "/1400/700";
+
+      var h1    = brief.heroHeadline  || "Your offer, clearly stated.";
+      var sub   = brief.heroSubhead   || "One clear value proposition. One clear action.";
+      var hook  = brief.hookStatement || "";
+      var cta1  = brief.phoneCta      || brief.heroCta1 || "Call Us Now";
+      var cta2  = brief.contactCta    || brief.heroCta2 || "Contact Us";
+      var close = brief.closingCta    || brief.tagline  || "Ready to get started?";
+      var closeBody = brief.closingBody || "Reach out today and we'll get back to you within one business day.";
+      var f1h   = brief.feature1Heading || "What We Do Best";
+      var f1b   = brief.feature1Body    || "Detail the primary service or capability that sets you apart.";
+      var f2h   = brief.feature2Heading || "Built for Your Needs";
+      var f2b   = brief.feature2Body    || "Explain how your approach is tailored to the specific customer.";
+      var f3h   = brief.feature3Heading || "Results You Can Count On";
+      var f3b   = brief.feature3Body    || "Speak to reliability, track record, or outcomes.";
+      var s1    = brief.trustStat1 || "10+";  var l1 = brief.trustLabel1 || "Years in business";
+      var s2    = brief.trustStat2 || "500+"; var l2 = brief.trustLabel2 || "Projects completed";
+      var s3    = brief.trustStat3 || "98%";  var l3 = brief.trustLabel3 || "Client satisfaction";
+      var svcs  = Array.isArray(brief.servicesList) ? brief.servicesList : ["Service one","Service two","Service three","Service four","Service five","Service six"];
+      var b1    = brief.benefit1 || "Faster results with less hassle";
+      var b2    = brief.benefit2 || "One team handles everything end to end";
+      var b3    = brief.benefit3 || "Decades of proven experience";
+      var tq1   = brief.testimonial1Quote || "Working with this team was a game changer for our operation. The quality and speed exceeded every expectation.";
+      var tn1   = brief.testimonial1Name  || "Client Name";
+      var tt1   = brief.testimonial1Title || "Operations Manager";
+      var tq2   = brief.testimonial2Quote || "We've tried other vendors. Nobody comes close on turnaround time and quality of work.";
+      var tn2   = brief.testimonial2Name  || "Client Name";
+      var tt2   = brief.testimonial2Title || "Fleet Director";
+      var tq3   = brief.testimonial3Quote || "Straightforward pricing, no surprises, and they always deliver on time.";
+      var tn3   = brief.testimonial3Name  || "Client Name";
+      var tt3   = brief.testimonial3Title || "Business Owner";
+      var formH = brief.formHeading    || "Request a Quote";
+      var formS = brief.formSubhead    || "We'll get back to you within one business day.";
+      var formC = brief.formCta        || "Send It Over";
+      var formR = brief.formReassurance|| "No sales team. A real reply.";
+
+      var btnStyle = "display:inline-block;padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:700;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:3px;";
+      var btnOutline = "display:inline-block;padding:13px 28px;background:transparent;color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:2px solid rgba(255,255,255,0.6);border-radius:3px;";
+      var btnDark = "display:inline-block;padding:13px 28px;background:transparent;color:" + ink + ";font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:2px solid " + brass + ";border-radius:3px;";
+
+      // ── VARIANT B — Lead Form ──────────────────────────────────────────────
+      if (variant === "B") {
+        return "<section style='background:" + brass + ";padding:80px clamp(24px,6vw,80px);'>" +
+            "<div style='max-width:1100px;margin:0 auto;text-align:center;'>" +
+              "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:16px;'>" + (brief.brandName||"Brand") + "</div>" +
+              "<h1 style='font-weight:800;font-size:clamp(32px,5vw,56px);color:#ffffff;margin:0 0 18px;line-height:1.08;'>" + h1 + "</h1>" +
+              (hook ? "<p style='font-size:18px;color:rgba(255,255,255,0.85);margin:0 0 12px;line-height:1.6;font-style:italic;'>" + hook + "</p>" : "") +
+              "<p style='font-size:17px;color:rgba(255,255,255,0.8);margin:0 0 32px;line-height:1.65;max-width:640px;margin-left:auto;margin-right:auto;'>" + sub + "</p>" +
+              "<a style='" + btnStyle.replace("background:"+brass, "background:#ffffff").replace("color:#ffffff", "color:"+brass) + "'>" + cta1 + "</a>" +
+            "</div>" +
+          "</section>" +
+          "<section style='background:" + bone + ";padding:80px clamp(24px,6vw,80px);'>" +
+            "<div style='max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;'>" +
+              "<div>" +
+                "<h2 style='font-size:clamp(24px,3vw,36px);font-weight:700;color:" + ink + ";margin:0 0 32px;'>Why " + (brief.brandName||"us") + "?</h2>" +
+                "<div style='display:flex;flex-direction:column;gap:28px;'>" +
+                  [{ s: s1, l: l1 }, { s: s2, l: l2 }, { s: s3, l: l3 }].map(function(t) {
+                    return "<div style='border-bottom:1px solid #dde0e6;padding-bottom:20px;'><div style='font-size:40px;font-weight:800;color:" + brass + ";line-height:1;margin-bottom:4px;'>" + t.s + "</div><div style='font-size:15px;color:" + stone + ";font-weight:500;'>" + t.l + "</div></div>";
+                  }).join("") +
+                "</div>" +
+              "</div>" +
+              "<div style='background:#ffffff;border:1px solid #dde0e6;border-radius:8px;padding:40px;'>" +
+                "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + formH + "</h3>" +
+                "<p style='font-size:14px;color:" + stone + ";margin:0 0 24px;'>" + formS + "</p>" +
+                ["Name","Company","Phone","What do you need?"].map(function(f) {
+                  return "<div style='margin-bottom:14px;'><label style='display:block;font-size:12px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;'>" + f + "</label><div style='width:100%;padding:10px 14px;border:1px solid #dde0e6;border-radius:4px;background:#f9f9f9;font-size:14px;color:#bbb;box-sizing:border-box;'>" + f + "...</div></div>";
+                }).join("") +
+                "<button style='width:100%;padding:14px;background:" + brass + ";color:#fff;font-weight:700;font-size:14px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:8px;'>" + formC + "</button>" +
+                "<p style='font-size:12px;color:" + stone + ";text-align:center;margin:10px 0 0;'>" + formR + "</p>" +
               "</div>" +
             "</div>" +
-            "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:8px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Hero image</div>" +
-          "</div>" +
-        "</section>" +
-        "<section style='background:#ffffff;padding:80px clamp(24px,8vw,80px);'>" +
-          "<div style='max-width:1160px;margin:0 auto;'>" +
-            benefits.map(function(b) {
-              return "<div style='display:grid;grid-template-columns:80px 1fr;gap:32px;padding:40px 0;border-bottom:1px solid #E2DBCC;align-items:start;'>" +
-                "<div style='font-size:28px;font-weight:800;color:" + brass + ";'>" + b.num + "</div>" +
-                "<div><h3 style='font-size:19px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + b.title + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.65;margin:0;'>" + b.body + "</p></div>" +
-              "</div>";
-            }).join("") +
-          "</div>" +
-        "</section>" +
-        "<section style='background:" + bone + ";padding:80px 40px;text-align:center;'>" +
-          "<h2 style='font-size:clamp(28px,4vw,40px);font-weight:800;color:" + ink + ";margin:0 0 24px;'>" + (brief.heroHeadline || "Ready to get started?") + "</h2>" +
-          "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
-        "</section>";
-      } else if (lp === "social-proof") {
-        var logos = ["Partner A", "Partner B", "Partner C", "Partner D", "Partner E"];
-        return "<section style='background:" + bone + ";padding:clamp(60px,10vw,100px) clamp(24px,8vw,80px);text-align:center;'>" +
-          "<div style='max-width:800px;margin:0 auto;'>" +
-            "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:20px;'>" + (brief.brandName || "Brand") + "</div>" +
-            "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(32px,5vw,56px);color:" + ink + ";margin:0 0 20px;line-height:1.1;'>" + (brief.heroHeadline || "Your offer, front and center.") + "</h1>" +
-            "<p style='font-size:18px;color:" + text + ";margin:0 0 40px;line-height:1.7;'>" + (brief.heroSubhead || "One clear message. One clear action.") + "</p>" +
-            "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
-          "</div>" +
-        "</section>" +
-        "<section style='background:#ffffff;padding:40px;border-top:1px solid #E2DBCC;border-bottom:1px solid #E2DBCC;'>" +
-          "<div style='max-width:900px;margin:0 auto;text-align:center;'>" +
-            "<p style='font-size:12px;color:" + stone + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:24px;'>Trusted by teams at</p>" +
-            "<div style='display:flex;gap:40px;justify-content:center;flex-wrap:wrap;align-items:center;'>" +
-              logos.map(function(l) {
-                return "<div style='font-size:15px;font-weight:700;color:" + stone + ";opacity:.5;'>" + l + "</div>";
+          "</section>" +
+          "<section style='background:#ffffff;padding:80px clamp(24px,6vw,80px);'>" +
+            "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";text-align:center;margin:0 0 48px;'>What our clients say</h2>" +
+            "<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:32px;max-width:1100px;margin:0 auto;'>" +
+              [[tq1,tn1,tt1],[tq2,tn2,tt2],[tq3,tn3,tt3]].map(function(t) {
+                return "<div style='background:" + bone + ";border-radius:6px;padding:32px;'><p style='font-size:16px;font-style:italic;color:" + ink + ";line-height:1.7;margin:0 0 20px;'>&#8220;" + t[0] + "&#8221;</p><div style='width:32px;height:2px;background:" + brass + ";margin-bottom:12px;'></div><div style='font-size:14px;font-weight:600;color:" + ink + ";'>" + t[1] + "</div><div style='font-size:13px;color:" + stone + ";'>" + t[2] + "</div></div>";
               }).join("") +
+            "</div>" +
+          "</section>" +
+          [[f1h,f1b,img1],[f2h,f2b,img2],[f3h,f3b,img3]].map(function(f,i) {
+            var imgLeft = i%2!==0;
+            var cols = imgLeft
+              ? "<div style='background:url(" + f[2] + ") center/cover no-repeat;min-height:400px;'></div><div style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'>"
+              : "<div style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'>";
+            var textContent = "<h2 style='font-size:clamp(22px,3vw,34px);font-weight:700;color:" + brass + ";margin:0 0 16px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p><a style='" + btnDark + "'>" + cta2 + "</a></div>";
+            var imgRight = !imgLeft ? "<div style='background:url(" + f[2] + ") center/cover no-repeat;min-height:400px;'></div>" : "";
+            return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + cols + textContent + imgRight + "</section>";
+          }).join("") +
+          "<section style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
+            "<h2 style='font-size:clamp(26px,4vw,40px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
+            "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:560px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
+            "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
+              "<a style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
+              "<a style='" + btnOutline + "'>" + cta2 + "</a>" +
+            "</div>" +
+          "</section>";
+      }
+
+      // ── VARIANT C — Minimal Retargeting ────────────────────────────────────
+      if (variant === "C") {
+        return "<section style='background:" + brass + ";padding:100px clamp(24px,6vw,80px);text-align:center;'>" +
+            "<div style='max-width:760px;margin:0 auto;'>" +
+              "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-bottom:20px;'>" + (brief.brandName||"Brand") + "</div>" +
+              "<h1 style='font-weight:800;font-size:clamp(32px,5.5vw,60px);color:#ffffff;margin:0 0 20px;line-height:1.08;'>" + h1 + "</h1>" +
+              "<p style='font-size:18px;color:rgba(255,255,255,0.85);margin:0 0 40px;line-height:1.65;'>" + sub + "</p>" +
+              "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
+                "<a style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
+                "<a style='" + btnOutline + "'>" + cta2 + "</a>" +
+              "</div>" +
+            "</div>" +
+          "</section>" +
+          "<section style='background:#ffffff;padding:0;'>" +
+            "<div style='display:grid;grid-template-columns:repeat(3,1fr);'>" +
+              [[b1,"✓"],[b2,"✓"],[b3,"✓"]].map(function(b,i) {
+                return "<div style='padding:48px 36px;text-align:center;" + (i<2?"border-right:1px solid #f0f0f0;":"") + "'><div style='font-size:32px;color:" + brass + ";font-weight:800;margin-bottom:12px;'>" + b[1] + "</div><p style='font-size:16px;font-weight:600;color:" + ink + ";line-height:1.4;margin:0;'>" + b[0] + "</p></div>";
+              }).join("") +
+            "</div>" +
+          "</section>" +
+          "<section style='background:" + bone + ";padding:0;display:grid;grid-template-columns:1fr 1fr;'>" +
+            "<div style='background:url(" + img1 + ") center/cover no-repeat;min-height:420px;'></div>" +
+            "<div style='padding:64px 56px;display:flex;flex-direction:column;justify-content:center;'>" +
+              "<p style='font-size:20px;font-style:italic;color:" + ink + ";line-height:1.65;margin:0 0 24px;'>&#8220;" + tq1 + "&#8221;</p>" +
+              "<div style='width:36px;height:2px;background:" + brass + ";margin-bottom:14px;'></div>" +
+              "<div style='font-size:15px;font-weight:600;color:" + ink + ";'>" + tn1 + "</div>" +
+              "<div style='font-size:13px;color:" + stone + ";'>" + tt1 + "</div>" +
+            "</div>" +
+          "</section>" +
+          "<section style='background:" + brass + ";padding:100px 40px;text-align:center;'>" +
+            "<h2 style='font-size:clamp(26px,4vw,44px);font-weight:800;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
+            "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 36px;max-width:480px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
+            "<a style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "display:block;max-width:280px;margin:0 auto;text-align:center;'>" + cta1 + "</a>" +
+            "<p style='font-size:13px;color:rgba(255,255,255,0.6);margin:16px 0 0;'>" + formR + "</p>" +
+          "</section>";
+      }
+
+      // ── VARIANT A — Awareness / Feature (default) ──────────────────────────
+      return "<section style='background:url(" + heroImg + ") center/cover no-repeat;position:relative;min-height:80vh;display:flex;align-items:center;padding:100px clamp(24px,6vw,80px);'>" +
+          "<div style='position:absolute;inset:0;background:" + brass + ";opacity:0.82;'></div>" +
+          "<div style='position:relative;max-width:800px;'>" +
+            "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:20px;'>" + (brief.brandName||"Brand") + "</div>" +
+            "<h1 style='font-weight:800;font-size:clamp(32px,5.5vw,62px);color:#ffffff;margin:0 0 20px;line-height:1.08;'>" + h1 + "</h1>" +
+            (hook ? "<p style='font-size:18px;color:rgba(255,255,255,0.9);margin:0 0 12px;line-height:1.6;font-style:italic;'>" + hook + "</p>" : "") +
+            "<p style='font-size:17px;color:rgba(255,255,255,0.82);margin:0 0 36px;line-height:1.65;max-width:580px;'>" + sub + "</p>" +
+            "<div style='display:flex;gap:16px;flex-wrap:wrap;'>" +
+              "<a style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
+              "<a style='" + btnOutline + "'>" + cta2 + "</a>" +
             "</div>" +
           "</div>" +
         "</section>" +
-        "<section style='background:" + bone + ";padding:80px 40px;'>" +
-          "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:32px;max-width:1060px;margin:0 auto;'>" +
-            benefits.map(function(b) {
-              return "<div style='background:#ffffff;border:1px solid #E2DBCC;padding:36px 28px;border-radius:6px;'>" +
-                "<div style='font-size:28px;color:" + brass + ";margin-bottom:16px;font-weight:800;'>" + b.num + "</div>" +
-                "<h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 10px;'>" + b.title + "</h3>" +
-                "<p style='font-size:15px;color:" + stone + ";line-height:1.65;margin:0;'>" + b.body + "</p>" +
-              "</div>";
+        "<section style='background:#ffffff;padding:0;border-bottom:1px solid #f0f0f0;'>" +
+          "<div style='display:grid;grid-template-columns:repeat(3,1fr);'>" +
+            [{ s:s1,l:l1 },{ s:s2,l:l2 },{ s:s3,l:l3 }].map(function(t,i) {
+              return "<div style='padding:40px 32px;text-align:center;" + (i<2?"border-right:1px solid #f0f0f0;":"") + "'><div style='font-size:42px;font-weight:800;color:" + brass + ";line-height:1;margin-bottom:6px;'>" + t.s + "</div><div style='font-size:14px;color:" + stone + ";font-weight:500;letter-spacing:0.02em;'>" + t.l + "</div></div>";
             }).join("") +
           "</div>" +
         "</section>" +
-        "<section style='background:" + ink + ";padding:80px 40px;text-align:center;'>" +
-          "<h2 style='font-size:clamp(28px,4vw,40px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>Ready?</h2>" +
-          "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
-        "</section>";
-      } else {
-        // centered-dark (default)
-        return "<section style='background:" + ink + ";min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 40px;text-align:center;'>" +
-          "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,6vw,64px);line-height:1.08;color:" + warmWhite + ";max-width:800px;margin:0 0 24px;'>" + (brief.heroHeadline || "Your offer, front and center.") + "</h1>" +
-          "<p style='font-size:18px;color:" + warmWhite + ";opacity:.8;max-width:520px;margin:0 0 40px;line-height:1.7;'>" + (brief.heroSubhead || "One clear message. One clear action.") + "</p>" +
-          "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+        [[f1h,f1b,img1,false],[f2h,f2b,img2,true],[f3h,f3b,img3,false]].map(function(f,i) {
+          var textDiv = "<div style='padding:60px 48px;display:flex;flex-direction:column;justify-content:center;'><h2 style='font-size:clamp(20px,2.5vw,32px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p><a style='" + btnDark + "'>" + cta2 + "</a></div>";
+          var imgDiv  = "<div style='background:url(" + f[2] + ") center/cover no-repeat;min-height:400px;'></div>";
+          return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + (f[3] ? imgDiv+textDiv : textDiv+imgDiv) + "</section>";
+        }).join("") +
+        "<section style='background:#ffffff;padding:80px clamp(24px,6vw,80px);'>" +
+          "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 32px;'>" + (brief.servicesHeading||"What We Do") + "</h2>" +
+          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:0;max-width:900px;'>" +
+            svcs.map(function(s) {
+              return "<div style='padding:12px 0;border-bottom:1px solid #f0f0f0;font-size:15px;color:" + text + ";display:flex;align-items:center;gap:10px;'><span style='color:" + brass + ";font-weight:700;'>✓</span>" + s + "</div>";
+            }).join("") +
+          "</div>" +
         "</section>" +
-        "<section style='background:" + bone + ";padding:80px 40px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:32px;max-width:1000px;margin:0 auto;text-align:center;'>" +
-          benefits.map(function(b) {
-            return "<div style='padding:32px;'><div style='font-size:32px;color:" + brass + ";margin-bottom:12px;font-weight:800;'>" + b.num + "</div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin-bottom:8px;'>" + b.title + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;'>" + b.body + "</p></div>";
-          }).join("") +
-        "</div></section>" +
-        "<section style='background:" + ink + ";padding:80px 40px;text-align:center;'>" +
-          "<h2 style='font-size:clamp(28px,4vw,44px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>Ready?</h2>" +
-          "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>" + (brief.heroCta1 || "Get started") + "</a>" +
+        "<section style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
+          "<h2 style='font-size:clamp(26px,4vw,42px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
+          "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:540px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
+          "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
+            "<a style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
+            "<a style='" + btnOutline + "'>" + cta2 + "</a>" +
+          "</div>" +
         "</section>";
-      }
     })(),
 
     // ── TEAM ──
