@@ -101,7 +101,7 @@ export async function saveToLibrary(brief, pages, layoutVariants, selectedVarian
     });
     deduped.unshift(entry);
     if (deduped.length > 50) deduped = deduped.slice(0, 50);
-    await kvStorageSet("spec-template-library", JSON.stringify(deduped), userId);
+    await kvStorageSet("spec-template-library", JSON.stringify(deduped));
 
     // Save individual sections for the swap drawer
     var existingSections = [];
@@ -133,7 +133,7 @@ export async function saveToLibrary(brief, pages, layoutVariants, selectedVarian
 
     var combinedSections = newSections.concat(existingSections);
     if (combinedSections.length > 300) combinedSections = combinedSections.slice(0, 300);
-    await kvStorageSet("spec-section-library", JSON.stringify(combinedSections), userId);
+    await kvStorageSet("spec-section-library", JSON.stringify(combinedSections));
 
   } catch(e) {
     console.warn("saveToLibrary failed:", e);

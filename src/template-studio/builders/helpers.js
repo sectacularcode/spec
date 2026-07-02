@@ -2,6 +2,8 @@
 // All return Elementor-compatible JSON objects using the container/flexbox system (v4.x).
 // Import what you need — do not construct widget JSON inline in page builders.
 
+import { textOn, isLight } from "../utils/colors.js";
+
 export const uid = () => Math.random().toString(36).slice(2, 9);
 
 // Container helpers — uses Elementor's modern Container architecture (3.16+)

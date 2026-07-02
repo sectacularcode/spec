@@ -2052,7 +2052,7 @@ Rules:
   // ── Shared context passed to all tab components ──────────────────────────
   const ctx = {
     brand, page, project, pageIdx, audit,
-    updBrand, updPage, updSocial, delSocial, clearDemoContent,
+    updBrand, updPage, updSocial, delSocial, clearDemoContent, toggleSection,
     generateStarterCopy, aiLoading,
     showAdvancedColors, setShowAdvancedColors,
     showAllThemes, setShowAllThemes,

@@ -4,7 +4,7 @@ import { I } from "../../styles.js";
 import { PAGE_TYPES, SECTION_OPTIONS } from "../../constants/ui.jsx";
 
 export default function ContentTab({ ctx }) {
-  const { brand, page, project, updPage, clearDemoContent } = ctx;
+  const { brand, page, project, updPage, clearDemoContent, toggleSection } = ctx;
   return (
             <>
               <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%", padding: "24px 24px 40px" }}>
