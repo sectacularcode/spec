@@ -94,12 +94,12 @@ function AppShell() {
   const { user } = useUser();
 
   const [view, setViewRaw] = useState(() => {
-    try { return localStorage.getItem("spec_app_view") || "dashboard"; } catch(e) { return "dashboard"; }
+    try { return localStorage.getItem("spec_app_view") || "dashboard"; } catch { return "dashboard"; }
   });
 
   function setView(v) {
     setViewRaw(v);
-    try { localStorage.setItem("spec_app_view", v); } catch(e) {}
+    try { localStorage.setItem("spec_app_view", v); } catch {}
   }
   const [role, setRole]             = useState("staff");
   const [tools, setTools]           = useState(["template-studio", "brief-to-blueprint"]);

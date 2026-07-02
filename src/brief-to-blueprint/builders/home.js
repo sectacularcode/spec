@@ -1,10 +1,9 @@
-import { nid, rPad, rFont, mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer, mkDivider } from "./helpers.js";
-import { inspoMatchesVariant } from "../utils/inspo.js";
+import { mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer } from "./helpers.js";
 
 export function buildHomePage(C, brief, inspoHint, patterns) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
-      asphalt = C.asphalt, brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
+      brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
   var heroPattern = (patterns && patterns.hero) || "centered-bold";
 
   // ── HERO — pattern-driven ──────────────────────────────────────────────────

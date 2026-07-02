@@ -8,7 +8,7 @@ import { authHeaders } from "../../utils/api.js";
 // Returns a fully structured page object dropped into the active project.
 // Multiple versions can be generated and kept for A/B comparison.
 
-export function GenerateFromKeywordsModal({ brand, initialKeywords, onClose, onAddPage, userId }) {
+export function GenerateFromKeywordsModal({ _brand, initialKeywords, onClose, onAddPage, _userId }) {
   const [keywords, setKeywords] = useState(initialKeywords || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");

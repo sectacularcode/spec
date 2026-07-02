@@ -1,4 +1,4 @@
-import { nid, rPad, rFont, mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer, mkDivider } from "./helpers.js";
+import { nid, mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer, mkDivider } from "./helpers.js";
 
 // Landing page builder — three distinct conversion-focused layouts.
 //
@@ -17,7 +17,6 @@ import { nid, rPad, rFont, mkContainer, mkHeading, mkText, mkButton, mkImagePh, 
 export function buildLandingPage(colors, brief, inspoContext, variant) {
   var ink      = colors.ink           || "#1A1A1A";
   var accent   = colors.brass         || colors.accent || "#1A5C2A";
-  var accentDp = colors["brass-deep"] || colors["accent-deep"] || "#154A22";
   var bone     = colors.bone          || colors.background || "#F2F2F2";
   var warmWhite= colors["warm-white"] || "#FFFFFF";
   var text     = colors.text          || "#1A1A1A";

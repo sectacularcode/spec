@@ -1,10 +1,10 @@
-import { nid, rPad, rFont, mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer, mkDivider } from "./helpers.js";
+import { mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer } from "./helpers.js";
 import { inspoMatchesVariant } from "../utils/inspo.js";
 
 export function buildWorkPage(C, brief, inspoHint) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
-      warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
-      brassDp = C["brass-deep"] || "#9C7E3A", asphalt = C.asphalt, text = C.text;
+      stone = C.stone || "#8A8170",
+      brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
 
   var header = mkContainer([
     mkHeading(brief.workEyebrow || "Work", brassDp, "h6", { eyebrow: true }),

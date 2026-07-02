@@ -167,7 +167,7 @@ function ReviewScreen({ locations, template, setTemplate, onBack, onConfirm }) {
   );
 }
 
-export function BulkLocationModal({ brief, onClose, onGenerate, userId }) {
+export function BulkLocationModal({ _brief, onClose, onGenerate, _userId }) {
   const [step, setStep] = useState("entry");   // "entry" | "review"
   const [locations, setLocations] = useState([{ ...EMPTY_LOC }]);
   const [template, setTemplate] = useState("A");

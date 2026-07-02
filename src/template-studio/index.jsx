@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 
 // Constants
-import { PAGE_TYPES } from "./constants/ui.jsx";
+
 import { THEMES } from "./constants/themes.js";
 import { LAYOUTS } from "./constants/layouts.js";
 import { WEBSITE_TEMPLATES, PAGE_TEMPLATES, BLANK_BRAND, newPage, applyWebsiteTemplate, applyTheme } from "./constants/templates.js";
@@ -42,8 +42,8 @@ import { authHeaders } from "../utils/api.js";
 
 export default function App({ userId } = {}) {
   const [projects, setProjects] = useState([]);
-  const [activeId, setActiveId] = useState(function(){try{return localStorage.getItem("spec_activeId")||"";}catch(e){return "";}});
-  const [view, setView] = useState(function(){try{return localStorage.getItem("spec_view")||"projects";}catch(e){return "projects";}});
+  const [activeId, setActiveId] = useState(function(){try{return localStorage.getItem("spec_activeId")||"";}catch{return "";}});
+  const [view, setView] = useState(function(){try{return localStorage.getItem("spec_view")||"projects";}catch{return "projects";}});
   useEffect(() => { const h = () => setView("projects"); window.addEventListener("spec-go-projects", h); return () => window.removeEventListener("spec-go-projects", h); }, []);
   const [mobilePreviewTS, setMobilePreviewTS] = useState(false);
   const [showPagePanel, setShowPagePanel] = useState(false);
@@ -57,8 +57,8 @@ export default function App({ userId } = {}) {
   { id: "export",      label: "Export & Import" },
 ];
 
-const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_tab")||"discovery";}catch(e){return "discovery";}});
-  const [pageIdx, setPageIdx] = useState(function(){try{return parseInt(localStorage.getItem("spec_pageIdx")||"0",10);}catch(e){return 0;}});
+const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_tab")||"discovery";}catch{return "discovery";}});
+  const [pageIdx, setPageIdx] = useState(function(){try{return parseInt(localStorage.getItem("spec_pageIdx")||"0",10);}catch{return 0;}});
   const [showAudit, setShowAudit] = useState(false);
   const [showAllThemes, setShowAllThemes] = useState(false);
   const [showAddPage, setShowAddPage] = useState(false);
@@ -91,7 +91,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
     let cancelled = false;
     (async () => {
       try {
-        const lsRaw = (() => { try { return localStorage.getItem("projects"); } catch(e2) { return null; } })();
+        const lsRaw = (() => { try { return localStorage.getItem("projects"); } catch { return null; } })();
         if (userId) {
           const _sRes = await fetch("/api/storage?key=projects", { headers: await authHeaders() }); const _sData = _sRes.ok ? await _sRes.json() : {}; const result = _sData.value ? { value: _sData.value } : null;
           if (result && result.value && !cancelled) {
@@ -147,7 +147,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
                 }
               });
               setProjects(parsed);
-              var sid=null;try{sid=localStorage.getItem("spec_activeId");}catch(e){}
+              var sid=null;try{sid=localStorage.getItem("spec_activeId");}catch{}
               setActiveId(sid&&parsed.find(function(x){return x.id===sid;})?sid:parsed[0].id);
             }
           }
@@ -156,12 +156,12 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
             const lsParsed = JSON.parse(lsRaw);
             if (Array.isArray(lsParsed) && lsParsed.length > 0 && !cancelled) {
               setProjects(lsParsed);
-              var sid2=null;try{sid2=localStorage.getItem("spec_activeId");}catch(e){}
+              var sid2=null;try{sid2=localStorage.getItem("spec_activeId");}catch{}
               setActiveId(sid2&&lsParsed.find(function(x){return x.id===sid2;})?sid2:lsParsed[0].id);
             }
-          } catch(e3) {}
+          } catch {}
         }
-      } catch (e) {
+      } catch {
         // No saved data or parse error — start with empty projects list
       } finally {
         if (!cancelled) setStorageLoaded(true);
@@ -170,7 +170,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
     return () => { cancelled = true; };
   }, []);
 
-  useEffect(function(){if(!storageLoaded)return;try{if(activeId)localStorage.setItem("spec_activeId",activeId);localStorage.setItem("spec_view",view);localStorage.setItem("spec_tab",tab);localStorage.setItem("spec_pageIdx",String(pageIdx));}catch(e){}}, [activeId,view,tab,pageIdx,storageLoaded]);
+  useEffect(function(){if(!storageLoaded)return;try{if(activeId)localStorage.setItem("spec_activeId",activeId);localStorage.setItem("spec_view",view);localStorage.setItem("spec_tab",tab);localStorage.setItem("spec_pageIdx",String(pageIdx));}catch{}}, [activeId,view,tab,pageIdx,storageLoaded]);
 
   // Save projects to storage whenever they change (after initial load)
   useEffect(() => {
@@ -178,11 +178,11 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
     let cancelled = false;
     const timer = setTimeout(async () => {
       try {
-        try { localStorage.setItem("projects", JSON.stringify(projects)); } catch(e) {}
+        try { localStorage.setItem("projects", JSON.stringify(projects)); } catch {}
         if (!cancelled) {
           await fetch("/api/storage", { method: "POST", headers: await authHeaders(), body: JSON.stringify({ action: "set", key: "projects", value: JSON.stringify(projects) }) });
         }
-      } catch (e) {
+      } catch {
         // Storage write failed — fail silently, user can export to file as backup
       }
     }, 600); // debounce
@@ -199,7 +199,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
           const parsed = JSON.parse(result.value);
           if (Array.isArray(parsed)) setSavedBuilds(parsed);
         }
-      } catch(e) {}
+      } catch {}
     }
     loadSavedBuilds();
     // Poll every 10s so new Blueprint saves appear without a page refresh
@@ -217,7 +217,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
           const parsed = JSON.parse(data.value);
           if (Array.isArray(parsed)) setKeywordBuilds(parsed);
         }
-      } catch(e) {}
+      } catch {}
     }
     loadKeywordBuilds();
   }, []);
@@ -227,7 +227,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
       const res = await fetch("/api/storage?key=spec-keyword-builds", { headers: await authHeaders() });
       const data = res.ok ? await res.json() : {};
       let existing = [];
-      try { if (data.value) existing = JSON.parse(data.value); } catch(e) {}
+      try { if (data.value) existing = JSON.parse(data.value); } catch {}
       // Dedup by keywords — replace if same keywords generated today
       const today = new Date().toISOString().slice(0, 10);
       const deduped = existing.filter(b => !(b.keywords === entry.keywords && b.date === today));
@@ -239,7 +239,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
         body: JSON.stringify({ action: "set", key: "spec-keyword-builds", value: JSON.stringify(deduped) }),
       });
       setKeywordBuilds(deduped);
-    } catch(e) {}
+    } catch {}
   }
 
   async function deleteKeywordBuild(id) {
@@ -251,7 +251,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
         body: JSON.stringify({ action: "set", key: "spec-keyword-builds", value: JSON.stringify(updated) }),
       });
       setKeywordBuilds(updated);
-    } catch(e) {}
+    } catch {}
   }
 
   const project = projects.find(p => p.id === activeId) || projects[0] || null;
@@ -812,71 +812,12 @@ Rules:
     setPageIdx(0);
     setBriefRec(null);
     setBriefText("");
-    try { localStorage.removeItem("spec_tab"); } catch(e) {}
+    try { localStorage.removeItem("spec_tab"); } catch {}
     setTab("discovery");
     setView("editor");
   };
 
   // Apply the AI brief to the CURRENT active project (overwrites brand + active page)
-  const applyBriefToCurrent = () => {
-    if (!briefRec) return;
-    const r = briefRec;
-    const template = WEBSITE_TEMPLATES.find(t => t.id === r.templateId);
-    if (!template) { setBriefError("Recommended template not found."); return; }
-    setProjects(ps => ps.map(p => {
-      if (p.id !== activeId) return p;
-      // Apply template to current brand + current page
-      let { brand: newBrand, page: newPage } = applyWebsiteTemplate(template, p.brand, p.pages[pageIdx], THEMES);
-      // Layer the AI brief on top
-      newBrand = {
-        ...newBrand,
-        layoutId: r.layoutId || newBrand.layoutId,
-        headingFont: r.headingFont || newBrand.headingFont,
-        bodyFont: r.bodyFont || newBrand.bodyFont,
-        goals: Array.isArray(r.goals) && r.goals.length ? r.goals : (r.goal ? [r.goal] : (newBrand.goals || [])),
-        goal: Array.isArray(r.goals) && r.goals.length ? r.goals[0] : (r.goal || newBrand.goal),
-        outcome: r.outcome || newBrand.outcome,
-        primaryKeywords: r.primaryKeywords || newBrand.primaryKeywords,
-        tagline: r.tagline || newBrand.tagline,
-      };
-      // Apply custom colors if provided, else apply named theme
-      const templateLocksTheme2 = ['photo-portfolio', 'video-portfolio'].includes(r.templateId);
-      if (!templateLocksTheme2 && r.customColors && r.customColors.background && r.customColors.accent) {
-        const bc = r.customColors;
-        const isDark = (() => {
-          const h = bc.background.replace("#", "");
-          const rr = parseInt(h.slice(0, 2), 16), gg = parseInt(h.slice(2, 4), 16), bb = parseInt(h.slice(4, 6), 16);
-          return (0.299 * rr + 0.587 * gg + 0.114 * bb) / 255 < 0.5;
-        })();
-        newBrand = {
-          ...newBrand,
-          brandColors: bc,
-          themeId: "custom-brand",
-          themeMode: isDark ? "dark" : "light",
-          primaryColor: bc.background,
-          cardBgColor: bc.card || (isDark ? "#181818" : "#f5f5f5"),
-          bodyTextColor: bc.text || (isDark ? "#a8a8a8" : "#4a4a4a"),
-          borderColor: isDark ? "#2a2a2a" : "#e5e5e5",
-          accentColor: bc.accent,
-        };
-      } else if (!templateLocksTheme2 && r.themeId) {
-        const theme = THEMES.find(t => t.id === r.themeId);
-        if (theme) newBrand = applyTheme(theme, newBrand);
-      }
-      if (templateLocksTheme2) {
-        newBrand = { ...newBrand, headingFont: 'Inter', bodyFont: 'Inter' };
-      }
-      newPage = { ...newPage, heroEyebrow: r.heroEyebrow || newPage.heroEyebrow };
-      const newPages = p.pages.map((pg, i) => i === pageIdx ? newPage : pg);
-      // Also update the project name if the AI suggested one (and the current project is still untitled/new)
-      const shouldRename = r.projectName && (p.name === "Untitled" || p.name === "New Project" || !p.name);
-      return { ...p, brand: { ...newBrand, ...(shouldRename ? { name: r.projectName } : {}) }, pages: newPages, ...(shouldRename ? { name: r.projectName } : {}) };
-    }));
-    setBriefRec(null);
-    setBriefText("");
-    try { localStorage.removeItem("spec_tab"); } catch(e) {}
-    setTab("discovery"); // Return to Discovery so they can review and build forward from the start
-  };
   const toggleSection = (s) => updPage("sections", page.sections.includes(s) ? page.sections.filter(x => x !== s) : [...page.sections, s]);
   const addPageFromKeywords = (pageConfig) => {
     // pageConfig comes from GenerateFromKeywordsModal
@@ -928,7 +869,6 @@ Rules:
   };
   const delPage = (i) => { if (project.pages.length <= 1) return; setProjects(ps => ps.map(p => p.id === activeId ? { ...p, pages: p.pages.filter((_, x) => x !== i) } : p)); setPageIdx(0); };
 
-  const addSocial = () => updBrand("socialLinks", [...(brand.socialLinks || []), { key: "instagram", label: "", url: "" }]);
   const updSocial = (i, k, v) => updBrand("socialLinks", brand.socialLinks.map((s, x) => x === i ? { ...s, [k]: v } : s));
   const delSocial = (i) => updBrand("socialLinks", brand.socialLinks.filter((_, x) => x !== i));
 
@@ -950,7 +890,7 @@ Rules:
     setActiveId(id);
     setView("editor");
     setPageIdx(0);
-    try { localStorage.removeItem("spec_tab"); } catch(e) {}
+    try { localStorage.removeItem("spec_tab"); } catch {}
     setTab("discovery"); // Land on Discovery so they start by filling in the business info
   };
 
@@ -1142,14 +1082,6 @@ Rules:
     const layout = LAYOUTS ? LAYOUTS.find(l => l.id === brand.layoutId) : null;
     const theme = THEMES ? THEMES.find(t => t.id === brand.themeId) : null;
     const sl = brand.socialLinks || [];
-
-    const section = (label, content) => content ? `
-      <div class="section">
-        <div class="section-label">${label}</div>
-        ${content}
-      </div>
-      <hr class="divider">
-    ` : "";
 
     const field = (label, value) => value ? `
       <div class="field">
@@ -1371,7 +1303,7 @@ Rules:
         }
         return raw; // old full format
       }
-    } catch(e) {}
+    } catch {}
     return null;
   })();
 
@@ -1682,9 +1614,7 @@ Rules:
                 .map(build => {
                   var colors = build.colors || {};
                   var ink = colors.ink || "#1C1A17";
-                  var bone = colors.bone || "#EDE7DB";
                   var brass = colors.brass || "#C2A35B";
-                  var stone = colors.stone || "#8A8170";
                   return (
                     <div key={build.id} style={{ background: "#fff", border: "1px solid #dde0e6", borderRadius: "10px", overflow: "hidden" }}>
                       {/* Color swatch preview */}
@@ -1744,7 +1674,7 @@ Rules:
                                 const updated = existing.filter(b => b.id !== build.id);
                                 await fetch("/api/storage", { method: "POST", headers: await authHeaders(), body: JSON.stringify({ action: "set", key: "spec-template-library", value: JSON.stringify(updated) }) });
                                 setSavedBuilds(updated);
-                              } catch(e) {}
+                              } catch {}
                             }}
                             style={{ padding: "9px 12px", fontSize: "12px", fontWeight: 500, background: "#fff", color: "#6b7280", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
                             Remove

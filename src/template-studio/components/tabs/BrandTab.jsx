@@ -1,14 +1,14 @@
 import { Section } from "../Section.jsx";
 import { Icon } from "../Icon.jsx";
 import { I } from "../../styles.js";
-import { FONT_OPTIONS, TONES, PREMIUM_ACCENTS } from "../../constants/ui.jsx";
+import { FONT_OPTIONS, PREMIUM_ACCENTS } from "../../constants/ui.jsx";
 import { THEMES } from "../../constants/themes.js";
 import { LAYOUTS } from "../../constants/layouts.js";
 import { WEBSITE_TEMPLATES, applyWebsiteTemplate, applyTheme } from "../../constants/templates.js";
 import { contrastRatio, isLight } from "../../utils/colors.js";
 
 export default function BrandTab({ ctx }) {
-  const { brand, page, project, pageIdx, updBrand, showAdvancedColors, setShowAdvancedColors, showAllThemes, setShowAllThemes, setProjects, activeId } = ctx;
+  const { brand, pageIdx, updBrand, showAdvancedColors, setShowAdvancedColors, showAllThemes, setShowAllThemes, setProjects, activeId } = ctx;
   return (
             <>
               <div style={{ padding: "24px 24px 40px", maxWidth: "1400px", margin: "0 auto" }}>

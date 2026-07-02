@@ -557,7 +557,6 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       var formR = brief.formReassurance|| "No sales team. A real reply.";
 
       var btnStyle = "display:inline-block;padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:700;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:3px;";
-      var btnClass = "cta-btn";
       var btnOutline = "display:inline-block;padding:13px 28px;background:transparent;color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:2px solid rgba(255,255,255,0.6);border-radius:3px;";
       var btnDark = "display:inline-block;padding:10px 24px;background:transparent;color:" + ink + ";font-weight:600;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border:2px solid " + brass + ";border-radius:3px;align-self:flex-start;width:fit-content;";
 
@@ -635,7 +634,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           "</section>" +
           "<section style='background:#ffffff;padding:72px clamp(24px,6vw,80px);border-bottom:1px solid rgba(0,0,0,0.06);'>" +
             "<div style='max-width:860px;margin:0 auto;'>" +
-              [[b1,"✓"],[b2,"✓"],[b3,"✓"]].map(function(b,i) {
+              [[b1,"✓"],[b2,"✓"],[b3,"✓"]].map(function(b,_i) {
                 return "<div class='grid-cell benefit-row' style='padding:28px 0;display:flex;align-items:center;gap:24px;text-align:left;border-bottom:1px solid rgba(0,0,0,0.06);'><span class='benefit-check' style='font-size:32px;color:" + brass + ";font-weight:800;flex-shrink:0;line-height:1;'>✓</span><p class='benefit-text' style='font-size:clamp(14px,1.8vw,22px);font-weight:600;color:" + ink + ";line-height:1.25;margin:0;'>" + b[0] + "</p></div>";
               }).join("") +
             "</div>" +

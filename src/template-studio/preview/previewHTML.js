@@ -4,10 +4,10 @@ import { THEMES } from "../constants/themes.js";
 // All user-controlled brand fields are sanitized via he() before insertion.
 
 import { he } from "../utils/htmlEscape.js";
-import { LAYOUTS, getLayout, eyebrowText } from "../constants/layouts.js";
+import { getLayout, eyebrowText } from "../constants/layouts.js";
 import { SVG } from "../utils/svg.js";
-import { IMAGE_LIBRARY, pickImage, imgOrPlaceholder } from "../utils/images.js";
-import { luminance, contrastRatio, isLight, textOn, mutedTextOn, buttonOn } from "../utils/colors.js";
+import { imgOrPlaceholder } from "../utils/images.js";
+import { luminance, textOn } from "../utils/colors.js";
 
 export function previewHTML(page, brand) {
   // Sanitize all brand string fields before any HTML insertion

@@ -1,7 +1,6 @@
-import { nid, rPad, rFont, mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer, mkDivider } from "./helpers.js";
-import { inspoMatchesVariant } from "../utils/inspo.js";
+import { mkContainer, mkHeading, mkText, mkButton, mkSpacer, mkDivider } from "./helpers.js";
 
-export function buildServicesPage(C, brief, inspoHint) {
+export function buildServicesPage(C, brief, _inspoHint) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", asphalt = C.asphalt || "#2B2823", text = C.text;
@@ -148,7 +147,7 @@ export function buildServicesPage(C, brief, inspoHint) {
     content: [header, tiersSection, menuSection, pricingNoteSection, closing] };
 }
 
-export function buildServicesPageLight(C, brief, inspoHint) {
+export function buildServicesPageLight(C, brief, _inspoHint) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", asphalt = C.asphalt || "#2B2823", text = C.text;

@@ -14,7 +14,7 @@ export async function kvStorageGet(key) {
     if (!res.ok) return null;
     const data = await res.json();
     return data.value ? { value: data.value } : null;
-  } catch (e) { return null; }
+  } catch { return null; }
 }
 
 export async function kvStorageSet(key, value) {
@@ -25,7 +25,7 @@ export async function kvStorageSet(key, value) {
       body: JSON.stringify({ action: "set", key, value }),
     });
     return res.ok;
-  } catch (e) { return false; }
+  } catch { return false; }
 }
 
 export async function kvStorageDel(key) {
@@ -36,5 +36,5 @@ export async function kvStorageDel(key) {
       body: JSON.stringify({ action: "delete", key }),
     });
     return res.ok;
-  } catch (e) { return false; }
+  } catch { return false; }
 }

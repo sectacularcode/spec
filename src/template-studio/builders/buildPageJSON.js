@@ -1,20 +1,16 @@
 import { THEMES } from "../constants/themes.js";
-import { LAYOUTS, getLayout, eyebrowText } from "../constants/layouts.js";
-import { luminance, contrastRatio, isLight, textOn, mutedTextOn, subtleTextOn, buttonOn } from "../utils/colors.js";
-import { IMAGE_LIBRARY, pickImage, imgOrPlaceholder } from "../utils/images.js";
-import { SVG } from "../utils/svg.js";
-import { he } from "../utils/htmlEscape.js";
-import { uid, eContainer, eSection, eRow, eCol, rPx, eHead, eTxt, eBtn, eSpacer, eImg, eIconBox, eCounter, eAccordion, eSocial, eVideo, eCarousel, eForm, eNavMenu, eShortcode, eHTML, eMarquee } from "./helpers.js";
+import { getLayout, eyebrowText } from "../constants/layouts.js";
+import { isLight, textOn, mutedTextOn, buttonOn } from "../utils/colors.js";
+import { imgOrPlaceholder } from "../utils/images.js";
+import { eSection, eRow, eCol, eHead, eTxt, eBtn, eSpacer, eImg, eIconBox, eCounter, eAccordion, eSocial, eVideo, eCarousel, eForm, eShortcode, eHTML, eMarquee } from "./helpers.js";
 // Builds Elementor JSON for a single page based on its section list and brand settings.
 // Iterates the page.sections array and routes each section type to the right widget builder.
 // To add a new section type: add a case in the big if/else block below.
 
 export function buildPageJSON(page, brand) {
-  const { primaryColor: pc, accentColor: ac, cardBgColor: card, bodyTextColor: body, headingFont: hf, bodyFont: bf } = brand;
-  const ts = body;
+  const { primaryColor: pc, accentColor: ac, cardBgColor: card, headingFont: hf, bodyFont: bf } = brand;
   const theme = THEMES.find(t => t.id === brand.themeId);
   const isDark = (brand.themeMode || (theme && theme.mode)) === "dark" || pc.toLowerCase() === "#0a0a0a" || pc.toLowerCase() === "#000000" || pc === "#111111";
-  const headingColor = (theme && theme.headingColor) || (isDark ? "#ffffff" : "#0a0a0a");
   const sections = [];
   const push = (parent, ...els) => els.forEach(e => parent.elements.push(e));
 
@@ -541,7 +537,7 @@ export function buildPageJSON(page, brand) {
       );
       const portLines = (page.portfolio || "").split("\n").filter(Boolean);
       const portImages = portLines.map((line, i) => {
-        const [title, cat, img] = line.split("|");
+        const [title, _cat, img] = line.split("|");
         return {
           url: imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, 1000, 750, brand.imageCategory),
           alt: title || `Project ${i + 1}`,

@@ -1,5 +1,4 @@
-import { nid, rPad, rFont, mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer, mkDivider } from "./helpers.js";
-import { inspoMatchesVariant } from "../utils/inspo.js";
+import { nid, mkContainer, mkHeading, mkText, mkButton, mkSpacer } from "./helpers.js";
 
 // Global header and footer JSON builders.
 // Export as separate templates — import via Elementor Theme Builder.
@@ -8,7 +7,6 @@ export function buildHeaderJSON(C, brief, inspoContext) {
   var ink = C.ink || "#1C1A17";
   var brass = C.brass || "#C2A35B";
   var brassDp = C["brass-deep"] || "#9C7E3A";
-  var bone = C.bone || "#EDE7DB";
   var warmWhite = C["warm-white"] || "#FBFAF7";
 
   // Determine header style from inspo context
@@ -21,27 +19,6 @@ export function buildHeaderJSON(C, brief, inspoContext) {
   var textColor = isDark ? warmWhite : ink;
   var borderColor = isDark ? "rgba(255,255,255,0.1)" : "#dde0e6";
 
-  // Nav links from brief
-  var navLinks = (brief.headerNav || ["Home", "Work", "Services", "About", "Process", "Contact"]);
-  var navLinkWidgets = navLinks.map(function(label) {
-    return {
-      id: nid(),
-      elType: "widget",
-      widgetType: "nav-menu",
-      settings: {
-        menu: label,
-        layout: "horizontal",
-        nav_menu_typography_typography: "custom",
-        nav_menu_typography_font_family: "Inter",
-        nav_menu_typography_font_weight: "500",
-        nav_menu_typography_font_size: { unit: "px", size: 14 },
-        color: textColor,
-        color_hover: brass,
-        mobile_breakpoint: "tablet",
-      },
-      elements: []
-    };
-  });
 
   // Logo widget
   var logoWidget = {
@@ -125,7 +102,6 @@ export function buildHeaderJSON(C, brief, inspoContext) {
 export function buildFooterJSON(C, brief, inspoContext) {
   var ink = C.ink || "#1C1A17";
   var brass = C.brass || "#C2A35B";
-  var brassDp = C["brass-deep"] || "#9C7E3A";
   var bone = C.bone || "#EDE7DB";
   var warmWhite = C["warm-white"] || "#FBFAF7";
   var stone = C.stone || "#8A8170";
@@ -163,7 +139,6 @@ export function buildFooterJSON(C, brief, inspoContext) {
   // Determine footer style from inspo
   var isMinimal = inspo.indexOf("minimal footer") !== -1 || inspo.indexOf("simple footer") !== -1;
 
-  var footerRow, copyrightRow;
 
   if (isMinimal) {
     // Minimal: one row with logo + nav + copyright

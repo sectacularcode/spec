@@ -137,7 +137,7 @@ export const eSpacer = (h = 40) => ({
   },
 });
 
-export const eImg = (url, alt = "") => ({
+export const eImg = (url, _alt = "") => ({
   id: uid(), elType: "widget", widgetType: "image", elements: [],
   settings: { image: { url, id: "" }, image_size: "full", align: "center", caption_source: "none" },
 });
@@ -193,7 +193,7 @@ export const eCounter = (num, suffix, label, accent, color, font, bf) => {
   };
 };
 
-export const eAccordion = (items, color, accent, font, bf) => ({
+export const eAccordion = (items, color, accent, font, _bf) => ({
   id: uid(), elType: "widget", widgetType: "accordion", elements: [],
   settings: {
     tabs: items.map(([q, a]) => ({ _id: uid(), tab_title: q, tab_content: a })),

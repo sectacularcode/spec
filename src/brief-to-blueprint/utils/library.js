@@ -66,7 +66,7 @@ export async function saveToLibrary(brief, pages, layoutVariants, selectedVarian
     try {
       var stored = await kvStorageGet("spec-template-library");
       if (stored && stored.value) existing = JSON.parse(stored.value);
-    } catch(e) {}
+    } catch {}
 
     var tags = inferTags(brief, pages, selectedVariants || layoutVariants);
     var id = "build-" + Date.now();
@@ -108,7 +108,7 @@ export async function saveToLibrary(brief, pages, layoutVariants, selectedVarian
     try {
       var storedSections = await kvStorageGet("spec-section-library");
       if (storedSections && storedSections.value) existingSections = JSON.parse(storedSections.value);
-    } catch(e) {}
+    } catch {}
 
     var newSections = [];
     pages.forEach(function(p) {

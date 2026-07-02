@@ -11,7 +11,7 @@
 //   locationName, city, state, address, phone, hours,
 //   headline, services (array of strings), mapEmbed (HTML string), ctaText
 
-import { nid, rPad, rFont, mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer, mkDivider } from "./helpers.js";
+import { nid, mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer } from "./helpers.js";
 
 function getColors(colors) {
   return {
@@ -57,7 +57,6 @@ function mkServicesList(services, text, brass) {
 }
 
 function mkInfoBlock(loc, ink, stone, bone) {
-  var name    = loc.locationName || "[Location Name]";
   var address = loc.address       || "[Street Address]";
   var city    = loc.city          || "[City]";
   var state   = loc.state         || "[State]";
@@ -95,7 +94,6 @@ export function buildLocationPageA(colors, brief, loc) {
   var C = getColors(colors);
   var loc = loc || brief.locationData || {};
 
-  var locationName = loc.locationName || "[Location Name]";
   var city         = loc.city         || "[City]";
   var state        = loc.state        || "[State]";
   var brandName    = brief.brandName  || "[Brand Name]";
@@ -185,7 +183,6 @@ export function buildLocationPageB(colors, brief, loc) {
   var C = getColors(colors);
   var loc = loc || brief.locationData || {};
 
-  var locationName = loc.locationName || "[Location Name]";
   var city         = loc.city         || "[City]";
   var state        = loc.state        || "[State]";
   var brandName    = brief.brandName  || "[Brand Name]";

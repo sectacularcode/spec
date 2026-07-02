@@ -1,7 +1,7 @@
 import { Icon } from "../Icon.jsx";
 
 export default function ExportTab({ ctx }) {
-  const { page, project, downloadPage, downloadHeader, downloadFooter, downloadAll, exportBrief, shareBrief, exportFormat } = ctx;
+  const { project, downloadPage, downloadHeader, downloadFooter, downloadAll, exportBrief, shareBrief, exportFormat } = ctx;
   return (
             <div className="editor-padding" style={{ padding: "24px 20px 40px", maxWidth: "1080px", margin: "0 auto" }}>
             <div style={{ background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "8px", padding: "20px", marginBottom: "16px" }}>

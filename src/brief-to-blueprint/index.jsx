@@ -99,7 +99,7 @@ export default function CustomBuild({ userId, role } = {}) {
         if (draft.generated)      setGenerated(draft.generated);
         if (draft.previewPage)    setPreviewPage(draft.previewPage);
         if (draft.crawlResults)   setCrawlResults(draft.crawlResults);
-      } catch(e) {}
+      } catch {}
     }
     loadDraft();
   }, []);
@@ -150,7 +150,7 @@ export default function CustomBuild({ userId, role } = {}) {
           const parsed = JSON.parse(result.value);
           if (Array.isArray(parsed)) setDrafts(parsed);
         }
-      } catch(e) {}
+      } catch {}
     }
     loadDrafts();
   }, []);
@@ -160,7 +160,7 @@ export default function CustomBuild({ userId, role } = {}) {
       const existing = await kvStorageGet("spec-blueprint-drafts");
       let list = [];
       if (existing && existing.value) {
-        try { list = JSON.parse(existing.value); } catch(e) {}
+        try { list = JSON.parse(existing.value); } catch {}
       }
       const id = "draft-" + Date.now();
       const entry = {
@@ -178,7 +178,7 @@ export default function CustomBuild({ userId, role } = {}) {
       if (deduped.length > 20) deduped.length = 20;
       await kvStorageSet("spec-blueprint-drafts", JSON.stringify(deduped));
       setDrafts(deduped);
-    } catch(e) {}
+    } catch {}
   }
 
   async function resumeDraft(draft) {
@@ -201,14 +201,12 @@ export default function CustomBuild({ userId, role } = {}) {
       const updated = drafts.filter(d => d.id !== id);
       await kvStorageSet("spec-blueprint-drafts", JSON.stringify(updated));
       setDrafts(updated);
-    } catch(e) {}
+    } catch {}
   }
   async function handleBulkLocationGenerate(locations, template) {
     if (!brief) return;
     // Generate one location page per location entry
-    const colors = brief.colors || {};
     locations.forEach((loc, i) => {
-      const locBrief = { ...brief, locationData: loc };
       const pageId = "location-" + Date.now() + "-" + i;
       const pageDef = { id: pageId, label: (loc.locationName || loc.city || "Location") + (loc.state ? ", " + loc.state : ""), slug: "/" + (loc.city || "location").toLowerCase().replace(/\s+/g, "-") };
       setPages(prev => [...prev, pageId]);
@@ -218,10 +216,9 @@ export default function CustomBuild({ userId, role } = {}) {
     if (generated) {
       try {
         const inspoCtx = generated.inspoContext || "";
-        const allIds = [...selectedPages, ...locations.map((_, i) => "location-" + Date.now() + "-" + i)];
         const newPages = generatePages(brief, [...selectedPages], inspoCtx, generated.aiRecs, customPages);
         setGenerated(prev => ({ ...prev, pages: newPages }));
-      } catch(e) {}
+      } catch {}
     }
   }
 
@@ -234,7 +231,7 @@ export default function CustomBuild({ userId, role } = {}) {
           // Handle both old per-page format and new flat pool format
           setStoredPatterns(parsed.pool ? { pool: parsed.pool } : parsed);
         }
-      } catch (e) {
+      } catch {
         // No stored patterns yet
       }
     }
@@ -248,7 +245,7 @@ export default function CustomBuild({ userId, role } = {}) {
       try {
         const result = await kvStorageGet("spec-section-library");
         if (result && result.value) setSectionLibrary(JSON.parse(result.value));
-      } catch(e) {}
+      } catch {}
     }
     loadSectionLibrary();
   }, []);
@@ -403,7 +400,7 @@ export default function CustomBuild({ userId, role } = {}) {
               });
             }
           }
-        } catch(e) { /* API not available — continue */ }
+        } catch { /* API not available — continue */ }
       }
 
       // Step 3: analyze inspo (skip if no inspo or no API)
@@ -423,7 +420,7 @@ export default function CustomBuild({ userId, role } = {}) {
             const data = await res.json();
             aiRecs = data.recommendations || {};
           }
-        } catch(e) { /* API not available — continue */ }
+        } catch { /* API not available — continue */ }
       }
 
       // Step 4: build pages — this is all client-side, always works
@@ -530,13 +527,6 @@ export default function CustomBuild({ userId, role } = {}) {
       saveToLibrary(brief, generated.pages, layoutVariants, layoutVariants);
     }
   }
-
-  const steps = [
-    { n: 1, label: "Brand Brief",   done: !!brief },
-    { n: 2, label: "Inspo URLs",    done: inspoUrls.some(u => u.trim()) },
-    { n: 3, label: "Pages",         done: selectedPages.length > 0 },
-    { n: 4, label: "Copy Settings", done: true },
-  ];
 
   return (
     <div style={{ minHeight: "100vh", width: "100%", background: "#eeedf1", fontFamily: "'Be Vietnam Pro', sans-serif", boxSizing: "border-box" }}>
@@ -725,7 +715,7 @@ export default function CustomBuild({ userId, role } = {}) {
                   setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]);
                   setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({});
                   setPreviewPage("home"); setPageOverrides({}); setCustomPages([]);
-                  { try { await kvStorageDel("spec-blueprint-draft"); } catch(e) {} }
+                  { try { await kvStorageDel("spec-blueprint-draft"); } catch {} }
                 }}
                 style={{ fontSize: "12px", color: "#6b7280", background: "none", border: "1px solid #dde0e6", borderRadius: "5px", padding: "5px 10px", cursor: "pointer", display: "inline-flex", alignItems: "center", lineHeight: 1 }}>
                 Clear draft

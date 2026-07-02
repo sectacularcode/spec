@@ -1,8 +1,7 @@
-import { nid, rPad, rFont, mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer, mkDivider } from "./helpers.js";
-import { inspoMatchesVariant } from "../utils/inspo.js";
+import { mkContainer, mkHeading, mkText, mkButton, mkSpacer } from "./helpers.js";
 
 export function buildContactPage(C, brief, inspoHint, patterns) {
-  var ink = C.ink, brass = C.brass, bone = C.bone,
+  var ink = C.ink, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
 
