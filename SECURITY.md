@@ -4,7 +4,7 @@
 
 Spec is currently in private beta. If you discover a security vulnerability, please report it privately — do not open a public issue.
 
-Email: hello@specish.com with the subject line "Security Report".
+Email: info@specish.com with the subject line "Security Report".
 
 Please include what you found, where (endpoint, page, or file), and steps to reproduce. You will receive a reply within two business days.
 
