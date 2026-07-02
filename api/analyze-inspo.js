@@ -1,20 +1,13 @@
+import { requireAuth } from "./_lib/auth.js";
+import { rateLimit, tooMany } from "./_lib/ratelimit.js";
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  // Auth — verify userId exists in Redis as a known Spec user
-  const _userId = req.headers["x-spec-user-id"] || (req.body && req.body._userId) || req.query._userId;
-  if (!_userId) return res.status(401).json({ error: "Unauthorized" });
-  const _kvUrl = process.env.KV_REST_API_URL;
-  const _kvToken = process.env.KV_REST_API_TOKEN;
-  if (_kvUrl && _kvToken) {
-    try {
-      const _profileRes = await fetch(`${_kvUrl}/get/${encodeURIComponent("spec:user:" + _userId)}`, {
-        headers: { Authorization: "Bearer " + _kvToken }
-      });
-      const _profileData = await _profileRes.json();
-      if (!_profileData.result) return res.status(401).json({ error: "Unauthorized" });
-    } catch { return res.status(401).json({ error: "Unauthorized" }); }
-  }
+  const userId = await requireAuth(req);
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+  if (!(await rateLimit(userId, "analyze-inspo", 15))) return tooMany(res);
 
 
   const { patterns, pages, brandVoice } = req.body || {};
@@ -26,7 +19,7 @@ export default async function handler(req, res) {
   if (!apiKey) return res.status(500).json({ error: "ANTHROPIC_API_KEY not set" });
 
   // If no patterns, skip AI and return all A defaults
-  const patternText = typeof patterns === "string" ? patterns : JSON.stringify(patterns);
+  const patternText = (typeof patterns === "string" ? patterns : JSON.stringify(patterns)).slice(0, 100000);
   if (!patternText || patternText.length < 20) {
     const defaults = {};
     pages.forEach(p => { defaults[p] = { variant: "A", reason: "No inspo patterns available" }; });

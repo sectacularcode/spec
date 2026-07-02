@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { authHeaders } from "../../utils/api.js";
 
 // GenerateFromKeywordsModal
 // Opened from the "Generate from keywords" option in the Add Page dropdown.
@@ -66,7 +67,7 @@ Research what this theme looks, sounds, and feels like. Use authentic colors fro
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(userId ? { "x-spec-user-id": userId } : {}),
+          ...(await authHeaders()),
         },
         body: JSON.stringify({
           model: "claude-sonnet-4-6",

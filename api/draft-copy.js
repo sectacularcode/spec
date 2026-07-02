@@ -1,24 +1,23 @@
+import { requireAuth } from "./_lib/auth.js";
+import { rateLimit, tooMany } from "./_lib/ratelimit.js";
+import { deepStripHTML } from "./_lib/sanitize.js";
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  // Auth — verify userId exists in Redis as a known Spec user
-  const _userId = req.headers["x-spec-user-id"] || (req.body && req.body._userId) || req.query._userId;
-  if (!_userId) return res.status(401).json({ error: "Unauthorized" });
-  const _kvUrl = process.env.KV_REST_API_URL;
-  const _kvToken = process.env.KV_REST_API_TOKEN;
-  if (_kvUrl && _kvToken) {
-    try {
-      const _profileRes = await fetch(`${_kvUrl}/get/${encodeURIComponent("spec:user:" + _userId)}`, {
-        headers: { Authorization: "Bearer " + _kvToken }
-      });
-      const _profileData = await _profileRes.json();
-      if (!_profileData.result) return res.status(401).json({ error: "Unauthorized" });
-    } catch { return res.status(401).json({ error: "Unauthorized" }); }
-  }
+  const userId = await requireAuth(req);
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+  if (!(await rateLimit(userId, "draft-copy", 15))) return tooMany(res);
 
 
   const { brief, positioning } = req.body || {};
-  if (!brief) return res.status(400).json({ error: "No brief provided" });
+  if (!brief || typeof brief !== "object") return res.status(400).json({ error: "No brief provided" });
+  // Cap total brief payload so an authed-but-abusive client can't run up
+  // input-token costs with an oversized brief.
+  if (JSON.stringify(brief).length > 100000) {
+    return res.status(413).json({ error: "Brief too large" });
+  }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "ANTHROPIC_API_KEY not set" });
@@ -123,7 +122,7 @@ Only include keys for the fields listed above.`;
     const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return res.status(200).json({ drafts: {}, message: "Could not parse drafts" });
 
-    const drafts = JSON.parse(jsonMatch[0]);
+    const drafts = deepStripHTML(JSON.parse(jsonMatch[0]));
     return res.status(200).json({ drafts, fieldsCount: Object.keys(drafts).length });
 
   } catch (err) {

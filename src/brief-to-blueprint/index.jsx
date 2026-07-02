@@ -23,6 +23,7 @@ import { IntakeForm } from "./components/IntakeForm.jsx";
 import { BriefReview } from "./components/BriefReview.jsx";
 import { BulkLocationModal } from "./components/BulkLocationModal.jsx";
 import AdminPanel from "../components/AdminPanel.jsx";
+import { authHeaders } from "../utils/api.js";
 
 export default function CustomBuild({ userId, role } = {}) {
   const [brief, setBrief]               = useState(null);
@@ -84,7 +85,7 @@ export default function CustomBuild({ userId, role } = {}) {
     async function loadDraft() {
       
       try {
-        const result = await kvStorageGet("spec-blueprint-draft", userId);
+        const result = await kvStorageGet("spec-blueprint-draft");
         if (!result || !result.value) return;
         const draft = JSON.parse(result.value);
         if (draft.brief)          setBrief(draft.brief);
@@ -144,7 +145,7 @@ export default function CustomBuild({ userId, role } = {}) {
   useEffect(() => {
     async function loadDrafts() {
       try {
-        const result = await kvStorageGet("spec-blueprint-drafts", userId);
+        const result = await kvStorageGet("spec-blueprint-drafts");
         if (result && result.value) {
           const parsed = JSON.parse(result.value);
           if (Array.isArray(parsed)) setDrafts(parsed);
@@ -156,7 +157,7 @@ export default function CustomBuild({ userId, role } = {}) {
 
   async function saveDraftToList(draftState) {
     try {
-      const existing = await kvStorageGet("spec-blueprint-drafts", userId);
+      const existing = await kvStorageGet("spec-blueprint-drafts");
       let list = [];
       if (existing && existing.value) {
         try { list = JSON.parse(existing.value); } catch(e) {}
@@ -227,7 +228,7 @@ export default function CustomBuild({ userId, role } = {}) {
   useEffect(() => {
     async function loadPatterns() {
       try {
-        const result = await kvStorageGet("spec-inspo-patterns", userId);
+        const result = await kvStorageGet("spec-inspo-patterns");
         if (result && result.value) {
           const parsed = JSON.parse(result.value);
           // Handle both old per-page format and new flat pool format
@@ -245,7 +246,7 @@ export default function CustomBuild({ userId, role } = {}) {
     async function loadSectionLibrary() {
       
       try {
-        const result = await kvStorageGet("spec-section-library", userId);
+        const result = await kvStorageGet("spec-section-library");
         if (result && result.value) setSectionLibrary(JSON.parse(result.value));
       } catch(e) {}
     }
@@ -282,7 +283,7 @@ export default function CustomBuild({ userId, role } = {}) {
       reader.onload = async e => {
         try {
           const base64 = e.target.result.split(",")[1];
-          const res = await fetch("/api/parse-brief", { method: "POST", headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) }, body: JSON.stringify({ content: base64, type: "pdf", fileName: file.name }) });
+          const res = await fetch("/api/parse-brief", { method: "POST", headers: await authHeaders(), body: JSON.stringify({ content: base64, type: "pdf", fileName: file.name }) });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || "Parsing failed");
           setBriefName(file.name); setBriefError("");
@@ -298,7 +299,7 @@ export default function CustomBuild({ userId, role } = {}) {
       reader.onload = async e => {
         try {
           const base64 = e.target.result.split(",")[1];
-          const res = await fetch("/api/parse-brief", { method: "POST", headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) }, body: JSON.stringify({ content: base64, type: "docx", fileName: file.name }) });
+          const res = await fetch("/api/parse-brief", { method: "POST", headers: await authHeaders(), body: JSON.stringify({ content: base64, type: "docx", fileName: file.name }) });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || "Parsing failed");
           setBriefName(file.name); setBriefError("");
@@ -313,7 +314,7 @@ export default function CustomBuild({ userId, role } = {}) {
       const reader = new FileReader();
       reader.onload = async e => {
         try {
-          const res = await fetch("/api/parse-brief", { method: "POST", headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) }, body: JSON.stringify({ content: e.target.result, type: "text", fileName: file.name }) });
+          const res = await fetch("/api/parse-brief", { method: "POST", headers: await authHeaders(), body: JSON.stringify({ content: e.target.result, type: "text", fileName: file.name }) });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || "Parsing failed");
           setBriefName(file.name); setBriefError("");
@@ -326,81 +327,6 @@ export default function CustomBuild({ userId, role } = {}) {
     } else {
       setBriefError("Unsupported file type. Upload a PDF, JSON, DOCX, or TXT file.");
     }
-  }
-
-  function extractBrief(raw) {
-    if (raw.designSystem && raw.brandBrief) {
-      const colors = {};
-      (raw.designSystem.colors || []).forEach(c => { colors[c.id] = c.hex; });
-      const pages = raw.pages || [];
-      const getField = (pageId, sectionType, fieldKey) => {
-        const page = pages.find(p => p.pageId === pageId);
-        if (!page) return "";
-        const sec = page.sections?.find(s => s.sectionType === sectionType || s.captureAs === sectionType);
-        if (!sec) return "";
-        const fld = sec.fields?.find(f => f.key === fieldKey);
-        return Array.isArray(fld?.value) ? fld.value.join(" · ") : fld?.value || "";
-      };
-      return {
-        brandName: raw.project?.name || "",
-        colors,
-        fonts: raw.designSystem.fonts?.map(f => f.family) || ["Inter"],
-        heroHeadline: getField("home","hero-dark","h1") || getField("home","hero","h1"),
-        heroSubhead: getField("home","hero-dark","subhead"),
-        heroCta1: (getField("home","hero-dark","buttons")||"").split("·")[0]?.trim() || "See the work",
-        heroCta2: (getField("home","hero-dark","buttons")||"").split("·")[1]?.trim() || "See pricing",
-        hookStatement: getField("home","statement-hook","statement"),
-        serviceCards: pages.find(p=>p.pageId==="home")?.sections?.find(s=>s.captureAs==="card-grid-4")?.fields?.map(f=>[f.role.replace(/Card \d+ ?·? ?/,""),f.value])||[],
-        differenceEyebrow: getField("home","eyebrow-heading-body","eyebrow"),
-        differenceH2: getField("home","eyebrow-heading-body","h2"),
-        differenceBody: getField("home","eyebrow-heading-body","body"),
-        whoEyebrow: getField("home","who-section","eyebrow"),
-        whoH2: getField("home","who-section","h2"),
-        whoBody: getField("home","who-section","body"),
-        workH2: getField("home","media-grid-link","h2"),
-        pricingH2: getField("home","pricing-teaser","h2"),
-        pricingSubhead: getField("home","pricing-teaser","body"),
-        pricingCta: (getField("home","pricing-teaser","button")||"").split("·")[0]?.trim()||"See packages",
-        tagline: raw.brandBrief?.tagline?.value||"",
-        signatureLine: raw.brandBrief?.signatureLine?.value||"",
-        closingCta: (getField("home","cta-pullquote-dark","button")||"").split("·")[0]?.trim()||"Start a project",
-        aboutH1: getField("about","page-header","h1"),
-        aboutStory: getField("about","story-block","story"),
-        whyOneMaker: getField("about","eyebrow-heading-body","body"),
-        founderValues: (getField("about","values-row","values")||"").split("·").map(v=>v.trim()).filter(Boolean),
-        processH1: getField("process","page-header","h1"),
-        processSteps: (raw.pages?.find(p=>p.pageId==="process")?.sections?.find(s=>s.captureAs==="numbered-steps")?.fields||[]).map(f=>[f.key,f.role,f.value]),
-        contactH1: getField("contact","page-header","h1"),
-        contactIntro: getField("contact","page-header","intro"),
-        contactCta: getField("contact","contact-form","submit"),
-        contactReassurance: getField("contact","contact-form","reassurance"),
-        pricingTiers: (raw.pricing?.tiers||[]).map(t=>[t.name,t.subtitle||"",t.desc,t.price]),
-      };
-    }
-    // Extract colors from text-based briefs (DOCX/TXT)
-    var textColors = {};
-    var rawStr = typeof raw === "string" ? raw : JSON.stringify(raw);
-    var hexMatches = rawStr.match(/#[0-9A-Fa-f]{6}/g) || [];
-    if (hexMatches.length > 0) {
-      // Map common color roles by order of appearance in intake form
-      var colorNames = ["ink", "accent", "brass-deep", "bone", "asphalt", "stone", "warm-white", "text"];
-      hexMatches.slice(0, 8).forEach(function(hex, i) {
-        if (i < colorNames.length) textColors[colorNames[i]] = hex;
-      });
-      // Also try to detect by context
-      var lowerStr = rawStr.toLowerCase();
-      hexMatches.forEach(function(hex) {
-        var idx = lowerStr.indexOf(hex.toLowerCase());
-        var context = lowerStr.substring(Math.max(0, idx - 60), idx).toLowerCase();
-        if (context.indexOf("amber") !== -1 || context.indexOf("accent") !== -1 || context.indexOf("primary accent") !== -1) textColors.brass = hex;
-        if (context.indexOf("charcoal") !== -1 || context.indexOf("primary text") !== -1 || context.indexOf("ink") !== -1) textColors.ink = hex;
-        if (context.indexOf("canvas") !== -1 || context.indexOf("background") !== -1 || context.indexOf("bone") !== -1) textColors.bone = hex;
-        if (context.indexOf("stone") !== -1 || context.indexOf("secondary") !== -1 || context.indexOf("warm stone") !== -1) textColors.stone = hex;
-        if (context.indexOf("border") !== -1 || context.indexOf("divider") !== -1) textColors.border = hex;
-        if (context.indexOf("white") !== -1 || context.indexOf("clean") !== -1) textColors["warm-white"] = hex;
-      });
-    }
-    return { brandName: raw.brandName||raw.name||"", colors: Object.keys(textColors).length > 0 ? textColors : (raw.colors||{}), ...raw };
   }
 
   function addUrl() { setInspoUrls(u => [...u, ""]); }
@@ -420,7 +346,7 @@ export default function CustomBuild({ userId, role } = {}) {
     try {
       const res = await fetch("/api/crawl-inspo", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) },
+        headers: await authHeaders(),
         body: JSON.stringify({ url: trimmed }),
       });
       const data = await res.json();
@@ -466,7 +392,7 @@ export default function CustomBuild({ userId, role } = {}) {
           const res = await fetch("/api/draft-copy", {
             signal: controller.signal,
             method: "POST",
-            headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) },
+            headers: await authHeaders(),
             body: JSON.stringify({ brief, positioning: { valueProposition: brief.valueProposition || "", targetAudience: brief.targetAudience || "" } }),
           });
           if (res.ok) {
@@ -490,7 +416,7 @@ export default function CustomBuild({ userId, role } = {}) {
           const res = await fetch("/api/analyze-inspo", {
             signal: controller2.signal,
             method: "POST",
-            headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) },
+            headers: await authHeaders(),
             body: JSON.stringify({ patterns: inspoContext, pages: selectedPages }),
           });
           if (res.ok) {
@@ -587,7 +513,7 @@ export default function CustomBuild({ userId, role } = {}) {
     a.click(); URL.revokeObjectURL(a.href);
     // Auto-save this single page to the library
     if (brief && generated) {
-      saveToLibrary(brief, [p], layoutVariants, layoutVariants, userId);
+      saveToLibrary(brief, [p], layoutVariants, layoutVariants);
     }
   }
 
@@ -601,7 +527,7 @@ export default function CustomBuild({ userId, role } = {}) {
     }, i * 300));
     // Auto-save full build to library
     if (brief && generated) {
-      saveToLibrary(brief, generated.pages, layoutVariants, layoutVariants, userId);
+      saveToLibrary(brief, generated.pages, layoutVariants, layoutVariants);
     }
   }
 
@@ -799,7 +725,7 @@ export default function CustomBuild({ userId, role } = {}) {
                   setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]);
                   setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({});
                   setPreviewPage("home"); setPageOverrides({}); setCustomPages([]);
-                  { try { await kvStorageDel("spec-blueprint-draft", userId); } catch(e) {} }
+                  { try { await kvStorageDel("spec-blueprint-draft"); } catch(e) {} }
                 }}
                 style={{ fontSize: "12px", color: "#6b7280", background: "none", border: "1px solid #dde0e6", borderRadius: "5px", padding: "5px 10px", cursor: "pointer", display: "inline-flex", alignItems: "center", lineHeight: 1 }}>
                 Clear draft

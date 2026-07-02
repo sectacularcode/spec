@@ -36,6 +36,7 @@ import ContentTab from "./components/tabs/ContentTab.jsx";
 import SocialTab from "./components/tabs/SocialTab.jsx";
 import HeaderFooterTab from "./components/tabs/HeaderFooterTab.jsx";
 import ExportTab from "./components/tabs/ExportTab.jsx";
+import { authHeaders } from "../utils/api.js";
 
 // Styles
 
@@ -92,7 +93,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
       try {
         const lsRaw = (() => { try { return localStorage.getItem("projects"); } catch(e2) { return null; } })();
         if (userId) {
-          const _sRes = await fetch("/api/storage?key=projects", { headers: { "x-spec-user-id": userId } }); const _sData = _sRes.ok ? await _sRes.json() : {}; const result = _sData.value ? { value: _sData.value } : null;
+          const _sRes = await fetch("/api/storage?key=projects", { headers: await authHeaders() }); const _sData = _sRes.ok ? await _sRes.json() : {}; const result = _sData.value ? { value: _sData.value } : null;
           if (result && result.value && !cancelled) {
             const parsed = JSON.parse(result.value);
             if (Array.isArray(parsed) && parsed.length > 0) {
@@ -179,7 +180,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
       try {
         try { localStorage.setItem("projects", JSON.stringify(projects)); } catch(e) {}
         if (!cancelled) {
-          await fetch("/api/storage", { method: "POST", headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) }, body: JSON.stringify({ action: "set", key: "projects", value: JSON.stringify(projects) }) });
+          await fetch("/api/storage", { method: "POST", headers: await authHeaders(), body: JSON.stringify({ action: "set", key: "projects", value: JSON.stringify(projects) }) });
         }
       } catch (e) {
         // Storage write failed — fail silently, user can export to file as backup
@@ -193,7 +194,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
     async function loadSavedBuilds() {
       // storage guard removed — use /api/storage directly
       try {
-        const _tlRes = await fetch("/api/storage?key=spec-template-library", { headers: userId ? { "x-spec-user-id": userId } : {} }); const _tlData = _tlRes.ok ? await _tlRes.json() : {}; const result = _tlData.value ? { value: _tlData.value } : null;
+        const _tlRes = await fetch("/api/storage?key=spec-template-library", { headers: await authHeaders() }); const _tlData = _tlRes.ok ? await _tlRes.json() : {}; const result = _tlData.value ? { value: _tlData.value } : null;
         if (result && result.value) {
           const parsed = JSON.parse(result.value);
           if (Array.isArray(parsed)) setSavedBuilds(parsed);
@@ -210,7 +211,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
   useEffect(() => {
     async function loadKeywordBuilds() {
       try {
-        const res = await fetch("/api/storage?key=spec-keyword-builds", { headers: userId ? { "x-spec-user-id": userId } : {} });
+        const res = await fetch("/api/storage?key=spec-keyword-builds", { headers: await authHeaders() });
         const data = res.ok ? await res.json() : {};
         if (data.value) {
           const parsed = JSON.parse(data.value);
@@ -223,7 +224,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
 
   async function saveKeywordBuild(entry) {
     try {
-      const res = await fetch("/api/storage?key=spec-keyword-builds", { headers: userId ? { "x-spec-user-id": userId } : {} });
+      const res = await fetch("/api/storage?key=spec-keyword-builds", { headers: await authHeaders() });
       const data = res.ok ? await res.json() : {};
       let existing = [];
       try { if (data.value) existing = JSON.parse(data.value); } catch(e) {}
@@ -234,7 +235,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
       if (deduped.length > 50) deduped.length = 50;
       await fetch("/api/storage", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) },
+        headers: await authHeaders(),
         body: JSON.stringify({ action: "set", key: "spec-keyword-builds", value: JSON.stringify(deduped) }),
       });
       setKeywordBuilds(deduped);
@@ -246,7 +247,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
       const updated = keywordBuilds.filter(b => b.id !== id);
       await fetch("/api/storage", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) },
+        headers: await authHeaders(),
         body: JSON.stringify({ action: "set", key: "spec-keyword-builds", value: JSON.stringify(updated) }),
       });
       setKeywordBuilds(updated);
@@ -403,7 +404,7 @@ Important guardrails:
 
       const res = await fetch("/api/generate-copy", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) },
+        headers: await authHeaders(),
         body: JSON.stringify({
           model: "claude-haiku-4-5-20251001",
           max_tokens: 1000,
@@ -475,7 +476,7 @@ Return ONLY the new ${fieldName} value as plain text.`;
       const timeoutId = setTimeout(() => controller.abort(), 20000);
       const res = await fetch("/api/generate-copy", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) },
+        headers: await authHeaders(),
         body: JSON.stringify({
           model: "claude-sonnet-4-6",
           max_tokens: 400,
@@ -649,7 +650,7 @@ Rules:
       const timeoutId = setTimeout(() => controller.abort(), 30000);
       const res = await fetch("/api/generate-copy", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) },
+        headers: await authHeaders(),
         body: JSON.stringify({
           model: "claude-sonnet-4-6",
           max_tokens: 800,
@@ -1737,11 +1738,11 @@ Rules:
                             onClick={async () => {
                               // storage guard removed
                               try {
-                                const _tl2Res = await fetch("/api/storage?key=spec-template-library", { headers: userId ? { "x-spec-user-id": userId } : {} }); const _tl2Data = _tl2Res.ok ? await _tl2Res.json() : {}; const result = _tl2Data.value ? { value: _tl2Data.value } : null;
+                                const _tl2Res = await fetch("/api/storage?key=spec-template-library", { headers: await authHeaders() }); const _tl2Data = _tl2Res.ok ? await _tl2Res.json() : {}; const result = _tl2Data.value ? { value: _tl2Data.value } : null;
                                 if (!result || !result.value) return;
                                 const existing = JSON.parse(result.value);
                                 const updated = existing.filter(b => b.id !== build.id);
-                                await fetch("/api/storage", { method: "POST", headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) }, body: JSON.stringify({ action: "set", key: "spec-template-library", value: JSON.stringify(updated) }) });
+                                await fetch("/api/storage", { method: "POST", headers: await authHeaders(), body: JSON.stringify({ action: "set", key: "spec-template-library", value: JSON.stringify(updated) }) });
                                 setSavedBuilds(updated);
                               } catch(e) {}
                             }}

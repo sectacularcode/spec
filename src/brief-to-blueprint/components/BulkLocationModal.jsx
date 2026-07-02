@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { authHeaders } from "../../utils/api.js";
 
 // BulkLocationModal
 // Opens from a dedicated "Bulk Location Pages" button in Brief to Blueprint.
@@ -230,7 +231,7 @@ export function BulkLocationModal({ brief, onClose, onGenerate, userId }) {
           const base64 = e.target.result.split(",")[1];
           const res = await fetch("/api/parse-brief", {
             method: "POST",
-            headers: { "Content-Type": "application/json", ...(userId ? { "x-spec-user-id": userId } : {}) },
+            headers: await authHeaders(),
             body: JSON.stringify({ content: base64, type: "docx", fileName: file.name, mode: "locations" }),
           });
           const data = await res.json();

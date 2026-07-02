@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
+import { authHeaders } from "../utils/api.js";
 
 const ROLE_COLORS = {
   admin:   { bg: "#09090b", color: "#fff" },
@@ -46,8 +47,8 @@ export default function AdminPanel({ isAdmin, isManager }) {
     try {
       const res = await fetch("/api/user-role", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "list", requesterId: user?.id }),
+        headers: await authHeaders(),
+        body: JSON.stringify({ action: "list" }),
       });
       const data = await res.json();
       setUsers(data.users || []);
@@ -63,10 +64,9 @@ export default function AdminPanel({ isAdmin, isManager }) {
     try {
       const res = await fetch("/api/user-role", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: await authHeaders(),
         body: JSON.stringify({
           action: "set",
-          requesterId: user?.id,
           userId: newUserId.trim(),
           role: newRole,
           tools: newTools.split(","),
@@ -91,10 +91,9 @@ export default function AdminPanel({ isAdmin, isManager }) {
     try {
       const res = await fetch("/api/user-role", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: await authHeaders(),
         body: JSON.stringify({
           action: "set",
-          requesterId: user?.id,
           userId,
           role: editRole,
           tools: editTools.split(","),
@@ -112,8 +111,8 @@ export default function AdminPanel({ isAdmin, isManager }) {
     try {
       await fetch("/api/user-role", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "delete", requesterId: user?.id, userId }),
+        headers: await authHeaders(),
+        body: JSON.stringify({ action: "delete", userId }),
       });
       flash("User removed.");
       loadUsers();

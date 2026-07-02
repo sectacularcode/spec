@@ -1,6 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { SignIn, SignedIn, SignedOut, useUser, UserButton } from "@clerk/clerk-react";
 import Dashboard from "./components/Dashboard.jsx";
+import { authHeaders } from "./utils/api.js";
 
 const ElementorBuilder = lazy(() => import("./template-studio/index.jsx"));
 const CustomBuild      = lazy(() => import("./brief-to-blueprint/index.jsx"));
@@ -106,14 +107,17 @@ function AppShell() {
 
   useEffect(() => {
     if (!user) return;
-    fetch(`/api/user-role?userId=${user.id}`, { credentials: "include" })
-      .then(r => r.json())
-      .then(d => {
+    (async () => {
+      try {
+        const res = await fetch("/api/user-role", { headers: await authHeaders() });
+        const d = await res.json();
         setRole(d.role || "staff");
         setTools(d.tools || ["template-studio", "brief-to-blueprint"]);
-      })
-      .catch(() => {})
-      .finally(() => setRoleLoaded(true));
+      } catch {
+        // keep defaults
+      }
+      setRoleLoaded(true);
+    })();
   }, [user]);
 
   if (!roleLoaded) return <Spinner />;

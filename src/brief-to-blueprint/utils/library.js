@@ -60,11 +60,11 @@ export function inferTags(brief, pages, layoutVariants) {
 
 // Saves a completed build to the template library and each section to the section library.
 // Both are stored in Upstash Redis with a 50-build / 300-section cap (oldest dropped).
-export async function saveToLibrary(brief, pages, layoutVariants, selectedVariants, userId) {
+export async function saveToLibrary(brief, pages, layoutVariants, selectedVariants) {
   try {
     var existing = [];
     try {
-      var stored = await kvStorageGet("spec-template-library", userId);
+      var stored = await kvStorageGet("spec-template-library");
       if (stored && stored.value) existing = JSON.parse(stored.value);
     } catch(e) {}
 
@@ -106,7 +106,7 @@ export async function saveToLibrary(brief, pages, layoutVariants, selectedVarian
     // Save individual sections for the swap drawer
     var existingSections = [];
     try {
-      var storedSections = await kvStorageGet("spec-section-library", userId);
+      var storedSections = await kvStorageGet("spec-section-library");
       if (storedSections && storedSections.value) existingSections = JSON.parse(storedSections.value);
     } catch(e) {}
 

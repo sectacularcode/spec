@@ -1,41 +1,154 @@
+// POST /api/crawl-inspo — fetch a public inspiration site and extract structure.
+//
+// Security model:
+// - Auth via verified Clerk JWT.
+// - SSRF protection: only http/https, hostname must not resolve to private,
+//   loopback, link-local, or cloud-metadata IP ranges. Redirects are followed
+//   manually and every hop is re-validated. Response bodies are size-capped.
+// - Per-user rate limit — crawling is expensive (up to 8 page fetches + one
+//   Anthropic call per request).
+
+import dns from "node:dns/promises";
+import net from "node:net";
+import { requireAuth } from "./_lib/auth.js";
+import { rateLimit, tooMany } from "./_lib/ratelimit.js";
+
+const MAX_REDIRECTS = 3;
+const MAX_BODY_BYTES = 2 * 1024 * 1024; // 2MB per page
+const FETCH_TIMEOUT_MS = 8000;
+
+function isPrivateIPv4(ip) {
+  const parts = ip.split(".").map(Number);
+  if (parts.length !== 4 || parts.some(n => Number.isNaN(n))) return true;
+  const [a, b] = parts;
+  return (
+    a === 0 || a === 10 || a === 127 ||
+    (a === 100 && b >= 64 && b <= 127) ||
+    (a === 169 && b === 254) ||
+    (a === 172 && b >= 16 && b <= 31) ||
+    (a === 192 && b === 0) ||
+    (a === 192 && b === 168) ||
+    (a === 198 && (b === 18 || b === 19)) ||
+    a >= 224
+  );
+}
+
+function isPrivateIp(ip) {
+  if (net.isIPv6(ip)) {
+    const lower = ip.toLowerCase();
+    if (lower.startsWith("::ffff:")) {
+      const mapped = lower.slice(7);
+      return net.isIPv4(mapped) ? isPrivateIPv4(mapped) : true;
+    }
+    return (
+      lower === "::" || lower === "::1" ||
+      lower.startsWith("fc") || lower.startsWith("fd") ||
+      lower.startsWith("fe80")
+    );
+  }
+  return isPrivateIPv4(ip);
+}
+
+// Validates protocol and resolves the hostname to confirm it points at a
+// public address. Returns true only when every resolved address is public.
+async function isSafeUrl(urlString) {
+  let parsed;
+  try {
+    parsed = new URL(urlString);
+  } catch {
+    return false;
+  }
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return false;
+
+  const host = parsed.hostname.replace(/^\[|\]$/g, "");
+  if (!host || host === "localhost" || host.endsWith(".local") || host.endsWith(".internal")) return false;
+  if (net.isIP(host)) return !isPrivateIp(host);
+
+  try {
+    const addrs = await dns.lookup(host, { all: true, verbatim: true });
+    if (!addrs.length) return false;
+    return addrs.every(a => !isPrivateIp(a.address));
+  } catch {
+    return false;
+  }
+}
+
+// Fetches a page with manual redirect handling. Every redirect target is
+// re-validated against the SSRF rules before following.
+async function fetchPage(url) {
+  let current = url;
+  for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+    if (!(await isSafeUrl(current))) return null;
+    let res;
+    try {
+      res = await fetch(current, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (compatible; SpecCrawler/1.0)",
+          "Accept": "text/html",
+        },
+        redirect: "manual",
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      });
+    } catch {
+      return null;
+    }
+
+    if (res.status >= 300 && res.status < 400) {
+      const location = res.headers.get("location");
+      if (!location) return null;
+      try {
+        current = new URL(location, current).href;
+      } catch {
+        return null;
+      }
+      continue;
+    }
+
+    if (!res.ok) return null;
+
+    const contentType = res.headers.get("content-type") || "";
+    if (!contentType.includes("text/html")) return null;
+
+    const declared = parseInt(res.headers.get("content-length") || "0", 10);
+    if (declared > MAX_BODY_BYTES) return null;
+
+    try {
+      const text = await res.text();
+      return text.length > MAX_BODY_BYTES ? text.slice(0, MAX_BODY_BYTES) : text;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  // Auth — verify userId exists in Redis as a known Spec user
-  const _userId = req.headers["x-spec-user-id"] || (req.body && req.body._userId) || req.query._userId;
-  if (!_userId) return res.status(401).json({ error: "Unauthorized" });
-  const _kvUrl = process.env.KV_REST_API_URL;
-  const _kvToken = process.env.KV_REST_API_TOKEN;
-  if (_kvUrl && _kvToken) {
-    try {
-      const _profileRes = await fetch(`${_kvUrl}/get/${encodeURIComponent("spec:user:" + _userId)}`, {
-        headers: { Authorization: "Bearer " + _kvToken }
-      });
-      const _profileData = await _profileRes.json();
-      if (!_profileData.result) return res.status(401).json({ error: "Unauthorized" });
-    } catch { return res.status(401).json({ error: "Unauthorized" }); }
-  }
+  const userId = await requireAuth(req);
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
+  if (!(await rateLimit(userId, "crawl-inspo", 5))) return tooMany(res);
 
   const { url } = req.body || {};
-  if (!url) return res.status(400).json({ error: "No URL provided" });
+  if (!url || typeof url !== "string" || url.length > 2000) {
+    return res.status(400).json({ error: "No URL provided" });
+  }
 
   try {
-    // Normalize URL
     const base = new URL(url.startsWith("http") ? url : "https://" + url);
     const origin = base.origin;
 
-    // Fetch the home/root page to find nav links
+    if (!(await isSafeUrl(base.href))) {
+      return res.status(400).json({ error: "That URL cannot be crawled. Use a public website address." });
+    }
+
     const rootHtml = await fetchPage(base.href);
     if (!rootHtml) return res.status(400).json({ error: "Could not fetch " + base.href });
 
-    // Extract nav links from the page
     const navLinks = extractNavLinks(rootHtml, origin);
-
-    // Deduplicate and filter to same-origin internal pages only
     const allUrls = [base.href, ...navLinks].filter((u, i, arr) => arr.indexOf(u) === i).slice(0, 8);
 
-    // Fetch each page and extract structure
     const pages = await Promise.all(
       allUrls.map(async (pageUrl) => {
         const html = await fetchPage(pageUrl);
@@ -49,10 +162,8 @@ export default async function handler(req, res) {
 
     const discovered = pages.filter(Boolean);
 
-    // Use Claude to summarize the structural patterns per page type
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
-      // Return raw structure if no API key
       return res.status(200).json({ origin, pages: discovered });
     }
 
@@ -71,25 +182,8 @@ export default async function handler(req, res) {
   }
 }
 
-async function fetchPage(url) {
-  try {
-    const res = await fetch(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; SpecCrawler/1.0)",
-        "Accept": "text/html",
-      },
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!res.ok) return null;
-    return await res.text();
-  } catch {
-    return null;
-  }
-}
-
 function extractNavLinks(html, origin) {
   const links = [];
-  // Match href attributes in nav, header areas
   const navMatch = html.match(/<(nav|header)[^>]*>([\s\S]*?)<\/(nav|header)>/gi) || [];
   const searchArea = navMatch.length > 0 ? navMatch.join(" ") : html;
 
@@ -101,7 +195,6 @@ function extractNavLinks(html, origin) {
       const resolved = new URL(href, origin).href;
       if (resolved.startsWith(origin) && resolved !== origin && resolved !== origin + "/") {
         const path = new URL(resolved).pathname;
-        // Skip obvious non-page paths
         if (!path.match(/\.(jpg|png|gif|svg|css|js|pdf|ico|woff|ttf)$/i) &&
             !path.includes("/wp-") && !path.includes("/feed") &&
             !path.includes("/cdn-") && !path.includes("/assets")) {
@@ -125,7 +218,6 @@ function inferPageType(path) {
 }
 
 function extractStructure(html) {
-  // Strip scripts and styles
   const clean = html
     .replace(/<script[\s\S]*?<\/script>/gi, "")
     .replace(/<style[\s\S]*?<\/style>/gi, "")

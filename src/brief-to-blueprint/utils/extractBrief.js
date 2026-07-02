@@ -5,7 +5,22 @@
 //   1. Native Spec format — has designSystem and brandBrief keys
 //   2. Flat format — keys map directly to brief fields
 
-export   function extractBrief(raw) {
+// Strips HTML angle brackets from every string, recursively. Client-supplied
+// JSON briefs bypass the server parser, so this is the ingestion boundary for
+// that path — same rule as api/_lib/sanitize.js.
+function deepStripHTML(value) {
+  if (typeof value === "string") return value.replace(/[<>]/g, "");
+  if (Array.isArray(value)) return value.map(deepStripHTML);
+  if (value && typeof value === "object") {
+    const out = {};
+    for (const k of Object.keys(value)) out[k] = deepStripHTML(value[k]);
+    return out;
+  }
+  return value;
+}
+
+export function extractBrief(rawInput) {
+    const raw = deepStripHTML(rawInput);
     if (raw.designSystem && raw.brandBrief) {
       const colors = {};
       (raw.designSystem.colors || []).forEach(c => { colors[c.id] = c.hex; });

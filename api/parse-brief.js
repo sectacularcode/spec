@@ -1,4 +1,7 @@
 import mammoth from "mammoth";
+import { requireAuth } from "./_lib/auth.js";
+import { rateLimit, tooMany } from "./_lib/ratelimit.js";
+import { deepStripHTML } from "./_lib/sanitize.js";
 
 const EXTRACTION_PROMPT = `Extract every field from this brand brief and return ONLY a single valid JSON object.
 No markdown, no code fences, no explanation — just the raw JSON.
@@ -113,24 +116,19 @@ async function callClaude(apiKey, messages, extraHeaders = {}) {
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  // Auth — verify userId exists in Redis as a known Spec user
-  const _userId = req.headers["x-spec-user-id"] || (req.body && req.body._userId) || req.query._userId;
-  if (!_userId) return res.status(401).json({ error: "Unauthorized" });
-  const _kvUrl = process.env.KV_REST_API_URL;
-  const _kvToken = process.env.KV_REST_API_TOKEN;
-  if (_kvUrl && _kvToken) {
-    try {
-      const _profileRes = await fetch(`${_kvUrl}/get/${encodeURIComponent("spec:user:" + _userId)}`, {
-        headers: { Authorization: "Bearer " + _kvToken }
-      });
-      const _profileData = await _profileRes.json();
-      if (!_profileData.result) return res.status(401).json({ error: "Unauthorized" });
-    } catch { return res.status(401).json({ error: "Unauthorized" }); }
+  const userId = await requireAuth(req);
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+  if (!(await rateLimit(userId, "parse-brief", 10))) return tooMany(res);
+
+
+  const { content, type } = req.body || {};
+  if (!content || typeof content !== "string") return res.status(400).json({ error: "No content provided" });
+  // ~4MB cap on uploaded brief content (base64 or text). Vercel enforces a
+  // body limit too; this returns a clean error instead of a platform 413.
+  if (content.length > 4 * 1024 * 1024) {
+    return res.status(413).json({ error: "File too large. Briefs must be under 3MB." });
   }
-
-
-  const { content, type, fileName } = req.body || {};
-  if (!content) return res.status(400).json({ error: "No content provided" });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "ANTHROPIC_API_KEY not set in Vercel environment variables." });
@@ -151,11 +149,11 @@ export default async function handler(req, res) {
     } else if (type === "docx") {
       const buffer = Buffer.from(content, "base64");
       const result = await mammoth.extractRawText({ buffer });
-      const text = result.value;
+      const text = result.value.slice(0, 150000);
       if (!text.trim()) throw new Error("Could not extract text from DOCX file.");
       messages = [{ role: "user", content: `${EXTRACTION_PROMPT}\n\nBRIEF CONTENT:\n\n${text}` }];
     } else {
-      messages = [{ role: "user", content: `${EXTRACTION_PROMPT}\n\nBRIEF CONTENT:\n\n${content}` }];
+      messages = [{ role: "user", content: `${EXTRACTION_PROMPT}\n\nBRIEF CONTENT:\n\n${content.slice(0, 150000)}` }];
     }
 
     const result = await callClaude(apiKey, messages, extraHeaders);
@@ -171,7 +169,7 @@ export default async function handler(req, res) {
     const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return res.status(500).json({ error: "Could not parse Claude response", raw: rawText.slice(0, 500) });
 
-    return res.status(200).json({ ...JSON.parse(jsonMatch[0]), _model: result.model });
+    return res.status(200).json(deepStripHTML({ ...JSON.parse(jsonMatch[0]), _model: result.model }));
 
   } catch (err) {
     console.error("parse-brief error:", err);
