@@ -3,8 +3,12 @@
 // if storage is unavailable rather than crashing.
 // Auth is a Clerk session JWT attached by authHeaders(); the server verifies
 // the token and namespaces every key to the signed-in user.
+//
+// Shared by both Template Studio and Brief to Blueprint — previously
+// Template Studio reimplemented this exact fetch pattern inline nine times
+// instead of importing it.
 
-import { authHeaders } from "../../utils/api.js";
+import { authHeaders } from "./api.js";
 
 export async function kvStorageGet(key) {
   try {

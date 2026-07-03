@@ -51,8 +51,15 @@ export default function AdminPanel({ isAdmin }) {
         body: JSON.stringify({ action: "list" }),
       });
       const data = await res.json();
-      setUsers(data.users || []);
-    } catch { setUsers([]); }
+      if (res.ok) {
+        setUsers(data.users || []);
+      } else {
+        // Previously silent — a failed/forbidden request looked identical
+        // to "there are no users" instead of surfacing the actual error.
+        flash(data.error || "Failed to load users.", "err");
+        setUsers([]);
+      }
+    } catch { flash("Error loading users.", "err"); setUsers([]); }
     setLoading(false);
   }
 
@@ -109,13 +116,21 @@ export default function AdminPanel({ isAdmin }) {
     if (!window.confirm("Remove this user? They will lose all access.")) return;
     setDeleting(userId);
     try {
-      await fetch("/api/user-role", {
+      const res = await fetch("/api/user-role", {
         method: "POST",
         headers: await authHeaders(),
         body: JSON.stringify({ action: "delete", userId }),
       });
-      flash("User removed.");
-      loadUsers();
+      if (res.ok) {
+        flash("User removed.");
+        loadUsers();
+      } else {
+        // Previously showed "User removed." unconditionally — e.g. the
+        // server-side block on an admin deleting their own account would
+        // silently fail while the UI claimed success.
+        const d = await res.json();
+        flash(d.error || "Failed to remove user.", "err");
+      }
     } catch { flash("Error removing user.", "err"); }
     setDeleting(null);
   }

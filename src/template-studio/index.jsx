@@ -37,6 +37,7 @@ import SocialTab from "./components/tabs/SocialTab.jsx";
 import HeaderFooterTab from "./components/tabs/HeaderFooterTab.jsx";
 import ExportTab from "./components/tabs/ExportTab.jsx";
 import { authHeaders } from "../utils/api.js";
+import { kvStorageGet, kvStorageSet } from "../utils/storage.js";
 
 // Styles
 
@@ -99,7 +100,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
       try {
         const lsRaw = (() => { try { return localStorage.getItem("projects"); } catch { return null; } })();
         if (userId) {
-          const _sRes = await fetch("/api/storage?key=projects", { headers: await authHeaders() }); const _sData = _sRes.ok ? await _sRes.json() : {}; const result = _sData.value ? { value: _sData.value } : null;
+          const result = await kvStorageGet("projects");
           if (result && result.value && !cancelled) {
             const parsed = JSON.parse(result.value);
             if (Array.isArray(parsed) && parsed.length > 0) {
@@ -189,7 +190,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
           // load (see `if (userId)` above). A localStorage mirror here is
           // redundant and can only go stale.
           if (!cancelled) {
-            await fetch("/api/storage", { method: "POST", headers: await authHeaders(), body: JSON.stringify({ action: "set", key: "projects", value: JSON.stringify(projects) }) });
+            await kvStorageSet("projects", JSON.stringify(projects));
           }
         } else {
           // Signed out — localStorage is the only persistence available,
@@ -208,7 +209,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
     async function loadSavedBuilds() {
       // storage guard removed — use /api/storage directly
       try {
-        const _tlRes = await fetch("/api/storage?key=spec-template-library", { headers: await authHeaders() }); const _tlData = _tlRes.ok ? await _tlRes.json() : {}; const result = _tlData.value ? { value: _tlData.value } : null;
+        const result = await kvStorageGet("spec-template-library");
         if (result && result.value) {
           const parsed = JSON.parse(result.value);
           if (Array.isArray(parsed)) setSavedBuilds(parsed);
@@ -225,10 +226,9 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
   useEffect(() => {
     async function loadKeywordBuilds() {
       try {
-        const res = await fetch("/api/storage?key=spec-keyword-builds", { headers: await authHeaders() });
-        const data = res.ok ? await res.json() : {};
-        if (data.value) {
-          const parsed = JSON.parse(data.value);
+        const result = await kvStorageGet("spec-keyword-builds");
+        if (result?.value) {
+          const parsed = JSON.parse(result.value);
           if (Array.isArray(parsed)) setKeywordBuilds(parsed);
         }
       } catch {}
@@ -238,20 +238,15 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
 
   async function saveKeywordBuild(entry) {
     try {
-      const res = await fetch("/api/storage?key=spec-keyword-builds", { headers: await authHeaders() });
-      const data = res.ok ? await res.json() : {};
+      const result = await kvStorageGet("spec-keyword-builds");
       let existing = [];
-      try { if (data.value) existing = JSON.parse(data.value); } catch {}
+      try { if (result?.value) existing = JSON.parse(result.value); } catch {}
       // Dedup by keywords — replace if same keywords generated today
       const today = new Date().toISOString().slice(0, 10);
       const deduped = existing.filter(b => !(b.keywords === entry.keywords && b.date === today));
       deduped.unshift(entry);
       if (deduped.length > 50) deduped.length = 50;
-      await fetch("/api/storage", {
-        method: "POST",
-        headers: await authHeaders(),
-        body: JSON.stringify({ action: "set", key: "spec-keyword-builds", value: JSON.stringify(deduped) }),
-      });
+      await kvStorageSet("spec-keyword-builds", JSON.stringify(deduped));
       setKeywordBuilds(deduped);
     } catch {}
   }
@@ -259,11 +254,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
   async function deleteKeywordBuild(id) {
     try {
       const updated = keywordBuilds.filter(b => b.id !== id);
-      await fetch("/api/storage", {
-        method: "POST",
-        headers: await authHeaders(),
-        body: JSON.stringify({ action: "set", key: "spec-keyword-builds", value: JSON.stringify(updated) }),
-      });
+      await kvStorageSet("spec-keyword-builds", JSON.stringify(updated));
       setKeywordBuilds(updated);
     } catch {}
   }
@@ -1694,11 +1685,11 @@ Rules:
                             onClick={async () => {
                               // storage guard removed
                               try {
-                                const _tl2Res = await fetch("/api/storage?key=spec-template-library", { headers: await authHeaders() }); const _tl2Data = _tl2Res.ok ? await _tl2Res.json() : {}; const result = _tl2Data.value ? { value: _tl2Data.value } : null;
+                                const result = await kvStorageGet("spec-template-library");
                                 if (!result || !result.value) return;
                                 const existing = JSON.parse(result.value);
                                 const updated = existing.filter(b => b.id !== build.id);
-                                await fetch("/api/storage", { method: "POST", headers: await authHeaders(), body: JSON.stringify({ action: "set", key: "spec-template-library", value: JSON.stringify(updated) }) });
+                                await kvStorageSet("spec-template-library", JSON.stringify(updated));
                                 setSavedBuilds(updated);
                               } catch {}
                             }}

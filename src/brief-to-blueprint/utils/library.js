@@ -2,7 +2,7 @@
 // Saves completed builds and individual sections to Upstash Redis
 // so they can be surfaced in the swap drawer and library browser.
 
-import { kvStorageGet, kvStorageSet } from "./storage.js";
+import { kvStorageGet, kvStorageSet } from "../../utils/storage.js";
 
 // Infers visual style tags, tone tags, and industry fit from a brief.
 // These tags power the library filter UI.
