@@ -191,15 +191,20 @@ export default function AdminPanel({ isAdmin }) {
       <div style={S.header}>
         <div style={S.headerTitle}>User Management</div>
         <div style={{ display: "flex", gap: "8px" }}>
-          {isAdmin && (
-            <button
-              style={{ ...S.btnSecondary, background: "#fef3c7", color: "#92400e", border: "1px solid #f59e0b" }}
-              onClick={runProfileMigration}
-              disabled={migrating}
-              title="TEMPORARY — one-time Redis to Postgres profile migration. Remove after use.">
-              {migrating ? "Migrating…" : "⚠ Run DB Migration (one-time)"}
-            </button>
-          )}
+          {/* TEMPORARY: isAdmin gate removed — the frontend's computed role
+              can't be trusted until the migration has actually run (that's
+              the whole point of this button). The endpoint itself checks
+              the *current Redis* admin role server-side, so this is safe
+              to expose more broadly for the one-time cutover window.
+              Restore `{isAdmin && (...)}` once migrated and this file/button
+              pair is deleted. */}
+          <button
+            style={{ ...S.btnSecondary, background: "#fef3c7", color: "#92400e", border: "1px solid #f59e0b" }}
+            onClick={runProfileMigration}
+            disabled={migrating}
+            title="TEMPORARY — one-time Redis to Postgres profile migration. Remove after use.">
+            {migrating ? "Migrating…" : "⚠ Run DB Migration (one-time)"}
+          </button>
           <button style={S.btnSecondary} onClick={loadUsers}>Refresh</button>
         </div>
       </div>
