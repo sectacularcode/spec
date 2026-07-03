@@ -38,6 +38,7 @@ import HeaderFooterTab from "./components/tabs/HeaderFooterTab.jsx";
 import ExportTab from "./components/tabs/ExportTab.jsx";
 import { authHeaders } from "../utils/api.js";
 import { kvStorageGet, kvStorageSet } from "../utils/storage.js";
+import { listProjects, saveProjectsBatch } from "../utils/projects.js";
 
 // Styles
 
@@ -86,6 +87,15 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
 
   // Persistence — load projects from window.storage on mount, save on changes
   const [storageLoaded, setStorageLoaded] = useState(false);
+  // Map of projectId -> JSON.stringify({name,brand,pages}) for what's last
+  // confirmed-saved to Postgres. Deliberately left empty after load (not
+  // pre-populated from the loaded rows) so the first autosave tick re-
+  // upserts every project once — this is what persists the one-time field
+  // migrations below back to the server, matching the old whole-blob
+  // autosave's behavior. Resets naturally on sign-out/sign-in because
+  // <SignedIn>/<SignedOut> unmount this component entirely; do not add a
+  // `key` prop to this component without reconsidering this ref's lifecycle.
+  const lastSavedRef = useRef({});
   const [showAdvancedColors, setShowAdvancedColors] = useState(false);
   const [briefDirty, setBriefDirty] = useState(false);
   const [importMsg, setImportMsg] = useState("");
@@ -100,11 +110,10 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
       try {
         const lsRaw = (() => { try { return localStorage.getItem("projects"); } catch { return null; } })();
         if (userId) {
-          const result = await kvStorageGet("projects");
-          if (result && result.value && !cancelled) {
-            const parsed = JSON.parse(result.value);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              // Migration: ensure every project's brand has a goals array.
+          const rows = await listProjects();
+          if (rows.length > 0 && !cancelled) {
+            const parsed = rows.map(({ id, name, brand, pages }) => ({ id, name, brand, pages }));
+            // Migration: ensure every project's brand has a goals array.
               // Older projects only have singular `goal` (string) — convert to array.
               parsed.forEach(p => {
                 if (p.brand) {
@@ -156,7 +165,6 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
               setProjects(parsed);
               var sid=null;try{sid=localStorage.getItem("spec_activeId");}catch{}
               setActiveId(sid&&parsed.find(function(x){return x.id===sid;})?sid:parsed[0].id);
-            }
           }
         } else if (lsRaw) {
           try {
@@ -179,18 +187,48 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
 
   useEffect(function(){if(!storageLoaded)return;try{if(activeId)localStorage.setItem("spec_activeId",activeId);localStorage.setItem("spec_view",view);localStorage.setItem("spec_tab",tab);localStorage.setItem("spec_pageIdx",String(pageIdx));}catch{}}, [activeId,view,tab,pageIdx,storageLoaded]);
 
-  // Save projects to storage whenever they change (after initial load)
+  // Save projects to storage whenever they change (after initial load).
+  // Diffs against lastSavedRef and only upserts/deletes the projects that
+  // actually changed, instead of rewriting the whole array — this is what
+  // fixes the write-race bug where two tabs editing different projects
+  // used to clobber each other's whole-blob save.
   useEffect(() => {
     if (!storageLoaded) return;
     let cancelled = false;
     const timer = setTimeout(async () => {
       try {
         if (userId) {
-          // Signed in — server storage is authoritative and read back on
-          // load (see `if (userId)` above). A localStorage mirror here is
-          // redundant and can only go stale.
-          if (!cancelled) {
-            await kvStorageSet("projects", JSON.stringify(projects));
+          if (cancelled) return;
+          const currentIds = new Set();
+          const upserts = [];
+          for (const p of projects) {
+            currentIds.add(p.id);
+            const data = { name: p.name, brand: p.brand, pages: p.pages };
+            const snapshot = JSON.stringify(data);
+            if (lastSavedRef.current[p.id] !== snapshot) upserts.push({ id: p.id, data });
+          }
+          const deletes = Object.keys(lastSavedRef.current).filter(id => !currentIds.has(id));
+          if (upserts.length === 0 && deletes.length === 0) return;
+
+          const result = await saveProjectsBatch({ upserts, deletes });
+          if (!result || cancelled) return;
+
+          for (const id of result.upserted) {
+            const p = projects.find(x => x.id === id);
+            if (p) lastSavedRef.current[id] = JSON.stringify({ name: p.name, brand: p.brand, pages: p.pages });
+          }
+          for (const id of result.deleted) delete lastSavedRef.current[id];
+
+          // Cross-tenant id collision (rare — see api/projects.js). Regenerate
+          // the id locally and rewrite state now, so the next save tick
+          // (driven by this same setProjects call) retries under the new id
+          // instead of colliding again.
+          if (result.collisions.length > 0) {
+            const remap = {};
+            result.collisions.forEach(({ id }) => { remap[id] = uid(); });
+            setProjects(ps => ps.map(p => remap[p.id] ? { ...p, id: remap[p.id] } : p));
+            setActiveId(cur => remap[cur] || cur);
+            Object.keys(remap).forEach(oldId => delete lastSavedRef.current[oldId]);
           }
         } else {
           // Signed out — localStorage is the only persistence available,
