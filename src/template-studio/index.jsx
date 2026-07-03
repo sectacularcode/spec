@@ -37,8 +37,9 @@ import SocialTab from "./components/tabs/SocialTab.jsx";
 import HeaderFooterTab from "./components/tabs/HeaderFooterTab.jsx";
 import ExportTab from "./components/tabs/ExportTab.jsx";
 import { authHeaders } from "../utils/api.js";
-import { kvStorageGet, kvStorageSet } from "../utils/storage.js";
 import { listProjects, saveProjectsBatch } from "../utils/projects.js";
+import { listTemplateLibrary, deleteTemplateLibraryEntry } from "../utils/templateLibrary.js";
+import { listKeywordBuilds, saveKeywordBuildEntry, deleteKeywordBuildEntry } from "../utils/keywordBuilds.js";
 
 // Styles
 
@@ -245,14 +246,8 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
   // Load Blueprint saved builds from storage
   useEffect(() => {
     async function loadSavedBuilds() {
-      // storage guard removed — use /api/storage directly
-      try {
-        const result = await kvStorageGet("spec-template-library");
-        if (result && result.value) {
-          const parsed = JSON.parse(result.value);
-          if (Array.isArray(parsed)) setSavedBuilds(parsed);
-        }
-      } catch {}
+      const entries = await listTemplateLibrary();
+      setSavedBuilds(entries);
     }
     loadSavedBuilds();
     // Poll every 10s so new Blueprint saves appear without a page refresh
@@ -263,38 +258,28 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
   // Load keyword builds history from storage
   useEffect(() => {
     async function loadKeywordBuilds() {
-      try {
-        const result = await kvStorageGet("spec-keyword-builds");
-        if (result?.value) {
-          const parsed = JSON.parse(result.value);
-          if (Array.isArray(parsed)) setKeywordBuilds(parsed);
-        }
-      } catch {}
+      const entries = await listKeywordBuilds();
+      setKeywordBuilds(entries);
     }
     loadKeywordBuilds();
   }, []);
 
   async function saveKeywordBuild(entry) {
-    try {
-      const result = await kvStorageGet("spec-keyword-builds");
-      let existing = [];
-      try { if (result?.value) existing = JSON.parse(result.value); } catch {}
-      // Dedup by keywords — replace if same keywords generated today
-      const today = new Date().toISOString().slice(0, 10);
+    const ok = await saveKeywordBuildEntry(entry);
+    if (!ok) return;
+    // Dedup locally too, mirroring the server's replace-same-day-keywords rule.
+    const today = new Date().toISOString().slice(0, 10);
+    setKeywordBuilds(existing => {
       const deduped = existing.filter(b => !(b.keywords === entry.keywords && b.date === today));
       deduped.unshift(entry);
-      if (deduped.length > 50) deduped.length = 50;
-      await kvStorageSet("spec-keyword-builds", JSON.stringify(deduped));
-      setKeywordBuilds(deduped);
-    } catch {}
+      return deduped.length > 50 ? deduped.slice(0, 50) : deduped;
+    });
   }
 
   async function deleteKeywordBuild(id) {
-    try {
-      const updated = keywordBuilds.filter(b => b.id !== id);
-      await kvStorageSet("spec-keyword-builds", JSON.stringify(updated));
-      setKeywordBuilds(updated);
-    } catch {}
+    const ok = await deleteKeywordBuildEntry(id);
+    if (!ok) return;
+    setKeywordBuilds(existing => existing.filter(b => b.id !== id));
   }
 
   const project = projects.find(p => p.id === activeId) || projects[0] || null;
@@ -1721,15 +1706,8 @@ Rules:
                           </button>
                           <button
                             onClick={async () => {
-                              // storage guard removed
-                              try {
-                                const result = await kvStorageGet("spec-template-library");
-                                if (!result || !result.value) return;
-                                const existing = JSON.parse(result.value);
-                                const updated = existing.filter(b => b.id !== build.id);
-                                await kvStorageSet("spec-template-library", JSON.stringify(updated));
-                                setSavedBuilds(updated);
-                              } catch {}
+                              const ok = await deleteTemplateLibraryEntry(build.id);
+                              if (ok) setSavedBuilds(existing => existing.filter(b => b.id !== build.id));
                             }}
                             style={{ padding: "9px 12px", fontSize: "12px", fontWeight: 500, background: "#fff", color: "#6b7280", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
                             Remove

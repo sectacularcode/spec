@@ -1,0 +1,89 @@
+// Template library API — Postgres-backed, replaces the Redis
+// spec-template-library array blob.
+//
+// GET  /api/template-library   — list the caller's saved builds
+// POST /api/template-library   — { entry } — atomic server-side dedup
+//                                 (replaces any existing entry for the
+//                                 same client+date+source) + insert,
+//                                 capped at 50 rows.
+// DELETE /api/template-library?id=xxx — remove one entry
+//
+// The old client-driven pattern was read-whole-array -> filter -> write-
+// whole-array, which is itself a smaller instance of the write-race bug
+// family. Doing the dedup as a DELETE immediately followed by an INSERT
+// in the same request removes that read-modify-write window entirely.
+
+import { requireAuth } from "./_lib/auth.js";
+import { rateLimit, tooMany } from "./_lib/ratelimit.js";
+import { validId, validText, validJsonSize } from "./_lib/validate.js";
+import { sql } from "@vercel/postgres";
+
+const CAP = 50;
+
+export default async function handler(req, res) {
+  if (req.method === "OPTIONS") return res.status(200).end();
+
+  const userId = await requireAuth(req);
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+  if (!(await rateLimit(userId, "template-library", 60))) return tooMany(res);
+
+  try {
+    if (req.method === "GET") {
+      const { rows } = await sql`
+        SELECT id, data FROM template_library_entries
+        WHERE user_id = ${userId}
+        ORDER BY created_at DESC, id DESC
+      `;
+      return res.status(200).json({ entries: rows.map(r => ({ id: r.id, ...r.data })) });
+    }
+
+    if (req.method === "POST") {
+      const { entry } = req.body || {};
+      const { id, client, date, source, ...rest } = entry || {};
+      if (!validId(id) || !validText(client) || !validText(date, 32) || !validText(source, 32) || !validJsonSize(rest)) {
+        return res.status(400).json({ error: "Invalid entry" });
+      }
+
+      // Dedup: replace any existing entry for the same client+date+source.
+      await sql`
+        DELETE FROM template_library_entries
+        WHERE user_id = ${userId} AND client = ${client} AND entry_date = ${date} AND source = ${source}
+      `;
+
+      const { rows } = await sql`
+        INSERT INTO template_library_entries (id, user_id, client, entry_date, source, data)
+        VALUES (${id}, ${userId}, ${client}, ${date}, ${source}, ${rest})
+        ON CONFLICT (id) DO NOTHING
+        RETURNING id
+      `;
+      if (rows.length === 0) {
+        return res.status(409).json({ error: "id_collision" });
+      }
+
+      // Cap at 50 most recent rows for this user.
+      await sql`
+        DELETE FROM template_library_entries
+        WHERE user_id = ${userId} AND id NOT IN (
+          SELECT id FROM template_library_entries
+          WHERE user_id = ${userId}
+          ORDER BY created_at DESC, id DESC
+          LIMIT ${CAP}
+        )
+      `;
+
+      return res.status(200).json({ ok: true, id });
+    }
+
+    if (req.method === "DELETE") {
+      const id = req.query.id;
+      if (!validId(id)) return res.status(400).json({ error: "Invalid id" });
+      await sql`DELETE FROM template_library_entries WHERE id = ${id} AND user_id = ${userId}`;
+      return res.status(200).json({ ok: true });
+    }
+
+    return res.status(405).json({ error: "Method not allowed" });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+}

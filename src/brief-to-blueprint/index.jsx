@@ -6,6 +6,7 @@ import { ALL_PAGES, ADDITIONAL_PAGE_TYPES } from "../constants/pages.js";
 
 // Utils
 import { kvStorageGet, kvStorageSet, kvStorageDel } from "../utils/storage.js";
+import { listSectionLibrary } from "../utils/sectionLibrary.js";
 import { buildInspoContext } from "./utils/inspo.js";
 import { saveToLibrary } from "./utils/library.js";
 import { extractBrief } from "./utils/extractBrief.js";
@@ -250,11 +251,8 @@ export default function CustomBuild({ userId, role } = {}) {
   // Load section library for swap drawer
   useEffect(() => {
     async function loadSectionLibrary() {
-      
-      try {
-        const result = await kvStorageGet("spec-section-library");
-        if (result && result.value) setSectionLibrary(JSON.parse(result.value));
-      } catch {}
+      const entries = await listSectionLibrary();
+      setSectionLibrary(entries);
     }
     loadSectionLibrary();
   }, []);
