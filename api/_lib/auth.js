@@ -3,9 +3,7 @@
 // Never trusts client-supplied user IDs.
 
 import { verifyToken } from "@clerk/backend";
-
-const KV_URL = process.env.KV_REST_API_URL;
-const KV_TOKEN = process.env.KV_REST_API_TOKEN;
+import { sql } from "@vercel/postgres";
 
 // Returns the verified Clerk user ID, or null if the request is not authenticated.
 export async function requireAuth(req) {
@@ -22,17 +20,16 @@ export async function requireAuth(req) {
   }
 }
 
-// Reads the user's Spec profile from Redis. Unknown users default to staff,
-// matching existing product behavior.
+// Reads the user's Spec profile from Postgres. Unknown users default to
+// staff, matching existing product behavior — a missing profile row is not
+// an error, it just means no admin has ever set this user's role yet.
 export async function getProfile(userId) {
   const fallback = { role: "staff", tools: ["template-studio", "brief-to-blueprint"] };
-  if (!KV_URL || !KV_TOKEN || !userId) return fallback;
+  if (!userId) return fallback;
   try {
-    const res = await fetch(`${KV_URL}/get/${encodeURIComponent("spec:user:" + userId)}`, {
-      headers: { Authorization: `Bearer ${KV_TOKEN}` },
-    });
-    const data = await res.json();
-    return data.result ? JSON.parse(data.result) : fallback;
+    const { rows } = await sql`SELECT role, tools FROM profiles WHERE user_id = ${userId}`;
+    if (rows.length === 0) return fallback;
+    return { role: rows[0].role, tools: rows[0].tools };
   } catch {
     return fallback;
   }

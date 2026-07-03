@@ -9,30 +9,9 @@
 
 import { requireAuth, getProfile } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
+import { sql } from "@vercel/postgres";
 
-const KV_URL = process.env.KV_REST_API_URL;
-const KV_TOKEN = process.env.KV_REST_API_TOKEN;
 const CLERK_SECRET = process.env.CLERK_SECRET_KEY;
-
-async function kvGet(key) {
-  const res = await fetch(`${KV_URL}/get/${encodeURIComponent(key)}`, {
-    headers: { Authorization: `Bearer ${KV_TOKEN}` },
-  });
-  const data = await res.json();
-  return data.result ? JSON.parse(data.result) : null;
-}
-
-async function kvSet(key, value) {
-  await fetch(`${KV_URL}/set/${encodeURIComponent(key)}/${encodeURIComponent(JSON.stringify(value))}`, {
-    headers: { Authorization: `Bearer ${KV_TOKEN}` },
-  });
-}
-
-async function kvDel(key) {
-  await fetch(`${KV_URL}/del/${encodeURIComponent(key)}`, {
-    headers: { Authorization: `Bearer ${KV_TOKEN}` },
-  });
-}
 
 // Fetch user details (name, email) from Clerk for a list of user IDs
 async function clerkGetUsers(userIds) {
@@ -59,10 +38,6 @@ async function clerkGetUsers(userIds) {
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  if (!KV_URL || !KV_TOKEN) {
-    return res.status(500).json({ error: "KV not configured" });
-  }
-
   const requesterId = await requireAuth(req);
   if (!requesterId) return res.status(401).json({ error: "Unauthorized" });
 
@@ -71,84 +46,77 @@ export default async function handler(req, res) {
   const requesterProfile = await getProfile(requesterId);
   const requesterRole = requesterProfile.role || "staff";
 
-  if (req.method === "GET") {
-    const queried = req.query.userId;
-    // Only admins may read someone else's profile.
-    if (queried && queried !== requesterId && requesterRole !== "admin") {
-      return res.status(403).json({ error: "Forbidden" });
-    }
-    const targetId = queried || requesterId;
-    const profile = await kvGet(`spec:user:${targetId}`) || { role: "staff", tools: ["template-studio", "brief-to-blueprint"] };
-    return res.status(200).json(profile);
-  }
-
-  if (req.method === "POST") {
-    const { action, userId, role, tools } = req.body || {};
-
-    if (!["admin", "manager"].includes(requesterRole)) {
-      return res.status(403).json({ error: "Forbidden" });
-    }
-
-    if (action === "set") {
-      if (!userId || typeof userId !== "string") return res.status(400).json({ error: "Missing userId" });
-      if (role && !["admin", "manager", "staff"].includes(role)) {
-        return res.status(400).json({ error: "Invalid role" });
+  try {
+    if (req.method === "GET") {
+      const queried = req.query.userId;
+      // Only admins may read someone else's profile.
+      if (queried && queried !== requesterId && requesterRole !== "admin") {
+        return res.status(403).json({ error: "Forbidden" });
       }
-      if (requesterRole === "manager" && role !== "staff") {
-        return res.status(403).json({ error: "Managers can only assign staff roles" });
+      const targetId = queried || requesterId;
+      const profile = await getProfile(targetId);
+      return res.status(200).json(profile);
+    }
+
+    if (req.method === "POST") {
+      const { action, userId, role, tools } = req.body || {};
+
+      if (!["admin", "manager"].includes(requesterRole)) {
+        return res.status(403).json({ error: "Forbidden" });
       }
-      const existing = await kvGet(`spec:user:${userId}`) || {};
-      await kvSet(`spec:user:${userId}`, {
-        role: role || existing.role || "staff",
-        tools: Array.isArray(tools) ? tools : (existing.tools || ["template-studio", "brief-to-blueprint"]),
-        updatedBy: requesterId,
-        updatedAt: new Date().toISOString(),
-      });
-      return res.status(200).json({ ok: true });
+
+      if (action === "set") {
+        if (!userId || typeof userId !== "string") return res.status(400).json({ error: "Missing userId" });
+        if (role && !["admin", "manager", "staff"].includes(role)) {
+          return res.status(400).json({ error: "Invalid role" });
+        }
+        if (requesterRole === "manager" && role !== "staff") {
+          return res.status(403).json({ error: "Managers can only assign staff roles" });
+        }
+        const { rows: existingRows } = await sql`SELECT role, tools FROM profiles WHERE user_id = ${userId}`;
+        const existing = existingRows[0] || {};
+        const finalRole = role || existing.role || "staff";
+        const finalTools = Array.isArray(tools) ? tools : (existing.tools || ["template-studio", "brief-to-blueprint"]);
+        await sql`
+          INSERT INTO profiles (user_id, role, tools, updated_at)
+          VALUES (${userId}, ${finalRole}, ${finalTools}, now())
+          ON CONFLICT (user_id) DO UPDATE
+          SET role = EXCLUDED.role, tools = EXCLUDED.tools, updated_at = now()
+        `;
+        return res.status(200).json({ ok: true });
+      }
+
+      if (action === "delete") {
+        if (requesterRole !== "admin") return res.status(403).json({ error: "Forbidden" });
+        if (!userId || typeof userId !== "string") return res.status(400).json({ error: "Missing userId" });
+        if (userId === requesterId) return res.status(400).json({ error: "You cannot remove your own admin account" });
+        await sql`DELETE FROM profiles WHERE user_id = ${userId}`;
+        return res.status(200).json({ ok: true });
+      }
+
+      if (action === "list") {
+        if (requesterRole !== "admin") return res.status(403).json({ error: "Forbidden" });
+        const { rows } = await sql`SELECT user_id, role, tools, updated_at FROM profiles ORDER BY user_id`;
+        const userIds = rows.map(r => r.user_id);
+        const clerkDetails = await clerkGetUsers(userIds);
+
+        const users = rows.map(r => ({
+          userId: r.user_id,
+          role: r.role,
+          tools: r.tools,
+          updatedAt: r.updated_at ? new Date(r.updated_at).toISOString() : null,
+          name:  clerkDetails[r.user_id]?.name  || null,
+          email: clerkDetails[r.user_id]?.email || null,
+        }));
+
+        return res.status(200).json({ users });
+      }
+
+      return res.status(400).json({ error: "Unknown action" });
     }
 
-    if (action === "delete") {
-      if (requesterRole !== "admin") return res.status(403).json({ error: "Forbidden" });
-      if (!userId || typeof userId !== "string") return res.status(400).json({ error: "Missing userId" });
-      if (userId === requesterId) return res.status(400).json({ error: "You cannot remove your own admin account" });
-      await kvDel(`spec:user:${userId}`);
-      return res.status(200).json({ ok: true });
-    }
-
-    if (action === "list") {
-      if (requesterRole !== "admin") return res.status(403).json({ error: "Forbidden" });
-      let cursor = 0;
-      let allKeys = [];
-      do {
-        const scanRes = await fetch(
-          `${KV_URL}/scan/${cursor}?match=${encodeURIComponent("spec:user:*")}&count=100`,
-          { headers: { Authorization: `Bearer ${KV_TOKEN}` } }
-        );
-        const scanData = await scanRes.json();
-        const result = scanData.result || [];
-        cursor = result[0] ?? 0;
-        allKeys = allKeys.concat(result[1] || []);
-      } while (cursor !== 0 && cursor !== "0");
-
-      const profiles = await Promise.all(allKeys.map(async (key) => {
-        const profile = await kvGet(key);
-        return { userId: key.replace("spec:user:", ""), ...profile };
-      }));
-
-      const userIds = profiles.map(p => p.userId);
-      const clerkDetails = await clerkGetUsers(userIds);
-
-      const users = profiles.map(p => ({
-        ...p,
-        name:  clerkDetails[p.userId]?.name  || null,
-        email: clerkDetails[p.userId]?.email || null,
-      }));
-
-      return res.status(200).json({ users });
-    }
-
-    return res.status(400).json({ error: "Unknown action" });
+    return res.status(405).json({ error: "Method not allowed" });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
   }
-
-  return res.status(405).json({ error: "Method not allowed" });
 }
