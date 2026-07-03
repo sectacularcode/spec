@@ -1,5 +1,6 @@
 import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
+import { deepStripHTML } from "./_lib/sanitize.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -89,7 +90,7 @@ Only include keys for pages in the PAGES TO BUILD list. Never include home or se
       return res.status(200).json({ recommendations: defaults });
     }
 
-    return res.status(200).json(JSON.parse(jsonMatch[0]));
+    return res.status(200).json(deepStripHTML(JSON.parse(jsonMatch[0])));
 
   } catch (err) {
     const defaults = {};
