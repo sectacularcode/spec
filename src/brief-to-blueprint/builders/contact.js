@@ -1,4 +1,5 @@
 import { mkContainer, mkHeading, mkText, mkButton, mkSpacer } from "./helpers.js";
+import { he } from "../utils/htmlEscape.js";
 
 export function buildContactPage(C, brief, inspoHint, patterns) {
   var ink = C.ink, bone = C.bone,
@@ -27,7 +28,7 @@ export function buildContactPage(C, brief, inspoHint, patterns) {
     mkSpacer(16),
     mkHeading(brief.contactH1 || "Tell us about your project.", ink, "h1", { weight: 800, px: 56 }),
     mkSpacer(16),
-    mkText(brief.contactIntro || "A quick note about what you need. You will get a real reply from a real person, usually within one business day.", text),
+    mkText(he(brief.contactIntro || "A quick note about what you need. You will get a real reply from a real person, usually within one business day."), text),
   ], bone, { padY: "88" });
 
   var formSectionA = mkContainer([
@@ -35,7 +36,7 @@ export function buildContactPage(C, brief, inspoHint, patterns) {
     mkSpacer(32),
     mkContainer([mkButton(brief.contactCta || "Send it over", brassDp, "#ffffff")], null, { padY: "0", isInner: true }),
     mkSpacer(24),
-    mkText(brief.contactReassurance || "No sales team. No automated funnel. A real reply from a real person.", stone),
+    mkText(he(brief.contactReassurance || "No sales team. No automated funnel. A real reply from a real person."), stone),
   ], bone, { padY: "64" });
 
   var infoLeft = mkContainer([
@@ -62,9 +63,9 @@ export function buildContactPage(C, brief, inspoHint, patterns) {
     mkSpacer(24),
     mkHeading(brief.contactH1 || "Tell us about your project.", ink, "h2", { font: "Fraunces", weight: 300, px: 56 }),
     mkSpacer(32),
-    mkText(brief.contactIntro || "A quick note about what you need. You will get a real reply from a real person, usually within one business day.", text),
+    mkText(he(brief.contactIntro || "A quick note about what you need. You will get a real reply from a real person, usually within one business day."), text),
     mkSpacer(32),
-    mkText(brief.contactReassurance || "No sales team. No automated funnel. A real reply from a real person.", stone),
+    mkText(he(brief.contactReassurance || "No sales team. No automated funnel. A real reply from a real person."), stone),
   ], null, { padY: "0", grow: 1, isInner: true });
 
   var formRight = mkContainer([

@@ -3,6 +3,7 @@
 // Import what you need — do not construct widget JSON inline in page builders.
 
 import { textOn, isLight } from "../utils/colors.js";
+import { he } from "../utils/htmlEscape.js";
 
 export const uid = () => Math.random().toString(36).slice(2, 9);
 
@@ -78,7 +79,7 @@ export const eHead = (text, tag = "h2", color = "#000", font = "Inter", size = 3
   return {
     id: uid(), elType: "widget", widgetType: "heading", elements: [],
     settings: {
-      title: text, header_size: tag, align,
+      title: he(text), header_size: tag, align,
       align_tablet: align,
       align_mobile: align,
       title_color: color,
@@ -93,12 +94,19 @@ export const eHead = (text, tag = "h2", color = "#000", font = "Inter", size = 3
   };
 };
 
-export const eTxt = (text, color = "#666", font = "Inter", size = 16, align = "left") => {
+// Escapes `text` before wrapping — use this for plain user/brief copy.
+export const eTxt = (text, color = "#666", font = "Inter", size = 16, align = "left") =>
+  eTxtRaw(`<p>${he(text)}</p>`, color, font, size, align);
+
+// Does NOT escape — use only when the caller has already built (and escaped
+// the user-data leaves of) an intentional HTML fragment, e.g. testimonial
+// name/role wrapped in <strong>/<span>.
+export const eTxtRaw = (html, color = "#666", font = "Inter", size = 16, align = "left") => {
   const r = rPx(size, 0.95, 0.9, 13);
   return {
     id: uid(), elType: "widget", widgetType: "text-editor", elements: [],
     settings: {
-      editor: `<p>${text}</p>`, align,
+      editor: html, align,
       align_tablet: align,
       align_mobile: align,
       text_color: color,
@@ -196,7 +204,7 @@ export const eCounter = (num, suffix, label, accent, color, font, bf) => {
 export const eAccordion = (items, color, accent, font, _bf) => ({
   id: uid(), elType: "widget", widgetType: "accordion", elements: [],
   settings: {
-    tabs: items.map(([q, a]) => ({ _id: uid(), tab_title: q, tab_content: a })),
+    tabs: items.map(([q, a]) => ({ _id: uid(), tab_title: he(q), tab_content: he(a) })),
     title_color: color,
     icon_color: accent,
     border_color: "rgba(255,255,255,0.08)",
@@ -348,7 +356,7 @@ export const eHTML = (html) => ({
 // (VaynerMedia, Superside style). Plays continuously across the section.
 export const eMarquee = (text, color, accent, font, bgColor) => {
   const cid = "m" + Math.random().toString(36).slice(2, 9);
-  const item = `<span class="${cid}-i">${text}</span><span class="${cid}-d">●</span>`;
+  const item = `<span class="${cid}-i">${he(text)}</span><span class="${cid}-d">●</span>`;
   const items = Array(8).fill(item).join("");
   const html = `<style>
 .${cid}-wrap { background: ${bgColor}; overflow: hidden; padding: 28px 0; width: 100%; }

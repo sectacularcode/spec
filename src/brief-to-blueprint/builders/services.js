@@ -1,4 +1,5 @@
 import { mkContainer, mkHeading, mkText, mkButton, mkSpacer, mkDivider } from "./helpers.js";
+import { he } from "../utils/htmlEscape.js";
 
 export function buildServicesPage(C, brief, _inspoHint) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
@@ -27,7 +28,7 @@ export function buildServicesPage(C, brief, _inspoHint) {
       mkSpacer(20),
       mkDivider("#4a4640"),
       mkSpacer(20),
-      mkText(desc || "", warmWhite),
+      mkText(he(desc || ""), warmWhite),
       mkSpacer(24),
       mkHeading(price || "", brass, "h3", { weight: 700, px: 32 }),
     ], asphalt, { padY: "48", padX: "36", isInner: true });
@@ -173,7 +174,7 @@ export function buildServicesPageLight(C, brief, _inspoHint) {
       mkSpacer(16),
       mkDivider(featured ? "rgba(255,255,255,.2)" : "#E2DBCC"),
       mkSpacer(16),
-      mkText(tier[2] || "", featured ? warmWhite : text),
+      mkText(he(tier[2] || ""), featured ? warmWhite : text),
       mkSpacer(20),
       mkHeading(tier[3] || "", featured ? brass : brassDp, "h4", { weight: 700, px: 28 }),
       mkSpacer(24),

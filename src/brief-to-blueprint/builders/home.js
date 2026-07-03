@@ -1,4 +1,5 @@
 import { mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer } from "./helpers.js";
+import { he } from "../utils/htmlEscape.js";
 
 export function buildHomePage(C, brief, inspoHint, patterns) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
@@ -15,7 +16,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
       mkSpacer(20),
       mkHeading(brief.heroHeadline || "Your headline here.", warmWhite, "h1", { weight: 800, px: 56 }),
       mkSpacer(24),
-      mkText(brief.heroSubhead || "Your subheadline here.", warmWhite),
+      mkText(he(brief.heroSubhead || "Your subheadline here."), warmWhite),
       mkSpacer(40),
       mkContainer([
         mkButton(brief.heroCta1 || "See the work", brassDp, "#ffffff"),
@@ -37,7 +38,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
       mkSpacer(20),
       mkHeading(brief.heroHeadline || "Your headline here.", warmWhite, "h1", { weight: 800, px: 56 }),
       mkSpacer(24),
-      mkText(brief.heroSubhead || "Your subheadline here.", warmWhite),
+      mkText(he(brief.heroSubhead || "Your subheadline here."), warmWhite),
       mkSpacer(40),
       mkContainer([
         mkButton(brief.heroCta1 || "See the work", brassDp, "#ffffff"),
@@ -63,7 +64,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
       mkHeading(brief.heroHeadline || "Your headline here.", warmWhite, "h1",
         { font: "Fraunces", weight: 300, px: 72, align: "center" }),
       mkSpacer(28),
-      mkText(brief.heroSubhead || "Your subheadline here.", warmWhite, "center"),
+      mkText(he(brief.heroSubhead || "Your subheadline here."), warmWhite, "center"),
       mkSpacer(40),
       mkContainer([
         mkButton(brief.heroCta1 || "See the work", brassDp, "#ffffff"),
@@ -88,7 +89,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
       var c = mkContainer([
         mkHeading(title, ink, "h4", { weight: 700, px: 18 }),
         mkSpacer(8),
-        mkText(body, stone),
+        mkText(he(body), stone),
       ], "#ffffff", { padY: "32", isInner: true });
       c.settings.border_border = "solid";
       c.settings.border_width = { unit: "px", top: "0", right: "0", bottom: "0", left: "3", isLinked: false };
@@ -109,7 +110,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
       mkHeading(brief.differenceH2 || "One person. The whole film.", ink, "h2", { px: 48, weight: 800 }),
     ], null, { padY: "0", grow: 1, isInner: true });
     var right = mkContainer([
-      mkText(brief.differenceBody || "[The difference — explain what sets this apart. Pulled from brand brief.]", text),
+      mkText(he(brief.differenceBody || "[The difference — explain what sets this apart. Pulled from brand brief.]"), text),
     ], null, { padY: "0", grow: 1, isInner: true });
     var row = mkContainer([left, right], null, { direction: "row", gap: "80", padY: "0", isInner: true });
     return mkContainer([row], bone, { padY: "96" });
@@ -122,7 +123,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
       mkHeading(brief.whoH2 || "For the underfilmed.", ink, "h2", { px: 48, weight: 800 }),
     ], null, { padY: "0", grow: 1, isInner: true });
     var right = mkContainer([
-      mkText(brief.whoBody || "[Who this is for — pulled from brand brief. Describe the ideal client specifically.]", text),
+      mkText(he(brief.whoBody || "[Who this is for — pulled from brand brief. Describe the ideal client specifically.]"), text),
     ], null, { padY: "0", grow: 1, isInner: true });
     var row = mkContainer([left, right], null, { direction: "row", gap: "80", padY: "0", isInner: true });
     return mkContainer([row], bone, { padY: "96" });
@@ -133,7 +134,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
     mkSpacer(48),
     mkContainer(
       (brief.workItems || ["Film 1","Film 2","Film 3"]).map(function(w) {
-        return mkContainer([mkImagePh(w), mkSpacer(12), mkText("<strong>" + w + "</strong>", stone)],
+        return mkContainer([mkImagePh(w), mkSpacer(12), mkText("<strong>" + he(w) + "</strong>", stone)],
           null, { padY: "0", grow: 1, isInner: true });
       }), null, { direction: "row", gap: "24", padY: "0", isInner: true }
     ),
@@ -143,7 +144,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
     mkHeading(brief.pricingH2 || "Clear prices. No discovery-call maze.", ink, "h2",
       { px: 44, weight: 800, align: "center" }),
     mkSpacer(24),
-    mkText(brief.pricingSubhead || "Pick a package or build a plan, with real numbers in the open.", stone, "center"),
+    mkText(he(brief.pricingSubhead || "Pick a package or build a plan, with real numbers in the open."), stone, "center"),
     mkSpacer(40),
     mkContainer([mkButton(brief.pricingCta || "See packages", brassDp, "#ffffff")],
       null, { padY: "0", center: true, isInner: true }),

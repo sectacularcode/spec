@@ -1,4 +1,5 @@
 import { mkContainer, mkHeading, mkText, mkButton, mkSpacer } from "./helpers.js";
+import { he } from "../utils/htmlEscape.js";
 
 export function buildGenericPage(colors, brief, pageDef, inspoContext, variant) {
   var ink = colors.ink || "#1C1A17";
@@ -69,7 +70,7 @@ export function buildGenericPage(colors, brief, pageDef, inspoContext, variant) 
     sections.push(mkContainer([
       mkHeading(brief.tagline || "[Landing page headline]", text, "h2", { weight: 700, px: 40 }),
       mkSpacer(16),
-      mkText(brief.hookStatement || "[Landing page subheadline — specific and direct]", stone),
+      mkText(he(brief.hookStatement || "[Landing page subheadline — specific and direct]"), stone),
       mkSpacer(24),
       mkButton(brief.heroCta1 || "Get started", brassDp, "#ffffff"),
     ], bone, { padY: "80", center: true }));
@@ -111,6 +112,6 @@ export function buildGenericPage(colors, brief, pageDef, inspoContext, variant) 
     mkButton(brief.headerCta || "Start a project", brassDp, "#ffffff"),
   ], asphalt, { padY: "80", center: true }));
 
-  return { version: "0.4", title: (brief.brandName || "Site") + " — " + label, type: "page", page_settings: {}, content: sections };
+  return { version: "0.4", title: he(brief.brandName || "Site") + " — " + he(label), type: "page", page_settings: {}, content: sections };
 }
 

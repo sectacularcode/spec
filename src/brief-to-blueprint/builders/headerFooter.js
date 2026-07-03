@@ -1,4 +1,5 @@
 import { nid, mkContainer, mkHeading, mkText, mkButton, mkSpacer } from "./helpers.js";
+import { he } from "../utils/htmlEscape.js";
 
 // Global header and footer JSON builders.
 // Export as separate templates — import via Elementor Theme Builder.
@@ -26,7 +27,7 @@ export function buildHeaderJSON(C, brief, inspoContext) {
     elType: "widget",
     widgetType: "heading",
     settings: {
-      title: brief.brandName || "Brand Name",
+      title: he(brief.brandName || "Brand Name"),
       header_size: "h4",
       title_color: isDark ? warmWhite : ink,
       typography_typography: "custom",
@@ -91,7 +92,7 @@ export function buildHeaderJSON(C, brief, inspoContext) {
 
   return {
     version: "0.4",
-    title: (brief.brandName || "Site") + " — Header",
+    title: he(brief.brandName || "Site") + " — Header",
     type: "header",
     page_settings: {},
     content: [headerRow]
@@ -120,11 +121,11 @@ export function buildFooterJSON(C, brief, inspoContext) {
   var brandCol = mkContainer([
     mkHeading(brief.brandName || "Brand Name", textColor, "h4", { weight: 800 }),
     mkSpacer(12),
-    mkText(brief.tagline || "", mutedColor),
+    mkText(he(brief.tagline || ""), mutedColor),
     mkSpacer(8),
-    mkText(brief.signatureLine || "", mutedColor),
+    mkText(he(brief.signatureLine || ""), mutedColor),
     mkSpacer(20),
-    brief.contactEmail ? mkText(brief.contactEmail, mutedColor) : mkSpacer(0),
+    brief.contactEmail ? mkText(he(brief.contactEmail), mutedColor) : mkSpacer(0),
   ], null, { padY: "0", grow: 1, isInner: true });
 
   // Nav column
@@ -146,7 +147,7 @@ export function buildFooterJSON(C, brief, inspoContext) {
       mkHeading(brief.brandName || "Brand Name", textColor, "h5", { weight: 800 }),
       mkContainer(navLinks.map(function(l) { return mkHeading(l, mutedColor, "h6", { weight: 400 }); }),
         null, { direction: "row", gap: "24", padY: "0", isInner: true }),
-      mkText("© " + new Date().getFullYear() + " " + (brief.brandName || ""), mutedColor),
+      mkText("© " + new Date().getFullYear() + " " + he(brief.brandName || ""), mutedColor),
     ], null, { direction: "row", gap: "40", padY: "0", isInner: false });
     minimalRow.settings.align_items = "center";
     minimalRow.settings.padding = { unit: "px", top: "32", right: "40", bottom: "32", left: "40", isLinked: false };
@@ -158,7 +159,7 @@ export function buildFooterJSON(C, brief, inspoContext) {
 
     return {
       version: "0.4",
-      title: (brief.brandName || "Site") + " — Footer",
+      title: he(brief.brandName || "Site") + " — Footer",
       type: "footer",
       page_settings: {},
       content: [minimalRow]
@@ -177,8 +178,8 @@ export function buildFooterJSON(C, brief, inspoContext) {
 
   // Copyright row
   var copyrightBar = mkContainer([
-    mkText("© " + new Date().getFullYear() + " " + (brief.brandName || "") + ". All rights reserved.", mutedColor),
-    brief.footerTagline ? mkText(brief.footerTagline, mutedColor) : mkSpacer(0),
+    mkText("© " + new Date().getFullYear() + " " + he(brief.brandName || "") + ". All rights reserved.", mutedColor),
+    brief.footerTagline ? mkText(he(brief.footerTagline), mutedColor) : mkSpacer(0),
   ], null, { direction: "row", gap: "24", padY: "0", isInner: false });
   copyrightBar.settings.padding = { unit: "px", top: "20", right: "40", bottom: "20", left: "40", isLinked: false };
   copyrightBar.settings.padding_mobile = { unit: "px", top: "16", right: "20", bottom: "16", left: "20", isLinked: false };
@@ -192,7 +193,7 @@ export function buildFooterJSON(C, brief, inspoContext) {
 
   return {
     version: "0.4",
-    title: (brief.brandName || "Site") + " — Footer",
+    title: he(brief.brandName || "Site") + " — Footer",
     type: "footer",
     page_settings: {},
     content: [mainRow, copyrightBar]

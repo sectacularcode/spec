@@ -1,5 +1,6 @@
 import { mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer } from "./helpers.js";
 import { inspoMatchesVariant } from "../utils/inspo.js";
+import { he } from "../utils/htmlEscape.js";
 
 export function buildWorkPage(C, brief, inspoHint) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
@@ -11,7 +12,7 @@ export function buildWorkPage(C, brief, inspoHint) {
     mkSpacer(16),
     mkHeading(brief.workH1 || "Selected work.", ink, "h1", { weight: 800, px: 64 }),
     mkSpacer(16),
-    mkText(brief.workIntro || "A look at the stories so far. Customer and team films, brand work, and the films that help a company show what it has become.", text),
+    mkText(he(brief.workIntro || "A look at the stories so far. Customer and team films, brand work, and the films that help a company show what it has become."), text),
   ], bone, { padY: "88" });
 
   var closing = mkContainer([mkButton("Start a project", brassDp, "#ffffff")], bone, { padY: "80", center: true });

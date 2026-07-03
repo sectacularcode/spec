@@ -1,6 +1,7 @@
 import { THEMES } from "../constants/themes.js";
 import { textOn } from "../utils/colors.js";
 import { uid, eContainer, eSection, eHead, eBtn, eNavMenu, eSocial } from "./helpers.js";
+import { he } from "../utils/htmlEscape.js";
 // Builds Elementor JSON for the site header (Theme Builder global template)
 export function buildHeaderJSON(brand) {
   const { primaryColor: pc, accentColor: ac, headingFont: hf, bodyFont: bf, headerStyle = "Editorial" } = brand;
@@ -180,7 +181,7 @@ export function buildHeaderJSON(brand) {
     sec.elements.push(row);
   }
 
-  return { version: "0.4", title: `${brand.name} — Header`, type: "header", content: [sec] };
+  return { version: "0.4", title: `${he(brand.name)} — Header`, type: "header", content: [sec] };
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
