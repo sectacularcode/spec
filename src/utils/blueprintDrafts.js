@@ -50,8 +50,10 @@ export async function saveDraftSnapshot(clientName, data) {
       headers: await authHeaders(),
       body: JSON.stringify({ entry: { clientName, data } }),
     });
-    return res.ok;
-  } catch { return false; }
+    if (!res.ok) return { ok: false };
+    const body = await res.json();
+    return { ok: true, id: body.id };
+  } catch { return { ok: false }; }
 }
 
 export async function deleteDraftSnapshot(id) {

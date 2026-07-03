@@ -45,13 +45,20 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "Invalid entry" });
       }
 
-      // Dedup: replace any existing entry for the same client+date+source.
-      await sql`
-        DELETE FROM template_library_entries
-        WHERE user_id = ${userId} AND client = ${client} AND entry_date = ${date} AND source = ${source}
-      `;
-
+      // Dedup (replace any existing entry for the same client+date+source)
+      // and insert are combined into one statement via a data-modifying
+      // CTE — the DELETE runs for its side effect only (never referenced),
+      // which Postgres never elides, so this is one round trip instead of
+      // two. Safe even in the near-impossible case of the deleted and
+      // inserted rows sharing an id: either order produces a deterministic
+      // outcome already handled below (successful replace, or the existing
+      // collision check firing) — never data corruption.
       const { rows } = await sql`
+        WITH dedup AS (
+          DELETE FROM template_library_entries
+          WHERE user_id = ${userId} AND client = ${client} AND entry_date = ${date} AND source = ${source}
+          RETURNING id
+        )
         INSERT INTO template_library_entries (id, user_id, client, entry_date, source, data)
         VALUES (${id}, ${userId}, ${client}, ${date}, ${source}, ${rest})
         ON CONFLICT (id) DO NOTHING

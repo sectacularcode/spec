@@ -151,17 +151,40 @@ export default function CustomBuild({ userId, role } = {}) {
 
   async function saveDraftToList(draftState) {
     const clientName = draftState.clientName || draftState.brief?.brandName || "Unnamed";
+    const today = new Date().toISOString().slice(0, 10);
     const data = {
-      date: new Date().toISOString().slice(0, 10),
+      date: today,
       pages: draftState.selectedPages || [],
       colors: draftState.brief?.colors || {},
       hasGenerated: !!draftState.generated,
       state: draftState,
     };
-    const ok = await saveDraftSnapshot(clientName, data);
-    if (!ok) return;
-    const list = await listDraftSnapshots();
-    setDrafts(list);
+
+    // Optimistic: replicate the server's same-client-same-day dedup
+    // predicate locally (matches api/blueprint-drafts.js's own check)
+    // rather than waiting on the network round trip to know whether this
+    // updates an existing snapshot or inserts a new one.
+    let previous;
+    let tempId = null;
+    setDrafts(existing => {
+      previous = existing;
+      const matchIndex = existing.findIndex(d => d.clientName === clientName && d.date === today);
+      if (matchIndex !== -1) {
+        const updated = [...existing];
+        updated[matchIndex] = { ...updated[matchIndex], clientName, ...data };
+        return updated;
+      }
+      tempId = "pending-" + Date.now();
+      const withNew = [{ id: tempId, clientName, ...data }, ...existing];
+      return withNew.length > 20 ? withNew.slice(0, 20) : withNew;
+    });
+
+    const result = await saveDraftSnapshot(clientName, data);
+    if (!result.ok) { setDrafts(previous); return; }
+    if (tempId) {
+      // Reconcile the temporary id with the server-assigned one.
+      setDrafts(existing => existing.map(d => d.id === tempId ? { ...d, id: result.id } : d));
+    }
   }
 
   async function resumeDraft(draft) {
@@ -180,9 +203,18 @@ export default function CustomBuild({ userId, role } = {}) {
   }
 
   async function deleteDraft(id) {
+    let removed, index;
+    setDrafts(existing => {
+      index = existing.findIndex(d => d.id === id);
+      removed = existing[index];
+      return existing.filter(d => d.id !== id);
+    });
     const ok = await deleteDraftSnapshot(id);
-    if (!ok) return;
-    setDrafts(existing => existing.filter(d => d.id !== id));
+    if (!ok && removed) {
+      setDrafts(existing =>
+        existing.some(d => d.id === id) ? existing : [...existing.slice(0, index), removed, ...existing.slice(index)]
+      );
+    }
   }
   async function handleBulkLocationGenerate(locations, template) {
     if (!brief) return;
