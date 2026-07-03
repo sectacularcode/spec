@@ -5,8 +5,9 @@ import { T } from "./styles.js";
 import { ALL_PAGES, ADDITIONAL_PAGE_TYPES } from "../constants/pages.js";
 
 // Utils
-import { kvStorageGet, kvStorageSet, kvStorageDel } from "../utils/storage.js";
 import { listSectionLibrary } from "../utils/sectionLibrary.js";
+import { getSessionDraft, saveSessionDraft, clearSessionDraft, listDraftSnapshots, saveDraftSnapshot, deleteDraftSnapshot } from "../utils/blueprintDrafts.js";
+import { getInspoPatterns, saveInspoPatterns } from "../utils/inspoPatterns.js";
 import { buildInspoContext } from "./utils/inspo.js";
 import { saveToLibrary } from "./utils/library.js";
 import { extractBrief } from "./utils/extractBrief.js";
@@ -83,11 +84,9 @@ export default function CustomBuild({ userId, role } = {}) {
   // Load saved draft on mount
   useEffect(() => {
     async function loadDraft() {
-      
+      const draft = await getSessionDraft();
+      if (!draft) return;
       try {
-        const result = await kvStorageGet("spec-blueprint-draft");
-        if (!result || !result.value) return;
-        const draft = JSON.parse(result.value);
         if (draft.brief)          setBrief(draft.brief);
         if (draft.briefName)      setBriefName(draft.briefName);
         if (draft.clientName)     setClientName(draft.clientName);
@@ -136,7 +135,7 @@ export default function CustomBuild({ userId, role } = {}) {
           }))
         } : null,
       };
-      kvStorageSet("spec-blueprint-draft", JSON.stringify(draft)).catch(() => {});
+      saveSessionDraft(draft);
     }, 800);
     return () => clearTimeout(timer);
   }, [brief, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants, previewPage, crawlResults, generated]);
@@ -144,41 +143,25 @@ export default function CustomBuild({ userId, role } = {}) {
   // Load saved drafts list on mount
   useEffect(() => {
     async function loadDrafts() {
-      try {
-        const result = await kvStorageGet("spec-blueprint-drafts");
-        if (result && result.value) {
-          const parsed = JSON.parse(result.value);
-          if (Array.isArray(parsed)) setDrafts(parsed);
-        }
-      } catch {}
+      const list = await listDraftSnapshots();
+      setDrafts(list);
     }
     loadDrafts();
   }, []);
 
   async function saveDraftToList(draftState) {
-    try {
-      const existing = await kvStorageGet("spec-blueprint-drafts");
-      let list = [];
-      if (existing && existing.value) {
-        try { list = JSON.parse(existing.value); } catch {}
-      }
-      const id = "draft-" + Date.now();
-      const entry = {
-        id,
-        clientName: draftState.clientName || draftState.brief?.brandName || "Unnamed",
-        date: new Date().toISOString().slice(0, 10),
-        pages: draftState.selectedPages || [],
-        colors: draftState.brief?.colors || {},
-        hasGenerated: !!draftState.generated,
-        state: draftState,
-      };
-      // Replace existing draft for same client today
-      const deduped = list.filter(d => !(d.clientName === entry.clientName && d.date === entry.date));
-      deduped.unshift(entry);
-      if (deduped.length > 20) deduped.length = 20;
-      await kvStorageSet("spec-blueprint-drafts", JSON.stringify(deduped));
-      setDrafts(deduped);
-    } catch {}
+    const clientName = draftState.clientName || draftState.brief?.brandName || "Unnamed";
+    const data = {
+      date: new Date().toISOString().slice(0, 10),
+      pages: draftState.selectedPages || [],
+      colors: draftState.brief?.colors || {},
+      hasGenerated: !!draftState.generated,
+      state: draftState,
+    };
+    const ok = await saveDraftSnapshot(clientName, data);
+    if (!ok) return;
+    const list = await listDraftSnapshots();
+    setDrafts(list);
   }
 
   async function resumeDraft(draft) {
@@ -197,11 +180,9 @@ export default function CustomBuild({ userId, role } = {}) {
   }
 
   async function deleteDraft(id) {
-    try {
-      const updated = drafts.filter(d => d.id !== id);
-      await kvStorageSet("spec-blueprint-drafts", JSON.stringify(updated));
-      setDrafts(updated);
-    } catch {}
+    const ok = await deleteDraftSnapshot(id);
+    if (!ok) return;
+    setDrafts(existing => existing.filter(d => d.id !== id));
   }
   async function handleBulkLocationGenerate(locations, template) {
     if (!brief) return;
@@ -234,16 +215,8 @@ export default function CustomBuild({ userId, role } = {}) {
 
   useEffect(() => {
     async function loadPatterns() {
-      try {
-        const result = await kvStorageGet("spec-inspo-patterns");
-        if (result && result.value) {
-          const parsed = JSON.parse(result.value);
-          // Handle both old per-page format and new flat pool format
-          setStoredPatterns(parsed.pool ? { pool: parsed.pool } : parsed);
-        }
-      } catch {
-        // No stored patterns yet
-      }
+      const patterns = await getInspoPatterns();
+      if (patterns.pool) setStoredPatterns(patterns);
     }
     loadPatterns();
   }, []);
@@ -360,7 +333,7 @@ export default function CustomBuild({ userId, role } = {}) {
           // Persist the merged pattern pool to storage
           if (data.patterns) {
             const merged = buildInspoContext(updated, storedPatterns);
-            kvStorageSet("spec-inspo-patterns", JSON.stringify({ pool: merged })).catch(() => {});
+            saveInspoPatterns(merged);
             setStoredPatterns({ pool: merged });
           }
           return updated;
@@ -792,7 +765,7 @@ export default function CustomBuild({ userId, role } = {}) {
                   setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]);
                   setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({});
                   setPreviewPage("home"); setPageOverrides({}); setCustomPages([]);
-                  { try { await kvStorageDel("spec-blueprint-draft"); } catch {} }
+                  clearSessionDraft();
                 }}
                 style={{ fontSize: "12px", color: "#6b7280", background: "none", border: "1px solid #dde0e6", borderRadius: "5px", padding: "5px 10px", cursor: "pointer", display: "inline-flex", alignItems: "center", lineHeight: 1 }}>
                 Clear draft
