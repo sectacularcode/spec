@@ -135,6 +135,29 @@ export default function AdminPanel({ isAdmin }) {
     setDeleting(null);
   }
 
+  // TEMPORARY — one-time Redis-to-Postgres profile migration trigger.
+  // Remove this function and its button once the migration has been run
+  // successfully and api/migrate-profiles-onetime.js has been deleted.
+  const [migrating, setMigrating] = useState(false);
+  async function runProfileMigration() {
+    if (!window.confirm("Run the one-time Redis → Postgres profile migration now?")) return;
+    setMigrating(true);
+    try {
+      const res = await fetch("/api/migrate-profiles-onetime", {
+        method: "POST",
+        headers: await authHeaders(),
+      });
+      const d = await res.json();
+      if (res.ok) {
+        flash(`Migrated ${d.migrated} profile(s), skipped ${d.skipped}.`);
+        console.log("Migration result:", d);
+      } else {
+        flash(d.error || "Migration failed.", "err");
+      }
+    } catch (err) { flash("Migration error: " + err.message, "err"); }
+    setMigrating(false);
+  }
+
   function startEdit(u) {
     setEditingId(u.userId);
     setEditRole(u.role || "staff");
@@ -167,7 +190,18 @@ export default function AdminPanel({ isAdmin }) {
     <div style={S.wrap}>
       <div style={S.header}>
         <div style={S.headerTitle}>User Management</div>
-        <button style={S.btnSecondary} onClick={loadUsers}>Refresh</button>
+        <div style={{ display: "flex", gap: "8px" }}>
+          {isAdmin && (
+            <button
+              style={{ ...S.btnSecondary, background: "#fef3c7", color: "#92400e", border: "1px solid #f59e0b" }}
+              onClick={runProfileMigration}
+              disabled={migrating}
+              title="TEMPORARY — one-time Redis to Postgres profile migration. Remove after use.">
+              {migrating ? "Migrating…" : "⚠ Run DB Migration (one-time)"}
+            </button>
+          )}
+          <button style={S.btnSecondary} onClick={loadUsers}>Refresh</button>
+        </div>
       </div>
 
       {/* Add new user */}
