@@ -84,7 +84,7 @@ export default function Dashboard({ onSelectTool, role, tools: allowedTools }) {
           <button style={S.drawerClose} onClick={() => setDrawerOpen(false)}>×</button>
         </div>
         <div style={S.drawerBody}>
-          <AdminPanel isAdmin={isAdmin} isManager={isManager} />
+          <AdminPanel isAdmin={isAdmin} />
         </div>
       </div>
 

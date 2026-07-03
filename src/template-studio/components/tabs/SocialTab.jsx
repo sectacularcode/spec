@@ -12,7 +12,7 @@ export default function SocialTab({ ctx }) {
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: "0px", alignItems: "start" }}>
                 <div style={{ display: "grid", gap: "10px", paddingRight: "32px" }}>
                 {brand.socialLinks.map((s, i) => (
-                  <div key={i} className="responsive-4col" style={{ display: "grid", gridTemplateColumns: "140px 120px 1fr 30px", gap: "8px", alignItems: "end" }}>
+                  <div key={s._id || i} className="responsive-4col" style={{ display: "grid", gridTemplateColumns: "140px 120px 1fr 30px", gap: "8px", alignItems: "end" }}>
                     <select style={{ width: "100%", padding: "11px 40px 11px 13px", background: "#ffffff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\") no-repeat right 14px center", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "14px", fontFamily: "inherit", color: "#09090b", outline: "none", boxSizing: "border-box", appearance: "none", WebkitAppearance: "none" }} value={s.key} onChange={e => updSocial(i, "key", e.target.value)}>
                       {Object.keys(SVG).map(k => <option key={k}>{k}</option>)}
                     </select>
@@ -45,7 +45,7 @@ export default function SocialTab({ ctx }) {
                         return (
                           <button
                             key={platform}
-                            onClick={() => { if (!alreadyAdded) updBrand("socialLinks", [...(brand.socialLinks || []), { key: platform, label: "", url: "" }]); }}
+                            onClick={() => { if (!alreadyAdded) updBrand("socialLinks", [...(brand.socialLinks || []), { key: platform, label: "", url: "", _id: platform + "-" + Date.now().toString(36) }]); }}
                             disabled={alreadyAdded}
                             style={{
                               padding: "6px 10px",

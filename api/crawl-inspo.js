@@ -12,6 +12,7 @@ import dns from "node:dns/promises";
 import net from "node:net";
 import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
+import { callAnthropic, extractJSON } from "./_lib/anthropic.js";
 
 const MAX_REDIRECTS = 3;
 const MAX_BODY_BYTES = 2 * 1024 * 1024; // 2MB per page
@@ -255,27 +256,15 @@ Return ONLY a valid JSON object with this structure:
 Only include page keys that were found on the site. Keep each value to 1-2 sentences focused on layout and structure, not copying any copy verbatim.`;
 
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 1000,
-        system: "You are a structural design analyst. Return ONLY valid JSON with no markdown, no code fences, no explanation.",
-        messages: [{ role: "user", content: prompt }],
-      }),
+    const { ok, data } = await callAnthropic(apiKey, {
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 1000,
+      system: "You are a structural design analyst. Return ONLY valid JSON with no markdown, no code fences, no explanation.",
+      messages: [{ role: "user", content: prompt }],
     });
 
-    if (!response.ok) return null;
-    const data = await response.json();
-    const raw = data.content?.[0]?.text || "";
-    const cleaned = raw.replace(/```json\n?/gi, "").replace(/```\n?/gi, "").trim();
-    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-    return jsonMatch ? JSON.parse(jsonMatch[0]) : null;
+    if (!ok) return null;
+    return extractJSON(data);
   } catch {
     return null;
   }

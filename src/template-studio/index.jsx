@@ -184,16 +184,24 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
     let cancelled = false;
     const timer = setTimeout(async () => {
       try {
-        try { localStorage.setItem("projects", JSON.stringify(projects)); } catch {}
-        if (!cancelled) {
-          await fetch("/api/storage", { method: "POST", headers: await authHeaders(), body: JSON.stringify({ action: "set", key: "projects", value: JSON.stringify(projects) }) });
+        if (userId) {
+          // Signed in — server storage is authoritative and read back on
+          // load (see `if (userId)` above). A localStorage mirror here is
+          // redundant and can only go stale.
+          if (!cancelled) {
+            await fetch("/api/storage", { method: "POST", headers: await authHeaders(), body: JSON.stringify({ action: "set", key: "projects", value: JSON.stringify(projects) }) });
+          }
+        } else {
+          // Signed out — localStorage is the only persistence available,
+          // matching the `else if (lsRaw)` fallback read above.
+          try { localStorage.setItem("projects", JSON.stringify(projects)); } catch {}
         }
       } catch {
         // Storage write failed — fail silently, user can export to file as backup
       }
     }, 600); // debounce
     return () => { cancelled = true; clearTimeout(timer); };
-  }, [projects, storageLoaded]);
+  }, [projects, storageLoaded, userId]);
 
   // Load Blueprint saved builds from storage
   useEffect(() => {

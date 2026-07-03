@@ -2,6 +2,7 @@ import mammoth from "mammoth";
 import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { deepStripHTML } from "./_lib/sanitize.js";
+import { callAnthropic, extractJSON } from "./_lib/anthropic.js";
 
 const EXTRACTION_PROMPT = `Extract every field from this brand brief and return ONLY a single valid JSON object.
 No markdown, no code fences, no explanation — just the raw JSON.
@@ -86,30 +87,16 @@ const MODELS = [
 
 async function callClaude(apiKey, messages, extraHeaders = {}) {
   for (const model of MODELS) {
-    const headers = {
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-      "content-type": "application/json",
-      ...extraHeaders,
-    };
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        model,
-        max_tokens: 4000,
-        system: "You are a data extraction assistant. Return ONLY valid JSON with no markdown, no code fences, no explanation.",
-        messages,
-      }),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      return { ok: true, data, model };
-    }
-    const errBody = await response.text();
-    console.log(`Model ${model} failed: ${response.status} — ${errBody.slice(0, 200)}`);
-    if (response.status !== 404 && response.status !== 400) {
-      return { ok: false, status: response.status, error: errBody };
+    const { ok, status, data } = await callAnthropic(apiKey, {
+      model,
+      max_tokens: 4000,
+      system: "You are a data extraction assistant. Return ONLY valid JSON with no markdown, no code fences, no explanation.",
+      messages,
+    }, extraHeaders);
+    if (ok) return { ok: true, data, model };
+    console.log(`Model ${model} failed: ${status} — ${JSON.stringify(data).slice(0, 200)}`);
+    if (status !== 404 && status !== 400) {
+      return { ok: false, status, error: JSON.stringify(data) };
     }
   }
   return { ok: false, status: 404, error: "No available model found" };
@@ -166,12 +153,13 @@ export default async function handler(req, res) {
       });
     }
 
-    const rawText = result.data.content?.[0]?.text || "";
-    const cleaned = rawText.replace(/```json\n?/gi, "").replace(/```\n?/gi, "").trim();
-    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return res.status(500).json({ error: "Could not parse Claude response", raw: rawText.slice(0, 500) });
+    const parsed = extractJSON(result.data);
+    if (!parsed) {
+      const rawText = result.data.content?.[0]?.text || "";
+      return res.status(500).json({ error: "Could not parse Claude response", raw: rawText.slice(0, 500) });
+    }
 
-    return res.status(200).json(deepStripHTML({ ...JSON.parse(jsonMatch[0]), _model: result.model }));
+    return res.status(200).json(deepStripHTML({ ...parsed, _model: result.model }));
 
   } catch (err) {
     console.error("parse-brief error:", err);

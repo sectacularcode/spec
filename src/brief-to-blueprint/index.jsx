@@ -633,7 +633,7 @@ export default function CustomBuild({ userId, role } = {}) {
               <button onClick={() => setShowUserDrawer(false)} style={{ background: "none", border: "none", fontSize: "20px", cursor: "pointer", color: "#6b7280", padding: "4px 8px", lineHeight: 1 }}>×</button>
             </div>
             <div style={{ flex: 1, overflowY: "auto" }}>
-              <AdminPanel isAdmin={isAdmin} isManager={isManager} />
+              <AdminPanel isAdmin={isAdmin} />
             </div>
           </div>
         </>
