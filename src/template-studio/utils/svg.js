@@ -10,8 +10,3 @@ export const SVG = {
   pinterest: (c, s = 22) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M10 22l2-8M9 12a3 3 0 1 1 6 0c0 2-1 4-3 4s-3-2-3-4"/></svg>`,
   threads: (c, s = 22) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 11.5c-.5-3-2.5-5-5-5-3 0-5 2-5 5 0 2.5 1.5 4.5 4 5 2.5.5 4-1 4-2.5 0-2-2-2.5-3-1.5"/><path d="M12 22c5 0 9-3 9-9.5C21 5 17 2.5 12 2.5S3 5 3 12.5C3 19 7 22 12 22z"/></svg>`,
 };
-
-// ──────────────────────────────────────────────────────────────────────────────
-// BLANK_BRAND — a clean slate for new projects. Keeps the structural defaults
-// (theme, layout, fonts, colors) so the project still renders, but clears all
-// content fields and replaces them with placeholders the user will overwrite.

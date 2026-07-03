@@ -2,7 +2,7 @@
 // pickImage() selects a placeholder image URL by category + seed.
 // imgOrPlaceholder() uses a real URL if provided, otherwise picks from the library.
 
-export const IMAGE_LIBRARY = {
+const IMAGE_LIBRARY = {
   // Marketing agency: creative teams, ad work, brainstorm, modern offices
   marketing: [
     "1551434678-e076c223a692", "1556761175-5973dc0f32e7", "1552664730-d307ca884978",
@@ -67,7 +67,7 @@ export const IMAGE_LIBRARY = {
 };
 
 // Pick a deterministic image from a category based on seed (so same seed always returns same image)
-export const pickImage = (category, seed, w, h) => {
+const pickImage = (category, seed, w, h) => {
   const list = IMAGE_LIBRARY[category] || IMAGE_LIBRARY.default;
   let hash = 0;
   const s = String(seed || "x");

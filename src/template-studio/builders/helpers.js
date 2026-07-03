@@ -64,7 +64,7 @@ export const eCol = (size = 100) => {
 // so a 84px hero heading becomes ~63px on tablet, ~46px on mobile, etc.
 // All Elementor widgets support typography_font_size_tablet/_mobile suffixes.
 // ──────────────────────────────────────────────────────────────────────────────
-export const rPx = (size, tabletRatio = 0.78, mobileRatio = 0.58, min = 14) => ({
+const rPx = (size, tabletRatio = 0.78, mobileRatio = 0.58, min = 14) => ({
   desktop: { unit: "px", size, sizes: [] },
   tablet: { unit: "px", size: Math.max(Math.round(size * tabletRatio), min), sizes: [] },
   mobile: { unit: "px", size: Math.max(Math.round(size * mobileRatio), min), sizes: [] },

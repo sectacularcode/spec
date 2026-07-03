@@ -9,7 +9,7 @@
 export function nid() { return Math.random().toString(16).slice(2, 9); }
 
 // Generates responsive padding settings (desktop / tablet / mobile)
-export function rPad(padY, padX) {
+function rPad(padY, padX) {
   padX = padX || "40";
   var y = parseInt(padY); var x = parseInt(padX);
   var yt = Math.round(y * 0.7); var ym = Math.round(y * 0.55);
@@ -22,7 +22,7 @@ export function rPad(padY, padX) {
 }
 
 // Generates responsive font size settings
-export function rFont(px) {
+function rFont(px) {
   if (!px) return {};
   var t = Math.max(16, Math.round(px * 0.68));
   var m = Math.max(16, Math.round(px * 0.50));

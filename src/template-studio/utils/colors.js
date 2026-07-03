@@ -20,7 +20,6 @@ export const contrastRatio = (hex1, hex2) => {
 export const isLight = (hex) => luminance(hex) > 0.179;
 export const textOn = (bg) => isLight(bg) ? "#0a0a0a" : "#ffffff";
 export const mutedTextOn = (bg) => isLight(bg) ? "rgba(10,10,10,0.65)" : "rgba(255,255,255,0.75)";
-export const subtleTextOn = (bg) => isLight(bg) ? "rgba(10,10,10,0.5)" : "rgba(255,255,255,0.55)";
 
 // Returns a sensible button color pair that works on any section background
 export const buttonOn = (sectionBg, accent) => {
@@ -34,12 +33,3 @@ export const buttonOn = (sectionBg, accent) => {
   const btnText = textOn(btnBg);
   return { btnBg, btnText };
 };
-
-// Returns image URL if provided, otherwise a stable Picsum placeholder
-// ──────────────────────────────────────────────────────────────────────────────
-// IMAGE LIBRARY — curated Unsplash photo IDs by industry/category. Used as
-// fallback when no custom image URL is provided. Photos are CDN-served (no API
-// key needed). Each template sets brand.imageCategory which steers fallback
-// imagery to match the industry — agency gets creative-team shots, production
-// gets cameras/lighting, e-commerce gets product shots, etc.
-// ──────────────────────────────────────────────────────────────────────────────
