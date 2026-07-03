@@ -11,8 +11,7 @@ import { saveToLibrary } from "./utils/library.js";
 import { extractBrief } from "./utils/extractBrief.js";
 
 // Builders
-import { buildHeaderJSON } from "./builders/headerFooter.js";
-import { buildFooterJSON } from "./builders/headerFooter.js";
+import { buildHeaderJSON, buildFooterJSON } from "./builders/headerFooter.js";
 import { generatePages } from "./builders/generatePages.js";
 
 // Preview

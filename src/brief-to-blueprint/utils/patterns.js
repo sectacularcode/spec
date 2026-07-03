@@ -8,7 +8,7 @@
 import { LAYOUT_PATTERNS } from "../../constants/patterns.js";
 
 // Scans crawled inspo text for structural keywords and returns a boost map { patternId: score }
-export function parseInspoPatterns(inspoContext) {
+function parseInspoPatterns(inspoContext) {
   if (!inspoContext) return {};
   var text = inspoContext.toLowerCase();
   var boosts = {};

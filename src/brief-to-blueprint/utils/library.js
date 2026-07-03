@@ -6,7 +6,7 @@ import { kvStorageGet, kvStorageSet } from "./storage.js";
 
 // Infers visual style tags, tone tags, and industry fit from a brief.
 // These tags power the library filter UI.
-export function inferTags(brief, pages, layoutVariants) {
+function inferTags(brief, pages, layoutVariants) {
   var colors = brief.colors || {};
   var ink = (colors.ink || "#000000").toLowerCase();
   var bone = (colors.bone || colors["warm-white"] || "#ffffff").toLowerCase();

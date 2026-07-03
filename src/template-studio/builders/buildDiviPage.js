@@ -55,7 +55,7 @@ export function buildDiviPage(page, brand) {
       const inner = dRow("4_4", dCol("4_4",
         dTxt(`●  STUDIO`, ac, bf, 11, "left") + dDiv(24) +
         dHead(page.heroHeading || brand.tagline, "h1", hc, hf, 84, "left") + dDiv(28) +
-        dTxt(page.heroSubhead || brand.keyMessages.split(".")[0], ts, bf, 18, "left") + dDiv(48) +
+        dTxt(page.heroSubhead || (brand.keyMessages || "").split(".")[0], ts, bf, 18, "left") + dDiv(48) +
         dBtn(brand.cta1, "#contact", ac, "#fff", "left")
       ));
       sections.push(`[et_pb_section fb_built="1" background_color="${pc}" background_image="${img}" background_blend="overlay" custom_padding="160px|20px|160px|20px"]${inner}[/et_pb_section]`);
