@@ -1,4 +1,5 @@
 import { nid, mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer, mkDivider } from "./helpers.js";
+import { he } from "../utils/htmlEscape.js";
 
 // Landing page builder — three distinct conversion-focused layouts.
 //
@@ -57,7 +58,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       return mkContainer([
         mkHeading(item.stat, accent, "h2", { weight: 800, px: 44, align: "center" }),
         mkSpacer(8),
-        mkText("<p style='text-align:center'>" + item.label + "</p>", stone),
+        mkText("<p style='text-align:center'>" + he(item.label) + "</p>", stone),
       ], warmWhite, { isInner: true, padY: "48", padX: "32", center: true, grow: "1" });
     });
     return mkContainer(cols, bgColor || bone, { direction: "row", padY: "0", padX: "0", gap: "0" });
@@ -73,7 +74,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       var textCol = mkContainer([
         mkHeading(f.heading, accent, "h2", { weight: 700, px: 34 }),
         mkSpacer(16),
-        mkText(f.body, text),
+        mkText(he(f.body), text),
         mkSpacer(24),
         mkButton(contactCta, accent, warmWhite),
       ], null, { isInner: true, padY: "60", padX: "48", grow: "1" });
@@ -87,7 +88,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     return mkContainer([
       mkHeading(closingLine, warmWhite, "h2", { weight: 700, px: 40, align: "center" }),
       mkSpacer(12),
-      mkText("<p style='text-align:center'>" + closingBody + "</p>", "rgba(255,255,255,0.8)"),
+      mkText("<p style='text-align:center'>" + he(closingBody) + "</p>", "rgba(255,255,255,0.8)"),
       mkSpacer(28),
       makeDualBtnRow(phoneCta, contactCta),
     ], dark, { padY: "80", center: true });
@@ -97,7 +98,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   if (variant !== "B" && variant !== "C") {
     var heroEyebrow = mkHeading(brandName, warmWhite, "h6", { eyebrow: true, align: "center" });
     var heroH1El    = mkHeading(heroH1, warmWhite, "h1", { weight: 800, px: 58, align: "center" });
-    var heroSubEl   = mkText("<p style='text-align:center'>" + heroSub + "</p>", "rgba(255,255,255,0.85)");
+    var heroSubEl   = mkText("<p style='text-align:center'>" + he(heroSub) + "</p>", "rgba(255,255,255,0.85)");
     heroSubEl.settings.text_align = heroSubEl.settings.text_align_tablet = heroSubEl.settings.text_align_mobile = "center";
 
     var heroA = mkContainer(
@@ -108,7 +109,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var checklistItems = brief.servicesList || ["2 Shifts — Quick Turn-Around","5 Complete Paint Booths","Full Restorations","Custom Painting, Striping and Design","Structural Repairs","Frame Rail Replacements","Body Swaps","Direct Insurance Billing"];
     var checklistHtml  = "<ul style='list-style:none;padding:0;margin:0;columns:2;column-gap:48px'>" +
       checklistItems.map(function(item) {
-        return "<li style='padding:6px 0 6px 28px;position:relative;border-bottom:1px solid #e5e5e5;break-inside:avoid'><span style='position:absolute;left:0;color:" + accent + ";font-weight:700'>✓</span>" + item + "</li>";
+        return "<li style='padding:6px 0 6px 28px;position:relative;border-bottom:1px solid #e5e5e5;break-inside:avoid'><span style='position:absolute;left:0;color:" + accent + ";font-weight:700'>✓</span>" + he(item) + "</li>";
       }).join("") + "</ul>";
     var checklistSection = mkContainer([
       mkHeading(brief.servicesHeading || "What We Do", text, "h2", { weight: 700, px: 36 }),
@@ -117,7 +118,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     ], warmWhite, { padY: "80" });
 
     return {
-      version: "0.4", title: (brandName || "Site") + " — Landing Page", type: "page", page_settings: {},
+      version: "0.4", title: he(brandName || "Site") + " — Landing Page", type: "page", page_settings: {},
       content: [heroA, makeTrustStrip(), ...makeFeatureRows(), checklistSection, makeClosingCta()],
     };
   }
@@ -130,9 +131,9 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkSpacer(16),
       mkHeading(heroH1, warmWhite, "h1", { weight: 800, px: 52, align: "center" }),
       mkSpacer(16),
-      mkText("<p style='text-align:center'>" + heroSub + "</p>", "rgba(255,255,255,0.85)"),
+      mkText("<p style='text-align:center'>" + he(heroSub) + "</p>", "rgba(255,255,255,0.85)"),
       mkSpacer(12),
-      mkText("<p style='text-align:center'>" + (brief.hookStatement || "[What sets you apart in one line]") + "</p>", "rgba(255,255,255,0.7)"),
+      mkText("<p style='text-align:center'>" + he(brief.hookStatement || "[What sets you apart in one line]") + "</p>", "rgba(255,255,255,0.7)"),
       mkSpacer(32),
       mkButton(phoneCta, warmWhite, dark),
     ], accent, { padY: "80", center: true });
@@ -146,14 +147,14 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     var formFieldsHtml = "<div style='display:flex;flex-direction:column;gap:12px;margin-bottom:20px'>" +
       formFields.map(function(f) {
-        return "<div style='display:flex;flex-direction:column;gap:4px'><label style='font-size:13px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em'>" + f + "</label><input type='text' placeholder='' style='padding:12px 14px;border:1px solid #dde0e6;border-radius:4px;font-size:15px;width:100%;box-sizing:border-box'/></div>";
+        return "<div style='display:flex;flex-direction:column;gap:4px'><label style='font-size:13px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em'>" + he(f) + "</label><input type='text' placeholder='' style='padding:12px 14px;border:1px solid #dde0e6;border-radius:4px;font-size:15px;width:100%;box-sizing:border-box'/></div>";
       }).join("") + "</div>";
     var formHtml = "<div style='background:" + warmWhite + ";border:1px solid #dde0e6;border-radius:8px;padding:40px'>" +
-      "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 8px'>" + formHeading + "</h3>" +
-      "<p style='font-size:15px;color:" + stone + ";margin:0 0 24px;line-height:1.6'>" + formSubhead + "</p>" +
+      "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 8px'>" + he(formHeading) + "</h3>" +
+      "<p style='font-size:15px;color:" + stone + ";margin:0 0 24px;line-height:1.6'>" + he(formSubhead) + "</p>" +
       formFieldsHtml +
-      "<button style='width:100%;padding:16px;background:" + accent + ";color:" + warmWhite + ";font-weight:700;font-size:15px;border:none;border-radius:4px;cursor:pointer;text-transform:uppercase;letter-spacing:0.08em'>" + formCta + "</button>" +
-      "<p style='font-size:13px;color:" + stone + ";margin:12px 0 0;text-align:center'>" + formReassure + "</p>" +
+      "<button style='width:100%;padding:16px;background:" + accent + ";color:" + warmWhite + ";font-weight:700;font-size:15px;border:none;border-radius:4px;cursor:pointer;text-transform:uppercase;letter-spacing:0.08em'>" + he(formCta) + "</button>" +
+      "<p style='font-size:13px;color:" + stone + ";margin:12px 0 0;text-align:center'>" + he(formReassure) + "</p>" +
       "</div>";
 
     var formWidget = { id: nid(), elType: "widget", widgetType: "text-editor", settings: { editor: formHtml }, elements: [] };
@@ -167,7 +168,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       return mkContainer([
         mkHeading(item.stat, accent, "h2", { weight: 800, px: 48 }),
         mkSpacer(8),
-        mkText(item.label, stone),
+        mkText(he(item.label), stone),
         mkSpacer(16),
         mkDivider(accent),
       ], null, { isInner: true, padY: "24", padX: "0", grow: "1" });
@@ -188,10 +189,10 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     ];
     var testimonialCols = testimonials.map(function(t) {
       return mkContainer([
-        mkText("<p style='font-size:17px;font-style:italic;line-height:1.7;margin:0 0 20px'>\"" + t.quote + "\"</p>", ink),
+        mkText("<p style='font-size:17px;font-style:italic;line-height:1.7;margin:0 0 20px'>\"" + he(t.quote) + "\"</p>", ink),
         mkDivider(accent),
         mkSpacer(12),
-        mkText("<strong>" + t.name + "</strong><br>" + t.title, stone),
+        mkText("<strong>" + he(t.name) + "</strong><br>" + he(t.title), stone),
       ], warmWhite, { isInner: true, padY: "40", padX: "32", grow: "1" });
     });
     var testimonialsSection = mkContainer([
@@ -208,7 +209,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     ], warmWhite, { padY: "60", center: true });
 
     return {
-      version: "0.4", title: (brandName || "Site") + " — Landing Page (Form)", type: "page", page_settings: {},
+      version: "0.4", title: he(brandName || "Site") + " — Landing Page (Form)", type: "page", page_settings: {},
       content: [heroB, formSection, testimonialsSection, ...makeFeatureRows(), midCta, makeClosingCta()],
     };
   }
@@ -221,7 +222,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     mkSpacer(12),
     mkHeading(heroH1, warmWhite, "h1", { weight: 800, px: 52, align: "center" }),
     mkSpacer(16),
-    mkText("<p style='text-align:center'>" + heroSub + "</p>", "rgba(255,255,255,0.85)"),
+    mkText("<p style='text-align:center'>" + he(heroSub) + "</p>", "rgba(255,255,255,0.85)"),
     mkSpacer(32),
     makeDualBtnRow(phoneCta, contactCta),
   ], accent, { padY: "80", center: true });
@@ -236,7 +237,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     return mkContainer([
       mkHeading("✓", accent, "h2", { weight: 800, px: 40, align: "center" }),
       mkSpacer(12),
-      mkText("<p style='text-align:center;font-size:18px;font-weight:600;line-height:1.4'>" + b + "</p>", ink),
+      mkText("<p style='text-align:center;font-size:18px;font-weight:600;line-height:1.4'>" + he(b) + "</p>", ink),
     ], warmWhite, { isInner: true, padY: "48", padX: "32", center: true, grow: "1" });
   });
   var benefitsSection = mkContainer(benefitCols, warmWhite, { direction: "row", padY: "0", padX: "0", gap: "0" });
@@ -259,8 +260,8 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   var tName  = brief.testimonial1Name  || "Client Name";
   var tTitle = brief.testimonial1Title || "Title, Company";
   var singleTestimonial = mkContainer([
-    mkText("<p style='font-size:22px;font-style:italic;line-height:1.6;text-align:center;margin:0 0 24px'>\"" + tQuote + "\"</p>", ink),
-    mkText("<p style='text-align:center;font-weight:600'>" + tName + " · " + tTitle + "</p>", stone),
+    mkText("<p style='font-size:22px;font-style:italic;line-height:1.6;text-align:center;margin:0 0 24px'>\"" + he(tQuote) + "\"</p>", ink),
+    mkText("<p style='text-align:center;font-weight:600'>" + he(tName) + " · " + he(tTitle) + "</p>", stone),
   ], bone, { padY: "80", center: true });
 
   // Single strong CTA
@@ -269,11 +270,11 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     mkSpacer(24),
     mkButton(phoneCta, warmWhite, dark),
     mkSpacer(16),
-    mkText("<p style='text-align:center;font-size:14px'>" + (brief.formReassurance || "No sales team. A real reply within one business day.") + "</p>", "rgba(255,255,255,0.7)"),
+    mkText("<p style='text-align:center;font-size:14px'>" + he(brief.formReassurance || "No sales team. A real reply within one business day.") + "</p>", "rgba(255,255,255,0.7)"),
   ], dark, { padY: "100", center: true });
 
   return {
-    version: "0.4", title: (brandName || "Site") + " — Landing Page (Minimal)", type: "page", page_settings: {},
+    version: "0.4", title: he(brandName || "Site") + " — Landing Page (Minimal)", type: "page", page_settings: {},
     content: [heroC, benefitsSection, compactTrust, singleTestimonial, singleCtaSection],
   };
 }

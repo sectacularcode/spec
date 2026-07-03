@@ -5,6 +5,8 @@
 // Naming convention: mk = "make" — mkContainer, mkHeading, mkText, etc.
 // All widgets use Elementor's container/flexbox system (v4.x compatible).
 
+import { he } from "../utils/htmlEscape.js";
+
 // Generates a random Elementor widget ID (7-char hex)
 export function nid() { return Math.random().toString(16).slice(2, 9); }
 
@@ -76,11 +78,12 @@ export function mkContainer(children, bg, opts) {
   return { id: nid(), elType: "container", isInner: !!opts.isInner, settings: s, elements: children };
 }
 
-// Heading widget (h1–h6)
+// Heading widget (h1–h6). `text` is always plain copy (no caller embeds real
+// tags here) so it's safe — and correct — to escape unconditionally.
 export function mkHeading(text, color, size, opts) {
   opts = opts || {};
   var s = {
-    title: text, header_size: size, title_color: color,
+    title: he(text), header_size: size, title_color: color,
     align: opts.align || "left", align_tablet: opts.align || "left",
     align_mobile: opts.align === "center" ? "center" : "left",
   };
@@ -115,10 +118,10 @@ export function mkText(html, color, align) {
   return { id: nid(), elType: "widget", widgetType: "text-editor", settings: s, elements: [] };
 }
 
-// Button widget
+// Button widget. `label` is always plain copy — safe to escape unconditionally.
 export function mkButton(label, bgColor, textColor) {
   return { id: nid(), elType: "widget", widgetType: "button", settings: {
-    text: label, link: { url: "#" },
+    text: he(label), link: { url: "#" },
     background_color: bgColor, button_text_color: textColor,
     border_radius: { unit:"px", top:"2", right:"2", bottom:"2", left:"2", isLinked:true },
     typography_typography: "custom", typography_font_family: "Inter",
@@ -131,10 +134,11 @@ export function mkButton(label, bgColor, textColor) {
   }, elements: [] };
 }
 
-// Image placeholder (user fills in after import)
+// Image placeholder (user fills in after import). `caption` is always plain
+// text — safe to escape unconditionally.
 export function mkImagePh(caption) {
   return { id: nid(), elType: "widget", widgetType: "image",
-    settings: { image: { url:"", id:"" }, caption_source:"custom", caption: caption||"" },
+    settings: { image: { url:"", id:"" }, caption_source:"custom", caption: he(caption||"") },
     elements: [] };
 }
 

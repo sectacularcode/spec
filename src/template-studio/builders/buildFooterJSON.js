@@ -1,5 +1,6 @@
 import { THEMES } from "../constants/themes.js";
 import { eSection, eHead, eTxt, eSpacer, eSocial, eNavMenu } from "./helpers.js";
+import { he } from "../utils/htmlEscape.js";
 // Builds Elementor JSON for the site footer (Theme Builder global template)
 export function buildFooterJSON(brand) {
   const { accentColor: ac, cardBgColor: card, headingFont: hf, bodyFont: bf, footerStyle } = brand;
@@ -64,7 +65,7 @@ export function buildFooterJSON(brand) {
     );
   }
 
-  return { version: "0.4", title: `${brand.name} — Footer`, type: "footer", content: [sec] };
+  return { version: "0.4", title: `${he(brand.name)} — Footer`, type: "footer", content: [sec] };
 }
 
 // ──────────────────────────────────────────────────────────────────────────────

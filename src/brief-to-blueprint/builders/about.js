@@ -1,4 +1,5 @@
 import { mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer } from "./helpers.js";
+import { he } from "../utils/htmlEscape.js";
 
 export function buildAboutPage(C, brief, inspoHint, patterns) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
@@ -14,9 +15,9 @@ export function buildAboutPage(C, brief, inspoHint, patterns) {
 
   // ── Variant A: Story + portrait split ─────────────────────────────────────
   var storyLeft = mkContainer([
-    mkText(brief.aboutStory || "[Founder story — pulled from brief. Fill in if missing.]", text),
+    mkText(he(brief.aboutStory || "[Founder story — pulled from brief. Fill in if missing.]"), text),
     mkSpacer(24),
-    mkText(brief.aboutStory2 || "[Second paragraph — additional context about the founder's background and what led to this work.]", text),
+    mkText(he(brief.aboutStory2 || "[Second paragraph — additional context about the founder's background and what led to this work.]"), text),
   ], null, { padY: "0", grow: 1, isInner: true });
 
   var storyRight = mkContainer([
@@ -31,7 +32,7 @@ export function buildAboutPage(C, brief, inspoHint, patterns) {
     mkSpacer(16),
     mkHeading(brief.whyH2 || "One mind on the whole project.", ink, "h2", { weight: 800, px: 44 }),
     mkSpacer(24),
-    mkText(brief.whyOneMaker || "[Why this approach — pulled from brief. Explain what makes the method different and why it matters to clients.]", text),
+    mkText(he(brief.whyOneMaker || "[Why this approach — pulled from brief. Explain what makes the method different and why it matters to clients.]"), text),
   ], "#ffffff", { padY: "80" });
 
   var values = (brief.founderValues || ["Grounded", "Forward", "Exact", "Singular", "Human"]).map(function(v) {
@@ -77,7 +78,7 @@ export function buildAboutPage(C, brief, inspoHint, patterns) {
       mkSpacer(20),
       mkHeading(m[0], ink, "h3", { weight: 700, px: 22 }),
       mkSpacer(8),
-      mkText(m[1], text),
+      mkText(he(m[1]), text),
     ], isEven ? bone : "#ffffff", { padY: "48", padX: "40", isInner: false });
   });
 
@@ -90,7 +91,7 @@ export function buildAboutPage(C, brief, inspoHint, patterns) {
     mkContainer([
       mkHeading(brief.whyEyebrow || "Why this approach", brassDp, "h6", { eyebrow: true }),
       mkSpacer(16),
-      mkText(brief.whyOneMaker || "[Why this approach — pulled from brief.]", text),
+      mkText(he(brief.whyOneMaker || "[Why this approach — pulled from brief.]"), text),
       mkSpacer(32),
       mkButton("Start a project", brassDp, "#ffffff"),
     ], null, { padY: "0", grow: 1, isInner: true }),
