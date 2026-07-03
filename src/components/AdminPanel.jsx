@@ -36,7 +36,6 @@ export default function AdminPanel({ isAdmin }) {
   const [saving, setSaving]         = useState(false);
   const [deleting, setDeleting]     = useState(null);
   const [msg, setMsg]               = useState({ text: "", type: "ok" });
-  const [migrating, setMigrating]   = useState(false); // TEMPORARY — Stage 2 projects migration trigger, remove after verified
 
   function flash(text, type = "ok") {
     setMsg({ text, type });
@@ -136,27 +135,6 @@ export default function AdminPanel({ isAdmin }) {
     setDeleting(null);
   }
 
-  // TEMPORARY — Stage 2 (projects Redis -> Postgres) one-time migration
-  // trigger. Delete this function and its button once the migration has
-  // been run and verified in production; see api/migrate-projects-onetime.js.
-  async function runProjectsMigration() {
-    if (!window.confirm("Run the one-time projects migration? This copies every user's Redis project data into Postgres. Safe to run more than once.")) return;
-    setMigrating(true);
-    try {
-      const res = await fetch("/api/migrate-projects-onetime", {
-        method: "POST",
-        headers: await authHeaders(),
-      });
-      const d = await res.json();
-      if (res.ok) {
-        flash(`Migrated ${d.totalProjectsMigrated} project(s) from ${d.totalUsersScanned} key(s). ${d.collisionsRemapped.length} collision(s) remapped, ${d.skipped.length} skipped.`);
-      } else {
-        flash(d.error || "Migration failed.", "err");
-      }
-    } catch { flash("Error running migration.", "err"); }
-    setMigrating(false);
-  }
-
   function startEdit(u) {
     setEditingId(u.userId);
     setEditRole(u.role || "staff");
@@ -228,16 +206,6 @@ export default function AdminPanel({ isAdmin }) {
           <div style={{ ...S.msg, color: msg.type === "err" ? "#dc2626" : "#b45309" }}>{msg.text}</div>
         )}
       </div>
-
-      {/* TEMPORARY — Stage 2 projects migration trigger, remove after verified */}
-      {isAdmin && (
-        <div style={{ ...S.addBlock, background: "#fff7ed" }}>
-          <div style={S.addLabel}>Data migration (temporary — Stage 2)</div>
-          <button style={S.btnSecondary} onClick={runProjectsMigration} disabled={migrating}>
-            {migrating ? "Migrating…" : "Run projects migration"}
-          </button>
-        </div>
-      )}
 
       {/* User table */}
       {loading ? (
