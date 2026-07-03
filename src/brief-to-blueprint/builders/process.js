@@ -1,4 +1,5 @@
 import { mkContainer, mkHeading, mkText, mkButton, mkSpacer, mkDivider } from "./helpers.js";
+import { he } from "../utils/htmlEscape.js";
 
 export function buildProcessPage(C, brief, inspoHint, patterns) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
@@ -10,7 +11,7 @@ export function buildProcessPage(C, brief, inspoHint, patterns) {
     mkSpacer(16),
     mkHeading(brief.processH1 || "How it gets made.", ink, "h1", { weight: 800, px: 64 }),
     mkSpacer(16),
-    mkText(brief.processIntro || "Simple and calm, from first call to final files. No maze, no surprises.", text),
+    mkText(he(brief.processIntro || "Simple and calm, from first call to final files. No maze, no surprises."), text),
   ], bone, { padY: "88" });
 
   var defaultSteps = [
@@ -25,7 +26,7 @@ export function buildProcessPage(C, brief, inspoHint, patterns) {
   var callout = mkContainer([
     mkHeading(brief.calloutEyebrow || "What to expect", brass, "h6", { eyebrow: true }),
     mkSpacer(16),
-    mkText(brief.calloutBody || "[What to expect — timeline and delivery details. Fill in from client brief.]", warmWhite),
+    mkText(he(brief.calloutBody || "[What to expect — timeline and delivery details. Fill in from client brief.]"), warmWhite),
   ], ink, { padY: "80" });
 
   var closing = mkContainer([mkButton("Start a project", brassDp, "#ffffff")], bone, { padY: "80", center: true });
@@ -40,7 +41,7 @@ export function buildProcessPage(C, brief, inspoHint, patterns) {
       mkSpacer(24),
       mkHeading(title, ink, "h3", { weight: 700, px: 22 }),
       mkSpacer(12),
-      mkText(body, text),
+      mkText(he(body), text),
     ], i % 2 === 0 ? bone : "#ffffff", { padY: "56", padX: "40" });
   });
 
@@ -64,7 +65,7 @@ export function buildProcessPage(C, brief, inspoHint, patterns) {
       mkSpacer(16),
       mkHeading(title, ink, "h4", { weight: 700, px: 18 }),
       mkSpacer(8),
-      mkText(body, text),
+      mkText(he(body), text),
     ], "#ffffff", { padY: "40", padX: "32", isInner: true });
     card.settings.border_border = "solid";
     card.settings.border_width = { unit:"px", top:"3", right:"0", bottom:"0", left:"0", isLinked:false };
