@@ -35,9 +35,17 @@ export default async function handler(req, res) {
       if (typeof pool !== "string" || !validJsonSize({ pool })) {
         return res.status(400).json({ error: "Invalid pool" });
       }
+      // `pool` is a plain string, not an object — @vercel/postgres only
+      // auto-JSON-encodes objects for JSONB columns (confirmed in the
+      // installed driver source: strings take a raw .toString() path, not
+      // the JSON.stringify path), so a bare string here would fail
+      // Postgres's jsonb cast for any value that isn't already valid JSON
+      // syntax. Explicitly encode it so it round-trips as a JSON string
+      // scalar — the driver still auto-parses it back to a plain JS string
+      // on read, so the GET path needs no corresponding change.
       await sql`
         INSERT INTO inspo_patterns (user_id, pool, updated_at)
-        VALUES (${userId}, ${pool}, now())
+        VALUES (${userId}, ${JSON.stringify(pool)}::jsonb, now())
         ON CONFLICT (user_id) DO UPDATE
         SET pool = EXCLUDED.pool, updated_at = now()
       `;

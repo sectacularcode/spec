@@ -4,7 +4,7 @@ A browser-based planning tool for WordPress designers. Converts brand briefs int
 
 **Live:** [specish.com](https://specish.com)
 **Repo:** `sectacularcode/elementor-builder2`
-**Stack:** React 19 + Vite v8, deployed on Vercel Pro, Upstash Redis for KV storage
+**Stack:** React 19 + Vite v8, deployed on Vercel Pro, Postgres (Neon) for data storage, Upstash Redis for rate limiting
 
 ---
 
@@ -32,6 +32,10 @@ src/
     patterns.js                  — Shared layout pattern data (B2B)
   utils/
     htmlEscape.js                — Shared HTML escape utility
+    projects.js, templateLibrary.js, sectionLibrary.js, keywordBuilds.js,
+    blueprintDrafts.js, inspoPatterns.js
+                                  — Thin fetch wrappers over the Postgres-backed
+                                    api/*.js endpoints, one per data type
 
   template-studio/
     index.jsx                    — State, handlers, layout shell, ctx object
@@ -84,9 +88,8 @@ src/
     utils/
       extractBrief.js            — Extract fields from raw brief data
       inspo.js                   — Inspo URL pattern builder
-      library.js                 — Section library save/load
+      library.js                 — Section/template library save/load (Postgres)
       patterns.js                — Layout pattern selection
-      storage.js                 — KV storage wrappers
       htmlEscape.js              — Re-exports from src/utils/htmlEscape.js
 
 api/
@@ -97,7 +100,12 @@ api/
   draft-copy.js                  — AI copy drafting for blank fields
   analyze-inspo.js               — AI layout variant recommendations from inspo
   crawl-inspo.js                 — Crawl inspo URLs, extract structure via Claude
-  storage.js                     — KV proxy for project and draft persistence
+  projects.js, template-library.js, section-library.js, keyword-builds.js,
+  blueprint-drafts.js, inspo-patterns.js
+                                  — Postgres-backed CRUD for each data type
+                                    (see db/schema.sql for the table shapes)
+  _lib/ratelimit.js               — Upstash Redis-backed rate limiting (the
+                                    only remaining use of Redis in this app)
 ```
 
 ---
@@ -116,9 +124,10 @@ All API routes (except `auth.js`, `me.js`, `signout.js`) verify the session cook
 |---|---|
 | `SPEC_PASSWORDS` | Comma-separated login passwords |
 | `SPEC_SESSION_SECRET` | Session cookie value (treat as a secret) |
-| `KV_REST_API_URL` | Upstash Redis endpoint |
+| `KV_REST_API_URL` | Upstash Redis endpoint — rate limiting only, not data storage |
 | `KV_REST_API_TOKEN` | Upstash Redis auth token |
 | `KV_REST_API_READ_ONLY_TOKEN` | Upstash read-only token |
+| `POSTGRES_URL` (and related `POSTGRES_*` vars) | Neon Postgres connection, via Vercel's native storage integration — primary data store, see `db/schema.sql` |
 | `ANTHROPIC_API_KEY` | Claude API key for server-side AI routes |
 
 ---
