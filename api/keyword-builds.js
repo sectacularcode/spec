@@ -39,13 +39,15 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "Invalid entry" });
       }
 
-      // Dedup: replace any existing entry for the same keywords+date.
-      await sql`
-        DELETE FROM keyword_builds
-        WHERE user_id = ${userId} AND keywords = ${keywords} AND build_date = ${date}
-      `;
-
+      // Dedup (replace any existing entry for the same keywords+date) and
+      // insert combined into one statement via a data-modifying CTE — see
+      // api/template-library.js for the full reasoning on why this is safe.
       const { rows } = await sql`
+        WITH dedup AS (
+          DELETE FROM keyword_builds
+          WHERE user_id = ${userId} AND keywords = ${keywords} AND build_date = ${date}
+          RETURNING id
+        )
         INSERT INTO keyword_builds (id, user_id, keywords, build_date, data)
         VALUES (${id}, ${userId}, ${keywords}, ${date}, ${rest})
         ON CONFLICT (id) DO NOTHING

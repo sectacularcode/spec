@@ -265,21 +265,34 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
   }, []);
 
   async function saveKeywordBuild(entry) {
-    const ok = await saveKeywordBuildEntry(entry);
-    if (!ok) return;
-    // Dedup locally too, mirroring the server's replace-same-day-keywords rule.
+    // Optimistic: apply the same dedup-by-same-day-keywords rule the
+    // server uses immediately, then persist in the background. Not a
+    // manually re-clickable button, so no debounce/rollback race to guard.
+    let previous;
     const today = new Date().toISOString().slice(0, 10);
     setKeywordBuilds(existing => {
+      previous = existing;
       const deduped = existing.filter(b => !(b.keywords === entry.keywords && b.date === today));
       deduped.unshift(entry);
       return deduped.length > 50 ? deduped.slice(0, 50) : deduped;
     });
+    const ok = await saveKeywordBuildEntry(entry);
+    if (!ok) setKeywordBuilds(previous);
   }
 
   async function deleteKeywordBuild(id) {
+    let removed, index;
+    setKeywordBuilds(existing => {
+      index = existing.findIndex(b => b.id === id);
+      removed = existing[index];
+      return existing.filter(b => b.id !== id);
+    });
     const ok = await deleteKeywordBuildEntry(id);
-    if (!ok) return;
-    setKeywordBuilds(existing => existing.filter(b => b.id !== id));
+    if (!ok && removed) {
+      setKeywordBuilds(existing =>
+        existing.some(b => b.id === id) ? existing : [...existing.slice(0, index), removed, ...existing.slice(index)]
+      );
+    }
   }
 
   const project = projects.find(p => p.id === activeId) || projects[0] || null;
@@ -1706,8 +1719,18 @@ Rules:
                           </button>
                           <button
                             onClick={async () => {
+                              let removed, index;
+                              setSavedBuilds(existing => {
+                                index = existing.findIndex(b => b.id === build.id);
+                                removed = existing[index];
+                                return existing.filter(b => b.id !== build.id);
+                              });
                               const ok = await deleteTemplateLibraryEntry(build.id);
-                              if (ok) setSavedBuilds(existing => existing.filter(b => b.id !== build.id));
+                              if (!ok && removed) {
+                                setSavedBuilds(existing =>
+                                  existing.some(b => b.id === build.id) ? existing : [...existing.slice(0, index), removed, ...existing.slice(index)]
+                                );
+                              }
                             }}
                             style={{ padding: "9px 12px", fontSize: "12px", fontWeight: 500, background: "#fff", color: "#6b7280", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
                             Remove
