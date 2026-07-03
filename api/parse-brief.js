@@ -73,9 +73,11 @@ Rules:
 - For differenceH2, whoH2, workH1, aboutH1: extract the actual headline copy, not the eyebrow label.
 - If a field is genuinely absent from the brief, use empty string "" — never invent copy.`;
 
-// Try models in order until one works
+// Try models in order until one works. Every ID here is already used
+// successfully elsewhere in this app (generate-copy.js, describeMySite,
+// GenerateFromKeywordsModal) — no unverified/guessed model IDs, so a brief
+// parse doesn't waste a round-trip on a model that never resolves.
 const MODELS = [
-  "claude-opus-4-6",
   "claude-sonnet-4-6",
   "claude-3-5-sonnet-20241022",
   "claude-3-5-haiku-20241022",
