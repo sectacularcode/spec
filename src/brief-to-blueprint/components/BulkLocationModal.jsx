@@ -324,11 +324,11 @@ export function BulkLocationModal({ _brief, onClose, onGenerate, _userId }) {
     onClose();
   }
 
-  // A location needs enough real data to be worth a page — city, address,
-  // and phone are the fields the generated page actually leads with.
+  // A location needs enough real data to be worth a page — city is what the
+  // slug and headline are built from, phone is the primary CTA target.
+  // Street address is optional (service-area/mobile businesses may not have one).
   const validLocations = locations.filter(l =>
     !!(l.city && l.city.trim()) &&
-    !!(l.address && l.address.trim()) &&
     !!(l.phone && String(l.phone).trim())
   );
 
@@ -386,7 +386,7 @@ export function BulkLocationModal({ _brief, onClose, onGenerate, _userId }) {
               <div style={{ fontSize: "12px", color: "#6b7280" }}>
                 {locations.length} location{locations.length !== 1 ? "s" : ""} added
                 {validLocations.length < locations.length && (
-                  <span style={{ color: "#dc2626" }}> — {locations.length - validLocations.length} missing city, address, or phone</span>
+                  <span style={{ color: "#dc2626" }}> — {locations.length - validLocations.length} missing city or phone</span>
                 )}
               </div>
               <button

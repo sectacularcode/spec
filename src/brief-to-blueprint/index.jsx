@@ -471,14 +471,20 @@ export default function CustomBuild({ userId, role } = {}) {
         setGeneratingStatus("Preparing content...");
         try {
           const controller = new AbortController();
-          setTimeout(() => controller.abort(), 4000);
+          // 4s was too tight for a call that can draft up to 12 fields —
+          // it silently aborted before Claude finished, making the review
+          // panel never appear with no indication why. Match the timeout
+          // used by the other AI calls in this app (describeMySite, etc).
+          setTimeout(() => controller.abort(), 25000);
           const res = await fetch("/api/draft-copy", {
             signal: controller.signal,
             method: "POST",
             headers: await authHeaders(),
             body: JSON.stringify({ brief, positioning: { valueProposition: brief.valueProposition || "", targetAudience: brief.targetAudience || "" } }),
           });
-          if (res.ok) {
+          if (!res.ok) {
+            console.warn("draft-copy request failed:", res.status);
+          } else {
             const data = await res.json();
             if (data.drafts) {
               // Only offer fields for review that would actually fill a blank —
@@ -490,7 +496,9 @@ export default function CustomBuild({ userId, role } = {}) {
               if (Object.keys(blanksFilled).length > 0) drafts = blanksFilled;
             }
           }
-        } catch { /* API not available — continue */ }
+        } catch (draftErr) {
+          console.warn("draft-copy request errored, continuing without drafts:", draftErr.message);
+        }
       }
 
       if (drafts) {
