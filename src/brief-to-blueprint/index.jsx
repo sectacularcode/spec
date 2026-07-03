@@ -204,18 +204,28 @@ export default function CustomBuild({ userId, role } = {}) {
   }
   async function handleBulkLocationGenerate(locations, template) {
     if (!brief) return;
-    // Generate one location page per location entry
+    // Generate one location page per location entry. Slugs are derived from
+    // city name, so dedupe against already-added pages and within this batch
+    // (e.g. two locations both named "Denver" in different states) — otherwise
+    // they'd silently collide on the same URL when imported.
+    const usedSlugs = new Set(customPages.map(p => p.slug));
+    const newPageDefs = [];
     locations.forEach((loc, i) => {
       const pageId = "location-" + Date.now() + "-" + i;
-      const pageDef = { id: pageId, label: (loc.locationName || loc.city || "Location") + (loc.state ? ", " + loc.state : ""), slug: "/" + (loc.city || "location").toLowerCase().replace(/\s+/g, "-") };
-      setPages(prev => [...prev, pageId]);
-      setCustomPages(prev => [...prev, { ...pageDef, _locationData: loc, _template: template }]);
+      let baseSlug = "/" + (loc.city || "location").toLowerCase().replace(/\s+/g, "-");
+      let slug = baseSlug;
+      let n = 2;
+      while (usedSlugs.has(slug)) { slug = baseSlug + "-" + n; n++; }
+      usedSlugs.add(slug);
+      newPageDefs.push({ id: pageId, label: (loc.locationName || loc.city || "Location") + (loc.state ? ", " + loc.state : ""), slug, _locationData: loc, _template: template });
     });
+    setPages(prev => [...prev, ...newPageDefs.map(p => p.id)]);
+    setCustomPages(prev => [...prev, ...newPageDefs]);
     // Regenerate pages if already generated
     if (generated) {
       try {
         const inspoCtx = generated.inspoContext || "";
-        const newPages = generatePages(brief, [...selectedPages], inspoCtx, generated.aiRecs, customPages);
+        const newPages = generatePages(brief, [...selectedPages, ...newPageDefs.map(p => p.id)], inspoCtx, generated.aiRecs, [...customPages, ...newPageDefs]);
         setGenerated(prev => ({ ...prev, pages: newPages }));
       } catch {}
     }
@@ -368,41 +378,18 @@ export default function CustomBuild({ userId, role } = {}) {
   }
   function togglePage(id) { setPages(prev => prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]); }
 
-  async function generate() {
-    if (!canGenerate) return;
+  // Holds the context needed to resume generation after the user reviews/
+  // edits/discards AI-drafted fields (see draftedFields review panel below).
+  const pendingGenRef = useRef(null);
+
+  // Step 3 (analyze inspo) + Step 4 (build pages) + save draft. Runs either
+  // immediately (no drafts to review) or after the user approves/discards
+  // the drafted-fields review panel.
+  async function finishGenerate(workingBrief, inspoContext) {
     setGenerating(true);
     setGeneratingStatus("Building pages...");
-    
     try {
-      // Step 1: build shared inspo pool
-      const inspoContext = buildInspoContext(crawlResults, storedPatterns);
-      let workingBrief = { ...brief };
       let aiRecs = {};
-
-      // Step 2: draft copy (skip if brief-only or no API)
-      if (!copyBriefOnly) {
-        setGeneratingStatus("Preparing content...");
-        try {
-          const controller = new AbortController();
-          setTimeout(() => controller.abort(), 4000);
-          const res = await fetch("/api/draft-copy", {
-            signal: controller.signal,
-            method: "POST",
-            headers: await authHeaders(),
-            body: JSON.stringify({ brief, positioning: { valueProposition: brief.valueProposition || "", targetAudience: brief.targetAudience || "" } }),
-          });
-          if (res.ok) {
-            const data = await res.json();
-            if (data.drafts) {
-              Object.keys(data.drafts).forEach(key => {
-                if (!workingBrief[key] || workingBrief[key].trim() === "") workingBrief[key] = data.drafts[key];
-              });
-            }
-          }
-        } catch { /* API not available — continue */ }
-      }
-
-      // Step 3: analyze inspo (skip if no inspo or no API)
       const hasInspo = inspoContext && inspoContext.length > 20;
       if (hasInspo) {
         setGeneratingStatus("Analyzing inspo patterns...");
@@ -422,7 +409,6 @@ export default function CustomBuild({ userId, role } = {}) {
         } catch { /* API not available — continue */ }
       }
 
-      // Step 4: build pages — this is all client-side, always works
       setGeneratingStatus("Building pages...");
       await new Promise(r => setTimeout(r, 200));
 
@@ -434,19 +420,99 @@ export default function CustomBuild({ userId, role } = {}) {
       setPreviewPage(selectedPages[0] || "home");
       setDraftsView(false);
 
-      // Save draft
       saveDraftToList({ brief: workingBrief, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants: variants, generated: { pages, inspoContext, aiRecs }, previewPage: selectedPages[0] || "home", crawlResults });
 
     } catch(genErr) {
       console.error("Generate error:", genErr);
-      // Even if something fails, try to build basic pages
+      try {
+        const pages = generatePages(workingBrief, selectedPages, "", {}, customPages);
+        setGenerated({ pages, inspoContext: "", aiRecs: {} });
+        setPreviewPage(selectedPages[0] || "home");
+        setDraftsView(false);
+      } catch(e2) { console.error("Fallback generate error:", e2); }
+    } finally {
+      setGenerating(false);
+      setGeneratingStatus("");
+      pendingGenRef.current = null;
+    }
+  }
+
+  // User clicked "Approve & continue" on the drafted-fields review panel —
+  // merge their (possibly edited) drafts into the brief and proceed.
+  function approveDraftedFields() {
+    const pending = pendingGenRef.current;
+    if (!pending) { setDraftedFields(null); return; }
+    const workingBrief = { ...pending.briefBase, ...draftedFields };
+    setDraftedFields(null);
+    finishGenerate(workingBrief, pending.inspoContext);
+  }
+
+  // User clicked "Discard" — continue with the brief exactly as written,
+  // none of the AI-suggested fields are applied.
+  function discardDraftedFields() {
+    const pending = pendingGenRef.current;
+    setDraftedFields(null);
+    if (!pending) return;
+    finishGenerate(pending.briefBase, pending.inspoContext);
+  }
+
+  async function generate() {
+    if (!canGenerate) return;
+    setGenerating(true);
+    setGeneratingStatus("Building pages...");
+
+    try {
+      const inspoContext = buildInspoContext(crawlResults, storedPatterns);
+      const briefBase = { ...brief };
+      let drafts = null;
+
+      // Draft copy (skip if brief-only or no API)
+      if (!copyBriefOnly) {
+        setGeneratingStatus("Preparing content...");
+        try {
+          const controller = new AbortController();
+          setTimeout(() => controller.abort(), 4000);
+          const res = await fetch("/api/draft-copy", {
+            signal: controller.signal,
+            method: "POST",
+            headers: await authHeaders(),
+            body: JSON.stringify({ brief, positioning: { valueProposition: brief.valueProposition || "", targetAudience: brief.targetAudience || "" } }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.drafts) {
+              // Only offer fields for review that would actually fill a blank —
+              // drafting over existing brief copy was never the intent.
+              const blanksFilled = {};
+              Object.keys(data.drafts).forEach(key => {
+                if (!briefBase[key] || String(briefBase[key]).trim() === "") blanksFilled[key] = data.drafts[key];
+              });
+              if (Object.keys(blanksFilled).length > 0) drafts = blanksFilled;
+            }
+          }
+        } catch { /* API not available — continue */ }
+      }
+
+      if (drafts) {
+        // Pause here — show the review panel instead of building pages.
+        // finishGenerate() runs once the user approves or discards.
+        pendingGenRef.current = { briefBase, inspoContext };
+        setDraftedFields(drafts);
+        setGenerating(false);
+        setGeneratingStatus("");
+        return;
+      }
+
+      await finishGenerate(briefBase, inspoContext);
+
+    } catch(genErr) {
+      console.error("Generate error:", genErr);
       try {
         const pages = generatePages(brief, selectedPages, "", {}, customPages);
         setGenerated({ pages, inspoContext: "", aiRecs: {} });
         setPreviewPage(selectedPages[0] || "home");
         setDraftsView(false);
       } catch(e2) { console.error("Fallback generate error:", e2); }
-    } finally {
       setGenerating(false);
       setGeneratingStatus("");
     }
@@ -977,44 +1043,54 @@ export default function CustomBuild({ userId, role } = {}) {
           <div style={{ display: "flex", justifyContent: "center", marginTop: "8px" }}>
           <button
             onClick={generate}
-            disabled={!canGenerate || generating}
+            disabled={!canGenerate || generating || !!draftedFields}
             style={{ ...T.btnPrimary, justifyContent: "center", padding: "14px 40px", fontSize: "14px", borderRadius: "8px", opacity: canGenerate ? 1 : 0.4, cursor: canGenerate ? "pointer" : "not-allowed" }}>
             {generating ? (generatingStatus || "Generating…") : "Generate " + selectedPages.length + " Page" + (selectedPages.length !== 1 ? "s" : "")}
           </button>
           </div>
           {!brief && <div style={{ fontSize: "12px", color: "#9ca3af", textAlign: "center", marginTop: "8px" }}>Upload a brand brief to enable generation</div>}
 
-          {generated && (
+          {/* AI Drafted fields approval — gates page generation until reviewed */}
+          {draftedFields && Object.keys(draftedFields).length > 0 && (
             <div style={{ marginTop: "24px", ...T.surface }}>
-              {/* AI Drafted fields approval */}
-              {draftedFields && Object.keys(draftedFields).length > 0 && (
-                <div style={{ marginBottom: "20px", padding: "16px", background: "#ffffff", borderRadius: "8px" }}>
-                  <div style={{ fontSize: "12px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>
-                    {Object.keys(draftedFields).length} field{Object.keys(draftedFields).length !== 1 ? "s" : ""} drafted in brand voice
-                  </div>
-                  <div style={{ fontSize: "11px", color: "#6b7280", marginBottom: "12px" }}>Review and edit before downloading. These replaced blank fields in the brief.</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                    {Object.entries(draftedFields).map(([key, value]) => (
-                      <div key={key}>
-                        <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "4px" }}>
-                          {key.replace(/([A-Z])/g, ' $1').trim()}
-                        </div>
-                        <textarea
-                          value={value}
-                          onChange={e => setDraftedFields(prev => ({ ...prev, [key]: e.target.value }))}
-                          rows={2}
-                          style={{ width: "100%", padding: "8px 10px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", resize: "vertical", fontFamily: "'Be Vietnam Pro', sans-serif", boxSizing: "border-box" }}
-                        />
+              <div style={{ padding: "16px", background: "#ffffff", borderRadius: "8px" }}>
+                <div style={{ fontSize: "12px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>
+                  {Object.keys(draftedFields).length} field{Object.keys(draftedFields).length !== 1 ? "s" : ""} drafted in brand voice
+                </div>
+                <div style={{ fontSize: "11px", color: "#6b7280", marginBottom: "12px" }}>Review and edit before anything is built. These will fill blank fields in the brief.</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {Object.entries(draftedFields).map(([key, value]) => (
+                    <div key={key}>
+                      <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "4px" }}>
+                        {key.replace(/([A-Z])/g, ' $1').trim()}
                       </div>
-                    ))}
-                  </div>
+                      <textarea
+                        value={value}
+                        onChange={e => setDraftedFields(prev => ({ ...prev, [key]: e.target.value }))}
+                        rows={2}
+                        style={{ width: "100%", padding: "8px 10px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", resize: "vertical", fontFamily: "'Be Vietnam Pro', sans-serif", boxSizing: "border-box" }}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
                   <button
-                    onClick={() => setDraftedFields(null)}
-                    style={{ ...T.btnGhost, marginTop: "10px", fontSize: "12px" }}>
-                    Dismiss
+                    onClick={approveDraftedFields}
+                    style={{ ...T.btnPrimary, fontSize: "12px" }}>
+                    Approve &amp; continue
+                  </button>
+                  <button
+                    onClick={discardDraftedFields}
+                    style={{ ...T.btnGhost, fontSize: "12px" }}>
+                    Discard &amp; continue
                   </button>
                 </div>
-              )}
+              </div>
+            </div>
+          )}
+
+          {generated && (
+            <div style={{ marginTop: "24px", ...T.surface }}>
               {/* Swap sections — moved from preview header into panel */}
               {sectionLibrary.length > 0 && (
                 <div style={{ marginBottom: "16px" }}>

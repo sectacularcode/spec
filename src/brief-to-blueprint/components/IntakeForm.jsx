@@ -74,6 +74,13 @@ export function IntakeForm({ onClose, onComplete }) {
     });
   }
 
+  // Blocks generating a page set from an essentially empty brief. Requires a
+  // brand name plus at least one real piece of content — otherwise every
+  // exported page is just developer placeholder text with no warning.
+  const CONTENT_FIELDS = ["whatItIs", "tagline", "heroH1", "heroSubhead", "hookStatement", "aboutStory", "whyOneMaker"];
+  const hasContent = CONTENT_FIELDS.some(k => (form[k] || "").trim().length > 0);
+  const canSubmit = form.brandName.trim().length > 0 && hasContent;
+
   function buildBriefFromForm() {
     const colors = {};
     const colorNames = ["ink", "brass", "brass-deep", "bone", "asphalt", "stone", "warm-white", "text"];
@@ -507,15 +514,26 @@ export function IntakeForm({ onClose, onComplete }) {
           <div style={{ display: "flex", gap: "8px" }}>
             {tab > 0 && <button onClick={() => setTab(tab - 1)} style={{ padding: "8px 16px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", cursor: "pointer" }}>← {INTAKE_TABS[tab - 1]}</button>}
           </div>
-          <div style={{ display: "flex", gap: "8px" }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "6px" }}>
             {tab < INTAKE_TABS.length - 1 ? (
               <button onClick={() => setTab(tab + 1)} style={{ padding: "8px 20px", fontSize: "13px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
                 Next → {INTAKE_TABS[tab + 1]}
               </button>
             ) : (
-              <button onClick={() => onComplete(buildBriefFromForm(), form.brandName)} style={{ padding: "8px 24px", fontSize: "13px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
-                Build from intake →
-              </button>
+              <>
+                <button
+                  onClick={() => canSubmit && onComplete(buildBriefFromForm(), form.brandName)}
+                  disabled={!canSubmit}
+                  style={{ padding: "8px 24px", fontSize: "13px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: canSubmit ? "pointer" : "not-allowed", opacity: canSubmit ? 1 : 0.4 }}
+                >
+                  Build from intake →
+                </button>
+                {!canSubmit && (
+                  <div style={{ fontSize: "11px", color: "#dc2626" }}>
+                    {form.brandName.trim() ? "Add at least one piece of content (What it is, tagline, hero copy, or about story) first." : "Brand name is required."}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

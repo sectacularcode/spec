@@ -324,7 +324,13 @@ export function BulkLocationModal({ _brief, onClose, onGenerate, _userId }) {
     onClose();
   }
 
-  const validLocations = locations.filter(l => l.city || l.locationName);
+  // A location needs enough real data to be worth a page — city, address,
+  // and phone are the fields the generated page actually leads with.
+  const validLocations = locations.filter(l =>
+    !!(l.city && l.city.trim()) &&
+    !!(l.address && l.address.trim()) &&
+    !!(l.phone && String(l.phone).trim())
+  );
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 1100, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
@@ -377,7 +383,12 @@ export function BulkLocationModal({ _brief, onClose, onGenerate, _userId }) {
 
             {/* Footer */}
             <div style={{ padding: "14px 24px", borderTop: "1px solid #dde0e6", background: "#fff", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-              <div style={{ fontSize: "12px", color: "#6b7280" }}>{locations.length} location{locations.length !== 1 ? "s" : ""} added</div>
+              <div style={{ fontSize: "12px", color: "#6b7280" }}>
+                {locations.length} location{locations.length !== 1 ? "s" : ""} added
+                {validLocations.length < locations.length && (
+                  <span style={{ color: "#dc2626" }}> — {locations.length - validLocations.length} missing city, address, or phone</span>
+                )}
+              </div>
               <button
                 onClick={() => setStep("review")}
                 disabled={validLocations.length === 0}
