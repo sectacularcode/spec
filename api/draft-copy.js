@@ -1,6 +1,7 @@
 import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { deepStripHTML } from "./_lib/sanitize.js";
+import { callAnthropic, extractJSON } from "./_lib/anthropic.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -99,30 +100,19 @@ Return format:
 Only include keys for the fields listed above.`;
 
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 2000,
-        system: "You are a brand strategist and copywriter. Return ONLY valid JSON with no markdown, no code fences, no explanation.",
-        messages: [{ role: "user", content: prompt }],
-      }),
+    const { ok, data } = await callAnthropic(apiKey, {
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 2000,
+      system: "You are a brand strategist and copywriter. Return ONLY valid JSON with no markdown, no code fences, no explanation.",
+      messages: [{ role: "user", content: prompt }],
     });
 
-    if (!response.ok) return res.status(500).json({ error: "API error", drafts: {} });
+    if (!ok) return res.status(500).json({ error: "API error", drafts: {} });
 
-    const data = await response.json();
-    const raw = data.content?.[0]?.text || "";
-    const cleaned = raw.replace(/```json\n?/gi, "").replace(/```\n?/gi, "").trim();
-    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return res.status(200).json({ drafts: {}, message: "Could not parse drafts" });
+    const parsed = extractJSON(data);
+    if (!parsed) return res.status(200).json({ drafts: {}, message: "Could not parse drafts" });
 
-    const drafts = deepStripHTML(JSON.parse(jsonMatch[0]));
+    const drafts = deepStripHTML(parsed);
     return res.status(200).json({ drafts, fieldsCount: Object.keys(drafts).length });
 
   } catch (err) {

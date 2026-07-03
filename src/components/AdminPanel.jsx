@@ -23,7 +23,7 @@ function RolePill({ role }) {
   );
 }
 
-export default function AdminPanel({ isAdmin, _isManager }) {
+export default function AdminPanel({ isAdmin }) {
   const { user } = useUser();
   const [users, setUsers]           = useState([]);
   const [loading, setLoading]       = useState(true);

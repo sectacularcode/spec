@@ -11,6 +11,7 @@
 
 import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
+import { callAnthropic } from "./_lib/anthropic.js";
 
 const ALLOWED_MODELS = new Set([
   "claude-haiku-4-5-20251001",
@@ -60,23 +61,13 @@ export default async function handler(req, res) {
   if (system) anthropicBody.system = system;
 
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify(anthropicBody),
-    });
+    const { ok, status, data } = await callAnthropic(apiKey, anthropicBody);
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error("Anthropic API error:", response.status, JSON.stringify(data));
-      return res.status(response.status).json({
+    if (!ok) {
+      console.error("Anthropic API error:", status, JSON.stringify(data));
+      return res.status(status).json({
         error: data?.error?.message || "Anthropic API error",
-        status: response.status,
+        status,
       });
     }
 
