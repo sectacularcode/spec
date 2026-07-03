@@ -77,6 +77,12 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
   const [briefError, setBriefError] = useState("");
   const [lockedTemplateId, setLockedTemplateId] = useState(""); // "" = let AI pick; otherwise force this template
 
+  // Request-generation counters — guard against a stale async response
+  // landing after a newer request has superseded it (e.g. user clicks
+  // "Regenerate" again, or cancels, before the first call resolves).
+  const briefRecReqRef = useRef(0);
+  const aiFieldRegenReqRef = useRef(0);
+
   // Persistence — load projects from window.storage on mount, save on changes
   const [storageLoaded, setStorageLoaded] = useState(false);
   const [showAdvancedColors, setShowAdvancedColors] = useState(false);
@@ -435,6 +441,7 @@ Important guardrails:
   // Useful when the user likes most of the copy but wants a different CTA or tagline.
   const regenerateField = async (fieldName) => {
     if (!aiDraft) return;
+    const reqId = ++aiFieldRegenReqRef.current;
     setAiFieldRegen(fieldName);
     const fieldLabels = {
       tagline: "Tagline (5-9 words, punchy)",
@@ -491,12 +498,17 @@ Return ONLY the new ${fieldName} value as plain text.`;
       const text = data.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
       // Strip leading/trailing quotes if Claude wrapped the answer
       const clean = text.replace(/^["']|["']$/g, "").trim();
-      setAiDraft(prev => ({ ...prev, [fieldName]: clean }));
+      // Bail if a newer regenerate/cancel/apply happened while this was in flight.
+      if (aiFieldRegenReqRef.current !== reqId) return;
+      // Functional updater reads LIVE state at apply-time — if the draft was
+      // cancelled (set to null) in the meantime, `prev` is null and this is a
+      // no-op instead of resurrecting a partial draft.
+      setAiDraft(prev => (prev ? { ...prev, [fieldName]: clean } : prev));
     } catch (e) {
       // Silent fail — keep the existing value, show a brief flash via field state
       console.warn(`Couldn't regenerate ${fieldName}:`, e.message);
     } finally {
-      setAiFieldRegen("");
+      if (aiFieldRegenReqRef.current === reqId) setAiFieldRegen("");
     }
   };
 
@@ -527,6 +539,7 @@ Return ONLY the new ${fieldName} value as plain text.`;
   // AI Site Brief — describe your site, get template/layout/theme/colors/fonts/brief recommendations
   const describeMySite = async () => {
     if (!briefText.trim() && !lockedTemplateId) return;
+    const reqId = ++briefRecReqRef.current;
     setBriefLoading(true);
     setBriefError("");
     setBriefRec(null);
@@ -669,14 +682,19 @@ Rules:
       }
       const text = data.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
       const clean = text.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+      // Drop this result if a newer request has been issued since (e.g. the
+      // user clicked "Regenerate" again before this one finished) — otherwise
+      // a slow first response can overwrite a fresher second one.
+      if (briefRecReqRef.current !== reqId) return;
       setBriefRec(JSON.parse(clean));
     } catch (e) {
+      if (briefRecReqRef.current !== reqId) return;
       const msg = e.name === "AbortError"
         ? "Request timed out after 30 seconds. The AI service may be slow right now — try again."
         : `Couldn't analyze: ${e.message}. Try again or pick a template manually.`;
       setBriefError(msg);
     } finally {
-      setBriefLoading(false);
+      if (briefRecReqRef.current === reqId) setBriefLoading(false);
     }
   };
 

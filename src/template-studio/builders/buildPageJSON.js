@@ -2,7 +2,8 @@ import { THEMES } from "../constants/themes.js";
 import { getLayout, eyebrowText } from "../constants/layouts.js";
 import { isLight, textOn, mutedTextOn, buttonOn } from "../utils/colors.js";
 import { imgOrPlaceholder } from "../utils/images.js";
-import { eSection, eRow, eCol, eHead, eTxt, eBtn, eSpacer, eImg, eIconBox, eCounter, eAccordion, eSocial, eVideo, eCarousel, eForm, eShortcode, eHTML, eMarquee } from "./helpers.js";
+import { eSection, eRow, eCol, eHead, eTxt, eTxtRaw, eBtn, eSpacer, eImg, eIconBox, eCounter, eAccordion, eSocial, eVideo, eCarousel, eForm, eShortcode, eHTML, eMarquee } from "./helpers.js";
+import { he } from "../utils/htmlEscape.js";
 // Builds Elementor JSON for a single page based on its section list and brand settings.
 // Iterates the page.sections array and routes each section type to the right widget builder.
 // To add a new section type: add a case in the big if/else block below.
@@ -48,8 +49,8 @@ export function buildPageJSON(page, brand) {
       if (page.pageType === "Case Study") {
         const darkBg = isDark ? pc : "#0a0a0a";
         const sec = eSection(darkBg, 120, 100);
-        const accentRule = eHTML(`<div style="display:flex;align-items:center;gap:12px;margin-bottom:32px;"><div style="width:32px;height:2px;background:${ac};"></div><span style="font-family:inherit;font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:${ac};">${eyebrow}</span></div>`);
-        const metaStrip = eHTML(`<div style="display:flex;gap:32px;flex-wrap:wrap;padding-top:28px;border-top:1px solid rgba(255,255,255,0.15);margin-top:40px;"><div><p style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:${ac};margin:0 0 6px;">Client</p><p style="font-size:14px;color:#ffffff;margin:0;font-weight:500;">${brand.name || "Client"}</p></div><div><p style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:${ac};margin:0 0 6px;">Industry</p><p style="font-size:14px;color:#ffffff;margin:0;font-weight:500;">${brand.industry || "Industry"}</p></div><div><p style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:${ac};margin:0 0 6px;">Year</p><p style="font-size:14px;color:#ffffff;margin:0;font-weight:500;">${new Date().getFullYear()}</p></div></div>`);
+        const accentRule = eHTML(`<div style="display:flex;align-items:center;gap:12px;margin-bottom:32px;"><div style="width:32px;height:2px;background:${ac};"></div><span style="font-family:inherit;font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:${ac};">${he(eyebrow)}</span></div>`);
+        const metaStrip = eHTML(`<div style="display:flex;gap:32px;flex-wrap:wrap;padding-top:28px;border-top:1px solid rgba(255,255,255,0.15);margin-top:40px;"><div><p style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:${ac};margin:0 0 6px;">Client</p><p style="font-size:14px;color:#ffffff;margin:0;font-weight:500;">${he(brand.name || "Client")}</p></div><div><p style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:${ac};margin:0 0 6px;">Industry</p><p style="font-size:14px;color:#ffffff;margin:0;font-weight:500;">${he(brand.industry || "Industry")}</p></div><div><p style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:${ac};margin:0 0 6px;">Year</p><p style="font-size:14px;color:#ffffff;margin:0;font-weight:500;">${new Date().getFullYear()}</p></div></div>`);
         push(sec,
           accentRule,
           eHead(heading || page.name, "h1", "#ffffff", hf, 72, "left"),
@@ -364,7 +365,7 @@ export function buildPageJSON(page, brand) {
         push(col,
           eHead(`"${q || ""}"`, "h3", hColor, hf, 22, "left"),
           eSpacer(20),
-          eTxt(`<strong style="color:${ac};">— ${n || ""}</strong>${r ? `, <span style="opacity:0.7;">${r}</span>` : ""}`, bColor, bf, 13, "left"),
+          eTxtRaw(`<p><strong style="color:${ac};">— ${he(n || "")}</strong>${r ? `, <span style="opacity:0.7;">${he(r)}</span>` : ""}</p>`, bColor, bf, 13, "left"),
         );
       }, 32);
       sections.push(sec);
@@ -429,7 +430,7 @@ export function buildPageJSON(page, brand) {
           eSpacer(20),
           eTxt("Tell us about your project and we'll be in touch within 24 hours.", bColor, bf, 16, "left"),
           eSpacer(32),
-          eTxt(`<strong style="color:${ac};font-size:11px;letter-spacing:0.15em;text-transform:uppercase;">Email</strong><br><span style="font-size:16px;">${brand.contactEmail || "hello@yourbrand.com"}</span>`, hColor, bf, 14, "left"),
+          eTxtRaw(`<p><strong style="color:${ac};font-size:11px;letter-spacing:0.15em;text-transform:uppercase;">Email</strong><br><span style="font-size:16px;">${he(brand.contactEmail || "hello@yourbrand.com")}</span></p>`, hColor, bf, 14, "left"),
         );
         const colRight = eCol(48);
         if (shortcode && shortcode.trim()) {
@@ -607,7 +608,7 @@ export function buildPageJSON(page, brand) {
       const bg = textOn(pc) === "#ffffff" ? ac : "#0a0a0a";
       const fg = textOn(bg);
       const text = brand.promoBanner || page.promoBanner || "FREE SHIPPING ON ORDERS OVER $75  ·  EASY 30-DAY RETURNS";
-      push(sec, eHTML(`<div style="text-align:center;font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:${fg};font-weight:600;">${text}</div>`));
+      push(sec, eHTML(`<div style="text-align:center;font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:${fg};font-weight:600;">${he(text)}</div>`));
       sections.push(sec);
     }
 
@@ -640,7 +641,7 @@ export function buildPageJSON(page, brand) {
     }
   });
 
-  return { version: "0.4", title: `${brand.name} — ${page.name}`, type: "page", content: sections };
+  return { version: "0.4", title: `${he(brand.name)} — ${he(page.name)}`, type: "page", content: sections };
 }
 
 // ──────────────────────────────────────────────────────────────────────────────

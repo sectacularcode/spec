@@ -1,5 +1,6 @@
 import { THEMES } from "../constants/themes.js";
 import { imgOrPlaceholder } from "../utils/images.js";
+import { he } from "../utils/htmlEscape.js";
 // Builds Divi shortcode format for a page (secondary export format)
 // Returns a plain string of Divi [et_pb_*] shortcodes.
 export function buildDiviPage(page, brand) {
@@ -9,42 +10,58 @@ export function buildDiviPage(page, brand) {
   const isDark = (brand.themeMode || (theme && theme.mode)) === "dark";
   const hc = (theme && theme.headingColor) || (isDark ? "#ffffff" : "#0a0a0a");
 
+  // Responsive padding string: desktop "T|R|B|L" plus tablet/phone scaled-down variants.
+  // Divi decodes HTML entities in shortcode attribute values the same way it decodes
+  // tag content, so he() is safe (and required) in every attribute below.
+  const dPad = (t, r, b, l) => {
+    const mk = (mult) => `${Math.round(t * mult)}px|${Math.round(r * mult)}px|${Math.round(b * mult)}px|${Math.round(l * mult)}px`;
+    return `custom_padding="${mk(1)}" custom_padding_tablet="${mk(0.7)}" custom_padding_phone="${mk(0.5)}" custom_padding_last_edited="on|desktop"`;
+  };
+  // Responsive font-size attribute trio for a given Divi attribute prefix (e.g. "header_font_size").
+  const dFontAttr = (attr, size, tabletRatio = 0.8, phoneRatio = 0.6, min = 12) => {
+    const t = Math.max(Math.round(size * tabletRatio), min);
+    const p = Math.max(Math.round(size * phoneRatio), min);
+    return `${attr}="${size}px" ${attr}_tablet="${t}px" ${attr}_phone="${p}px" ${attr}_last_edited="on|desktop"`;
+  };
+
   // Divi shortcode helpers
   const dSec = (bg, pad = 100, inner = "") =>
-    `[et_pb_section fb_built="1" background_color="${bg}" custom_padding="${pad}px|20px|${pad}px|20px"]${inner}[/et_pb_section]`;
+    `[et_pb_section fb_built="1" background_color="${bg}" ${dPad(pad, 20, pad, 20)}]${inner}[/et_pb_section]`;
   const dRow = (cols = "4_4", inner = "") =>
     cols === "4_4" ? `[et_pb_row]${inner}[/et_pb_row]` : `[et_pb_row column_structure="${cols}"]${inner}[/et_pb_row]`;
   const dCol = (type = "4_4", inner = "") => `[et_pb_column type="${type}"]${inner}[/et_pb_column]`;
   const dHead = (text, tag = "h2", color = hc, font = hf, size = 48, align = "left") => {
     const k = tag === "h1" ? "" : tag.charAt(1) + "_";
-    return `[et_pb_text header_${k}font="${font}|400|||||||" header_${k}text_color="${color}" header_${k}font_size="${size}px" text_orientation="${align}" module_alignment="${align}"]<${tag}>${text}</${tag}>[/et_pb_text]`;
+    const tabletR = size > 50 ? 0.7 : 0.85;
+    const phoneR = size > 50 ? 0.5 : 0.75;
+    return `[et_pb_text header_${k}font="${font}|400|||||||" header_${k}text_color="${color}" ${dFontAttr(`header_${k}font_size`, size, tabletR, phoneR, 14)} text_orientation="${align}" module_alignment="${align}"]<${tag}>${he(text)}</${tag}>[/et_pb_text]`;
   };
   const dTxt = (html, color = ts, font = bf, size = 16, align = "left") =>
-    `[et_pb_text text_font="${font}||||" text_text_color="${color}" text_font_size="${size}px" text_orientation="${align}"]<p>${html}</p>[/et_pb_text]`;
+    `[et_pb_text text_font="${font}||||" text_text_color="${color}" ${dFontAttr("text_font_size", size, 0.95, 0.85, 13)} text_orientation="${align}"]<p>${he(html)}</p>[/et_pb_text]`;
   const dBtn = (text, link = "#", bg = ac, color = "#fff", align = "left") =>
-    `[et_pb_button button_text="${text}" button_url="${link}" button_alignment="${align}" custom_button="on" button_text_color="${color}" button_bg_color="${bg}" button_font="${bf}|700|on|on|||||" button_letter_spacing="2px" button_text_size="11px" custom_padding="16px|36px|16px|36px|true|true"][/et_pb_button]`;
+    `[et_pb_button button_text="${he(text)}" button_url="${link}" button_alignment="${align}" custom_button="on" button_text_color="${color}" button_bg_color="${bg}" button_font="${bf}|700|on|on|||||" button_letter_spacing="2px" button_text_size="11px" custom_padding="16px|36px|16px|36px|true|true" custom_padding_tablet="14px|28px|14px|28px|true|true" custom_padding_phone="12px|24px|12px|24px|true|true" custom_padding_last_edited="on|desktop"][/et_pb_button]`;
   const dImg = (url, alt = "") =>
-    `[et_pb_image src="${url}" alt="${alt}" align="center"][/et_pb_image]`;
+    `[et_pb_image src="${url}" alt="${he(alt)}" align="center"][/et_pb_image]`;
   const dDiv = (h = 40) =>
     `[et_pb_divider color="transparent" divider_position="top" height="${h}px" hide_on_mobile="off"][/et_pb_divider]`;
   const dBlurb = (title, content) =>
-    `[et_pb_blurb title="${title}" header_font="${hf}|500|||||||" header_text_color="${hc}" header_font_size="22px" body_font="${bf}||||" body_text_color="${ts}" body_font_size="14px"]${content}[/et_pb_blurb]`;
+    `[et_pb_blurb title="${he(title)}" header_font="${hf}|500|||||||" header_text_color="${hc}" header_font_size="22px" body_font="${bf}||||" body_text_color="${ts}" body_font_size="14px"]${he(content)}[/et_pb_blurb]`;
   const dTest = (text, name, role) =>
-    `[et_pb_testimonial author="${name}" job_title="${role}" body_font="${hf}||||" body_text_color="${hc}" body_font_size="22px" author_font="${bf}|600||on|||||" author_text_color="${ac}"]${text}[/et_pb_testimonial]`;
+    `[et_pb_testimonial author="${he(name)}" job_title="${he(role)}" body_font="${hf}||||" body_text_color="${hc}" body_font_size="22px" author_font="${bf}|600||on|||||" author_text_color="${ac}"]${he(text)}[/et_pb_testimonial]`;
   const dCount = (num, suffix, label) =>
-    `[et_pb_number_counter title="${label}" number="${parseInt(num) || 0}" percent_sign="off" counter_color="${ac}" title_font="${bf}|500||on|||||" title_text_color="${hc}" number_font="${hf}||||" number_font_size="56px"][/et_pb_number_counter]`;
+    `[et_pb_number_counter title="${he(label)}" number="${parseInt(num) || 0}" percent_sign="off" counter_color="${ac}" title_font="${bf}|500||on|||||" title_text_color="${hc}" number_font="${hf}||||" number_font_size="56px"][/et_pb_number_counter]`;
   const dAcc = (items) =>
-    `[et_pb_accordion toggle_font="${hf}|400||||||" toggle_text_color="${hc}" icon_color="${ac}"]${items.map(([q, a]) => `[et_pb_accordion_item title="${q}"]${a}[/et_pb_accordion_item]`).join("")}[/et_pb_accordion]`;
+    `[et_pb_accordion toggle_font="${hf}|400||||||" toggle_text_color="${hc}" icon_color="${ac}"]${items.map(([q, a]) => `[et_pb_accordion_item title="${he(q)}"]${he(a)}[/et_pb_accordion_item]`).join("")}[/et_pb_accordion]`;
   const dSocial = (links) =>
-    `[et_pb_social_media_follow url_new_window="on" follow_button="off" icon_color="${hc}"]${links.map(l => `[et_pb_social_media_follow_network social_network="${l.key}" url="${l.url}" bg_color="transparent"]${l.label}[/et_pb_social_media_follow_network]`).join("")}[/et_pb_social_media_follow]`;
+    `[et_pb_social_media_follow url_new_window="on" follow_button="off" icon_color="${hc}"]${links.map(l => `[et_pb_social_media_follow_network social_network="${l.key}" url="${l.url}" bg_color="transparent"]${he(l.label)}[/et_pb_social_media_follow_network]`).join("")}[/et_pb_social_media_follow]`;
   const dVid = (url) =>
     `[et_pb_video src="${url}"][/et_pb_video]`;
   const dForm = (title, fields, btn) => {
     const f = fields.map(fl => {
       const ft = /message|details|notes/i.test(fl) ? "text" : (/email/i.test(fl) ? "email" : "input");
-      return `[et_pb_contact_field field_id="${fl.toLowerCase().replace(/\s+/g, "_")}" field_title="${fl}" field_type="${ft}" fullwidth_field="on"][/et_pb_contact_field]`;
+      return `[et_pb_contact_field field_id="${fl.toLowerCase().replace(/[^a-z0-9]+/g, "_")}" field_title="${he(fl)}" field_type="${ft}" fullwidth_field="on"][/et_pb_contact_field]`;
     }).join("");
-    return `[et_pb_contact_form title="${title}" submit_button_text="${btn}" custom_button="on" button_bg_color="${ac}" button_text_color="#ffffff" form_field_text_color="${hc}" form_field_background_color="transparent"]${f}[/et_pb_contact_form]`;
+    return `[et_pb_contact_form title="${he(title)}" submit_button_text="${he(btn)}" custom_button="on" button_bg_color="${ac}" button_text_color="#ffffff" form_field_text_color="${hc}" form_field_background_color="transparent"]${f}[/et_pb_contact_form]`;
   };
 
   const sections = [];
@@ -58,7 +75,7 @@ export function buildDiviPage(page, brand) {
         dTxt(page.heroSubhead || (brand.keyMessages || "").split(".")[0], ts, bf, 18, "left") + dDiv(48) +
         dBtn(brand.cta1, "#contact", ac, "#fff", "left")
       ));
-      sections.push(`[et_pb_section fb_built="1" background_color="${pc}" background_image="${img}" background_blend="overlay" custom_padding="160px|20px|160px|20px"]${inner}[/et_pb_section]`);
+      sections.push(`[et_pb_section fb_built="1" background_color="${pc}" background_image="${img}" background_blend="overlay" ${dPad(160, 20, 160, 20)}]${inner}[/et_pb_section]`);
     }
 
     if (s === "About") {
@@ -89,12 +106,12 @@ export function buildDiviPage(page, brand) {
     if (s === "Portfolio") {
       const items = (page.portfolio || "").split("\n").filter(Boolean);
       const headRow = dRow("4_4", dCol("4_4", dTxt("SELECTED WORK", ac, bf, 11, "left") + dDiv(16) + dHead("Recent projects.", "h2", hc, hf, 52, "left") + dDiv(40)));
-      const cards = items.map((line, i) => {
+      const cards = items.slice(0, 3).map((line, i) => {
         const [t, c, img] = line.split("|");
         const portImg = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, 800, 1000, brand.imageCategory);
         return dCol("1_3", dImg(portImg, t || "") + dHead(t || "", "h3", hc, hf, 22, "left") + dTxt(c || "", ac, bf, 12, "left"));
       }).join("");
-      const cardRow = dRow("1_3,1_3,1_3", cards.slice(0, 3 * 200)); // safety
+      const cardRow = dRow("1_3,1_3,1_3", cards);
       sections.push(dSec(card, 140, headRow + cardRow));
     }
 

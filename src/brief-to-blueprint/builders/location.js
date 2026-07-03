@@ -12,6 +12,7 @@
 //   headline, services (array of strings), mapEmbed (HTML string), ctaText
 
 import { nid, mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer } from "./helpers.js";
+import { he } from "../utils/htmlEscape.js";
 
 function getColors(colors) {
   return {
@@ -50,7 +51,7 @@ function mkServicesList(services, text, brass) {
     items.map(function(s) {
       return "<li style=\"padding:8px 0 8px 28px;position:relative;border-bottom:1px solid rgba(0,0,0,0.07);\">" +
         "<span style=\"position:absolute;left:0;top:10px;display:inline-block;width:12px;height:2px;background:" + brass + ";\"></span>" +
-        s + "</li>";
+        he(s) + "</li>";
     }).join("") +
     "</ul>";
   return mkText(html, text);
@@ -60,25 +61,25 @@ function mkInfoBlock(loc, ink, stone, bone) {
   var address = loc.address       || "[Street Address]";
   var city    = loc.city          || "[City]";
   var state   = loc.state         || "[State]";
-  var phone   = loc.phone         || "[Phone Number]";
+  var phone   = String(loc.phone  || "[Phone Number]");
   var hours   = loc.hours         || "[Hours]";
 
   var addrCol = mkContainer([
     mkHeading("Address", stone, "h6", { eyebrow: true }),
     mkSpacer(8),
-    mkText(address + "<br>" + city + ", " + state, ink),
+    mkText(he(address) + "<br>" + he(city) + ", " + he(state), ink),
   ], null, { padY: "0", grow: 1, isInner: true });
 
   var phoneCol = mkContainer([
     mkHeading("Phone", stone, "h6", { eyebrow: true }),
     mkSpacer(8),
-    mkText("<a href=\"tel:" + phone.replace(/\D/g, "") + "\" style=\"color:inherit;text-decoration:none;font-weight:600;\">" + phone + "</a>", ink),
+    mkText("<a href=\"tel:" + phone.replace(/\D/g, "") + "\" style=\"color:inherit;text-decoration:none;font-weight:600;\">" + he(phone) + "</a>", ink),
   ], null, { padY: "0", grow: 1, isInner: true });
 
   var hoursCol = mkContainer([
     mkHeading("Hours", stone, "h6", { eyebrow: true }),
     mkSpacer(8),
-    mkText(hours, ink),
+    mkText(he(hours), ink),
   ], null, { padY: "0", grow: 1, isInner: true });
 
   var row = mkContainer([addrCol, phoneCol, hoursCol], null, {
@@ -111,7 +112,7 @@ export function buildLocationPageA(colors, brief, loc) {
     mkSpacer(24),
     mkHeading(headline, C.warmWhite, "h1", { weight: 800, px: 56 }),
     mkSpacer(20),
-    mkText(city + ", " + state, C.stone),
+    mkText(he(city) + ", " + he(state), C.stone),
     mkSpacer(32),
     mkButton(ctaText, C.brassDp, "#ffffff"),
   ], C.ink, { padY: "80", center: false }));
@@ -123,14 +124,14 @@ export function buildLocationPageA(colors, brief, loc) {
   sections.push(mkContainer([
     mkHeading("Service in " + city + " You Can Count On", C.ink, "h2", { weight: 700, px: 40 }),
     mkSpacer(20),
-    mkText(intro, C.text),
+    mkText(he(intro), C.text),
   ], C.bone, { padY: "60" }));
 
   // Services checklist
   sections.push(mkContainer([
     mkHeading("Services We Offer in " + city + ", " + state, C.ink, "h2", { weight: 700, px: 36 }),
     mkSpacer(8),
-    mkText("Our " + city + " team handles all of the following:", C.stone),
+    mkText("Our " + he(city) + " team handles all of the following:", C.stone),
     mkSpacer(20),
     mkServicesList(services, C.text, C.brass),
   ], C.warmWhite, { padY: "60" }));
@@ -139,7 +140,7 @@ export function buildLocationPageA(colors, brief, loc) {
   var supportText = mkContainer([
     mkHeading("What to Expect from Our " + city + " Team", C.ink, "h3", { weight: 700, px: 32 }),
     mkSpacer(16),
-    mkText(supportBody, C.text),
+    mkText(he(supportBody), C.text),
     mkSpacer(24),
     mkButton(ctaText, C.brassDp, "#ffffff"),
   ], null, { padY: "0", grow: 1, isInner: true });
@@ -159,7 +160,7 @@ export function buildLocationPageA(colors, brief, loc) {
     mkSpacer(16),
     mkMapEmbed(loc.mapEmbed, C.stone),
     mkSpacer(8),
-    mkText(loc.address + " · " + city + ", " + state, C.stone),
+    mkText(he(loc.address || "") + " · " + he(city) + ", " + he(state), C.stone),
   ], C.warmWhite, { padY: "60" }));
 
   // Closing CTA
@@ -171,7 +172,7 @@ export function buildLocationPageA(colors, brief, loc) {
 
   return {
     version: "0.4",
-    title: brandName + " — " + city + ", " + state,
+    title: he(brandName) + " — " + he(city) + ", " + he(state),
     type: "page",
     page_settings: {},
     content: sections,
@@ -200,7 +201,7 @@ export function buildLocationPageB(colors, brief, loc) {
     mkContainer([
       mkHeading(headline, C.warmWhite, "h1", { weight: 800, px: 48 }),
       mkSpacer(16),
-      mkText(intro, C.warmWhite),
+      mkText(he(intro), C.warmWhite),
       mkSpacer(28),
       mkButton(ctaText, C.brassDp, "#ffffff"),
     ], C.asphalt, { padY: "60" }),
@@ -222,7 +223,7 @@ export function buildLocationPageB(colors, brief, loc) {
   sections.push(mkContainer([
     mkMapEmbed(loc.mapEmbed, C.stone),
     mkSpacer(12),
-    mkText("<strong>" + (loc.address || "[Address]") + "</strong><br>" + city + ", " + state + " · " + (loc.phone || "[Phone]") + " · " + (loc.hours || "[Hours]"), C.stone, "center"),
+    mkText("<strong>" + he(loc.address || "[Address]") + "</strong><br>" + he(city) + ", " + he(state) + " · " + he(String(loc.phone || "[Phone]")) + " · " + he(loc.hours || "[Hours]"), C.stone, "center"),
   ], C.bone, { padY: "48", center: true }));
 
   // Closing CTA
@@ -234,7 +235,7 @@ export function buildLocationPageB(colors, brief, loc) {
 
   return {
     version: "0.4",
-    title: brandName + " — " + city + ", " + state + " (Conversion)",
+    title: he(brandName) + " — " + he(city) + ", " + he(state) + " (Conversion)",
     type: "page",
     page_settings: {},
     content: sections,
