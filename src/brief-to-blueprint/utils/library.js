@@ -1,8 +1,9 @@
 // Template library utilities
-// Saves completed builds and individual sections to Upstash Redis
-// so they can be surfaced in the swap drawer and library browser.
+// Saves completed builds and individual sections to Postgres so they can
+// be surfaced in the swap drawer and library browser.
 
-import { kvStorageGet, kvStorageSet } from "../../utils/storage.js";
+import { saveTemplateLibraryEntry } from "../../utils/templateLibrary.js";
+import { saveSectionLibraryEntries } from "../../utils/sectionLibrary.js";
 
 // Infers visual style tags, tone tags, and industry fit from a brief.
 // These tags power the library filter UI.
@@ -59,15 +60,11 @@ function inferTags(brief, pages, layoutVariants) {
 }
 
 // Saves a completed build to the template library and each section to the section library.
-// Both are stored in Upstash Redis with a 50-build / 300-section cap (oldest dropped).
+// Both are stored in Postgres with a 50-build / 300-section cap (oldest
+// dropped), enforced server-side — the server also handles the
+// same-client-same-day dedup, so this just POSTs the new entries.
 export async function saveToLibrary(brief, pages, layoutVariants, selectedVariants) {
   try {
-    var existing = [];
-    try {
-      var stored = await kvStorageGet("spec-template-library");
-      if (stored && stored.value) existing = JSON.parse(stored.value);
-    } catch {}
-
     var tags = inferTags(brief, pages, selectedVariants || layoutVariants);
     var id = "build-" + Date.now();
     var entry = {
@@ -96,27 +93,21 @@ export async function saveToLibrary(brief, pages, layoutVariants, selectedVarian
       }),
     };
 
-    var deduped = existing.filter(function(e) {
-      return !(e.client === entry.client && e.date === entry.date && e.source === "blueprint");
-    });
-    deduped.unshift(entry);
-    if (deduped.length > 50) deduped = deduped.slice(0, 50);
-    await kvStorageSet("spec-template-library", JSON.stringify(deduped));
+    await saveTemplateLibraryEntry(entry);
 
-    // Save individual sections for the swap drawer
-    var existingSections = [];
-    try {
-      var storedSections = await kvStorageGet("spec-section-library");
-      if (storedSections && storedSections.value) existingSections = JSON.parse(storedSections.value);
-    } catch {}
-
+    // Save individual sections for the swap drawer. `n` is a running
+    // counter across every page's sections (not reset per page) — two
+    // pages processed within the same millisecond would otherwise mint
+    // colliding ids (id is now a real Postgres primary key, unlike the old
+    // Redis array where a duplicate id was harmless).
     var newSections = [];
+    var n = 0;
     pages.forEach(function(p) {
       var pageData = (selectedVariants || {})[p.id] === "B" && p.variantB ? p.variantB : p.variantA || p.data;
       if (!pageData || !pageData.content) return;
       pageData.content.forEach(function(section, si) {
         newSections.push({
-          id: "section-" + Date.now() + "-" + si,
+          id: "section-" + Date.now() + "-" + (n++),
           buildId: id,
           client: brief.brandName || "Unnamed Client",
           date: new Date().toISOString().slice(0, 10),
@@ -131,9 +122,7 @@ export async function saveToLibrary(brief, pages, layoutVariants, selectedVarian
       });
     });
 
-    var combinedSections = newSections.concat(existingSections);
-    if (combinedSections.length > 300) combinedSections = combinedSections.slice(0, 300);
-    await kvStorageSet("spec-section-library", JSON.stringify(combinedSections));
+    await saveSectionLibraryEntries(newSections);
 
   } catch(e) {
     console.warn("saveToLibrary failed:", e);
