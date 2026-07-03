@@ -36,6 +36,7 @@ export default function AdminPanel({ isAdmin }) {
   const [saving, setSaving]         = useState(false);
   const [deleting, setDeleting]     = useState(null);
   const [msg, setMsg]               = useState({ text: "", type: "ok" });
+  const [migratingBlueprint, setMigratingBlueprint] = useState(false); // TEMPORARY — Stage 3 blueprint migration trigger, remove after verified
 
   function flash(text, type = "ok") {
     setMsg({ text, type });
@@ -135,6 +136,28 @@ export default function AdminPanel({ isAdmin }) {
     setDeleting(null);
   }
 
+  // TEMPORARY — Stage 3 (blueprint drafts + inspo patterns, Redis ->
+  // Postgres) one-time migration trigger. Delete this function and its
+  // button once the migration has been run and verified in production;
+  // see api/migrate-blueprint-onetime.js.
+  async function runBlueprintMigration() {
+    if (!window.confirm("Run the one-time blueprint migration? This copies every user's current draft session, saved draft snapshots, and inspo pattern pool from Redis into Postgres. Safe to run more than once.")) return;
+    setMigratingBlueprint(true);
+    try {
+      const res = await fetch("/api/migrate-blueprint-onetime", {
+        method: "POST",
+        headers: await authHeaders(),
+      });
+      const d = await res.json();
+      if (res.ok) {
+        flash(`Sessions: ${d.sessionDrafts.migrated}/${d.sessionDrafts.keysScanned} key(s). Snapshots: ${d.draftSnapshots.migrated}/${d.draftSnapshots.keysScanned} key(s). Inspo pools: ${d.inspoPatterns.migrated}/${d.inspoPatterns.keysScanned} key(s).`);
+      } else {
+        flash(d.error || "Migration failed.", "err");
+      }
+    } catch { flash("Error running migration.", "err"); }
+    setMigratingBlueprint(false);
+  }
+
   function startEdit(u) {
     setEditingId(u.userId);
     setEditRole(u.role || "staff");
@@ -206,6 +229,16 @@ export default function AdminPanel({ isAdmin }) {
           <div style={{ ...S.msg, color: msg.type === "err" ? "#dc2626" : "#b45309" }}>{msg.text}</div>
         )}
       </div>
+
+      {/* TEMPORARY — Stage 3 blueprint migration trigger, remove after verified */}
+      {isAdmin && (
+        <div style={{ ...S.addBlock, background: "#fff7ed" }}>
+          <div style={S.addLabel}>Data migration (temporary — Stage 3, blueprint)</div>
+          <button style={S.btnSecondary} onClick={runBlueprintMigration} disabled={migratingBlueprint}>
+            {migratingBlueprint ? "Migrating…" : "Run blueprint migration"}
+          </button>
+        </div>
+      )}
 
       {/* User table */}
       {loading ? (
