@@ -5,7 +5,7 @@ import { T } from "./styles.js";
 import { ALL_PAGES, ADDITIONAL_PAGE_TYPES } from "../constants/pages.js";
 
 // Utils
-import { kvStorageGet, kvStorageSet, kvStorageDel } from "./utils/storage.js";
+import { kvStorageGet, kvStorageSet, kvStorageDel } from "../utils/storage.js";
 import { buildInspoContext } from "./utils/inspo.js";
 import { saveToLibrary } from "./utils/library.js";
 import { extractBrief } from "./utils/extractBrief.js";
@@ -395,7 +395,9 @@ export default function CustomBuild({ userId, role } = {}) {
         setGeneratingStatus("Analyzing inspo patterns...");
         try {
           const controller2 = new AbortController();
-          setTimeout(() => controller2.abort(), 4000);
+          // Was 4s — the same too-tight timeout bug already found in the
+          // draft-copy call above; matched to the same 25s here.
+          setTimeout(() => controller2.abort(), 25000);
           const res = await fetch("/api/analyze-inspo", {
             signal: controller2.signal,
             method: "POST",
@@ -405,8 +407,12 @@ export default function CustomBuild({ userId, role } = {}) {
           if (res.ok) {
             const data = await res.json();
             aiRecs = data.recommendations || {};
+          } else {
+            console.warn("analyze-inspo request failed:", res.status);
           }
-        } catch { /* API not available — continue */ }
+        } catch (inspoErr) {
+          console.warn("analyze-inspo request errored, continuing without recommendations:", inspoErr.message);
+        }
       }
 
       setGeneratingStatus("Building pages...");
