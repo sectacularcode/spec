@@ -19,8 +19,10 @@ export async function saveKeywordBuildEntry(entry) {
       headers: await authHeaders(),
       body: JSON.stringify({ entry }),
     });
-    return res.ok;
-  } catch { return false; }
+    if (res.ok) return { ok: true };
+    const body = await res.json().catch(() => null);
+    return { ok: false, error: body?.error || "Request failed" };
+  } catch { return { ok: false, error: "Request failed" }; }
 }
 
 export async function deleteKeywordBuildEntry(id) {
@@ -29,6 +31,8 @@ export async function deleteKeywordBuildEntry(id) {
       method: "DELETE",
       headers: await authHeaders(),
     });
-    return res.ok;
-  } catch { return false; }
+    if (res.ok) return { ok: true };
+    const body = await res.json().catch(() => null);
+    return { ok: false, error: body?.error || "Request failed" };
+  } catch { return { ok: false, error: "Request failed" }; }
 }

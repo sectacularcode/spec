@@ -30,6 +30,7 @@ export default function CustomBuild({ userId, role } = {}) {
   const [brief, setBrief]               = useState(null);
   const [briefName, setBriefName]       = useState("");
   const [briefError, setBriefError]     = useState("");
+  const [draftMsg, setDraftMsg]         = useState(""); // transient message for saved-drafts list actions
   const [clientName, setClientName]     = useState("");
   const [showIntake, setShowIntake]     = useState(false);
   const [showBulkLocation, setShowBulkLocation] = useState(false);
@@ -180,7 +181,12 @@ export default function CustomBuild({ userId, role } = {}) {
     });
 
     const result = await saveDraftSnapshot(clientName, data);
-    if (!result.ok) { setDrafts(previous); return; }
+    if (!result.ok) {
+      setDrafts(previous);
+      setDraftMsg("Save failed: " + (result.error || "please try again."));
+      setTimeout(() => setDraftMsg(""), 3500);
+      return;
+    }
     if (tempId) {
       // Reconcile the temporary id with the server-assigned one.
       setDrafts(existing => existing.map(d => d.id === tempId ? { ...d, id: result.id } : d));
@@ -209,11 +215,13 @@ export default function CustomBuild({ userId, role } = {}) {
       removed = existing[index];
       return existing.filter(d => d.id !== id);
     });
-    const ok = await deleteDraftSnapshot(id);
-    if (!ok && removed) {
+    const result = await deleteDraftSnapshot(id);
+    if (!result.ok && removed) {
       setDrafts(existing =>
         existing.some(d => d.id === id) ? existing : [...existing.slice(0, index), removed, ...existing.slice(index)]
       );
+      setDraftMsg("Delete failed: " + (result.error || "please try again."));
+      setTimeout(() => setDraftMsg(""), 3500);
     }
   }
   async function handleBulkLocationGenerate(locations, template) {
@@ -696,6 +704,11 @@ export default function CustomBuild({ userId, role } = {}) {
             </div>
           </div>
 
+          {draftMsg && (
+            <div style={{ marginBottom: "16px", padding: "12px 16px", background: draftMsg.includes("failed") ? "#fef2f2" : "#f5f5f7", border: draftMsg.includes("failed") ? "1px solid #fecaca" : "1px solid #dde0e6", borderRadius: "8px", fontSize: "13px", color: draftMsg.includes("failed") ? "#991b1b" : "#09090b" }}>
+              {draftMsg}
+            </div>
+          )}
           {drafts.length === 0 ? (
             <div style={{ border: "2px dashed #dde0e6", borderRadius: "12px", padding: "64px", textAlign: "center" }}>
               <div style={{ fontSize: "15px", fontWeight: 600, color: "#09090b", marginBottom: "8px" }}>No saved builds yet</div>

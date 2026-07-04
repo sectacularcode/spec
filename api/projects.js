@@ -58,34 +58,56 @@ export default async function handler(req, res) {
       const upsertList = Array.isArray(upserts) ? upserts : [];
       const deleteList = Array.isArray(deletes) ? deletes : [];
 
-      const upserted = [];
-      const collisions = [];
-      const deleted = [];
-
+      // Validate everything up front (fail closed before any DB call).
+      const ids = [];
+      const userIds = [];
+      const dataArr = [];
+      const seenUpsertIds = new Set();
       for (const item of upsertList) {
         const { id, data } = item || {};
         if (!validId(id) || !validData(data)) {
           return res.status(400).json({ error: "Invalid upsert entry" });
         }
+        // A duplicate id within the same batch would otherwise be
+        // misreported as a cross-tenant collision below.
+        if (seenUpsertIds.has(id)) return res.status(400).json({ error: "Duplicate id in upserts" });
+        seenUpsertIds.add(id);
+        ids.push(id);
+        userIds.push(userId);
+        // Pre-stringify rather than relying on the driver's array-of-
+        // objects auto-serialization path for the array bind below.
+        dataArr.push(JSON.stringify(data));
+      }
+      for (const id of deleteList) {
+        if (!validId(id)) return res.status(400).json({ error: "Invalid delete id" });
+      }
+
+      let upserted = [];
+      let collisions = [];
+      if (ids.length > 0) {
         const { rows } = await sql`
           INSERT INTO projects (id, user_id, data, updated_at)
-          VALUES (${id}, ${userId}, ${data}, now())
+          SELECT id, user_id, data::jsonb, now()
+          FROM unnest(${ids}::text[], ${userIds}::text[], ${dataArr}::text[])
+            AS t(id, user_id, data)
           ON CONFLICT (id) DO UPDATE
           SET data = EXCLUDED.data, updated_at = now()
           WHERE projects.user_id = ${userId}
           RETURNING id
         `;
-        if (rows.length === 0) {
-          collisions.push({ id });
-        } else {
-          upserted.push(id);
-        }
+        const upsertedSet = new Set(rows.map(r => r.id));
+        upserted = ids.filter(id => upsertedSet.has(id));
+        collisions = ids.filter(id => !upsertedSet.has(id)).map(id => ({ id }));
       }
 
-      for (const id of deleteList) {
-        if (!validId(id)) return res.status(400).json({ error: "Invalid delete id" });
-        await sql`DELETE FROM projects WHERE id = ${id} AND user_id = ${userId}`;
-        deleted.push(id);
+      let deleted = [];
+      if (deleteList.length > 0) {
+        const { rows } = await sql`
+          DELETE FROM projects
+          WHERE user_id = ${userId} AND id = ANY(${deleteList}::text[])
+          RETURNING id
+        `;
+        deleted = rows.map(r => r.id);
       }
 
       return res.status(200).json({ upserted, collisions, deleted });
