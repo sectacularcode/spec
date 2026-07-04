@@ -50,10 +50,10 @@ export async function saveDraftSnapshot(clientName, data) {
       headers: await authHeaders(),
       body: JSON.stringify({ entry: { clientName, data } }),
     });
-    if (!res.ok) return { ok: false };
-    const body = await res.json();
-    return { ok: true, id: body.id };
-  } catch { return { ok: false }; }
+    const body = await res.json().catch(() => null);
+    if (!res.ok) return { ok: false, error: body?.error || "Request failed" };
+    return { ok: true, id: body?.id };
+  } catch { return { ok: false, error: "Request failed" }; }
 }
 
 export async function deleteDraftSnapshot(id) {
@@ -62,6 +62,8 @@ export async function deleteDraftSnapshot(id) {
       method: "DELETE",
       headers: await authHeaders(),
     });
-    return res.ok;
-  } catch { return false; }
+    if (res.ok) return { ok: true };
+    const body = await res.json().catch(() => null);
+    return { ok: false, error: body?.error || "Request failed" };
+  } catch { return { ok: false, error: "Request failed" }; }
 }

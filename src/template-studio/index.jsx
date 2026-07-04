@@ -276,8 +276,12 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
       deduped.unshift(entry);
       return deduped.length > 50 ? deduped.slice(0, 50) : deduped;
     });
-    const ok = await saveKeywordBuildEntry(entry);
-    if (!ok) setKeywordBuilds(previous);
+    const result = await saveKeywordBuildEntry(entry);
+    if (!result.ok) {
+      setKeywordBuilds(previous);
+      setImportMsg("Save failed: " + (result.error || "please try again."));
+      setTimeout(() => setImportMsg(""), 3500);
+    }
   }
 
   async function deleteKeywordBuild(id) {
@@ -287,11 +291,13 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
       removed = existing[index];
       return existing.filter(b => b.id !== id);
     });
-    const ok = await deleteKeywordBuildEntry(id);
-    if (!ok && removed) {
+    const result = await deleteKeywordBuildEntry(id);
+    if (!result.ok && removed) {
       setKeywordBuilds(existing =>
         existing.some(b => b.id === id) ? existing : [...existing.slice(0, index), removed, ...existing.slice(index)]
       );
+      setImportMsg("Delete failed: " + (result.error || "please try again."));
+      setTimeout(() => setImportMsg(""), 3500);
     }
   }
 
@@ -1725,11 +1731,13 @@ Rules:
                                 removed = existing[index];
                                 return existing.filter(b => b.id !== build.id);
                               });
-                              const ok = await deleteTemplateLibraryEntry(build.id);
-                              if (!ok && removed) {
+                              const result = await deleteTemplateLibraryEntry(build.id);
+                              if (!result.ok && removed) {
                                 setSavedBuilds(existing =>
                                   existing.some(b => b.id === build.id) ? existing : [...existing.slice(0, index), removed, ...existing.slice(index)]
                                 );
+                                setImportMsg("Delete failed: " + (result.error || "please try again."));
+                                setTimeout(() => setImportMsg(""), 3500);
                               }
                             }}
                             style={{ padding: "9px 12px", fontSize: "12px", fontWeight: 500, background: "#fff", color: "#6b7280", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
@@ -1949,7 +1957,7 @@ Rules:
           </div>
         )}
         {importMsg && (
-          <div style={{ marginBottom: "16px", padding: "12px 16px", background: importMsg.startsWith("Import failed") ? "#fef2f2" : "#f5f5f7", border: importMsg.startsWith("Import failed") ? "1px solid #fecaca" : "1px solid #dde0e6", borderRadius: "8px", fontSize: "13px", color: importMsg.startsWith("Import failed") ? "#991b1b" : "#09090b" }}>
+          <div style={{ marginBottom: "16px", padding: "12px 16px", background: importMsg.includes("failed") ? "#fef2f2" : "#f5f5f7", border: importMsg.includes("failed") ? "1px solid #fecaca" : "1px solid #dde0e6", borderRadius: "8px", fontSize: "13px", color: importMsg.includes("failed") ? "#991b1b" : "#09090b" }}>
             {importMsg}
           </div>
         )}

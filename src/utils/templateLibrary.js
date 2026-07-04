@@ -30,6 +30,8 @@ export async function deleteTemplateLibraryEntry(id) {
       method: "DELETE",
       headers: await authHeaders(),
     });
-    return res.ok;
-  } catch { return false; }
+    if (res.ok) return { ok: true };
+    const body = await res.json().catch(() => null);
+    return { ok: false, error: body?.error || "Request failed" };
+  } catch { return { ok: false, error: "Request failed" }; }
 }

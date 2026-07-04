@@ -51,22 +51,41 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "Invalid entries" });
       }
 
-      const inserted = [];
-      const collisions = [];
+      // Validate everything up front (fail closed before any DB call,
+      // unlike a mid-loop check which could let earlier valid rows insert
+      // before hitting a later invalid one).
+      const ids = [];
+      const userIds = [];
+      const dataArr = [];
+      const seen = new Set();
       for (const entry of list) {
         const { id, ...rest } = entry || {};
         if (!validId(id) || !validJsonSize(rest)) {
           return res.status(400).json({ error: "Invalid entry" });
         }
-        const { rows } = await sql`
-          INSERT INTO section_library_entries (id, user_id, data)
-          VALUES (${id}, ${userId}, ${rest})
-          ON CONFLICT (id) DO NOTHING
-          RETURNING id
-        `;
-        if (rows.length === 0) collisions.push({ id });
-        else inserted.push(id);
+        // A duplicate id within the same batch would otherwise be
+        // misreported as a cross-tenant collision below — ON CONFLICT DO
+        // NOTHING skips the second occurrence as if it collided with
+        // another user's row, not because it's a dupe of the first.
+        if (seen.has(id)) return res.status(400).json({ error: "Duplicate id in request" });
+        seen.add(id);
+        ids.push(id);
+        userIds.push(userId);
+        // Pre-stringify rather than relying on the driver's array-of-
+        // objects auto-serialization path for the jsonb[] bind below.
+        dataArr.push(JSON.stringify(rest));
       }
+
+      const { rows } = await sql`
+        INSERT INTO section_library_entries (id, user_id, data)
+        SELECT * FROM unnest(${ids}::text[], ${userIds}::text[], ${dataArr}::jsonb[])
+          AS t(id, user_id, data)
+        ON CONFLICT (id) DO NOTHING
+        RETURNING id
+      `;
+      const insertedSet = new Set(rows.map(r => r.id));
+      const inserted = ids.filter(id => insertedSet.has(id));
+      const collisions = ids.filter(id => !insertedSet.has(id)).map(id => ({ id }));
 
       // Cap at 300 most recent rows for this user.
       await sql`
