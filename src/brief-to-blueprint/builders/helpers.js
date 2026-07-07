@@ -58,22 +58,28 @@ export function mkContainer(children, bg, opts) {
     s.justify_content_tablet = "center";
     s.justify_content_mobile = "center";
   }
+  if (direction === "row" && !opts.keepRow) {
+    // Elementor's actual settings key for cross-axis alignment on a flex
+    // container is `flex_align_items` (not `align_items`, which Elementor
+    // silently ignores). Default to stretch so side-by-side columns —
+    // e.g. an image column next to a text column — match height instead
+    // of the image floating at its natural size inside a taller row.
+    s.flex_align_items = "stretch";
+    s.flex_direction_tablet = "column"; s.flex_direction_mobile = "column";
+    s.flex_align_items_tablet = "flex-start"; s.flex_align_items_mobile = "flex-start";
+  }
+  if (direction === "row" && opts.buttonRow) {
+    s.flex_direction_tablet = "row"; s.flex_direction_mobile = "column";
+    s.flex_align_items_mobile = "center"; s.flex_wrap_mobile = "wrap";
+  }
   if (opts.center) {
-    s.align_items = "center"; s.align_items_tablet = "center"; s.align_items_mobile = "center";
+    s.flex_align_items = "center"; s.flex_align_items_tablet = "center"; s.flex_align_items_mobile = "center";
     s.text_align = "center"; s.text_align_tablet = "center"; s.text_align_mobile = "center";
   }
   if (opts.grow) {
     s._flex_grow = opts.grow;
     s.width_mobile = { unit:"%", size: 100 };
     s.width_tablet = { unit:"%", size: 100 };
-  }
-  if (direction === "row" && !opts.keepRow) {
-    s.flex_direction_tablet = "column"; s.flex_direction_mobile = "column";
-    s.align_items_tablet = "flex-start"; s.align_items_mobile = "flex-start";
-  }
-  if (direction === "row" && opts.buttonRow) {
-    s.flex_direction_tablet = "row"; s.flex_direction_mobile = "column";
-    s.align_items_mobile = "center"; s.flex_wrap_mobile = "wrap";
   }
   return { id: nid(), elType: "container", isInner: !!opts.isInner, settings: s, elements: children };
 }
