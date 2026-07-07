@@ -57,6 +57,9 @@ export function mkContainer(children, bg, opts) {
     s.justify_content = "center";
     s.justify_content_tablet = "center";
     s.justify_content_mobile = "center";
+    s.flex_justify_content = "center";
+    s.flex_justify_content_tablet = "center";
+    s.flex_justify_content_mobile = "center";
   }
   if (direction === "row" && !opts.keepRow) {
     // Elementor's actual settings key for cross-axis alignment on a flex
