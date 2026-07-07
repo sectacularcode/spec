@@ -78,6 +78,10 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         mkSpacer(24),
         mkButton(contactCta, accent, warmWhite),
       ], null, { isInner: true, padY: "60", padX: "48", grow: "1" });
+      // Row is stretched to match the image column's height (flex_align_items:
+      // stretch on the parent row) — center this column's content vertically
+      // so it fills that height instead of leaving empty space below it.
+      textCol.settings.justify_content = "center";
       var imgCol = mkContainer([mkImagePh(f.imgCaption)], bone, { isInner: true, padY: "0", padX: "0", grow: "1" });
       var cols   = f.imageLeft ? [imgCol, textCol] : [textCol, imgCol];
       return mkContainer(cols, i % 2 === 0 ? warmWhite : bone, { direction: "row", padY: "0", padX: "0", gap: "0" });
