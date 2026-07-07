@@ -93,19 +93,16 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       } else {
         textCol = mkContainer(innerChildren, null, { isInner: true, padY: "60", padX: "48", grow: "1", full: true });
       }
-      // Row is stretched to match the image column's height (flex_align_items:
-      // stretch on the parent row) — center this column's content vertically
-      // so it fills that height instead of leaving empty space below it.
-      // NOTE: Elementor's actual key here isn't publicly documented; every
-      // other container property we've confirmed (flex_direction,
-      // flex_align_items, flex_gap, flex_wrap) uses the flex_ prefix, so
-      // that's almost certainly correct — but we set both spellings so
-      // whichever one Elementor actually reads takes effect either way.
-      textCol.settings.justify_content = "center";
-      textCol.settings.flex_justify_content = "center";
       var imgCol = mkContainer([mkImagePh(f.imgCaption)], bone, { isInner: true, padY: "0", padX: "0", grow: "1", full: true });
       var cols   = f.imageLeft ? [imgCol, textCol] : [textCol, imgCol];
-      return mkContainer(cols, i % 2 === 0 ? warmWhite : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
+      // Row-level centering instead of stretch+inner-justify: block-centers
+      // the (shorter) text column next to the (taller) image column, using
+      // flex_align_items — the same key already confirmed working for the
+      // header row and the stretch fix. Avoids relying on justify_content,
+      // which still isn't taking effect even with both key spellings set.
+      var row = mkContainer(cols, i % 2 === 0 ? warmWhite : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
+      row.settings.flex_align_items = "center";
+      return row;
     });
   }
 
