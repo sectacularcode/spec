@@ -43,7 +43,7 @@ export function mkContainer(children, bg, opts) {
   opts = opts || {};
   var direction = opts.direction || "column";
   var s = {
-    content_width: "boxed",
+    content_width: opts.full ? "full" : "boxed",
     flex_direction: direction,
     flex_gap: { unit:"px", size: opts.gap||"20", column: opts.gap||"20", row: opts.gap||"20" },
     flex_gap_mobile: { unit:"px", size: "16", column: "16", row: "16" },
