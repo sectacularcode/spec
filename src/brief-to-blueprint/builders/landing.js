@@ -65,19 +65,34 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   }
 
   function makeFeatureRows() {
+    // Opt-in per brief — most landing pages should NOT get a bordered text
+    // box. Only apply it when the brief explicitly asks for it.
+    var featureBorder = !!brief.featureTextBorder;
     var features = [
       { heading: brief.feature1Heading || "Advanced Body Repair Techniques",       body: brief.feature1Body || "[Describe your body repair capabilities]",   imgCaption: "[Photo: technician at work]",      imageLeft: false },
       { heading: brief.feature2Heading || "Custom Paint Jobs for a Standout Fleet", body: brief.feature2Body || "[Describe your paint capabilities]",         imgCaption: "[Photo: finished paint or booth]", imageLeft: true  },
       { heading: brief.feature3Heading || "Fleet Maintenance You Can Trust",        body: brief.feature3Body || "[Describe your maintenance and reliability]", imgCaption: "[Photo: fleet or shop floor]",     imageLeft: false },
     ];
     return features.map(function(f, i) {
-      var textCol = mkContainer([
+      var innerChildren = [
         mkHeading(f.heading, accent, "h2", { weight: 700, px: 34 }),
         mkSpacer(16),
         mkText(he(f.body), text),
         mkSpacer(24),
         mkButton(contactCta, accent, warmWhite),
-      ], null, { isInner: true, padY: "60", padX: "48", grow: "1", full: true });
+      ];
+      var textCol;
+      if (featureBorder) {
+        // Bordered box floats inside the column — its own padding/border,
+        // with the column's own padding acting as the margin around it.
+        var boxed = mkContainer(innerChildren, null, { isInner: true, padY: "40", padX: "40", full: true });
+        boxed.settings.border_border = "solid";
+        boxed.settings.border_width = { unit: "px", top: "1", right: "1", bottom: "1", left: "1", isLinked: true };
+        boxed.settings.border_color = accent;
+        textCol = mkContainer([boxed], null, { isInner: true, padY: "60", padX: "48", grow: "1", full: true });
+      } else {
+        textCol = mkContainer(innerChildren, null, { isInner: true, padY: "60", padX: "48", grow: "1", full: true });
+      }
       // Row is stretched to match the image column's height (flex_align_items:
       // stretch on the parent row) — center this column's content vertically
       // so it fills that height instead of leaving empty space below it.
