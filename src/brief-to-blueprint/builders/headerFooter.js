@@ -76,7 +76,7 @@ export function buildHeaderJSON(C, brief, inspoContext) {
   var headerRow = mkContainer([logoCol, navCol, ctaCol], null, {
     direction: "row", gap: "24", padY: "0", isInner: false
   });
-  headerRow.settings.align_items = "center";
+  headerRow.settings.flex_align_items = "center";
   headerRow.settings.padding = { unit: "px", top: "16", right: "40", bottom: "16", left: "40", isLinked: false };
   headerRow.settings.padding_tablet = { unit: "px", top: "14", right: "24", bottom: "14", left: "24", isLinked: false };
   headerRow.settings.padding_mobile = { unit: "px", top: "12", right: "16", bottom: "12", left: "16", isLinked: false };
@@ -149,7 +149,7 @@ export function buildFooterJSON(C, brief, inspoContext) {
         null, { direction: "row", gap: "24", padY: "0", isInner: true }),
       mkText("© " + new Date().getFullYear() + " " + he(brief.brandName || ""), mutedColor),
     ], null, { direction: "row", gap: "40", padY: "0", isInner: false });
-    minimalRow.settings.align_items = "center";
+    minimalRow.settings.flex_align_items = "center";
     minimalRow.settings.padding = { unit: "px", top: "32", right: "40", bottom: "32", left: "40", isLinked: false };
     minimalRow.settings.background_background = "classic";
     minimalRow.settings.background_color = bgColor;
@@ -189,7 +189,7 @@ export function buildFooterJSON(C, brief, inspoContext) {
   copyrightBar.settings.border_width = { unit: "px", top: "1", right: "0", bottom: "0", left: "0", isLinked: false };
   copyrightBar.settings.border_color = "rgba(255,255,255,0.08)";
   copyrightBar.settings.justify_content = "space-between";
-  copyrightBar.settings.align_items = "center";
+  copyrightBar.settings.flex_align_items = "center";
 
   return {
     version: "0.4",
