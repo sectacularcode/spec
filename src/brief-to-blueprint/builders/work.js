@@ -1,4 +1,4 @@
-import { mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer } from "./helpers.js";
+import { mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer } from "./helpers.js";
 import { inspoMatchesVariant } from "../utils/inspo.js";
 import { he } from "../utils/htmlEscape.js";
 
@@ -34,11 +34,7 @@ export function buildWorkPage(C, brief, inspoHint) {
 
   var gridTiles = (brief.workItems || []).map(function(title) {
     var tile = mkContainer([
-      mkImagePh(title),
-      mkSpacer(16),
-      mkHeading(title, ink, "h4", { weight: 700 }),
-      mkSpacer(4),
-      mkText("[Project type — fill in]", stone),
+      mkImageBg(title, { minHeight: 200 }),
       mkSpacer(4),
       mkText("[One line of context about this project]", stone),
     ], "#ffffff", { padY: "0", isInner: true });
@@ -53,7 +49,7 @@ export function buildWorkPage(C, brief, inspoHint) {
   if (gridTiles.length === 0) {
     for (var wi = 0; wi < 6; wi++) {
       var pt = mkContainer([
-        mkImagePh("[Upload project image " + (wi+1) + "]"),
+        mkImageBg("[Upload project image " + (wi+1) + "]", { minHeight: 200 }),
         mkSpacer(16),
         mkHeading("[Project title " + (wi+1) + "]", ink, "h4", { weight: 700 }),
         mkSpacer(4),
@@ -77,9 +73,7 @@ export function buildWorkPage(C, brief, inspoHint) {
   var items = brief.workItems || [];
   var featured = items[0] || "[Featured project title]";
   var featuredTile = mkContainer([
-    mkContainer([
-      mkImagePh(featured),
-    ], null, { padY: "0", grow: 1, isInner: true }),
+    mkImageBg(featured, { grow: 1, minHeight: 420 }),
     mkContainer([
       mkHeading("Featured", brass, "h6", { eyebrow: true }),
       mkSpacer(16),
@@ -97,9 +91,7 @@ export function buildWorkPage(C, brief, inspoHint) {
   var supportingItems = items.length > 1 ? items.slice(1) : ["[Project 2]", "[Project 3]", "[Project 4]", "[Project 5]"];
   var supportingTiles = supportingItems.map(function(title) {
     var t = mkContainer([
-      mkImagePh(title),
-      mkSpacer(12),
-      mkHeading(title, ink, "h4", { weight: 700 }),
+      mkImageBg(title, { minHeight: 180 }),
       mkSpacer(4),
       mkText("[Project type]", stone),
     ], "#ffffff", { padY: "24", isInner: true });
