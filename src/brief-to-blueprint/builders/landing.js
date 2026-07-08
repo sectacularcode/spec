@@ -1,4 +1,4 @@
-import { nid, mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer, mkDivider, mkIconList, mkForm, mkTestimonialCarousel } from "./helpers.js";
+import { nid, mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer, mkDivider, mkIconList, mkForm, mkTestimonialCarousel, mkAccordion } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
 
 // Landing page builder — three distinct conversion-focused layouts.
@@ -126,6 +126,25 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     ], dark, { padY: "80", center: true });
   }
 
+  // Optional FAQ section — accordion widget, staged with generic placeholder
+  // Q&As until real content lands in the brief (brief.faqItems: array of
+  // {question, answer}). Sits at the very bottom of the page, after the
+  // closing CTA.
+  function makeFaqSection() {
+    var faqItems = Array.isArray(brief.faqItems) && brief.faqItems.length ? brief.faqItems : [
+      { question: "[FAQ question one]",   answer: "[Answer, in brand voice]" },
+      { question: "[FAQ question two]",   answer: "[Answer, in brand voice]" },
+      { question: "[FAQ question three]", answer: "[Answer, in brand voice]" },
+      { question: "[FAQ question four]",  answer: "[Answer, in brand voice]" },
+      { question: "[FAQ question five]",  answer: "[Answer, in brand voice]" },
+    ];
+    return mkContainer([
+      mkHeading(brief.faqHeading || "Frequently Asked Questions", accent, "h2", { weight: 800, px: 32 }),
+      mkSpacer(28),
+      mkAccordion(faqItems),
+    ], warmWhite, { padY: "80" });
+  }
+
   // ── VARIANT A — Awareness / Feature layout ────────────────────────────────
   if (variant !== "B" && variant !== "C") {
     var heroEyebrow = mkHeading(brandName, warmWhite, "h6", { eyebrow: true, align: "center" });
@@ -151,7 +170,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     return {
       version: "0.4", title: he(brandName || "Site") + " — Landing Page", type: "page", page_settings: {},
-      content: [heroA, makeTrustStrip(), ...makeFeatureRows(), checklistSection, makeClosingCta()],
+      content: [heroA, makeTrustStrip(), ...makeFeatureRows(), checklistSection, makeClosingCta(), makeFaqSection()],
     };
   }
 
@@ -250,7 +269,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     return {
       version: "0.4", title: he(brandName || "Site") + " — Landing Page (Form)", type: "page", page_settings: {},
-      content: [heroB, formSection, testimonialsSection, ...makeFeatureRows(), midCta, makeClosingCta()],
+      content: [heroB, formSection, testimonialsSection, ...makeFeatureRows(), midCta, makeClosingCta(), makeFaqSection()],
     };
   }
 
