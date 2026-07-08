@@ -1,4 +1,4 @@
-import { mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer } from "./helpers.js";
+import { mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
 
 export function buildHomePage(C, brief, inspoHint, patterns) {
@@ -23,16 +23,12 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
         mkButton(brief.heroCta2 || "See pricing", "rgba(0,0,0,0)", warmWhite),
       ], null, { direction: "row", gap: "16", padY: "0", isInner: true, buttonRow: true }),
     ], null, { padY: "0", grow: 1, isInner: true });
-    var heroImgCol = mkContainer([
-      mkImagePh("Hero image"),
-    ], null, { padY: "0", grow: 1, isInner: true });
+    var heroImgCol = mkImageBg("Hero image", { grow: 1, minHeight: 480 });
     var heroRow = mkContainer([heroTextCol, heroImgCol], null, { direction: "row", gap: "64", padY: "0", isInner: true });
     hero = mkContainer([heroRow], ink, { padY: "80" });
   } else if (heroPattern === "split-right") {
     // Image placeholder left, text right
-    var heroImgColR = mkContainer([
-      mkImagePh("Hero image"),
-    ], null, { padY: "0", grow: 1, isInner: true });
+    var heroImgColR = mkImageBg("Hero image", { grow: 1, minHeight: 480 });
     var heroTextColR = mkContainer([
       mkHeading(brief.brandName || "Brand Name", brass, "h6", { eyebrow: true }),
       mkSpacer(20),
@@ -134,7 +130,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
     mkSpacer(48),
     mkContainer(
       (brief.workItems || ["Film 1","Film 2","Film 3"]).map(function(w) {
-        return mkContainer([mkImagePh(w), mkSpacer(12), mkText("<strong>" + he(w) + "</strong>", stone)],
+        return mkContainer([mkImageBg(w, { minHeight: 220 }), mkSpacer(12), mkText("<strong>" + he(w) + "</strong>", stone)],
           null, { padY: "0", grow: 1, isInner: true });
       }), null, { direction: "row", gap: "24", padY: "0", isInner: true }
     ),
