@@ -143,9 +143,9 @@ export function buildLocationPageA(colors, brief, loc) {
     mkText(he(supportBody), C.text),
     mkSpacer(24),
     mkButton(ctaText, C.brassDp, "#ffffff"),
-  ], null, { padY: "0", grow: 1, isInner: true });
+  ], null, { padY: "0", width: 50, isInner: true });
 
-  var supportImg = mkImageBg(city + " location photo", { grow: 1, minHeight: 380 });
+  var supportImg = mkImageBg(city + " location photo", { width: 50 });
 
   var supportRow = mkContainer([supportText, supportImg], null, {
     direction: "row", gap: "48", padY: "0", isInner: true,
