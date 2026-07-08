@@ -139,14 +139,37 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     );
 
     var checklistItems = brief.servicesList || ["2 Shifts — Quick Turn-Around","5 Complete Paint Booths","Full Restorations","Custom Painting, Striping and Design","Structural Repairs","Frame Rail Replacements","Body Swaps","Direct Insurance Billing"];
-    var checklistHtml  = "<ul style='list-style:none;padding:0;margin:0;columns:2;column-gap:48px'>" +
-      checklistItems.map(function(item) {
-        return "<li style='padding:6px 0 6px 28px;position:relative;border-bottom:1px solid #e5e5e5;break-inside:avoid'><span style='position:absolute;left:0;color:" + accent + ";font-weight:700'>✓</span>" + he(item) + "</li>";
-      }).join("") + "</ul>";
+    var half = Math.ceil(checklistItems.length / 2);
+    function mkIconList(items) {
+      return {
+        id: nid(), elType: "widget", widgetType: "icon-list",
+        settings: {
+          icon_list: items.map(function(item) {
+            return {
+              text: he(item),
+              selected_icon: { value: "far fa-check-circle", library: "fa-regular" },
+              _id: nid().slice(0, 7),
+            };
+          }),
+          icon_color: accent,
+          text_color: text,
+          space_between: { unit: "px", size: 14 },
+          icon_size: { unit: "px", size: 16 },
+          typography_typography: "custom",
+          typography_font_size: { unit: "px", size: 15 },
+          typography_font_size_tablet: { unit: "px", size: 15 },
+          typography_font_size_mobile: { unit: "px", size: 14 },
+        },
+        elements: [],
+      };
+    }
     var checklistSection = mkContainer([
       mkHeading(brief.servicesHeading || "What We Do", text, "h2", { weight: 700, px: 36 }),
       mkSpacer(24), mkDivider(accent), mkSpacer(32),
-      { id: nid(), elType: "widget", widgetType: "text-editor", settings: { editor: checklistHtml, text_color: text, typography_font_size: { unit: "px", size: 15 }, typography_font_size_tablet: { unit: "px", size: 15 }, typography_font_size_mobile: { unit: "px", size: 14 }, typography_line_height: { unit: "em", size: 1.7 } }, elements: [] },
+      mkContainer([
+        mkIconList(checklistItems.slice(0, half)),
+        mkIconList(checklistItems.slice(half)),
+      ], null, { direction: "row", gap: "48", padY: "0", isInner: true, full: true }),
     ], warmWhite, { padY: "80" });
 
     return {
