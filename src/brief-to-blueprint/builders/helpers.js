@@ -10,14 +10,21 @@ import { he } from "../utils/htmlEscape.js";
 // Generates a random Elementor widget ID (7-char hex)
 export function nid() { return Math.random().toString(16).slice(2, 9); }
 
-// Generates responsive padding settings (desktop / tablet / mobile)
+// Generates responsive padding settings (desktop / laptop / tablet / mobile).
+// Elementor treats "laptop" as its own breakpoint on many desktop widths and
+// applies default padding when we don't override it — CS Repair's confirmed
+// production template sets padding_laptop explicitly on every top-level row,
+// so we mirror that here to prevent unwanted vertical space leaking between
+// stacked feature rows.
 function rPad(padY, padX) {
   padX = padX || "40";
   var y = parseInt(padY); var x = parseInt(padX);
+  var yl = Math.round(y * 0.85);
   var yt = Math.round(y * 0.7); var ym = Math.round(y * 0.55);
   var xt = Math.min(parseInt(padX), 32);
   return {
     padding:        { unit:"px", top:String(y),  right:String(x),  bottom:String(y),  left:String(x),  isLinked:false },
+    padding_laptop: { unit:"px", top:String(yl), right:String(x),  bottom:String(yl), left:String(x),  isLinked:false },
     padding_tablet: { unit:"px", top:String(yt), right:String(xt), bottom:String(yt), left:String(xt), isLinked:false },
     padding_mobile: { unit:"px", top:String(ym), right:"20",       bottom:String(ym), left:"20",        isLinked:false },
   };
@@ -49,6 +56,10 @@ export function mkContainer(children, bg, opts) {
     flex_gap_mobile: { unit:"px", size: "16", column: "16", row: "16" },
   };
   Object.assign(s, rPad(opts.padY || "80", opts.padX || "40"));
+  // Explicit zero margin at every breakpoint — matches CS Repair's confirmed
+  // production template, prevents unwanted vertical space leaking between
+  // stacked top-level rows on desktop/laptop breakpoints.
+  s.margin = { unit: "px", top: "0", right: "0", bottom: "0", left: "0", isLinked: true };
   if (bg) { s.background_background = "classic"; s.background_color = bg; }
   if (opts.minH) {
     s.min_height = { unit:"vh", size: opts.minH };
