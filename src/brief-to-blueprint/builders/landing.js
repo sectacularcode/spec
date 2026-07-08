@@ -135,7 +135,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     var heroA = mkContainer(
       [heroEyebrow, mkSpacer(16), heroH1El, mkSpacer(20), heroSubEl, mkSpacer(32), makeDualBtnRow(phoneCta, contactCta)],
-      accent, { padY: "100", center: true }
+      dark, { padY: "100", center: true }
     );
 
     var checklistItems = brief.servicesList || ["2 Shifts — Quick Turn-Around","5 Complete Paint Booths","Full Restorations","Custom Painting, Striping and Design","Structural Repairs","Frame Rail Replacements","Body Swaps","Direct Insurance Billing"];
@@ -191,7 +191,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkText("<p style='text-align:center'>" + he(brief.hookStatement || "[What sets you apart in one line]") + "</p>", "rgba(255,255,255,0.7)"),
       mkSpacer(32),
       mkButton(phoneCta, warmWhite, dark),
-    ], accent, { padY: "80", center: true });
+    ], dark, { padY: "80", center: true });
 
     // Lead form section
     var formHeading   = brief.formHeading    || "Request a Quote";
@@ -280,7 +280,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     mkText("<p style='text-align:center'>" + he(heroSub) + "</p>", "rgba(255,255,255,0.85)"),
     mkSpacer(32),
     makeDualBtnRow(phoneCta, contactCta),
-  ], accent, { padY: "80", center: true });
+  ], dark, { padY: "80", center: true });
 
   // 3 outcome-focused benefit bullets
   var benefits = [
