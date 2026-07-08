@@ -22,13 +22,13 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
         mkButton(brief.heroCta1 || "See the work", brassDp, "#ffffff"),
         mkButton(brief.heroCta2 || "See pricing", "rgba(0,0,0,0)", warmWhite),
       ], null, { direction: "row", gap: "16", padY: "0", isInner: true, buttonRow: true }),
-    ], null, { padY: "0", grow: 1, isInner: true });
-    var heroImgCol = mkImageBg("Hero image", { grow: 1, minHeight: 480 });
+    ], null, { padY: "0", width: 50, isInner: true });
+    var heroImgCol = mkImageBg("Hero image", { width: 50 });
     var heroRow = mkContainer([heroTextCol, heroImgCol], null, { direction: "row", gap: "64", padY: "0", isInner: true });
     hero = mkContainer([heroRow], ink, { padY: "80" });
   } else if (heroPattern === "split-right") {
     // Image placeholder left, text right
-    var heroImgColR = mkImageBg("Hero image", { grow: 1, minHeight: 480 });
+    var heroImgColR = mkImageBg("Hero image", { width: 50 });
     var heroTextColR = mkContainer([
       mkHeading(brief.brandName || "Brand Name", brass, "h6", { eyebrow: true }),
       mkSpacer(20),
@@ -40,7 +40,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
         mkButton(brief.heroCta1 || "See the work", brassDp, "#ffffff"),
         mkButton(brief.heroCta2 || "See pricing", "rgba(0,0,0,0)", warmWhite),
       ], null, { direction: "row", gap: "16", padY: "0", isInner: true, buttonRow: true }),
-    ], null, { padY: "0", grow: 1, isInner: true });
+    ], null, { padY: "0", width: 50, isInner: true });
     var heroRowR = mkContainer([heroImgColR, heroTextColR], null, { direction: "row", gap: "64", padY: "0", isInner: true });
     hero = mkContainer([heroRowR], ink, { padY: "80" });
   } else if (heroPattern === "minimal") {
