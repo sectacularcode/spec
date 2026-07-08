@@ -244,3 +244,106 @@ export function mkDivider(color) {
     settings: { color: color || "#E2DBCC", weight: { unit:"px", size: 1 } },
     elements: [] };
 }
+
+// Native Elementor icon-list widget (check-mark bullet list). Shared across
+// page builders — pass `opts.width` (0-100) when the list needs a fixed
+// column width for a side-by-side split (icon-list is a widget, not built
+// via mkContainer, so it never gets mkContainer's width handling
+// automatically). Leave width unset for a list that just sits full-width
+// inside whatever column it's placed in.
+export function mkIconList(items, accent, textColor, opts) {
+  opts = opts || {};
+  var fontSize = opts.fontSize || 15;
+  var s = {
+    icon_list: items.map(function(item) {
+      return {
+        text: he(item),
+        selected_icon: { value: "far fa-check-circle", library: "fa-regular" },
+        _id: nid().slice(0, 7),
+      };
+    }),
+    icon_color: accent,
+    text_color: textColor,
+    space_between: { unit: "px", size: opts.spaceBetween || 14 },
+    icon_size: { unit: "px", size: opts.iconSize || 16 },
+    typography_typography: "custom",
+    typography_font_size: { unit: "px", size: fontSize },
+    typography_font_size_tablet: { unit: "px", size: fontSize },
+    typography_font_size_mobile: { unit: "px", size: Math.max(13, fontSize - 1) },
+  };
+  if (opts.width) {
+    s.width = { unit: "%", size: opts.width };
+    s.width_tablet = { unit: "%", size: 100 };
+  }
+  return { id: nid(), elType: "widget", widgetType: "icon-list", settings: s, elements: [] };
+}
+
+// Native Elementor Pro Form widget. Field types are inferred from the label
+// text (email/phone/message) so briefs that just list field names in plain
+// English ("Name", "Email", "Message") still get sensible input types.
+// NOTE: form_fields sub-keys (field_type, field_label, placeholder,
+// required, width, field_id) are Elementor's documented, stable Form-widget
+// field schema. `required` is deliberately left unset on every field here —
+// whoever imports the template sets that per-field in the Elementor editor
+// rather than us guessing which fields a given client wants to force.
+export function mkForm(fields, ctaLabel, opts) {
+  opts = opts || {};
+  var formFields = fields.map(function(label, i) {
+    var lower = String(label).toLowerCase();
+    var type = "text";
+    if (lower.indexOf("email") !== -1) type = "email";
+    else if (lower.indexOf("phone") !== -1) type = "tel";
+    else if (lower.indexOf("message") !== -1 || lower.indexOf("comment") !== -1 || lower.indexOf("detail") !== -1) type = "textarea";
+    return {
+      _id: nid().slice(0, 7),
+      field_type: type,
+      field_label: he(label),
+      placeholder: "",
+      required: "",
+      width: "100",
+      field_id: "field_" + i,
+    };
+  });
+  return {
+    id: nid(), elType: "widget", widgetType: "form",
+    settings: {
+      form_name: he(opts.formName || "Lead Form"),
+      form_fields: formFields,
+      button_text: he(ctaLabel || "Submit"),
+    },
+    elements: [],
+  };
+}
+
+// Native Elementor Pro Testimonial Carousel widget — confirmed widgetType
+// "testimonial-carousel" against Elementor Pro's own source
+// (modules/carousel/widgets/testimonial-carousel.php get_name()). The
+// per-slide field names (testimonial_content/name/job) follow Elementor's
+// standard Testimonial-widget field naming, carried over into the carousel
+// version — this part is NOT verified against a real production export, so
+// spot-check one real import before this goes out to many client sites.
+export function mkTestimonialCarousel(testimonials, opts) {
+  opts = opts || {};
+  return {
+    id: nid(), elType: "widget", widgetType: "testimonial-carousel",
+    settings: {
+      testimonials: testimonials.map(function(t) {
+        return {
+          _id: nid().slice(0, 7),
+          testimonial_content: he(t.quote),
+          testimonial_name: he(t.name),
+          testimonial_job: he(t.title),
+        };
+      }),
+      content_color: opts.textColor || "#FFFFFF",
+      name_color: opts.nameColor || "#FFFFFF",
+      job_color: opts.jobColor || "rgba(255,255,255,0.7)",
+      dots: "yes",
+      arrows: "",
+      autoplay: "yes",
+      pause_on_hover: "yes",
+      loop: "yes",
+    },
+    elements: [],
+  };
+}
