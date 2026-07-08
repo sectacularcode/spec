@@ -125,6 +125,7 @@ export default async function handler(req, res) {
   try {
     let messages;
     let extraHeaders = {};
+    let sourceText = null; // raw text, when we have local access to it (docx/text but not pdf)
 
     if (type === "pdf") {
       extraHeaders["anthropic-beta"] = "pdfs-2024-09-25";
@@ -140,9 +141,11 @@ export default async function handler(req, res) {
       const result = await mammoth.extractRawText({ buffer });
       const text = result.value.slice(0, 150000);
       if (!text.trim()) throw new Error("Could not extract text from DOCX file.");
+      sourceText = text;
       messages = [{ role: "user", content: `${EXTRACTION_PROMPT}\n\nBRIEF CONTENT:\n\n${text}` }];
     } else {
-      messages = [{ role: "user", content: `${EXTRACTION_PROMPT}\n\nBRIEF CONTENT:\n\n${content.slice(0, 150000)}` }];
+      sourceText = content.slice(0, 150000);
+      messages = [{ role: "user", content: `${EXTRACTION_PROMPT}\n\nBRIEF CONTENT:\n\n${sourceText}` }];
     }
 
     const result = await callClaude(apiKey, messages, extraHeaders);
@@ -159,18 +162,28 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Could not parse Claude response", raw: rawText.slice(0, 500) });
     }
 
-    // Sanity check on extracted colors: a real brand palette pulled from a
-    // brief has real variety across its 8 slots. If the model collapses
-    // everything into just 1-2 repeated hex values, that's not a genuine
-    // extraction — it's the model inventing/duplicating values despite the
-    // "never invent" instruction (seen with briefs that have no color
-    // section at all). Clear it so the UI falls through to the neutral
-    // default instead of showing fabricated colors.
     if (parsed.colors && typeof parsed.colors === "object") {
-      const vals = Object.values(parsed.colors).filter(Boolean);
-      const distinct = new Set(vals.map(v => String(v).toLowerCase()));
-      if (vals.length >= 4 && distinct.size <= 2) {
+      // Hard guarantee for docx/text sources (where we have the raw source
+      // text locally, not just what the model chose to report): if the
+      // source contains no hex-color pattern at all, there is no real
+      // palette to extract — force colors empty regardless of what the
+      // model returned. This doesn't depend on trusting the model's
+      // judgment or guessing at hallucination patterns; it's a direct
+      // check against the actual source.
+      const sourceHasHex = sourceText ? /#[0-9a-fA-F]{3,8}\b/.test(sourceText) : true; // unknown for PDFs, skip this guarantee
+      if (sourceText && !sourceHasHex) {
         parsed.colors = { ink: "", brass: "", "brass-deep": "", bone: "", asphalt: "", stone: "", "warm-white": "", text: "" };
+      } else {
+        // Fallback heuristic for PDFs (no local text to check) or as a
+        // second layer here: a real extracted palette has real variety
+        // across its 8 slots. If everything collapses into 1-2 repeated
+        // hex values, that's the model inventing/duplicating, not a
+        // genuine find.
+        const vals = Object.values(parsed.colors).filter(Boolean);
+        const distinct = new Set(vals.map(v => String(v).toLowerCase()));
+        if (vals.length >= 4 && distinct.size <= 2) {
+          parsed.colors = { ink: "", brass: "", "brass-deep": "", bone: "", asphalt: "", stone: "", "warm-white": "", text: "" };
+        }
       }
     }
 
