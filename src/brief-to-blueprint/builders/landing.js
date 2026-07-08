@@ -159,6 +159,12 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
           typography_font_size: { unit: "px", size: 15 },
           typography_font_size_tablet: { unit: "px", size: 15 },
           typography_font_size_mobile: { unit: "px", size: 14 },
+          // Icon-list is a widget, not built via mkContainer, so it never
+          // gets mkContainer's width handling automatically — set it
+          // directly here so two side-by-side lists split evenly instead
+          // of each claiming only as much width as its own text needs.
+          width: { unit: "%", size: 50 },
+          width_tablet: { unit: "%", size: 100 },
         },
         elements: [],
       };
