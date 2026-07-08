@@ -89,19 +89,17 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         boxed.settings.border_border = "solid";
         boxed.settings.border_width = { unit: "px", top: "1", right: "1", bottom: "1", left: "1", isLinked: true };
         boxed.settings.border_color = accent;
-        textCol = mkContainer([boxed], null, { isInner: true, padY: "60", padX: "48", grow: "1", full: true });
+        textCol = mkContainer([boxed], null, { isInner: true, padY: "60", padX: "48", width: 50, full: true });
       } else {
-        textCol = mkContainer(innerChildren, null, { isInner: true, padY: "60", padX: "48", grow: "1", full: true });
+        textCol = mkContainer(innerChildren, null, { isInner: true, padY: "60", padX: "48", width: 50, full: true });
       }
-      var imgCol = mkImageBg(f.imgCaption, { grow: "1", minHeight: 500 });
+      var imgCol = mkImageBg(f.imgCaption, { width: 50 });
       var cols   = f.imageLeft ? [imgCol, textCol] : [textCol, imgCol];
-      // Row-level centering instead of stretch+inner-justify: block-centers
-      // the (shorter) text column next to the (taller) image column, using
-      // flex_align_items — the same key already confirmed working for the
-      // header row and the stretch fix. Avoids relying on justify_content,
-      // which still isn't taking effect even with both key spellings set.
+      // No explicit align-items override — matching the confirmed production
+      // reference, which leaves this unset and relies on the browser's
+      // default flex stretch behavior to match the image column's height to
+      // the text column's natural content height.
       var row = mkContainer(cols, i % 2 === 0 ? warmWhite : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
-      row.settings.flex_align_items = "center";
       return row;
     });
   }
