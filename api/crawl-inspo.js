@@ -76,7 +76,8 @@ async function isSafeUrl(urlString) {
 
 // Fetches a page with manual redirect handling. Every redirect target is
 // re-validated against the SSRF rules before following.
-async function fetchPage(url) {
+async function fetchResource(url, expectedType) {
+  const acceptHeader = expectedType === "css" ? "text/css,*/*;q=0.1" : "text/html";
   let current = url;
   for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
     if (!(await isSafeUrl(current))) return null;
@@ -85,7 +86,7 @@ async function fetchPage(url) {
       res = await fetch(current, {
         headers: {
           "User-Agent": "Mozilla/5.0 (compatible; SpecCrawler/1.0)",
-          "Accept": "text/html",
+          "Accept": acceptHeader,
         },
         redirect: "manual",
         signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
@@ -108,7 +109,10 @@ async function fetchPage(url) {
     if (!res.ok) return null;
 
     const contentType = res.headers.get("content-type") || "";
-    if (!contentType.includes("text/html")) return null;
+    const typeOk = expectedType === "css"
+      ? (contentType.includes("text/css") || contentType.includes("octet-stream") || contentType === "")
+      : contentType.includes("text/html");
+    if (!typeOk) return null;
 
     const declared = parseInt(res.headers.get("content-length") || "0", 10);
     if (declared > MAX_BODY_BYTES) return null;
@@ -121,6 +125,51 @@ async function fetchPage(url) {
     }
   }
   return null;
+}
+
+async function fetchPage(url) {
+  return fetchResource(url, "html");
+}
+
+// Elementor's Kit-level Global Colors are almost never inline in the HTML
+// response — they live in linked stylesheets. Pull the handful of
+// Elementor-related <link rel="stylesheet"> URLs out of the page and fetch
+// them too (same SSRF-checked fetch as everything else), capped to a
+// small number so this stays cheap. Non-Elementor sites simply won't
+// match any of these links, and the caller falls back to whatever (if
+// anything) is inline.
+const MAX_CSS_FETCHES = 6;
+
+function extractElementorStylesheetUrls(html, origin) {
+  const linkRe = /<link[^>]+rel=["']stylesheet["'][^>]*>/gi;
+  const hrefRe = /href=["']([^"']+)["']/i;
+  const links = html.match(linkRe) || [];
+  const postCssUrls = [];
+  const otherUrls = [];
+  for (const tag of links) {
+    const hrefMatch = tag.match(hrefRe);
+    if (!hrefMatch) continue;
+    const href = hrefMatch[1];
+    if (!/elementor/i.test(href)) continue;
+    let resolved;
+    try { resolved = new URL(href, origin).href; } catch { continue; }
+    // Elementor's Kit-level Global Colors live in a small per-post CSS
+    // file named like post-857.css — confirmed by testing against a real
+    // site, where this file was the only one (out of 15 elementor-tagged
+    // stylesheets) containing --e-global-color definitions. Prioritize
+    // these over large generic framework files (frontend.min.css, etc.).
+    if (/post-\d+\.css/i.test(href)) postCssUrls.push(resolved);
+    else otherUrls.push(resolved);
+  }
+  const ordered = [...new Set([...postCssUrls, ...otherUrls])];
+  return ordered.slice(0, MAX_CSS_FETCHES);
+}
+
+async function fetchElementorCss(html, origin) {
+  const urls = extractElementorStylesheetUrls(html, origin);
+  if (!urls.length) return "";
+  const bodies = await Promise.all(urls.map(u => fetchResource(u, "css")));
+  return bodies.filter(Boolean).join("\n");
 }
 
 export default async function handler(req, res) {
@@ -147,6 +196,9 @@ export default async function handler(req, res) {
     const rootHtml = await fetchPage(base.href);
     if (!rootHtml) return res.status(400).json({ error: "Could not fetch " + base.href });
 
+    const elementorCss = await fetchElementorCss(rootHtml, origin);
+    const colorExtraction = buildColorsFromExtraction(rootHtml + "\n" + elementorCss);
+
     const navLinks = extractNavLinks(rootHtml, origin);
     const allUrls = [base.href, ...navLinks].filter((u, i, arr) => arr.indexOf(u) === i).slice(0, 8);
 
@@ -165,7 +217,7 @@ export default async function handler(req, res) {
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
-      return res.status(200).json({ origin, pages: discovered });
+      return res.status(200).json({ origin, pages: discovered, colors: colorExtraction?.colors || null, colorConfidence: colorExtraction?.confidence || null });
     }
 
     const summary = await summarizeWithClaude(apiKey, origin, discovered);
@@ -175,6 +227,8 @@ export default async function handler(req, res) {
       pageCount: discovered.length,
       pages: discovered.map(p => ({ url: p.url, path: p.path, pageType: p.pageType })),
       patterns: summary,
+      colors: colorExtraction?.colors || null,
+      colorConfidence: colorExtraction?.confidence || null,
     });
 
   } catch (err) {
@@ -205,6 +259,81 @@ function extractNavLinks(html, origin) {
     } catch {}
   }
   return [...new Set(links)];
+}
+
+// Elementor writes its Kit's Global Colors directly into the page as CSS
+// custom properties — confirmed live (--e-global-color-text on a real
+// production nav menu) rather than guessed. The 4 stock slots
+// (primary/secondary/text/accent) use readable names; any additional
+// custom-added swatches (e.g. a brand's own "Button Color") get an
+// opaque hash-style id instead, since only the human-readable label for
+// those lives in Elementor's admin UI, not in the rendered CSS.
+const STOCK_SLOTS = ["primary", "secondary", "text", "accent"];
+
+function extractElementorGlobalColors(html) {
+  const found = {};
+  const custom = {};
+  const re = /--e-global-color-([a-z0-9]+)\s*:\s*(#[0-9a-fA-F]{3,8})/g;
+  let m;
+  while ((m = re.exec(html)) !== null) {
+    const id = m[1].toLowerCase();
+    const hex = m[2].toUpperCase();
+    if (STOCK_SLOTS.includes(id)) found[id] = hex;
+    else custom[id] = hex;
+  }
+  return { stock: found, custom };
+}
+
+function darkenHex(hex, amount) {
+  const h = hex.replace("#", "");
+  if (h.length !== 6) return hex;
+  const num = parseInt(h, 16);
+  const r = Math.max(0, Math.round(((num >> 16) & 0xff) * (1 - amount)));
+  const g = Math.max(0, Math.round(((num >> 8) & 0xff) * (1 - amount)));
+  const b = Math.max(0, Math.round((num & 0xff) * (1 - amount)));
+  return "#" + [r, g, b].map(v => v.toString(16).padStart(2, "0")).join("").toUpperCase();
+}
+
+// Builds a brief-schema colors object (ink/brass/brass-deep/bone/asphalt/
+// stone/warm-white/text) from what was actually found on the page.
+// Mapping is grounded in a real confirmed case (Penn Jersey): Elementor's
+// "Primary" slot was the actual hero/dark-panel color, and a single custom
+// global color beyond the 4 stock slots was the real accent (labeled
+// "Button Color" in that site's own Elementor UI) — not an assumption
+// made in the abstract. Fields with no real signal are left blank rather
+// than guessed, same rule the brief parser already follows.
+//
+// NOTE: an earlier version tried to confirm the accent by finding which
+// color a .elementor-button CSS rule actually uses — tested against a real
+// site and it returned a generic Elementor-core default, not the site's
+// real accent. Dropped rather than ship an unreliable "confirmed" value.
+function buildColorsFromExtraction(html) {
+  const { stock, custom } = extractElementorGlobalColors(html);
+  if (!Object.keys(stock).length && !Object.keys(custom).length) return null;
+
+  const colors = { ink: "", brass: "", "brass-deep": "", bone: "", asphalt: "", stone: "", "warm-white": "", text: "" };
+  const confidence = {};
+
+  if (stock.text) { colors.ink = stock.text; colors.text = stock.text; confidence.ink = confidence.text = "confirmed"; }
+  if (stock.secondary) { colors["warm-white"] = stock.secondary; confidence["warm-white"] = "confirmed"; }
+  if (stock.primary) { colors.asphalt = stock.primary; confidence.asphalt = "confirmed"; }
+
+  const customIds = Object.keys(custom);
+  if (customIds.length === 1) {
+    colors.brass = custom[customIds[0]];
+    confidence.brass = "confirmed (single custom global color — reliable accent signal)";
+  } else if (stock.accent) {
+    colors.brass = stock.accent;
+    confidence.brass = customIds.length > 1
+      ? "uncertain (multiple custom colors found, defaulted to stock accent slot — review)"
+      : "confirmed (Elementor accent slot)";
+  }
+  if (colors.brass) {
+    colors["brass-deep"] = darkenHex(colors.brass, 0.15);
+    confidence["brass-deep"] = "derived (darkened brass)";
+  }
+
+  return { colors, confidence, rawFound: { ...stock, ...custom } };
 }
 
 function inferPageType(path) {
