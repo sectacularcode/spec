@@ -69,7 +69,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         mkHeading(item.stat, accent, "h2", { weight: 800, px: 44, align: "center" }),
         mkSpacer(8),
         mkText("<p style='text-align:center'>" + he(item.label) + "</p>", stone),
-      ], warmWhite, { isInner: true, padY: "48", padX: "32", center: true, grow: "1" });
+      ], null, { isInner: true, padY: "48", padX: "32", center: true, grow: "1" });
     });
     return mkContainer(cols, bgColor || bone, { direction: "row", padY: "0", padX: "0", gap: "0" });
   }
