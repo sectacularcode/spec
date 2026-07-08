@@ -538,6 +538,19 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       var s1    = brief.trustStat1 || "10+";  var l1 = brief.trustLabel1 || "Years in business";
       var s2    = brief.trustStat2 || "500+"; var l2 = brief.trustLabel2 || "Projects completed";
       var s3    = brief.trustStat3 || "98%";  var l3 = brief.trustLabel3 || "Client satisfaction";
+      // Same guard as landing.js's buildLandingPage: if asphalt was left as
+      // (or defaulted to) the brand accent color, treat it as unset and
+      // fall back to a neutral charcoal so dark panels read as neutral,
+      // not brand-saturated. Keeps this preview's hero/testimonial panel
+      // color consistent with what the real Elementor export produces.
+      var dark = asphalt;
+      var brassDpCheck = (brassDp || "").toLowerCase();
+      if (!dark || dark.toLowerCase() === (brass||"").toLowerCase() || dark.toLowerCase() === brassDpCheck) {
+        dark = "#1F2328";
+      }
+      var whyUsIntro = brief.whyUsIntro || "Add 1–2 sentences on why this business is the right choice.";
+      var wb1 = brief.benefit1 || "Key benefit one";
+      var wb2 = brief.benefit2 || "Key benefit two";
       var svcs  = Array.isArray(brief.servicesList) ? brief.servicesList : ["Service one","Service two","Service three","Service four","Service five","Service six"];
       var b1    = brief.benefit1 || "Faster results with less hassle";
       var b2    = brief.benefit2 || "One team handles everything end to end";
@@ -562,29 +575,36 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
 
       // ── VARIANT B — Lead Form ──────────────────────────────────────────────
       if (variant === "B") {
-        return "<section style='background:" + brass + ";padding:clamp(48px,8vh,80px) clamp(24px,6vw,80px);position:relative;'>" +
+        var formFieldsB = Array.isArray(brief.formFields) ? brief.formFields : ["Name", "Company", "Phone", "What do you need?", "Message"];
+        return "<section style='background:" + dark + ";padding:clamp(48px,8vh,80px) clamp(24px,6vw,80px);position:relative;'>" +
             "<div class='var-b-hero' style='max-width:1100px;margin:0 auto;text-align:center;'>" +
               "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:16px;'>" + (brief.brandName||"Brand") + "</div>" +
               "<h1 style='font-weight:800;font-size:clamp(32px,5vw,56px);color:#ffffff;margin:0 0 18px;line-height:1.08;'>" + h1 + "</h1>" +
               (hook ? "<p style='font-size:18px;color:rgba(255,255,255,0.85);margin:0 0 12px;line-height:1.6;font-style:italic;'>" + hook + "</p>" : "") +
               "<p style='font-size:clamp(14px,3.5vw,16px);color:rgba(255,255,255,0.8);margin:0 0 24px;line-height:1.55;max-width:580px;margin-left:auto;margin-right:auto;'>" + sub + "</p>" +
-              "<a style='" + btnStyle.replace("background:"+brass, "background:#ffffff").replace("color:#ffffff", "color:"+brass) + "'>" + cta1 + "</a>" +
+              "<a style='" + btnStyle.replace("background:"+brass, "background:#ffffff").replace("color:#ffffff", "color:"+dark) + "'>" + cta1 + "</a>" +
             "</div>" +
           "</section>" +
           "<section style='background:" + bone + ";padding:80px clamp(24px,6vw,80px);'>" +
             "<div class='var-b-body' style='max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;'>" +
               "<div>" +
-                "<h2 style='font-size:clamp(24px,3vw,36px);font-weight:700;color:" + ink + ";margin:0 0 32px;'>Why " + (brief.brandName||"us") + "?</h2>" +
-                "<div style='display:flex;flex-direction:column;gap:28px;'>" +
+                "<h2 style='font-size:clamp(24px,3vw,36px);font-weight:700;color:" + ink + ";margin:0 0 14px;'>Why " + (brief.brandName||"Us") + "?</h2>" +
+                "<p style='font-size:15px;color:" + text + ";line-height:1.65;margin:0 0 20px;'>" + whyUsIntro + "</p>" +
+                "<div style='display:flex;flex-direction:column;gap:10px;margin-bottom:26px;'>" +
+                  [wb1, wb2].map(function(b) {
+                    return "<div style='display:flex;align-items:center;gap:10px;'><span style='color:" + brass + ";font-weight:700;flex-shrink:0;'>&#10003;</span><span style='font-size:14px;color:" + text + ";'>" + b + "</span></div>";
+                  }).join("") +
+                "</div>" +
+                "<div style='display:flex;flex-direction:row;gap:24px;'>" +
                   [{ s: s1, l: l1 }, { s: s2, l: l2 }, { s: s3, l: l3 }].map(function(t) {
-                    return "<div style='border-bottom:1px solid #dde0e6;padding-bottom:20px;'><div style='font-size:40px;font-weight:800;color:" + brass + ";line-height:1;margin-bottom:4px;'>" + t.s + "</div><div style='font-size:15px;color:" + stone + ";font-weight:500;'>" + t.l + "</div></div>";
+                    return "<div><div style='font-size:36px;font-weight:800;color:" + brass + ";line-height:1;margin-bottom:4px;'>" + t.s + "</div><div style='font-size:13px;color:" + stone + ";font-weight:500;'>" + t.l + "</div></div>";
                   }).join("") +
                 "</div>" +
               "</div>" +
               "<div style='background:#ffffff;border:1px solid #dde0e6;border-radius:8px;padding:40px;'>" +
                 "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + formH + "</h3>" +
                 "<p style='font-size:14px;color:" + stone + ";margin:0 0 24px;'>" + formS + "</p>" +
-                ["Name","Company","Phone","What do you need?"].map(function(f) {
+                formFieldsB.map(function(f) {
                   return "<div style='margin-bottom:14px;'><label style='display:block;font-size:12px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;'>" + f + "</label><div style='width:100%;padding:10px 14px;border:1px solid #dde0e6;border-radius:4px;background:#f9f9f9;font-size:14px;color:#bbb;box-sizing:border-box;'>" + f + "...</div></div>";
                 }).join("") +
                 "<button style='width:100%;padding:14px;background:" + brass + ";color:#fff;font-weight:700;font-size:14px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:8px;'>" + formC + "</button>" +
@@ -592,12 +612,16 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
               "</div>" +
             "</div>" +
           "</section>" +
-          "<section style='background:#ffffff;padding:80px clamp(24px,6vw,80px);'>" +
-            "<h2 class='var-b-testi-h' style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";text-align:center;margin:0 0 48px;'>What our clients say</h2>" +
-            "<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:32px;max-width:1100px;margin:0 auto;'>" +
-              [[tq1,tn1,tt1],[tq2,tn2,tt2],[tq3,tn3,tt3]].map(function(t) {
-                return "<div style='background:#ffffff;border-radius:6px;padding:28px;box-shadow:0 1px 4px rgba(0,0,0,0.06);'><p style='font-size:16px;font-style:italic;color:" + ink + ";line-height:1.7;margin:0 0 20px;'>&#8220;" + t[0] + "&#8221;</p><div style='width:32px;height:2px;background:" + brass + ";margin-bottom:12px;'></div><div style='font-size:14px;font-weight:600;color:" + ink + ";'>" + t[1] + "</div><div style='font-size:13px;color:" + stone + ";'>" + t[2] + "</div></div>";
-              }).join("") +
+          "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
+            "<div style='max-width:640px;margin:0 auto;'>" +
+              "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
+              "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
+              "<p style='font-size:14px;color:rgba(255,255,255,0.7);margin:0 0 22px;'>" + tn1 + " &middot; " + tt1 + "</p>" +
+              "<div style='display:flex;justify-content:center;gap:6px;'>" +
+                "<div style='width:6px;height:6px;border-radius:50%;background:" + brass + ";'></div>" +
+                "<div style='width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.25);'></div>" +
+                "<div style='width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.25);'></div>" +
+              "</div>" +
             "</div>" +
           "</section>" +
           [[f1h,f1b,img1],[f2h,f2b,img2],[f3h,f3b,img3]].map(function(f,i) {
@@ -1506,7 +1530,6 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         ".var-b-hero,.var-b-hero *{text-align:center !important;}" +
         ".var-b-body{text-align:center !important;}" +
         ".var-b-body h2,.var-b-body p,.var-b-body div{text-align:center !important;}" +
-        ".var-b-testi-h{text-align:center !important;}" +
         /* VARIANT C — center hero (default), left body */
         ".benefit-row,.benefit-row *{text-align:left !important;}" +
 
