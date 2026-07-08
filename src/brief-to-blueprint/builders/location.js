@@ -11,7 +11,7 @@
 //   locationName, city, state, address, phone, hours,
 //   headline, services (array of strings), mapEmbed (HTML string), ctaText
 
-import { nid, mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer } from "./helpers.js";
+import { nid, mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
 
 function getColors(colors) {
@@ -145,9 +145,7 @@ export function buildLocationPageA(colors, brief, loc) {
     mkButton(ctaText, C.brassDp, "#ffffff"),
   ], null, { padY: "0", grow: 1, isInner: true });
 
-  var supportImg = mkContainer([
-    mkImagePh(city + " location photo"),
-  ], null, { padY: "0", grow: 1, isInner: true });
+  var supportImg = mkImageBg(city + " location photo", { grow: 1, minHeight: 380 });
 
   var supportRow = mkContainer([supportText, supportImg], null, {
     direction: "row", gap: "48", padY: "0", isInner: true,
@@ -196,7 +194,7 @@ export function buildLocationPageB(colors, brief, loc) {
 
   // Hero — image placeholder + headline
   sections.push(mkContainer([
-    mkImagePh(city + " location"),
+    mkImageBg(city + " location", { minHeight: 360 }),
     mkSpacer(0),
     mkContainer([
       mkHeading(headline, C.warmWhite, "h1", { weight: 800, px: 48 }),
