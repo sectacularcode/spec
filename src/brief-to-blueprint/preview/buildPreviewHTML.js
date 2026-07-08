@@ -551,6 +551,32 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       var whyUsIntro = brief.whyUsIntro || "Add 1–2 sentences on why this business is the right choice.";
       var wb1 = brief.benefit1 || "Key benefit one";
       var wb2 = brief.benefit2 || "Key benefit two";
+      var faqItemsList = Array.isArray(brief.faqItems) && brief.faqItems.length ? brief.faqItems : [
+        { question: "FAQ question one",   answer: "Answer, in brand voice." },
+        { question: "FAQ question two",   answer: "Answer, in brand voice." },
+        { question: "FAQ question three", answer: "Answer, in brand voice." },
+        { question: "FAQ question four",  answer: "Answer, in brand voice." },
+        { question: "FAQ question five",  answer: "Answer, in brand voice." },
+      ];
+      // Plain, dependency-free open/close: a checkbox-driven CSS accordion
+      // (no JS needed for the preview) so the interaction is visible without
+      // wiring up click handlers just for this static HTML preview.
+      var faqHTML = "<section style='background:#ffffff;padding:80px clamp(24px,6vw,80px);'>" +
+          "<div style='max-width:900px;margin:0 auto;'>" +
+            "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + brass + ";margin:0 0 28px;'>" + (brief.faqHeading || "Frequently Asked Questions") + "</h2>" +
+            faqItemsList.map(function(f, i) {
+              var cbId = "faq-cb-" + i;
+              return "<div class='faq-item' style='border:1px solid #dde0e6;border-top:none;'>" +
+                "<input type='checkbox' id='" + cbId + "' class='faq-toggle' style='display:none;'" + (i === 0 ? " checked" : "") + "/>" +
+                "<label for='" + cbId + "' style='display:flex;align-items:center;gap:10px;padding:18px 20px;cursor:pointer;font-weight:700;font-size:15px;color:#1a1a1a;'>" +
+                  "<span class='faq-icon' style='font-size:16px;color:" + brass + ";width:14px;'></span>" + f.question +
+                "</label>" +
+                "<div class='faq-answer' style='display:none;padding:0 20px 20px 44px;font-size:14px;color:" + stone + ";line-height:1.6;'>" + f.answer + "</div>" +
+              "</div>";
+            }).join("") +
+            "<style>.faq-icon::before{content:'+';}.faq-toggle:checked ~ label .faq-icon::before{content:'\u2212';}.faq-toggle:checked ~ label{color:" + brass + " !important;}.faq-toggle:checked + label + .faq-answer{display:block !important;}.faq-item:first-child{border-top:1px solid #dde0e6;}</style>" +
+          "</div>" +
+        "</section>";
       var svcs  = Array.isArray(brief.servicesList) ? brief.servicesList : ["Service one","Service two","Service three","Service four","Service five","Service six"];
       var b1    = brief.benefit1 || "Faster results with less hassle";
       var b2    = brief.benefit2 || "One team handles everything end to end";
@@ -633,14 +659,15 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             var imgRight = !imgLeft ? "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>" : "";
             return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + cols + textContent + imgRight + "</section>";
           }).join("") +
-          "<section style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
+          "<section style='background:" + dark + ";padding:80px 40px;text-align:center;'>" +
             "<h2 style='font-size:clamp(26px,4vw,40px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
             "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:560px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
             "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
-              "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
+              "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+dark) + "'>" + cta1 + "</a>" +
               "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
             "</div>" +
-          "</section>";
+          "</section>" +
+          faqHTML;
       }
 
       // ── VARIANT C — Minimal Retargeting ────────────────────────────────────
@@ -723,7 +750,8 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
             "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
           "</div>" +
-        "</section>";
+        "</section>" +
+        faqHTML;
     })(),
 
     // ── TEAM ──
