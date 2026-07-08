@@ -146,9 +146,14 @@ export function mkButton(label, bgColor, textColor) {
 // Image placeholder (user fills in after import) — Option B: a container
 // with a background image instead of an Image widget. background_image /
 // background_position / background_size are confirmed-working keys (already
-// used in production for hero images) and background_size:"cover" guarantees
-// edge-to-edge fill regardless of the uploaded photo's native pixel size —
-// unlike the Image widget, which renders at native size with no stretch.
+// used in production for hero images). Size is set beyond 100% (150%,
+// single-value so aspect ratio is preserved) rather than "cover" — a plain
+// cover fit can still look distant/empty with wide, zoomed-out photos (e.g.
+// a parking lot shot vs. a tight close-up), so this crops in further by
+// default regardless of the uploaded photo's own composition. It also
+// guarantees edge-to-edge fill regardless of the uploaded photo's native
+// pixel size — unlike the Image widget, which renders at native size with
+// no stretch at all.
 // A small caption badge sits at the bottom so an empty slot still reads as
 // an obvious upload target in the editor. `caption` is plain text — safe to
 // escape unconditionally. `opts` passes through to mkContainer (grow, full,
@@ -178,7 +183,7 @@ export function mkImageBg(caption, opts) {
   }, opts));
   box.settings.background_image = { url: "", id: "" };
   box.settings.background_position = "center center";
-  box.settings.background_size = "cover";
+  box.settings.background_size = "150%";
   box.settings.min_height = { unit: "px", size: minHeight };
   box.settings.min_height_tablet = { unit: "px", size: Math.round(minHeight * 0.85) };
   box.settings.min_height_mobile = { unit: "px", size: Math.round(minHeight * 0.7) };
