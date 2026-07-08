@@ -35,6 +35,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   }
 
   var brandName   = brief.brandName    || "";
+  var heroEyebrowText = brief.heroEyebrow != null ? brief.heroEyebrow : brandName;
   var heroH1      = brief.heroHeadline || brief.tagline || "[Landing page headline]";
   var heroSub     = brief.heroSubhead  || brief.hookStatement || "[Specific, direct subheadline]";
   var phoneCta    = brief.phoneCta     || brief.heroCta1 || "Call Us Now";
@@ -147,7 +148,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
   // ── VARIANT A — Awareness / Feature layout ────────────────────────────────
   if (variant !== "B" && variant !== "C") {
-    var heroEyebrow = mkHeading(brandName, warmWhite, "h6", { eyebrow: true, align: "center" });
+    var heroEyebrow = mkHeading(heroEyebrowText, warmWhite, "h6", { eyebrow: true, align: "center" });
     var heroH1El    = mkHeading(heroH1, warmWhite, "h1", { weight: 800, px: 58, align: "center" });
     var heroSubEl   = mkText("<p style='text-align:center'>" + he(heroSub) + "</p>", "rgba(255,255,255,0.85)");
     heroSubEl.settings.text_align = heroSubEl.settings.text_align_tablet = heroSubEl.settings.text_align_mobile = "center";
@@ -178,7 +179,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   if (variant === "B") {
     // Hero with inline form block instead of dual buttons
     var heroB = mkContainer([
-      mkHeading(brandName, warmWhite, "h6", { eyebrow: true, align: "center" }),
+      mkHeading(heroEyebrowText, warmWhite, "h6", { eyebrow: true, align: "center" }),
       mkSpacer(16),
       mkHeading(heroH1, warmWhite, "h1", { weight: 800, px: 52, align: "center" }),
       mkSpacer(16),
@@ -277,7 +278,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // Tight hero → 3 outcome bullets → single testimonial → single CTA
   // No nav distractions, no checklist, no feature rows. Just the essentials.
   var heroC = mkContainer([
-    mkHeading(brandName, warmWhite, "h6", { eyebrow: true, align: "center" }),
+    mkHeading(heroEyebrowText, warmWhite, "h6", { eyebrow: true, align: "center" }),
     mkSpacer(12),
     mkHeading(heroH1, warmWhite, "h1", { weight: 800, px: 52, align: "center" }),
     mkSpacer(16),
