@@ -315,7 +315,30 @@ export function mkForm(fields, ctaLabel, opts) {
   };
 }
 
-// Native Elementor Pro Testimonial Carousel widget — confirmed widgetType
+// Native Elementor Accordion widget (core, not Pro) — confirmed via
+// elementor.com/help/accordion-widget/: each item has a Title and Content
+// field. Field key names (tab_title/tab_content) follow Elementor's Tabs
+// widget naming convention, which the Accordion widget shares. Icon colors
+// and active/hover state styling aren't set here (those style-tab keys
+// aren't confirmed) — do one style pass in the Elementor editor after
+// import if the open/closed icon colors need to match brand exactly.
+export function mkAccordion(items) {
+  return {
+    id: nid(), elType: "widget", widgetType: "accordion",
+    settings: {
+      tabs: items.map(function(item) {
+        return {
+          _id: nid().slice(0, 7),
+          tab_title: he(item.question),
+          tab_content: he(item.answer),
+        };
+      }),
+      selected_icon: { value: "fas fa-plus", library: "fa-solid" },
+      selected_active_icon: { value: "fas fa-minus", library: "fa-solid" },
+    },
+    elements: [],
+  };
+}
 // "testimonial-carousel" against Elementor Pro's own source
 // (modules/carousel/widgets/testimonial-carousel.php get_name()). The
 // per-slide field names (testimonial_content/name/job) follow Elementor's
