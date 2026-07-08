@@ -65,9 +65,9 @@ export function mkContainer(children, bg, opts) {
     s.min_height = { unit:"vh", size: opts.minH };
     s.min_height_tablet = { unit:"vh", size: Math.round(opts.minH * 0.75) };
     s.min_height_mobile = { unit:"px", size: 480 };
-    s.justify_content = "center";
-    s.justify_content_tablet = "center";
-    s.justify_content_mobile = "center";
+    // flex_justify_content is the confirmed-correct key (verified against
+    // real production Elementor exports) — no longer hedging with the
+    // unprefixed justify_content, which was an earlier guess.
     s.flex_justify_content = "center";
     s.flex_justify_content_tablet = "center";
     s.flex_justify_content_mobile = "center";
