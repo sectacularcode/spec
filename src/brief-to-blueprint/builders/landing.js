@@ -1,4 +1,4 @@
-import { nid, mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer, mkDivider } from "./helpers.js";
+import { nid, mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer, mkDivider, mkIconList, mkForm, mkTestimonialCarousel } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
 
 // Landing page builder — three distinct conversion-focused layouts.
@@ -60,9 +60,9 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
   function makeTrustStrip(bgColor) {
     var items = [
-      { stat: brief.trustStat1 || "50+",  label: brief.trustLabel1 || "Years in business" },
-      { stat: brief.trustStat2 || "15",   label: brief.trustLabel2 || "Full-service bays" },
-      { stat: brief.trustStat3 || "5",    label: brief.trustLabel3 || "Paint booths" },
+      { stat: brief.trustStat1 || "10+",  label: brief.trustLabel1 || "Years in business" },
+      { stat: brief.trustStat2 || "500+", label: brief.trustLabel2 || "Projects completed" },
+      { stat: brief.trustStat3 || "98%",  label: brief.trustLabel3 || "Client satisfaction" },
     ];
     var cols = items.map(function(item) {
       return mkContainer([
@@ -79,9 +79,9 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // box. Only apply it when the brief explicitly asks for it.
     var featureBorder = !!brief.featureTextBorder;
     var features = [
-      { heading: brief.feature1Heading || "Advanced Body Repair Techniques",       body: brief.feature1Body || "[Describe your body repair capabilities]",   imgCaption: "[Photo: technician at work]",      imageLeft: false },
-      { heading: brief.feature2Heading || "Custom Paint Jobs for a Standout Fleet", body: brief.feature2Body || "[Describe your paint capabilities]",         imgCaption: "[Photo: finished paint or booth]", imageLeft: true  },
-      { heading: brief.feature3Heading || "Fleet Maintenance You Can Trust",        body: brief.feature3Body || "[Describe your maintenance and reliability]", imgCaption: "[Photo: fleet or shop floor]",     imageLeft: false },
+      { heading: brief.feature1Heading || "What We Do Best",     body: brief.feature1Body || "[Describe the primary service or capability that sets you apart]", imgCaption: "[Photo placeholder]", imageLeft: false },
+      { heading: brief.feature2Heading || "Built for Your Needs", body: brief.feature2Body || "[Explain how your approach is tailored to the specific customer]", imgCaption: "[Photo placeholder]", imageLeft: true  },
+      { heading: brief.feature3Heading || "Results You Can Count On", body: brief.feature3Body || "[Speak to reliability, track record, or outcomes]", imgCaption: "[Photo placeholder]", imageLeft: false },
     ];
     return features.map(function(f, i) {
       var innerChildren = [
@@ -138,43 +138,14 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       dark, { padY: "100", center: true }
     );
 
-    var checklistItems = brief.servicesList || ["2 Shifts — Quick Turn-Around","5 Complete Paint Booths","Full Restorations","Custom Painting, Striping and Design","Structural Repairs","Frame Rail Replacements","Body Swaps","Direct Insurance Billing"];
+    var checklistItems = brief.servicesList || ["Reduced overall cost", "Reduced downtime", "Proactive planning", "Expert team", "Fast response time", "Tailored reporting", "Direct billing", "Add more below..."];
     var half = Math.ceil(checklistItems.length / 2);
-    function mkIconList(items) {
-      return {
-        id: nid(), elType: "widget", widgetType: "icon-list",
-        settings: {
-          icon_list: items.map(function(item) {
-            return {
-              text: he(item),
-              selected_icon: { value: "far fa-check-circle", library: "fa-regular" },
-              _id: nid().slice(0, 7),
-            };
-          }),
-          icon_color: accent,
-          text_color: text,
-          space_between: { unit: "px", size: 14 },
-          icon_size: { unit: "px", size: 16 },
-          typography_typography: "custom",
-          typography_font_size: { unit: "px", size: 15 },
-          typography_font_size_tablet: { unit: "px", size: 15 },
-          typography_font_size_mobile: { unit: "px", size: 14 },
-          // Icon-list is a widget, not built via mkContainer, so it never
-          // gets mkContainer's width handling automatically — set it
-          // directly here so two side-by-side lists split evenly instead
-          // of each claiming only as much width as its own text needs.
-          width: { unit: "%", size: 50 },
-          width_tablet: { unit: "%", size: 100 },
-        },
-        elements: [],
-      };
-    }
     var checklistSection = mkContainer([
       mkHeading(brief.servicesHeading || "What We Do", text, "h2", { weight: 700, px: 36 }),
       mkSpacer(24), mkDivider(accent), mkSpacer(32),
       mkContainer([
-        mkIconList(checklistItems.slice(0, half)),
-        mkIconList(checklistItems.slice(half)),
+        mkIconList(checklistItems.slice(0, half), accent, text, { width: 50 }),
+        mkIconList(checklistItems.slice(half), accent, text, { width: 50 }),
       ], null, { direction: "row", gap: "48", padY: "0", isInner: true, full: true }),
     ], warmWhite, { padY: "80" });
 
@@ -206,61 +177,69 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var formCta       = brief.formCta        || "Send It Over";
     var formReassure  = brief.formReassurance|| "No sales team. A real reply.";
 
-    var formFieldsHtml = "<div style='display:flex;flex-direction:column;gap:12px;margin-bottom:20px'>" +
-      formFields.map(function(f) {
-        return "<div style='display:flex;flex-direction:column;gap:4px'><label style='font-size:13px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em'>" + he(f) + "</label><input type='text' placeholder='' style='padding:12px 14px;border:1px solid #dde0e6;border-radius:4px;font-size:15px;width:100%;box-sizing:border-box'/></div>";
-      }).join("") + "</div>";
-    var formHtml = "<div style='background:" + warmWhite + ";border:1px solid #dde0e6;border-radius:8px;padding:40px'>" +
-      "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 8px'>" + he(formHeading) + "</h3>" +
-      "<p style='font-size:15px;color:" + stone + ";margin:0 0 24px;line-height:1.6'>" + he(formSubhead) + "</p>" +
-      formFieldsHtml +
-      "<button style='width:100%;padding:16px;background:" + accent + ";color:" + warmWhite + ";font-weight:700;font-size:15px;border:none;border-radius:4px;cursor:pointer;text-transform:uppercase;letter-spacing:0.08em'>" + he(formCta) + "</button>" +
-      "<p style='font-size:13px;color:" + stone + ";margin:12px 0 0;text-align:center'>" + he(formReassure) + "</p>" +
-      "</div>";
+    // Form widget — real Elementor Form, not a raw HTML mockup. Field types
+    // (email/tel/textarea) are inferred from the label text in mkForm.
+    var formWidget = mkForm(formFields, formCta, { formName: (brandName || "Site") + " Quote Request" });
+    var formCard = mkContainer([
+      mkHeading(formHeading, ink, "h3", { weight: 700, px: 22 }),
+      mkSpacer(4),
+      mkText(he(formSubhead), stone),
+      mkSpacer(20),
+      formWidget,
+      mkSpacer(12),
+      mkText("<p style='text-align:center'>" + he(formReassure) + "</p>", stone),
+    ], warmWhite, { isInner: true, padY: "40", padX: "40" });
+    formCard.settings.border_border  = "solid";
+    formCard.settings.border_width   = { unit: "px", top: "1", right: "1", bottom: "1", left: "1", isLinked: true };
+    formCard.settings.border_color   = "#DDE0E6";
+    formCard.settings.border_radius  = { unit: "px", top: "6", right: "6", bottom: "6", left: "6", isLinked: true };
 
-    var formWidget = { id: nid(), elType: "widget", widgetType: "text-editor", settings: { editor: formHtml }, elements: [] };
-
-    // Split: trust stats left, form right
+    // Trust stats — compact row, no per-stat divider (kept intentionally
+    // light so it sits inline under the intro/benefits instead of reading
+    // as its own separate block).
     var trustColsB = [
-      { stat: brief.trustStat1 || "50+", label: brief.trustLabel1 || "Years in business" },
-      { stat: brief.trustStat2 || "15",  label: brief.trustLabel2 || "Full-service bays" },
-      { stat: brief.trustStat3 || "5",   label: brief.trustLabel3 || "Paint booths" },
+      { stat: brief.trustStat1 || "10+",  label: brief.trustLabel1 || "Years in business" },
+      { stat: brief.trustStat2 || "500+", label: brief.trustLabel2 || "Projects completed" },
+      { stat: brief.trustStat3 || "98%",  label: brief.trustLabel3 || "Client satisfaction" },
     ].map(function(item) {
       return mkContainer([
-        mkHeading(item.stat, accent, "h2", { weight: 800, px: 48 }),
-        mkSpacer(8),
+        mkHeading(item.stat, accent, "h2", { weight: 800, px: 42 }),
+        mkSpacer(4),
         mkText(he(item.label), stone),
-        mkSpacer(16),
-        mkDivider(accent),
-      ], null, { isInner: true, padY: "24", padX: "0", grow: "1" });
+      ], null, { isInner: true, padY: "0", padX: "0", grow: "1" });
     });
 
-    var trustLeftCol = mkContainer(
-      [mkHeading("Why " + (brandName || "us") + "?", ink, "h2", { weight: 700, px: 32 }), mkSpacer(32)].concat(trustColsB),
-      null, { isInner: true, padY: "80", padX: "48", grow: "1" }
-    );
-    var formRightCol = mkContainer([formWidget], null, { isInner: true, padY: "80", padX: "48", grow: "1" });
+    // Why-Us column: intro paragraph + two folded-in benefit lines (icon
+    // list, no separate boxed section) + the stat row. Benefits reuse the
+    // same brief.benefit1/benefit2 fields Variant C already uses, rather
+    // than introducing a new brief field just for this variant.
+    var whyUsIntro = brief.whyUsIntro || "[Add 1–2 sentences on why this business is the right choice]";
+    var whyUsBenefits = [
+      brief.benefit1 || "[Key benefit one]",
+      brief.benefit2 || "[Key benefit two]",
+    ];
+    var trustLeftCol = mkContainer([
+      mkHeading("Why " + (brandName || "Us") + "?", ink, "h2", { weight: 700, px: 32 }),
+      mkSpacer(14),
+      mkText(he(whyUsIntro), text),
+      mkSpacer(20),
+      mkIconList(whyUsBenefits, accent, text, { fontSize: 15 }),
+      mkSpacer(26),
+      mkContainer(trustColsB, null, { isInner: true, direction: "row", padY: "0", padX: "0", gap: "24", full: true }),
+    ], null, { isInner: true, padY: "80", padX: "48", grow: "1" });
+    var formRightCol = mkContainer([formCard], null, { isInner: true, padY: "80", padX: "48", grow: "1" });
     var formSection  = mkContainer([trustLeftCol, formRightCol], bone, { direction: "row", padY: "0", padX: "0", gap: "0" });
 
-    // Testimonials
+    // Testimonials — Testimonial Carousel widget (single rotating quote)
+    // instead of three stacked white cards, sitting on a dark panel.
     var testimonials = [
       { quote: brief.testimonial1Quote || "[Client testimonial — specific result or outcome]", name: brief.testimonial1Name || "Client Name", title: brief.testimonial1Title || "Title, Company" },
       { quote: brief.testimonial2Quote || "[Second testimonial — different benefit angle]",    name: brief.testimonial2Name || "Client Name", title: brief.testimonial2Title || "Title, Company" },
       { quote: brief.testimonial3Quote || "[Third testimonial — reliability or speed]",        name: brief.testimonial3Name || "Client Name", title: brief.testimonial3Title || "Title, Company" },
     ];
-    var testimonialCols = testimonials.map(function(t) {
-      return mkContainer([
-        mkText("<p style='font-size:17px;font-style:italic;line-height:1.7;margin:0 0 20px'>\"" + he(t.quote) + "\"</p>", ink),
-        mkDivider(accent),
-        mkSpacer(12),
-        mkText("<strong>" + he(t.name) + "</strong><br>" + he(t.title), stone),
-      ], warmWhite, { isInner: true, padY: "40", padX: "32", grow: "1" });
-    });
     var testimonialsSection = mkContainer([
-      mkHeading("What our clients say", ink, "h2", { weight: 700, px: 32, align: "center" }),
-      mkSpacer(40),
-      mkContainer(testimonialCols, null, { isInner: true, direction: "row", padY: "0", padX: "0", gap: "24" }),
-    ], bone, { padY: "80", center: true });
+      mkTestimonialCarousel(testimonials, { textColor: warmWhite, nameColor: warmWhite, jobColor: "rgba(255,255,255,0.7)" }),
+    ], dark, { padY: "80", center: true });
 
     // Mid-page CTA after feature rows
     var midCta = mkContainer([
@@ -290,9 +269,9 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
   // 3 outcome-focused benefit bullets
   var benefits = [
-    brief.benefit1 || "Your fleet back on the road faster",
-    brief.benefit2 || "One shop handles everything — no vendor juggling",
-    brief.benefit3 || "50 years of fleet experience behind every repair",
+    brief.benefit1 || "Faster results with less hassle",
+    brief.benefit2 || "One team handles everything end to end",
+    brief.benefit3 || "Decades of proven experience",
   ];
   var benefitCols = benefits.map(function(b) {
     return mkContainer([
@@ -306,13 +285,13 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // Trust bar — compact stat row
   var compactTrust = mkContainer([
     mkContainer([
-      mkHeading((brief.trustStat1 || "50+") + "  " + (brief.trustLabel1 || "Years"), accent, "h6", { eyebrow: false, align: "center", weight: 700, px: 15 }),
+      mkHeading((brief.trustStat1 || "10+") + "  " + (brief.trustLabel1 || "Years"), accent, "h6", { eyebrow: false, align: "center", weight: 700, px: 15 }),
     ], null, { isInner: true, padY: "0", padX: "24", grow: "1", center: true }),
     mkContainer([
-      mkHeading((brief.trustStat2 || "15") + "  " + (brief.trustLabel2 || "Bays"), accent, "h6", { eyebrow: false, align: "center", weight: 700, px: 15 }),
+      mkHeading((brief.trustStat2 || "500+") + "  " + (brief.trustLabel2 || "Projects"), accent, "h6", { eyebrow: false, align: "center", weight: 700, px: 15 }),
     ], null, { isInner: true, padY: "0", padX: "24", grow: "1", center: true }),
     mkContainer([
-      mkHeading((brief.trustStat3 || "5") + "  " + (brief.trustLabel3 || "Paint Booths"), accent, "h6", { eyebrow: false, align: "center", weight: 700, px: 15 }),
+      mkHeading((brief.trustStat3 || "98%") + "  " + (brief.trustLabel3 || "Satisfaction"), accent, "h6", { eyebrow: false, align: "center", weight: 700, px: 15 }),
     ], null, { isInner: true, padY: "0", padX: "24", grow: "1", center: true }),
   ], bone, { direction: "row", padY: "20", padX: "40", gap: "0" });
 
