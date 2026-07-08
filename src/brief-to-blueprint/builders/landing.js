@@ -262,10 +262,13 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     ], dark, { padY: "80", center: true });
 
     // Mid-page CTA after feature rows
+    var midCtaText = brief.midCtaText || "Or {link} and we'll get back to you within one business day.";
+    var midCtaLinkText = brief.midCtaLinkText || "send us a message";
+    var midCtaHtml = he(midCtaText).replace("{link}", "<a href='/contact' style='color:" + accent + ";font-weight:600'>" + he(midCtaLinkText) + "</a>");
     var midCta = mkContainer([
       mkHeading(phoneCta, accent, "h2", { weight: 800, px: 36, align: "center" }),
       mkSpacer(8),
-      mkText("<p style='text-align:center'>Or <a href='/contact' style='color:" + accent + ";font-weight:600'>send us a message</a> and we'll get back to you within one business day.</p>", stone),
+      mkText("<p style='text-align:center'>" + midCtaHtml + "</p>", stone),
     ], warmWhite, { padY: "60", center: true });
 
     return {
