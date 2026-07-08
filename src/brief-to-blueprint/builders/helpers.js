@@ -143,12 +143,49 @@ export function mkButton(label, bgColor, textColor) {
   }, elements: [] };
 }
 
-// Image placeholder (user fills in after import). `caption` is always plain
-// text — safe to escape unconditionally.
-export function mkImagePh(caption) {
-  return { id: nid(), elType: "widget", widgetType: "image",
-    settings: { image: { url:"", id:"" }, caption_source:"custom", caption: he(caption||"") },
-    elements: [] };
+// Image placeholder (user fills in after import) — Option B: a container
+// with a background image instead of an Image widget. background_image /
+// background_position / background_size are confirmed-working keys (already
+// used in production for hero images) and background_size:"cover" guarantees
+// edge-to-edge fill regardless of the uploaded photo's native pixel size —
+// unlike the Image widget, which renders at native size with no stretch.
+// A small caption badge sits at the bottom so an empty slot still reads as
+// an obvious upload target in the editor. `caption` is plain text — safe to
+// escape unconditionally. `opts` passes through to mkContainer (grow, full,
+// isInner, etc.); `opts.minHeight` sets the placeholder's height in px
+// (default 320, scaled down for tablet/mobile).
+export function mkImageBg(caption, opts) {
+  opts = opts || {};
+  var minHeight = opts.minHeight || 320;
+  var captionBadge = {
+    id: nid(), elType: "widget", widgetType: "text-editor",
+    settings: {
+      editor: "<p>" + he(caption || "") + "</p>",
+      text_color: "#6B635C",
+      typography_typography: "custom",
+      typography_font_size: { unit: "px", size: 13 },
+      typography_font_style: "italic",
+      text_align: "center",
+      background_background: "classic",
+      background_color: "#FFFFFFDD",
+      padding: { unit: "px", top: "6", right: "14", bottom: "6", left: "14", isLinked: false },
+      border_radius: { unit: "px", top: "4", right: "4", bottom: "4", left: "4", isLinked: true },
+    },
+    elements: [],
+  };
+  var box = mkContainer([captionBadge], "#DDE0E6", Object.assign({
+    isInner: true, full: true, padY: "16", padX: "16",
+  }, opts));
+  box.settings.background_image = { url: "", id: "" };
+  box.settings.background_position = "center center";
+  box.settings.background_size = "cover";
+  box.settings.min_height = { unit: "px", size: minHeight };
+  box.settings.min_height_tablet = { unit: "px", size: Math.round(minHeight * 0.85) };
+  box.settings.min_height_mobile = { unit: "px", size: Math.round(minHeight * 0.7) };
+  box.settings.flex_align_items = "flex-end";
+  box.settings.flex_justify_content = "center";
+  box.settings.justify_content = "center";
+  return box;
 }
 
 // Vertical spacer
