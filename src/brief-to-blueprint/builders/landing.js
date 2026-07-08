@@ -1,4 +1,4 @@
-import { nid, mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer, mkDivider } from "./helpers.js";
+import { nid, mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer, mkDivider } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
 
 // Landing page builder — three distinct conversion-focused layouts.
@@ -93,7 +93,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       } else {
         textCol = mkContainer(innerChildren, null, { isInner: true, padY: "60", padX: "48", grow: "1", full: true });
       }
-      var imgCol = mkContainer([mkImagePh(f.imgCaption)], bone, { isInner: true, padY: "0", padX: "0", grow: "1", full: true });
+      var imgCol = mkImageBg(f.imgCaption, { grow: "1", minHeight: 500 });
       var cols   = f.imageLeft ? [imgCol, textCol] : [textCol, imgCol];
       // Row-level centering instead of stretch+inner-justify: block-centers
       // the (shorter) text column next to the (taller) image column, using
