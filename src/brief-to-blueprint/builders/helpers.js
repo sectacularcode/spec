@@ -84,6 +84,11 @@ export function mkContainer(children, bg, opts) {
     s.width_mobile = { unit:"%", size: 100 };
     s.width_tablet = { unit:"%", size: 100 };
   }
+  if (opts.width) {
+    s.width = { unit: "%", size: opts.width };
+    s.width_tablet = { unit: "%", size: 100 };
+    s.width_mobile = { unit: "%", size: 100 };
+  }
   return { id: nid(), elType: "container", isInner: !!opts.isInner, settings: s, elements: children };
 }
 
@@ -145,23 +150,29 @@ export function mkButton(label, bgColor, textColor) {
 
 // Image placeholder (user fills in after import) — Option B: a container
 // with a background image instead of an Image widget. background_image /
-// background_position / background_size are confirmed-working keys (already
-// used in production for hero images). Size is set beyond 100% (150%,
-// single-value so aspect ratio is preserved) rather than "cover" — a plain
-// cover fit can still look distant/empty with wide, zoomed-out photos (e.g.
-// a parking lot shot vs. a tight close-up), so this crops in further by
-// default regardless of the uploaded photo's own composition. It also
-// guarantees edge-to-edge fill regardless of the uploaded photo's native
-// pixel size — unlike the Image widget, which renders at native size with
-// no stretch at all.
-// A small caption badge sits at the bottom so an empty slot still reads as
-// an obvious upload target in the editor. `caption` is plain text — safe to
-// escape unconditionally. `opts` passes through to mkContainer (grow, full,
-// isInner, etc.); `opts.minHeight` sets the placeholder's height in px
-// (default 320, scaled down for tablet/mobile).
+// background_position / background_size are confirmed-working keys — and as
+// of this version, confirmed against a real production Elementor export
+// (CS Repair's own site), which uses this exact pattern: a fixed-percentage
+// `width` on each column (not flex-grow) and NO explicit height on the
+// image side at all — it just relies on the browser's default flex stretch
+// behavior to match the text column's natural content height. That's what
+// this now does too, instead of the earlier flex-grow + fixed-min-height
+// approach. Size is set beyond 100% (150%, single-value so aspect ratio is
+// preserved) rather than plain "cover" — CS Repair's own template actually
+// uses plain "cover" and gets its tight look purely from photo choice, but
+// this zooms in further by default regardless of the uploaded photo's own
+// composition, since not every photo will be a tight close-up.
+// `opts.width` (0-100) sets a fixed column width instead of flex-grow, for
+// side-by-side split layouts. `opts.minHeight` sets an explicit height in
+// px for standalone cards/grids where there's no sibling content to stretch
+// against. `caption` is plain text — safe to escape unconditionally.
 export function mkImageBg(caption, opts) {
   opts = opts || {};
-  var minHeight = opts.minHeight || 320;
+  var width = opts.width;
+  var minHeight = opts.minHeight;
+  var passThrough = Object.assign({}, opts);
+  delete passThrough.width;
+  delete passThrough.minHeight;
   var captionBadge = {
     id: nid(), elType: "widget", widgetType: "text-editor",
     settings: {
@@ -179,17 +190,31 @@ export function mkImageBg(caption, opts) {
     elements: [],
   };
   var box = mkContainer([captionBadge], "#DDE0E6", Object.assign({
-    isInner: true, full: true, padY: "16", padX: "16",
-  }, opts));
+    isInner: true, full: true, padY: "0", padX: "0",
+  }, passThrough));
   box.settings.background_image = { url: "", id: "" };
   box.settings.background_position = "center center";
   box.settings.background_size = "150%";
-  box.settings.min_height = { unit: "px", size: minHeight };
-  box.settings.min_height_tablet = { unit: "px", size: Math.round(minHeight * 0.85) };
-  box.settings.min_height_mobile = { unit: "px", size: Math.round(minHeight * 0.7) };
-  box.settings.flex_align_items = "flex-end";
-  box.settings.flex_justify_content = "center";
-  box.settings.justify_content = "center";
+  // Badge sits bottom-center: flex_justify_content is the main axis (vertical,
+  // since this box is column-direction) and flex_align_items is the cross
+  // axis (horizontal).
+  box.settings.flex_justify_content = "flex-end";
+  box.settings.flex_align_items = "center";
+  if (width) {
+    box.settings.width = { unit: "%", size: width };
+    box.settings.width_tablet = { unit: "%", size: 100 };
+  }
+  if (minHeight) {
+    box.settings.min_height = { unit: "px", size: minHeight };
+    box.settings.min_height_tablet = { unit: "px", size: Math.round(minHeight * 0.85) };
+    box.settings.min_height_mobile = { unit: "px", size: Math.round(minHeight * 0.7) };
+  } else {
+    // No desktop height (matches production reference) — just sane
+    // tablet/mobile fallbacks so the placeholder isn't invisible before
+    // the row's own content gives it a real height to stretch to.
+    box.settings.min_height_tablet = { unit: "px", size: 400 };
+    box.settings.min_height_mobile = { unit: "px", size: 220 };
+  }
   return box;
 }
 
