@@ -81,25 +81,27 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         mkSpacer(24),
         mkButton(contactCta, accent, warmWhite),
       ];
-      var textCol;
+      // Always-on: content lives inside an inner box with min_height 508px,
+      // matching CS Repair's confirmed production template. This is what
+      // makes rows come out uniform height regardless of how much or how
+      // little text lands in any individual row — the min_height on this
+      // inner box forces the whole text column to at least 508px, so the
+      // image column stretches to match, so every row comes out consistent.
+      // The visible border is still opt-in via brief.featureTextBorder.
+      var innerBox = mkContainer(innerChildren, null, { isInner: true, padY: "30", padX: "30", full: true });
+      innerBox.settings.min_height = { unit: "px", size: 508 };
+      innerBox.settings.min_height_tablet = { unit: "custom", size: "auto" };
+      innerBox.settings.flex_justify_content = "center";
+      innerBox.settings.flex_align_items = "flex-start";
       if (featureBorder) {
-        // Bordered box floats inside the column — its own padding/border,
-        // with the column's own padding acting as the margin around it.
-        var boxed = mkContainer(innerChildren, null, { isInner: true, padY: "40", padX: "40", full: true });
-        boxed.settings.border_border = "solid";
-        boxed.settings.border_width = { unit: "px", top: "1", right: "1", bottom: "1", left: "1", isLinked: true };
-        boxed.settings.border_color = accent;
-        textCol = mkContainer([boxed], null, { isInner: true, padY: "60", padX: "48", width: 50, full: true });
-      } else {
-        textCol = mkContainer(innerChildren, null, { isInner: true, padY: "60", padX: "48", width: 50, full: true });
+        innerBox.settings.border_border = "solid";
+        innerBox.settings.border_width = { unit: "px", top: "1", right: "1", bottom: "1", left: "1", isLinked: true };
+        innerBox.settings.border_color = accent;
       }
-      var imgCol = mkImageBg(f.imgCaption, { width: 50 });
-      var cols   = f.imageLeft ? [imgCol, textCol] : [textCol, imgCol];
-      // No explicit align-items override — matching the confirmed production
-      // reference, which leaves this unset and relies on the browser's
-      // default flex stretch behavior to match the image column's height to
-      // the text column's natural content height.
-      var row = mkContainer(cols, i % 2 === 0 ? warmWhite : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
+      var textCol = mkContainer([innerBox], null, { isInner: true, padY: "30", padX: "30", width: 50, full: true });
+      var imgCol  = mkImageBg(f.imgCaption, { width: 50 });
+      var cols    = f.imageLeft ? [imgCol, textCol] : [textCol, imgCol];
+      var row     = mkContainer(cols, i % 2 === 0 ? warmWhite : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
       return row;
     });
   }
