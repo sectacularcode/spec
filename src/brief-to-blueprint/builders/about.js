@@ -1,4 +1,4 @@
-import { mkContainer, mkHeading, mkText, mkButton, mkImagePh, mkSpacer } from "./helpers.js";
+import { mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
 
 export function buildAboutPage(C, brief, inspoHint, patterns) {
@@ -20,9 +20,7 @@ export function buildAboutPage(C, brief, inspoHint, patterns) {
     mkText(he(brief.aboutStory2 || "[Second paragraph — additional context about the founder's background and what led to this work.]"), text),
   ], null, { padY: "0", grow: 1, isInner: true });
 
-  var storyRight = mkContainer([
-    mkImagePh("Founder portrait — on location, not in a studio."),
-  ], null, { padY: "0", grow: 1, isInner: true });
+  var storyRight = mkImageBg("Founder portrait — on location, not in a studio.", { grow: 1, minHeight: 420 });
 
   var storyRow = mkContainer([storyLeft, storyRight], null, { direction: "row", gap: "64", padY: "0", isInner: true });
   var storySection = mkContainer([storyRow], bone, { padY: "80" });
@@ -85,9 +83,7 @@ export function buildAboutPage(C, brief, inspoHint, patterns) {
   var timeline = mkContainer(timelineItems, null, { gap: "0", padY: "0" });
 
   var portraitSection = mkContainer([
-    mkContainer([
-      mkImagePh("Founder portrait — on location."),
-    ], null, { padY: "0", grow: 1, isInner: true }),
+    mkImageBg("Founder portrait — on location.", { grow: 1, minHeight: 420 }),
     mkContainer([
       mkHeading(brief.whyEyebrow || "Why this approach", brassDp, "h6", { eyebrow: true }),
       mkSpacer(16),
