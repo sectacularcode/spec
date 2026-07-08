@@ -18,9 +18,9 @@ export function buildAboutPage(C, brief, inspoHint, patterns) {
     mkText(he(brief.aboutStory || "[Founder story — pulled from brief. Fill in if missing.]"), text),
     mkSpacer(24),
     mkText(he(brief.aboutStory2 || "[Second paragraph — additional context about the founder's background and what led to this work.]"), text),
-  ], null, { padY: "0", grow: 1, isInner: true });
+  ], null, { padY: "0", width: 50, isInner: true });
 
-  var storyRight = mkImageBg("Founder portrait — on location, not in a studio.", { grow: 1, minHeight: 420 });
+  var storyRight = mkImageBg("Founder portrait — on location, not in a studio.", { width: 50 });
 
   var storyRow = mkContainer([storyLeft, storyRight], null, { direction: "row", gap: "64", padY: "0", isInner: true });
   var storySection = mkContainer([storyRow], bone, { padY: "80" });
@@ -83,14 +83,14 @@ export function buildAboutPage(C, brief, inspoHint, patterns) {
   var timeline = mkContainer(timelineItems, null, { gap: "0", padY: "0" });
 
   var portraitSection = mkContainer([
-    mkImageBg("Founder portrait — on location.", { grow: 1, minHeight: 420 }),
+    mkImageBg("Founder portrait — on location.", { width: 50 }),
     mkContainer([
       mkHeading(brief.whyEyebrow || "Why this approach", brassDp, "h6", { eyebrow: true }),
       mkSpacer(16),
       mkText(he(brief.whyOneMaker || "[Why this approach — pulled from brief.]"), text),
       mkSpacer(32),
       mkButton("Start a project", brassDp, "#ffffff"),
-    ], null, { padY: "0", grow: 1, isInner: true }),
+    ], null, { padY: "0", width: 50, isInner: true }),
   ], bone, { direction: "row", gap: "64", padY: "80" });
 
   var variantB = { version: "0.4", title: "About", type: "page", page_settings: {},
