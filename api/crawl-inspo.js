@@ -5,8 +5,10 @@
 // - SSRF protection: only http/https, hostname must not resolve to private,
 //   loopback, link-local, or cloud-metadata IP ranges. Redirects are followed
 //   manually and every hop is re-validated. Response bodies are size-capped.
-// - Per-user rate limit — crawling is expensive (up to 8 page fetches + one
-//   Anthropic call per request).
+// - Per-user rate limit — crawling is expensive (up to 8 page fetches, plus
+//   up to 6 CSS fetches for color extraction, plus one Anthropic call per
+//   request — roughly 14 fetches worst case, still bounded by the same
+//   per-user rate limit below).
 
 import dns from "node:dns/promises";
 import net from "node:net";
