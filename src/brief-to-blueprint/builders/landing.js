@@ -22,7 +22,17 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   var warmWhite= colors["warm-white"] || "#FFFFFF";
   var text     = colors.text          || "#1A1A1A";
   var stone    = colors.stone         || colors.muted || "#666666";
-  var dark     = colors.asphalt       || colors["dark-panel"] || accent;
+  var dark     = colors.asphalt       || colors["dark-panel"] || "";
+  // Guard: some briefs set "asphalt" to the same value as the brand accent
+  // (or its hover/deep variant) as a placeholder rather than a deliberate
+  // neutral dark tone — that produces brand-green (or whatever-color) dark
+  // panels instead of a neutral one. Treat that as "not provided" and fall
+  // back to a generic neutral charcoal so landing pages read as neutral by
+  // default, not brand-saturated.
+  var brassDeepCheck = (colors["brass-deep"] || "").toLowerCase();
+  if (!dark || dark.toLowerCase() === accent.toLowerCase() || dark.toLowerCase() === brassDeepCheck) {
+    dark = "#1F2328";
+  }
 
   var brandName   = brief.brandName    || "";
   var heroH1      = brief.heroHeadline || brief.tagline || "[Landing page headline]";
