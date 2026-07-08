@@ -159,6 +159,21 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Could not parse Claude response", raw: rawText.slice(0, 500) });
     }
 
+    // Sanity check on extracted colors: a real brand palette pulled from a
+    // brief has real variety across its 8 slots. If the model collapses
+    // everything into just 1-2 repeated hex values, that's not a genuine
+    // extraction — it's the model inventing/duplicating values despite the
+    // "never invent" instruction (seen with briefs that have no color
+    // section at all). Clear it so the UI falls through to the neutral
+    // default instead of showing fabricated colors.
+    if (parsed.colors && typeof parsed.colors === "object") {
+      const vals = Object.values(parsed.colors).filter(Boolean);
+      const distinct = new Set(vals.map(v => String(v).toLowerCase()));
+      if (vals.length >= 4 && distinct.size <= 2) {
+        parsed.colors = { ink: "", brass: "", "brass-deep": "", bone: "", asphalt: "", stone: "", "warm-white": "", text: "" };
+      }
+    }
+
     return res.status(200).json(deepStripHTML({ ...parsed, _model: result.model }));
 
   } catch (err) {
