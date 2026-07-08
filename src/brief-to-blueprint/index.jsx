@@ -378,6 +378,26 @@ export default function CustomBuild({ userId, role } = {}) {
           }
           return updated;
         });
+        // Real brand colors pulled from the reference site's own Elementor
+        // Kit CSS (not guessed). Only fills currently-blank color fields —
+        // never overwrites a color the user already set or that came from
+        // an uploaded brief doc, same "fill blanks only" rule used
+        // everywhere else in this app.
+        if (data.colors) {
+          setBrief(b => {
+            if (!b) return b;
+            const existing = b.colors || {};
+            const merged = { ...existing };
+            let changed = false;
+            for (const key of Object.keys(data.colors)) {
+              if (!existing[key] && data.colors[key]) {
+                merged[key] = data.colors[key];
+                changed = true;
+              }
+            }
+            return changed ? { ...b, colors: merged } : b;
+          });
+        }
       } else {
         setCrawlResults(r => ({ ...r, [trimmed]: { error: data.error || "Could not crawl this URL" } }));
       }
