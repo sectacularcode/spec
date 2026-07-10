@@ -23,38 +23,61 @@ export async function callAnthropic(apiKey, body, extraHeaders = {}) {
   return { ok: response.ok, status: response.status, data };
 }
 
-// Escapes raw control characters (literal newlines, tabs, carriage returns)
-// that appear INSIDE quoted JSON string values, leaving everything else —
-// structural whitespace between tokens, already-escaped sequences — alone.
-// A simple character-scan state machine, not a regex, because correctly
-// distinguishing "inside a string" from "between tokens" while respecting
-// escaped quotes isn't reliably expressible as one regex.
+// Repairs the two known ways the model produces near-valid JSON while
+// reproducing long, real-world prose (e.g. an "About story" pulled from a
+// Word doc) inside a JSON string value — a character-scan state machine,
+// not a regex, because correctly tracking "inside a string" while handling
+// both issues isn't reliably expressible as one regex:
 //
-// Why this exists: when asked to reproduce long, multi-paragraph prose
-// (e.g. an "About story" field pulled from a real Word doc) inside a JSON
-// string, the model sometimes emits a literal newline instead of the
-// escaped \n. The braces stay perfectly balanced — the response finishes
-// with stop_reason "end_turn", not "max_tokens" — but a raw control
-// character inside a quoted string is illegal JSON, so a bare JSON.parse
-// throws even though the object is otherwise well-formed.
-function escapeControlCharsInStrings(text) {
+// 1. Literal control characters (raw newlines/tabs/CR) instead of the
+//    escaped \n/\t/\r — straightforward to fix, any raw control character
+//    found while inside a string gets escaped.
+//
+// 2. Unescaped internal quotes — e.g. the source text uses smart/curly
+//    quotes around a word ("community"), and while reproducing it verbatim
+//    the model normalizes them to straight ASCII quotes but doesn't escape
+//    them, so what should be one string value becomes "...every ",
+//    followed by content, followed by another unescaped ",... — which
+//    JSON.parse reads as the string ending early. Whether a given `"` is a
+//    real closing quote or unescaped content isn't determinable from that
+//    character alone, so this uses a lookahead heuristic: skip whitespace
+//    after the quote and check what comes next. A comma, colon, or closing
+//    brace/bracket means it's a real string boundary. A letter or other
+//    content character means it wasn't meant to close the string — escape
+//    it and keep treating subsequent text as still inside the string.
+//
+// Both issues can appear in the same response, so this handles them in one
+// pass rather than as two separate repair attempts.
+function repairJsonText(text) {
   let result = "";
   let inString = false;
   let escaped = false;
   for (let i = 0; i < text.length; i++) {
     const ch = text[i];
-    if (inString) {
-      if (escaped) { result += ch; escaped = false; continue; }
-      if (ch === "\\") { result += ch; escaped = true; continue; }
-      if (ch === '"') { result += ch; inString = false; continue; }
-      if (ch === "\n") { result += "\\n"; continue; }
-      if (ch === "\r") { result += "\\r"; continue; }
-      if (ch === "\t") { result += "\\t"; continue; }
-      result += ch;
-    } else {
+    if (!inString) {
       result += ch;
       if (ch === '"') inString = true;
+      continue;
     }
+    if (escaped) { result += ch; escaped = false; continue; }
+    if (ch === "\\") { result += ch; escaped = true; continue; }
+    if (ch === "\n") { result += "\\n"; continue; }
+    if (ch === "\r") { result += "\\r"; continue; }
+    if (ch === "\t") { result += "\\t"; continue; }
+    if (ch === '"') {
+      let j = i + 1;
+      while (j < text.length && /\s/.test(text[j])) j++;
+      const next = text[j];
+      const closesString = next === undefined || next === "," || next === "}" || next === "]" || next === ":";
+      if (closesString) {
+        result += ch;
+        inString = false;
+      } else {
+        result += '\\"';
+      }
+      continue;
+    }
+    result += ch;
   }
   return result;
 }
@@ -80,7 +103,7 @@ export function extractJSONWithDiagnostics(data) {
     return { parsed: JSON.parse(match[0]), error: null };
   } catch (err1) {
     try {
-      const repaired = escapeControlCharsInStrings(match[0]);
+      const repaired = repairJsonText(match[0]);
       return { parsed: JSON.parse(repaired), error: null, repaired: true };
     } catch (err2) {
       const posMatch = /position (\d+)/.exec(err2.message);
@@ -102,9 +125,9 @@ export function extractJSONWithDiagnostics(data) {
 
 // Claude is asked to return raw JSON but sometimes wraps it in markdown
 // fences anyway — strip those, then pull out the first {...} block. Tries a
-// straight parse first; if that fails, retries once against a control-char-
-// repaired version before giving up. Returns null (never throws) if no
-// valid JSON object can be recovered either way.
+// straight parse first; if that fails, retries once against a repaired
+// version (see repairJsonText) before giving up. Returns null (never
+// throws) if no valid JSON object can be recovered either way.
 export function extractJSON(data) {
   return extractJSONWithDiagnostics(data).parsed;
 }
