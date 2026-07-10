@@ -589,6 +589,108 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           })
         : [[f1h, f1b, img1, false], [f2h, f2b, img2, true], [f3h, f3b, img3, false]];
       var featureRowStyle = selectFeatureRowStyle(inspoContext, featureRowsData.length);
+
+      // Mirrors landing.js's renderFeatureLayout() — same per-section
+      // override mechanism, rendered as HTML strings instead of Elementor
+      // JSON. When brief.featureLayout is set, this takes over entirely
+      // for the feature-row area; the uniform style above is unused.
+      function renderCuratedFeatureLayoutHTML() {
+        var rawFeatures = Array.isArray(brief.features) ? brief.features : [];
+        var htmlParts = [];
+        brief.featureLayout.forEach(function (entry, rowIdx) {
+          var items = (entry.indices || []).map(function (i) { return rawFeatures[i]; }).filter(Boolean);
+          if (!items.length) return;
+          var bg = rowIdx % 2 === 0 ? "#ffffff" : bone;
+          var f = items[0];
+
+          if (entry.style === "grouped-header") {
+            var colWidth = Math.floor(100 / items.length);
+            htmlParts.push(
+              "<section style='background:#ffffff;padding:56px clamp(24px,6vw,64px);'>" +
+                "<div style='font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:" + brass + ";margin-bottom:20px;'>" + (entry.header || "") + "</div>" +
+                "<div style='display:grid;grid-template-columns:repeat(" + items.length + ",1fr);gap:32px;'>" +
+                  items.map(function (it) {
+                    return "<div><h4 style='font-size:16px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + (it.heading || "") + "</h4><p style='font-size:14px;color:" + text + ";line-height:1.6;margin:0;'>" + (it.body || "") + "</p></div>";
+                  }).join("") +
+                "</div>" +
+              "</section>"
+            );
+            return;
+          }
+
+          if (entry.style === "centered-cta") {
+            htmlParts.push(
+              "<section style='background:" + bg + ";padding:56px clamp(24px,6vw,64px);text-align:center;'>" +
+                "<h3 style='font-size:clamp(18px,2.2vw,24px);font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + (f.heading || "") + "</h3>" +
+                "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0 auto 20px;max-width:640px;'>" + (f.body || "") + "</p>" +
+                "<a class='row-btn' style='" + btnDark + "display:inline-block;'>" + cta2 + "</a>" +
+              "</section>"
+            );
+            return;
+          }
+
+          if (entry.style === "embedded-form") {
+            var ffHeading = f.heading || brief.formHeading || "Get a Quote";
+            var ffSubhead = f.body || brief.formSubhead || "";
+            var ffFields  = (Array.isArray(brief.formFields) && brief.formFields.length) ? brief.formFields : ["Name", "Phone", "Message"];
+            var ffCta     = brief.formCta || "Request a Quote";
+            htmlParts.push(
+              "<section style='background:" + bone + ";padding:56px clamp(24px,6vw,64px);'>" +
+                "<div style='max-width:560px;'>" +
+                "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + ffHeading + "</h3>" +
+                (ffSubhead ? "<p style='font-size:14px;color:" + stone + ";margin:0 0 20px;'>" + ffSubhead + "</p>" : "") +
+                ffFields.map(function (lbl) {
+                  return "<div style='margin-bottom:12px;'><label style='display:block;font-size:12px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;'>" + lbl + "</label><div style='width:100%;padding:10px 14px;border:1px solid #dde0e6;border-radius:4px;background:#ffffff;font-size:14px;color:#bbb;box-sizing:border-box;'>" + lbl + "...</div></div>";
+                }).join("") +
+                "<button style='padding:12px 28px;background:" + brass + ";color:#fff;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:6px;'>" + ffCta + "</button>" +
+                "</div>" +
+              "</section>"
+            );
+            return;
+          }
+
+          if (entry.style === "map-beside") {
+            htmlParts.push(
+              "<section style='background:" + bg + ";display:grid;grid-template-columns:1fr 1fr;'>" +
+                "<div style='padding:56px 48px;display:flex;flex-direction:column;justify-content:center;'>" +
+                  "<h2 style='font-size:clamp(20px,2.5vw,28px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + (f.heading || "") + "</h2>" +
+                  "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0;'>" + (f.body || "") + "</p>" +
+                "</div>" +
+                "<div class='landing-img' style='min-height:320px;height:100%;overflow:hidden;background:" + bone + ";display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:12px;'>Map placeholder</div>" +
+              "</section>"
+            );
+            return;
+          }
+
+          if (entry.style === "split-right" || entry.style === "split-left" || entry.style === "split-cta-right" || entry.style === "split-cta-left") {
+            var imgLeft = entry.style === "split-left" || entry.style === "split-cta-left";
+            var withBtn = entry.style === "split-cta-right" || entry.style === "split-cta-left";
+            var img = makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg);
+            var textBlock = "<div style='padding:56px 48px;display:flex;flex-direction:column;justify-content:center;'>" +
+              "<h2 style='font-size:clamp(20px,2.5vw,28px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + (f.heading || "") + "</h2>" +
+              "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0" + (withBtn ? " 0 20px" : "") + ";'>" + (f.body || "") + "</p>" +
+              (withBtn ? "<a class='row-btn' style='" + btnDark + "'>" + cta2 + "</a>" : "") +
+            "</div>";
+            var imgBlock = "<div class='landing-img' style='min-height:320px;height:100%;overflow:hidden;'><img src=\"" + img + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:320px;'/></div>";
+            htmlParts.push(
+              "<section style='background:" + bg + ";display:grid;grid-template-columns:1fr 1fr;'>" +
+                (imgLeft ? imgBlock + textBlock : textBlock + imgBlock) +
+              "</section>"
+            );
+            return;
+          }
+
+          // "plain" fallback
+          htmlParts.push(
+            "<section style='background:" + bg + ";padding:44px clamp(24px,6vw,64px);'>" +
+              "<div style='width:28px;height:2px;background:" + brass + ";margin-bottom:14px;'></div>" +
+              "<h3 style='font-size:clamp(17px,2vw,22px);font-weight:700;color:" + ink + ";margin:0 0 10px;'>" + (f.heading || "") + "</h3>" +
+              "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0;'>" + (f.body || "") + "</p>" +
+            "</section>"
+          );
+        });
+        return htmlParts.join("");
+      }
       var s1    = brief.trustStat1 || "10+";  var l1 = brief.trustLabel1 || "Years in business";
       var s2    = brief.trustStat2 || "500+"; var l2 = brief.trustLabel2 || "Projects completed";
       var s3    = brief.trustStat3 || "98%";  var l3 = brief.trustLabel3 || "Client satisfaction";
@@ -704,6 +806,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
               "</div>" +
             "</div>" +
           "</section>" +
+          (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML() :
           featureRowsData.map(function(f,i) {
             if (featureRowStyle === "stacked-text") {
               return "<section style='background:" + (i%2===0?"#ffffff":bone) + ";padding:56px clamp(24px,6vw,64px);'>" +
@@ -725,7 +828,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             var textContent = "<h2 style='font-size:clamp(22px,3vw,34px);font-weight:700;color:" + brass + ";margin:0 0 16px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p><a class='row-btn' style='" + btnDark + "'>" + cta2 + "</a></div>";
             var imgRight = !imgLeft ? "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>" : "";
             return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + cols + textContent + imgRight + "</section>";
-          }).join("") +
+          }).join("")) +
           "<section style='background:" + dark + ";padding:80px 40px;text-align:center;'>" +
             "<h2 style='font-size:clamp(26px,4vw,40px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
             "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:560px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
@@ -797,6 +900,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             }).join("") +
           "</div>" +
         "</section>" +
+        (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML() :
         featureRowsDataB.map(function(f,i) {
           if (featureRowStyle === "stacked-text") {
             return "<section style='background:" + (i%2===0?"#ffffff":bone) + ";padding:52px clamp(24px,6vw,64px);'>" +
@@ -814,7 +918,8 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           var textDiv = "<div class='feature-text' style='padding:72px 64px;display:flex;flex-direction:column;justify-content:center;'><h2 style='font-size:clamp(20px,2.5vw,32px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p><a class='row-btn' style='" + btnDark + "'>" + cta2 + "</a></div>";
           var imgDiv  = "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>";
           return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + (f[3] ? imgDiv+textDiv : textDiv+imgDiv) + "</section>";
-        }).join("") +
+        }).join("")) +
+        (brief.skipServicesChecklist ? "" :
         "<section style='background:" + bone + ";padding:80px clamp(24px,6vw,80px);border-top:1px solid rgba(0,0,0,0.08);'>" +
           "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 32px;'>" + (brief.servicesHeading||"What We Do") + "</h2>" +
           "<div style='display:grid;grid-template-columns:1fr 1fr;gap:0;max-width:900px;'>" +
@@ -822,7 +927,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
               return "<div style='padding:12px 0;border-bottom:1px solid #f0f0f0;font-size:15px;color:" + text + ";display:flex;align-items:center;gap:10px;'><span style='color:" + brass + ";font-weight:700;'>✓</span>" + s + "</div>";
             }).join("") +
           "</div>" +
-        "</section>" +
+        "</section>") +
         "<section class='va-cta' style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
           "<h2 style='font-size:clamp(26px,4vw,42px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
           "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:540px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
