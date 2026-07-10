@@ -462,35 +462,70 @@ function manifestPageDocumentToBrief(raw) {
   // order changed, the form moved to after the closing CTA, and the real
   // shop address (found in her edited export, not previously available
   // anywhere in the Manifest data) now drives a real Google Maps widget.
+  //
+  // Keyed to brand.id, not page.id — a second export for this same brand
+  // (a "gold standard" reference file, restructured to use feature_cards/
+  // form/cta instead of plain text_section for everything) has a
+  // genuinely different section count once feature_cards/form pull
+  // content out of the generic features array. Branching on
+  // brief.features.length picks the right layout for whichever structure
+  // is actually present, rather than assuming one fixed shape.
+  //
   // The underlying mechanisms (brief.featureLayout, brief.postClosingLayout
   // — see landing.js's renderFeatureLayout/makePostClosingRows) are real
-  // and reusable; this is just their first concrete usage, keyed to this
-  // exact page.id until a proper per-section style picker exists in the
-  // UI. Should move there once that's built, not accumulate more page-id
-  // special cases here.
-  var AFS_SAGINAW_PAGE_ID = "49c7efb7-c26a-4eb1-a287-7656f10b8472";
-  if (page.id === AFS_SAGINAW_PAGE_ID && brief.features && brief.features.length >= 11) {
-    brief.featureLayout = [
-      { style: "split-right", indices: [0] },
-      { style: "centered-cta", indices: [1] },
-      { style: "split-left", indices: [2] },
-      { style: "grouped-header", header: "Our Services", indices: [3, 4] },
-      { style: "split-cta-right", indices: [5] },
-      { style: "plain", indices: [7] },
-      { style: "split-left", indices: [8] },
-      { style: "plain", indices: [10] },
-      { style: "map-beside", indices: [9] },
-    ];
-    // The pricing/form section ended up after the closing CTA in the
-    // actual reviewed page, not with the other feature rows.
-    brief.postClosingLayout = [
-      { style: "embedded-form", indices: [6] },
-    ];
-    brief.skipServicesChecklist = true;
-    // Real address, confirmed from her own edited export — Manifest's
-    // source data never included one, so this couldn't have been set any
-    // earlier than discovering it there.
-    if (!brief.mapAddress) brief.mapAddress = "1013 Jarvis RD, Saginaw, TX 76179";
+  // and reusable; this is just their concrete usage for one brand until a
+  // proper per-section style picker exists in the UI. Should move there
+  // once that's built, not accumulate more brand-id special cases here.
+  var AFS_BRAND_ID = "bb63b46d-84a5-47b1-8a68-c1556742ab0b";
+  if (brand.id === AFS_BRAND_ID && brief.features) {
+    if (brief.features.length >= 11) {
+      // Original export shape: everything (including "Semi Truck Repair" /
+      // "Trailer Repair" / "Straight Pricing" / the closer) came through
+      // as plain text_section, so all of it lives in brief.features.
+      brief.featureLayout = [
+        { style: "split-right", indices: [0] },
+        { style: "centered-cta", indices: [1] },
+        { style: "split-left", indices: [2] },
+        { style: "grouped-header", header: "Our Services", indices: [3, 4] },
+        { style: "split-cta-right", indices: [5] },
+        { style: "plain", indices: [7] },
+        { style: "split-left", indices: [8] },
+        { style: "plain", indices: [10] },
+        { style: "map-beside", indices: [9] },
+      ];
+      // The pricing/form section ended up after the closing CTA in the
+      // actual reviewed page, not with the other feature rows.
+      brief.postClosingLayout = [
+        { style: "embedded-form", indices: [6] },
+      ];
+      brief.skipServicesChecklist = true;
+      // Real address, confirmed from her own edited export — Manifest's
+      // source data never included one, so this couldn't have been set any
+      // earlier than discovering it there.
+      if (!brief.mapAddress) brief.mapAddress = "1013 Jarvis RD, Saginaw, TX 76179";
+    } else if (brief.features.length === 9) {
+      // Improved export shape: "Semi Truck Repair"/"Trailer Repair" came
+      // through as feature_cards (still indices 3,4 here — feature_cards
+      // items land in the same brief.features array as text_section
+      // content), "Straight Pricing" came through as a real form section
+      // (captured directly into brief.formHeading/formFields, not part of
+      // this array at all), and the closer came through as an explicit
+      // cta type (captured into brief.closingCta directly). Both of those
+      // are picked up automatically by landing.js's makeFormSection() and
+      // the standard closing-CTA rendering — no featureLayout entry needed
+      // for either, unlike the 11-item shape above.
+      brief.featureLayout = [
+        { style: "split-right", indices: [0] },
+        { style: "centered-cta", indices: [1] },
+        { style: "split-left", indices: [2] },
+        { style: "grouped-header", header: "Our Services", indices: [3, 4] },
+        { style: "split-cta-right", indices: [5] },
+        { style: "plain", indices: [6] },
+        { style: "split-left", indices: [7] },
+        { style: "map-beside", indices: [8] },
+      ];
+      brief.skipServicesChecklist = true;
+    }
   }
 
   return brief;
