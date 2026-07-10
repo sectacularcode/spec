@@ -121,7 +121,13 @@ async function callClaude(apiKey, messages, extraHeaders = {}) {
   for (const model of MODELS) {
     const { ok, status, data } = await callAnthropic(apiKey, {
       model,
-      max_tokens: 4000,
+      // Raised from 4000 — the extraction schema now covers 90+ fields
+      // (landing page, services menu, testimonials, FAQ, etc.), and a
+      // content-rich multi-page brief can legitimately produce a response
+      // large enough to hit the old ceiling, truncating mid-JSON and
+      // failing to parse. Stays under ~16k, the point where responses need
+      // streaming to avoid request timeouts — this endpoint isn't streamed.
+      max_tokens: 8000,
       system: "You are a data extraction assistant. Return ONLY valid JSON with no markdown, no code fences, no explanation.",
       messages,
     }, extraHeaders);
