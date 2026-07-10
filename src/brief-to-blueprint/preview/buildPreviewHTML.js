@@ -121,15 +121,29 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
   if (baseActivePage === "event-single") {
     patterns["event-single"] = (variant === "B") ? "light-centered" : "dark-hero";
   }
-  var C = brief.colors || {
+  // Per-key fallbacks for every color, not a single object-level check —
+  // brief.colors can be a present-but-empty object (confirmed: every
+  // Manifest import has brief.colors === {}, since Manifest's export
+  // format carries no color data at all). {} is truthy in JS, so
+  // `brief.colors || {defaults}` never falls through to the defaults —
+  // C ends up {} and C.ink/C.brass/C.bone all evaluate to undefined,
+  // which becomes the literal string "undefined" in a CSS value like
+  // `background:undefined` — invalid CSS the browser silently drops,
+  // rendering no background, no accent color, no visible section
+  // structure at all. Every other color here already had its own
+  // fallback and was fine; only these three were missing it.
+  var colorDefaults = {
     ink: "#1C1A17", brass: "#C2A35B", "brass-deep": "#9C7E3A",
     bone: "#EDE7DB", asphalt: "#2B2823", stone: "#8A8170",
     "warm-white": "#FBFAF7", text: "#2A2722"
   };
-  var ink = C.ink, brass = C.brass, bone = C.bone,
-      warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
-      brassDp = C["brass-deep"] || "#9C7E3A", asphalt = C.asphalt || "#2B2823",
-      text = C.text || "#2A2722";
+  var C = brief.colors || {};
+  var ink = C.ink || colorDefaults.ink,
+      brass = C.brass || colorDefaults.brass,
+      bone = C.bone || colorDefaults.bone,
+      warmWhite = C["warm-white"] || colorDefaults["warm-white"], stone = C.stone || colorDefaults.stone,
+      brassDp = C["brass-deep"] || colorDefaults["brass-deep"], asphalt = C.asphalt || colorDefaults.asphalt,
+      text = C.text || colorDefaults.text;
   var fontUrl = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap";
 
   var sections = {
