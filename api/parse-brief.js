@@ -79,6 +79,9 @@ Return this exact structure (use empty string "" for any field not found):
   "servicesEyebrow": "",
   "servicesH1": "",
   "pricingTiers": [["Tier name", "Tier subtitle", "Description", "From $X"]],
+  "pricingMenuHeading": "",
+  "pricingMenu": [{ "category": "", "items": [{ "name": "", "price": "", "desc": "", "includes": "" }] }],
+  "pricingNote": "",
   "colors": { "ink": "", "brass": "", "brass-deep": "", "bone": "", "asphalt": "", "stone": "", "warm-white": "", "text": "" },
   "fonts": ["Primary font", "Accent font"],
   "voiceRules": ["Rule 1", "Rule 2"],
@@ -97,6 +100,7 @@ Rules:
 - For differenceH2, whoH2, workH1, aboutH1: extract the actual headline copy, not the eyebrow label.
 - If a field is genuinely absent from the brief, use empty string "" — never invent copy.
 - For servicesEyebrow/servicesH1: these are the standalone Services & Pricing page's own header, distinct from pricingH2/pricingSubhead (which are the short pricing teaser on the Home page). Extract them separately even if the brief only has one pricing section — use that same section's heading for both if there's no separate Services page section.
+- For pricingMenu: this is a separate, optional itemized add-on/full-menu list distinct from pricingTiers (the top-line 3-tier comparison). Only extract it if the brief has a genuine itemized list of individual services or add-ons beyond the main tiers, grouped or not. If the brief only has the 3 main tiers and nothing more granular, leave pricingMenu as an empty array [] — do not invent categories or items, and do not duplicate the 3 tiers into pricingMenu.
 - The trustStat/trustLabel, feature, testimonial, benefit, form, and map fields only apply if this brief is for a standalone landing/ad page. If the brief is for a general multi-page site with no landing-page section, leave all of these as empty string "" or empty array [] — do not repurpose Home-page content to fill them.
 - For faqItems: extract each question/answer pair exactly as written. Never invent a question or answer that isn't in the brief.
 - For testimonials: only extract a quote, name, and title if a real testimonial is present in the brief. If a testimonial slot is explicitly blank or marked for AI drafting, leave that testimonial's three fields as empty string "" rather than inventing a quote.
