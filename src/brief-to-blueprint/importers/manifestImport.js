@@ -200,25 +200,33 @@ function legacyManifestToBrief(raw) {
 
 const PAGE_DOCUMENT_FORMAT = "manifest.page-document/1";
 
-// Flattens a rich-text array (e.g. hero.subheading: [{type:"text", text}])
-// into a plain string. Manifest's rich-text arrays can in principle carry
-// more than plain text runs; anything without a .text field is skipped
-// rather than guessed at.
+// Flattens a rich-text array (e.g. hero.subheading: [{type:"text", text},
+// {type:"link", text, url}]) into a plain string. Every run type with a
+// .text field contributes its visible text -- including link runs, whose
+// visible text is real content even though the href itself has nowhere to
+// go, since Spec's text widgets are plain text, not rich HTML with
+// embedded anchors.
 function flattenRichText(arr) {
   if (!Array.isArray(arr)) return "";
   return arr.map(function (item) { return item && item.text ? item.text : ""; }).join("").trim();
 }
 
-// Flattens a text_section's `items` (paragraph blocks, each with its own
-// rich_text array) into a plain string, paragraphs separated by a blank
-// line. Only "paragraph" items are read — other item kinds (if Manifest
-// adds them later) are skipped rather than guessed at.
+// Flattens a text_section's `items` into a plain string. Handles both
+// documented item kinds: "paragraph" (a rich_text run) and "list" (ordered
+// or unordered entries, each its own RichText) -- the list case was missing
+// entirely before, silently dropping any list content.
 function flattenTextSectionBody(items) {
   if (!Array.isArray(items)) return "";
   return items
     .map(function (item) {
-      if (item && item.kind === "paragraph" && Array.isArray(item.rich_text)) {
-        return item.rich_text.map(function (rt) { return rt && rt.text ? rt.text : ""; }).join("");
+      if (!item) return "";
+      if (item.kind === "paragraph" && Array.isArray(item.rich_text)) {
+        return flattenRichText(item.rich_text);
+      }
+      if (item.kind === "list" && Array.isArray(item.entries)) {
+        return item.entries
+          .map(function (entry, i) { return (item.ordered ? (i + 1) + ". " : "\u2022 ") + flattenRichText(entry); })
+          .join("\n");
       }
       return "";
     })
@@ -226,16 +234,19 @@ function flattenTextSectionBody(items) {
     .join("\n\n");
 }
 
-// A button's real destination, or "" if it's explicitly marked as a
-// placeholder. destination.kind === "placeholder" is Manifest's own system
-// telling us the real URL isn't decided yet — that's a more reliable
-// signal than guessing, so it's treated the same as "blank."
+// A button's real destination, or "" if it's explicitly a placeholder.
+// destination.kind === "placeholder" is Manifest's own system telling us
+// the real URL isn't decided yet -- more reliable than guessing, so it's
+// treated the same as "blank." Handles all 4 real kinds: internal/external
+// are already URLs or paths; tel/email need their scheme prefixed before
+// sanitizeUrl will allow them through (a bare phone number like
+// "6103980393" isn't a URL sanitizeUrl recognizes on its own).
 function pageDocumentButtonUrl(button) {
-  if (!button || !button.destination) return "";
-  if (button.destination.kind === "external" && button.destination.value) {
-    return sanitizeUrl(button.destination.value);
-  }
-  return "";
+  if (!button || !button.destination || !button.destination.value) return "";
+  var d = button.destination;
+  if (d.kind === "tel") return sanitizeUrl(d.value.indexOf("tel:") === 0 ? d.value : "tel:" + d.value);
+  if (d.kind === "email") return sanitizeUrl(d.value.indexOf("mailto:") === 0 ? d.value : "mailto:" + d.value);
+  return sanitizeUrl(d.value); // internal or external
 }
 
 function validateManifestPageDocument(raw) {
@@ -246,8 +257,8 @@ function validateManifestPageDocument(raw) {
   if (!Array.isArray(raw.sections) || raw.sections.length === 0) issues.push("sections: missing or empty");
 
   var state = raw.provenance && raw.provenance.content_state;
-  if (state && state !== "marketing_approved") {
-    issues.push('provenance.content_state: "' + state + '" — only marketing_approved content should be imported');
+  if (state && state !== "marketing_approved" && state !== "leadership_approved") {
+    issues.push('provenance.content_state: "' + state + '" -- only marketing_approved or leadership_approved content should be imported');
   }
 
   if (issues.length) {
@@ -259,22 +270,33 @@ function validateManifestPageDocument(raw) {
 }
 
 // Converts a validated manifest.page-document/1 export into Spec's flat
-// brief shape. Section-type mapping, grounded against a real export:
+// brief shape. Rewritten against the real, formal contract (page-document-v1.md
+// + page-document-v1.schema.json) rather than pattern-matching a single
+// sample -- the earlier version got two things wrong that looked right
+// against one file: FAQ detection via heading.level === 3 (an accidental
+// correlation, not a real rule -- faq is its own explicit section type) and
+// closing-CTA detection via "last section with buttons" (a real fallback,
+// but cta is the documented signal and takes priority when present).
 //
-// - "hero" sections map directly.
-// - "testimonials" sections map directly (no title/company field exists in
-//   this format, so testimonial*Title stays blank rather than invented).
-// - Within "text_section" entries, heading.level === 3 is used ONLY for
-//   Q&A pairs in the real export this was built against — a genuine
-//   structural signal already present in the data, not a guess.
-// - The last section, if it carries buttons, is treated as the closing
-//   CTA — confirmed against the real export, where every page ends this
-//   way.
-// - Every other text_section becomes a feature row via brief.features
-//   (landing.js now accepts any number of these — no 3-row cap, so a page
-//   with 10+ real content sections gets all of them placed).
-// - Any section type outside hero/text_section/testimonials is flagged in
-//   _unmappedBlocks rather than dropped.
+// Section-type coverage, all 8 from the v1 catalog:
+// - hero, testimonials -- map directly.
+// - feature_cards -- maps directly to brief.features (title/body/image).
+// - faq -- maps directly to brief.faqItems.
+// - cta -- if any section has this explicit type, it's the closing CTA;
+//   text_section's "last section with buttons" is only used as a fallback
+//   when no explicit cta section exists (real files may use either).
+// - map_location -- builds brief.mapAddress from location.{street,city,
+//   region,postal_code} when present. When absent (confirmed real case:
+//   Manifest doesn't always have structured address data), the section's
+//   note text still becomes a feature row rather than silently vanishing
+//   -- never invents an address, never drops real prose either.
+// - form -- maps to the Variant B lead-form fields Spec already has a
+//   widget for (formHeading/formSubhead/formFields).
+// - text_section -- every remaining one becomes a feature row via
+//   brief.features (landing.js accepts any number of these).
+// - Anything outside this catalog is flagged in _unmappedBlocks, never
+//   dropped silently -- matches the spec's own "unknown section types must
+//   never crash" rule while still surfacing that something didn't land.
 function manifestPageDocumentToBrief(raw) {
   validateManifestPageDocument(raw);
 
@@ -293,10 +315,10 @@ function manifestPageDocumentToBrief(raw) {
     _manifestMetaDescription: page.meta_description || "",
     faqItems: [],
     _unmappedBlocks: [],
-    // Surfaces Manifest's own audit trail — flagged claims needing a real
-    // receipt, buttons still pointing at placeholders — so a human sees
-    // exactly what needs attention before this ships, instead of it
-    // silently disappearing during import.
+    // Surfaces Manifest's own audit trail -- flagged claims needing a real
+    // receipt, unverified technical claims pending expert review, buttons
+    // still pointing at placeholders -- so a human sees exactly what needs
+    // attention before this ships, instead of it silently disappearing.
     _manifestWarnings: [],
   };
 
@@ -310,14 +332,25 @@ function manifestPageDocumentToBrief(raw) {
       );
     });
   }
+  // content_flags (1.1.0, additive) -- operator-marked flags on claims in
+  // THIS page's copy, distinct from claim_flags (which flag the brand
+  // memory generally). Every content flag counts against `clean`, so it
+  // deserves the same visibility claim_flags already gets.
+  if (Array.isArray(provenance.content_flags)) {
+    provenance.content_flags.forEach(function (cf) {
+      brief._manifestWarnings.push(
+        'Unverified claim (' + (cf.status || "flagged") + '): "' + (cf.claim || "") + '"' + (cf.note ? " -- " + cf.note : "")
+      );
+    });
+  }
 
   var featurePairs = [];
   var faqPairs = [];
+  var hasCtaType = sections.some(function (s) { return s.type === "cta"; });
 
   sections.forEach(function (section, idx) {
     var isLast = idx === sections.length - 1;
     var headingText = section.heading ? section.heading.text || "" : "";
-    var headingLevel = section.heading ? section.heading.level : null;
 
     if (section.type === "hero") {
       var heroButtons = section.buttons || [];
@@ -334,32 +367,70 @@ function manifestPageDocumentToBrief(raw) {
       (section.items || []).slice(0, 3).forEach(function (t, i) {
         brief["testimonial" + (i + 1) + "Quote"] = t.quote || "";
         brief["testimonial" + (i + 1) + "Name"] = t.author || "";
-        brief["testimonial" + (i + 1) + "Title"] = "";
+        brief["testimonial" + (i + 1) + "Title"] = t.role || "";
       });
       return;
     }
 
-    if (section.type === "text_section") {
-      if (headingLevel === 3) {
-        faqPairs.push({ question: headingText, answer: flattenTextSectionBody(section.items) });
-        return;
-      }
+    if (section.type === "feature_cards") {
+      (section.items || []).forEach(function (item) {
+        featurePairs.push({ heading: item.title || "", body: flattenRichText(item.body) });
+      });
+      return;
+    }
 
-      if (isLast && section.buttons && section.buttons.length) {
+    if (section.type === "faq") {
+      (section.items || []).forEach(function (item) {
+        faqPairs.push({ question: item.question || "", answer: flattenRichText(item.answer) });
+      });
+      if (headingText && !brief.faqHeading) brief.faqHeading = headingText;
+      return;
+    }
+
+    if (section.type === "cta") {
+      brief.closingCta = headingText;
+      brief.closingBody = flattenRichText(section.body);
+      return;
+    }
+
+    if (section.type === "map_location") {
+      var loc = section.location || {};
+      var addressParts = [loc.street, loc.city, loc.region, loc.postal_code].filter(Boolean);
+      var noteText = flattenRichText(section.note);
+      if (addressParts.length) {
+        brief.mapAddress = addressParts.join(", ");
+        var mapBtnUrl = pageDocumentButtonUrl(section.button);
+        if (mapBtnUrl) brief.mapUrl = mapBtnUrl;
+        if (noteText) brief._manifestMapNote = noteText;
+      } else if (noteText) {
+        // No structured address to build the real map widget from -- the
+        // content is still real, so it becomes a feature row instead of
+        // silently disappearing. Never invents an address to fill the gap.
+        featurePairs.push({ heading: headingText, body: noteText });
+      }
+      return;
+    }
+
+    if (section.type === "form") {
+      brief.formHeading = headingText;
+      brief.formSubhead = flattenRichText(section.body);
+      brief.formFields = (section.fields || []).map(function (f) { return f.label || ""; }).filter(Boolean);
+      return;
+    }
+
+    if (section.type === "text_section") {
+      if (!hasCtaType && isLast && section.buttons && section.buttons.length) {
         brief.closingCta = headingText;
         brief.closingBody = flattenTextSectionBody(section.items);
         return;
       }
-
-      // No cap here — every real content section becomes a feature row.
-      // landing.js's makeFeatureRows() now accepts brief.features as a
-      // variable-length array (see landing.js), so a page with 10+ real
-      // sections gets all of them placed instead of the first 3 kept and
-      // the rest flagged as unmapped.
       featurePairs.push({ heading: headingText, body: flattenTextSectionBody(section.items) });
       return;
     }
 
+    // Unknown section type -- per the spec's own additive-versioning rule,
+    // this must never crash. Flagged, not dropped: if there's readable
+    // text on it, surface that too rather than losing it entirely.
     brief._unmappedBlocks.push({ elementType: section.type, reason: "no matching Spec widget yet", heading: headingText });
   });
 
@@ -369,11 +440,11 @@ function manifestPageDocumentToBrief(raw) {
   return brief;
 }
 
-// ─── Public entry point ─────────────────────────────────────────────────────
+// --- Public entry point -----------------------------------------------------
 
 // Dispatches to the real page-document parser or the legacy schema parser
 // based on the export's own `format` marker. Throws ManifestImportError if
-// validation fails for whichever path is used — callers should catch this
+// validation fails for whichever path is used -- callers should catch this
 // and show the .issues list rather than a generic parse error.
 export function manifestToBrief(raw) {
   if (raw && raw.format === PAGE_DOCUMENT_FORMAT) {
