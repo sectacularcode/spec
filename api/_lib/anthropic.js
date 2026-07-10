@@ -59,23 +59,52 @@ function escapeControlCharsInStrings(text) {
   return result;
 }
 
+// Same as extractJSON, but on failure returns real diagnostics instead of
+// just null: both parse attempts' actual error messages, the character
+// position JSON.parse choked on (parsed out of V8's error message, e.g.
+// "Unexpected token h in JSON at position 1234"), and a text window
+// centered on that exact position — not just the first 500 characters of
+// what can be a much longer response, which may not even reach the actual
+// problem spot. Use this at the one call site that needs to show a human
+// (admin/manager) what actually went wrong; extractJSON stays the simple
+// object-or-null contract for callers that don't.
+export function extractJSONWithDiagnostics(data) {
+  const raw = data?.content?.[0]?.text || "";
+  const cleaned = raw.replace(/```json\n?/gi, "").replace(/```\n?/gi, "").trim();
+  const match = cleaned.match(/\{[\s\S]*\}/);
+  if (!match) {
+    return { parsed: null, error: "No JSON object found in response", rawLength: raw.length, snippet: raw.slice(0, 500) };
+  }
+
+  try {
+    return { parsed: JSON.parse(match[0]), error: null };
+  } catch (err1) {
+    try {
+      const repaired = escapeControlCharsInStrings(match[0]);
+      return { parsed: JSON.parse(repaired), error: null, repaired: true };
+    } catch (err2) {
+      const posMatch = /position (\d+)/.exec(err2.message);
+      const pos = posMatch ? parseInt(posMatch[1], 10) : null;
+      const snippet = pos != null
+        ? match[0].slice(Math.max(0, pos - 250), pos + 250)
+        : match[0].slice(0, 500);
+      return {
+        parsed: null,
+        error: err2.message,
+        firstAttemptError: err1.message,
+        position: pos,
+        snippet,
+        rawLength: raw.length,
+      };
+    }
+  }
+}
+
 // Claude is asked to return raw JSON but sometimes wraps it in markdown
 // fences anyway — strip those, then pull out the first {...} block. Tries a
 // straight parse first; if that fails, retries once against a control-char-
 // repaired version before giving up. Returns null (never throws) if no
 // valid JSON object can be recovered either way.
 export function extractJSON(data) {
-  const raw = data?.content?.[0]?.text || "";
-  const cleaned = raw.replace(/```json\n?/gi, "").replace(/```\n?/gi, "").trim();
-  const match = cleaned.match(/\{[\s\S]*\}/);
-  if (!match) return null;
-  try {
-    return JSON.parse(match[0]);
-  } catch {
-    try {
-      return JSON.parse(escapeControlCharsInStrings(match[0]));
-    } catch {
-      return null;
-    }
-  }
+  return extractJSONWithDiagnostics(data).parsed;
 }
