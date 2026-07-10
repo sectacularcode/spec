@@ -132,11 +132,13 @@ export default function CustomBuild({ userId, role } = {}) {
             recommended: p.recommended,
             hasVariants: p.hasVariants,
             hasVariantC: p.hasVariantC,
+            hasVariantD: p.hasVariantD,
             // store full data so preview and download work on return
             data: p.data,
             variantA: p.variantA,
             variantB: p.variantB,
             variantC: p.variantC,
+            variantD: p.variantD,
           }))
         } : null,
       };
@@ -678,7 +680,7 @@ export default function CustomBuild({ userId, role } = {}) {
 
   function getPageData(p) {
     var variant = layoutVariants[p.id] || "A";
-    var baseData = variant === "C" && p.variantC ? p.variantC : variant === "B" && p.variantB ? p.variantB : p.variantA || p.data;
+    var baseData = variant === "D" && p.variantD ? p.variantD : variant === "C" && p.variantC ? p.variantC : variant === "B" && p.variantB ? p.variantB : p.variantA || p.data;
     // Apply any section overrides for this page
     var overrides = pageOverrides[p.id];
     if (!overrides || Object.keys(overrides).length === 0) return baseData;
@@ -929,15 +931,16 @@ export default function CustomBuild({ userId, role } = {}) {
             const activePage = generated.pages.find(p => p.id === previewPage);
             if (!activePage || !activePage.hasVariants) return null;
             const isLanding = activePage.hasVariantC;
-            const variants = isLanding ? ["A","B","C"] : ["A","B"];
+            const variants = isLanding ? (activePage.hasVariantD ? ["A","B","C","D"] : ["A","B","C"]) : ["A","B"];
             const labels = isLanding
-              ? { A: "Awareness", B: "Lead Form", C: "Retargeting" }
+              ? { A: "Awareness", B: "Lead Form", C: "Retargeting", D: "Varied" }
               : { A: "Layout A", B: "Layout B" };
             const descs = isLanding
               ? {
                   A: "Feature rows + services checklist with dual phone and contact CTAs. Best for cold traffic and brand awareness.",
                   B: "Inline quote request form with testimonials and feature rows. Best for high-intent traffic ready to convert.",
                   C: "Tight hero, three outcome bullets, single testimonial, one CTA. Best for retargeting warm audiences.",
+                  D: "Each section gets a different visual treatment — split image, a centered call-out, a plain block — cycling through automatically. Best for pages with several distinct sections that shouldn't all look the same.",
                 }
               : { A: "Primary layout for this page type.", B: "Alternate layout with a different section structure." };
             const current = layoutVariants[previewPage] || activePage.recommended || "A";
