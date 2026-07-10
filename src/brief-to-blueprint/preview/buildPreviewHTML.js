@@ -701,6 +701,43 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             return;
           }
 
+          if (entry.style === "checklist") {
+            var clauses = (f.body || "").split(/\.\s+/).map(function (s) { return s.trim().replace(/\.$/, ""); }).filter(function (s) { return s.length > 0; });
+            if (clauses.length === 0) clauses = [f.body || ""];
+            htmlParts.push(
+              "<section style='background:" + bg + ";padding:44px clamp(24px,6vw,64px);'>" +
+                "<h3 style='font-size:clamp(17px,2vw,22px);font-weight:700;color:" + ink + ";margin:0 0 16px;'>" + (f.heading || "") + "</h3>" +
+                "<div style='display:flex;flex-direction:column;gap:10px;'>" +
+                  clauses.map(function (c) {
+                    return "<div style='display:flex;align-items:flex-start;gap:10px;'><span style='color:" + brass + ";font-weight:700;flex-shrink:0;margin-top:2px;'>&#10003;</span><span style='font-size:15px;color:" + text + ";line-height:1.5;'>" + c + "</span></div>";
+                  }).join("") +
+                "</div>" +
+              "</section>"
+            );
+            return;
+          }
+
+          if (entry.style === "video") {
+            // Mirrors landing.js's renderVideoRow -- unverified against a
+            // real Elementor render, unlike the other widgets here. This
+            // is just an <iframe>, so it's not subject to the same
+            // settings-shape risk as the real export, but the export side
+            // (the part that actually matters) carries that caveat.
+            if (!brief.videoUrl) { htmlParts.push(""); return; }
+            var ytMatch = String(brief.videoUrl).match(/(?:youtu\.be\/|v=)([\w-]{6,})/);
+            var embedSrc = ytMatch ? "https://www.youtube.com/embed/" + ytMatch[1] : brief.videoUrl;
+            htmlParts.push(
+              "<section style='background:" + bg + ";display:grid;grid-template-columns:1fr 1fr;'>" +
+                "<div style='padding:44px 48px;display:flex;flex-direction:column;justify-content:center;'>" +
+                  "<h3 style='font-size:clamp(17px,2vw,22px);font-weight:700;color:" + ink + ";margin:0 0 10px;'>" + (f.heading || "") + "</h3>" +
+                  "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0;'>" + (f.body || "") + "</p>" +
+                "</div>" +
+                "<div style='min-height:280px;height:100%;overflow:hidden;'><iframe src=\"" + embedSrc + "\" style='border:0;width:100%;height:100%;min-height:280px;display:block;' loading='lazy' allowfullscreen></iframe></div>" +
+              "</section>"
+            );
+            return;
+          }
+
           // "plain" fallback -- no accent line, matches landing.js
           htmlParts.push(
             "<section style='background:" + bg + ";padding:44px clamp(24px,6vw,64px);'>" +
@@ -924,11 +961,13 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.featureLayout) :
         variant === "D" ? renderCuratedFeatureLayoutHTML((Array.isArray(brief.features) ? brief.features : []).map(function (_, i) {
           // Mirrors landing.js's Variant D dispatch -- the same proven,
-          // brand-agnostic visual-variety cycle (split-right/centered-cta/
-          // split-left/split-cta-right/plain), built dynamically here
+          // brand-agnostic visual-variety cycle, built dynamically here
           // since the preview has no equivalent of landing.js's
           // renderFeatureLayout dispatch table to reuse directly.
-          var cyclePattern = ["split-right", "centered-cta", "split-left", "split-cta-right", "plain"];
+          var hasVideo = !!brief.videoUrl;
+          var cyclePattern = hasVideo
+            ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
+            : ["split-right", "centered-cta", "checklist", "split-left", "split-cta-right", "plain"];
           return { style: cyclePattern[i % cyclePattern.length], indices: [i] };
         })) :
         featureRowsDataB.map(function(f,i) {
