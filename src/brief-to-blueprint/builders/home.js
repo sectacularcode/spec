@@ -80,7 +80,38 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
       ["People", "Recruiting, origin stories, the human core of the company."],
       ["Brand", "Founder stories, vision, the company's own voice."],
       ["Exit", "The story a business shows when it is ready to be bought."],
-    ]).map(function(pair) {
+    ]);
+
+    // "numbered-features" — a real alternative to the bordered card grid,
+    // matching the pattern name and visual language the preview has used
+    // for this option (see buildPreviewHTML.js's sections.home) but which
+    // the real Elementor export never actually implemented until now.
+    // Plain bold numbers, not a circular badge — no precedent anywhere in
+    // this codebase for a fixed-size circular container (every real width
+    // uses percentage units, every real height uses min_height; see
+    // landing.js's compact-list fix, July 2026).
+    if ((patterns && patterns.services) === "numbered-features") {
+      var numberedRows = cds.map(function(pair, idx) {
+        var title = pair[0]; var body = pair[1];
+        var numberCol = mkContainer([
+          mkHeading((idx + 1 < 10 ? "0" : "") + (idx + 1), brass, "h4", { weight: 800, px: 32 }),
+        ], null, { isInner: true, padY: "0", padX: "0" });
+        var textCol = mkContainer([
+          mkHeading(title, ink, "h4", { weight: 700, px: 18 }),
+          mkSpacer(8),
+          mkText(he(body), stone),
+        ], null, { isInner: true, padY: "0", padX: "0", grow: 1 });
+        var row = mkContainer([numberCol, textCol], null, { direction: "row", gap: "24", padY: "28", padX: "0", isInner: true });
+        row.settings.border_border = "solid";
+        row.settings.border_width = { unit: "px", top: "1", right: "0", bottom: "0", left: "0", isLinked: false };
+        row.settings.border_color = "#E2DBCC";
+        return row;
+      });
+      return mkContainer(numberedRows, bone, { padY: "80" });
+    }
+
+    // "card-grid" (default) — the original bordered card grid.
+    var cardEls = cds.map(function(pair) {
       var title = pair[0]; var body = pair[1];
       var c = mkContainer([
         mkHeading(title, ink, "h4", { weight: 700, px: 18 }),
@@ -94,7 +125,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
       c.settings._flex_grow = 1;
       return c;
     });
-    var row = mkContainer(cds, null, { direction: "row", gap: "20", padY: "0", isInner: true });
+    var row = mkContainer(cardEls, null, { direction: "row", gap: "20", padY: "0", isInner: true });
     row.settings.flex_wrap = "wrap";
     return mkContainer([row], bone, { padY: "80" });
   })();
