@@ -41,9 +41,19 @@ export function generatePages(brief, selectedPages, inspoContext, aiRecs, custom
       var homePatternsB = Object.assign({}, patterns);
       homePatternsB.hero = "split-left";
       var homeB = buildHomePage(colors, brief, inspoContext, homePatternsB);
+      // Layout C — a third, genuinely distinct combination: the "minimal"
+      // hero (large centered text, no image, single CTA) paired with the
+      // "numbered-features" cards treatment, instead of A/B's shared
+      // bordered-card-grid look. Both patterns already existed in the
+      // preview; the numbered-features cards treatment didn't exist in
+      // the real export until now (see home.js).
+      var homePatternsC = Object.assign({}, patterns);
+      homePatternsC.hero = "minimal";
+      homePatternsC.services = "numbered-features";
+      var homeC = buildHomePage(colors, brief, inspoContext, homePatternsC);
       var homeRec = (patterns.hero === "split-left" || patterns.hero === "split-right") ? "B" : "A";
       var homeData = homeRec === "B" ? homeB : homeA;
-      return { id: pid, label: label, data: homeData, variantA: homeA, variantB: homeB, recommended: homeRec, hasVariants: true };
+      return { id: pid, label: label, data: homeData, variantA: homeA, variantB: homeB, variantC: homeC, recommended: homeRec, hasVariants: true, hasVariantC: true };
     }
     if (pid === "services") {
       var svcA = buildServicesPage(colors, brief, inspoContext);
