@@ -29,12 +29,12 @@ export const ALL_PAGES = [
   { id: "about",    label: "About",               slug: "/about" },
   { id: "process",  label: "Process",             slug: "/process" },
   { id: "contact",  label: "Contact",             slug: "/contact" },
+  { id: "landing",  label: "Landing Page",        slug: "/landing" },
+  { id: "other",    label: "Other / Custom Page", slug: "/custom" },
 ];
 
 // Additional pages — shown in the "+ Add Page" dropdown
 export const ADDITIONAL_PAGE_TYPES = [
-  { id: "landing",      label: "Landing Page",      slug: "/landing" },
-  { id: "other",        label: "Other / Custom Page",slug: "/custom" },
   { id: "team",         label: "Team",              slug: "/team" },
   { id: "blog",         label: "Blog / Journal",    slug: "/blog" },
   { id: "blog-post",    label: "Blog Post",         slug: "/blog/post" },
