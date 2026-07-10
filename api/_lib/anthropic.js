@@ -23,13 +23,59 @@ export async function callAnthropic(apiKey, body, extraHeaders = {}) {
   return { ok: response.ok, status: response.status, data };
 }
 
+// Escapes raw control characters (literal newlines, tabs, carriage returns)
+// that appear INSIDE quoted JSON string values, leaving everything else —
+// structural whitespace between tokens, already-escaped sequences — alone.
+// A simple character-scan state machine, not a regex, because correctly
+// distinguishing "inside a string" from "between tokens" while respecting
+// escaped quotes isn't reliably expressible as one regex.
+//
+// Why this exists: when asked to reproduce long, multi-paragraph prose
+// (e.g. an "About story" field pulled from a real Word doc) inside a JSON
+// string, the model sometimes emits a literal newline instead of the
+// escaped \n. The braces stay perfectly balanced — the response finishes
+// with stop_reason "end_turn", not "max_tokens" — but a raw control
+// character inside a quoted string is illegal JSON, so a bare JSON.parse
+// throws even though the object is otherwise well-formed.
+function escapeControlCharsInStrings(text) {
+  let result = "";
+  let inString = false;
+  let escaped = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (inString) {
+      if (escaped) { result += ch; escaped = false; continue; }
+      if (ch === "\\") { result += ch; escaped = true; continue; }
+      if (ch === '"') { result += ch; inString = false; continue; }
+      if (ch === "\n") { result += "\\n"; continue; }
+      if (ch === "\r") { result += "\\r"; continue; }
+      if (ch === "\t") { result += "\\t"; continue; }
+      result += ch;
+    } else {
+      result += ch;
+      if (ch === '"') inString = true;
+    }
+  }
+  return result;
+}
+
 // Claude is asked to return raw JSON but sometimes wraps it in markdown
-// fences anyway — strip those, then pull out the first {...} block.
-// Returns null (never throws) if no valid JSON object can be found.
+// fences anyway — strip those, then pull out the first {...} block. Tries a
+// straight parse first; if that fails, retries once against a control-char-
+// repaired version before giving up. Returns null (never throws) if no
+// valid JSON object can be recovered either way.
 export function extractJSON(data) {
   const raw = data?.content?.[0]?.text || "";
   const cleaned = raw.replace(/```json\n?/gi, "").replace(/```\n?/gi, "").trim();
   const match = cleaned.match(/\{[\s\S]*\}/);
   if (!match) return null;
-  try { return JSON.parse(match[0]); } catch { return null; }
+  try {
+    return JSON.parse(match[0]);
+  } catch {
+    try {
+      return JSON.parse(escapeControlCharsInStrings(match[0]));
+    } catch {
+      return null;
+    }
+  }
 }
