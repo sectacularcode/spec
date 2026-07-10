@@ -409,6 +409,37 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     return mkMapSection(brief.mapAddress, brief.mapUrl, colors, { heading: brief.mapHeading || "Find Us" });
   }
 
+  // Optional lead-capture form section — renders only when the brief
+  // carries real form content (from a Manifest "form" section, or
+  // brief.formHeading/formFields set directly) AND no curated layout is
+  // already placing it inline (see renderEmbeddedForm) — this is the
+  // general-case fallback for any page that doesn't have a page-specific
+  // curated layout, which is the common case: most pages won't have one.
+  // Without this, form content from a real "type: form" section would be
+  // captured by the importer but never actually rendered anywhere on a
+  // page using the uniform/default styles. Sits after the feature rows,
+  // before the map/closing sections.
+  function makeFormSection() {
+    if (!brief.formHeading && !(Array.isArray(brief.formFields) && brief.formFields.length)) return null;
+    var formAlreadyPlaced =
+      (Array.isArray(brief.featureLayout) && brief.featureLayout.some(function (e) { return e.style === "embedded-form"; })) ||
+      (Array.isArray(brief.postClosingLayout) && brief.postClosingLayout.some(function (e) { return e.style === "embedded-form"; }));
+    if (formAlreadyPlaced) return null;
+
+    var fHeading = brief.formHeading || "Get a Quote";
+    var fSubhead = brief.formSubhead || "";
+    var fFields  = (Array.isArray(brief.formFields) && brief.formFields.length) ? brief.formFields : ["Name", "Phone", "Message"];
+    var fCtaLabel = brief.formCta || "Request a Quote";
+    var formWidget = mkForm(fFields, fCtaLabel, { formName: (brandName || "Site") + " Quote Request" });
+    return mkContainer([
+      mkHeading(fHeading, ink, "h3", { weight: 700, px: 26 }),
+      mkSpacer(10),
+      fSubhead ? mkText(he(fSubhead), stone) : null,
+      mkSpacer(20),
+      formWidget,
+    ].filter(Boolean), bone, { padY: "56", padX: "48" });
+  }
+
   // ── VARIANT A — Awareness / Feature layout ────────────────────────────────
   if (variant !== "B" && variant !== "C") {
     var heroEyebrow = mkHeading(heroEyebrowText, warmWhite, "h6", { eyebrow: true, align: "center" });
@@ -439,7 +470,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     return {
       version: "0.4", title: he(brandName || "Site") + " — Landing Page", type: "page", page_settings: {},
-      content: [heroA, makeTrustStrip(), ...makeFeatureRows(), checklistSection, makeMapSection(), makeClosingCta(), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),
+      content: [heroA, makeTrustStrip(), ...makeFeatureRows(), checklistSection, makeFormSection(), makeMapSection(), makeClosingCta(), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),
     };
   }
 
