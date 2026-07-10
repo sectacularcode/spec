@@ -1005,6 +1005,17 @@ export default function CustomBuild({ userId, role } = {}) {
                       Import from Manifest
                     </button>
                   </div>
+                  {uploadSource === "manifest" && (
+                    <div style={{ marginBottom: "16px", textAlign: "center" }}>
+                      <a
+                        href="/downloads/Spec_Manifest_Copy_Template.docx"
+                        download
+                        style={{ fontSize: "12px", color: "#b45309", fontWeight: 600, textDecoration: "none" }}
+                      >
+                        ↓ Download the copy template for Manifest
+                      </a>
+                    </div>
+                  )}
                   <div
                     onClick={() => fileRef.current?.click()}
                     onDragOver={e => e.preventDefault()}
