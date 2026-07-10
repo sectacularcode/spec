@@ -910,6 +910,15 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           "</div>" +
         "</section>" +
         (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.featureLayout) :
+        variant === "D" ? renderCuratedFeatureLayoutHTML((Array.isArray(brief.features) ? brief.features : []).map(function (_, i) {
+          // Mirrors landing.js's Variant D dispatch -- the same proven,
+          // brand-agnostic visual-variety cycle (split-right/centered-cta/
+          // split-left/split-cta-right/plain), built dynamically here
+          // since the preview has no equivalent of landing.js's
+          // renderFeatureLayout dispatch table to reuse directly.
+          var cyclePattern = ["split-right", "centered-cta", "split-left", "split-cta-right", "plain"];
+          return { style: cyclePattern[i % cyclePattern.length], indices: [i] };
+        })) :
         featureRowsDataB.map(function(f,i) {
           if (featureRowStyle === "stacked-text") {
             return "<section style='background:" + (i%2===0?"#ffffff":bone) + ";padding:52px clamp(24px,6vw,64px);'>" +
