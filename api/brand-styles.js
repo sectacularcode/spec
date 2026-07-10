@@ -30,12 +30,22 @@ function sanitizeColors(input) {
   return out;
 }
 
+// Real font names are letters, numbers, spaces, and a handful of
+// punctuation marks (e.g. "Be Vietnam Pro", "DM Sans", "Helvetica Neue").
+// Restricting to that character class closes off font-family as an
+// injection vector before it's used in any HTML/CSS context downstream --
+// not currently rendered anywhere in the preview, but this is exactly the
+// kind of stored value that becomes exploitable the moment some future
+// feature does render it, and validating at the point of storage is
+// cheaper than tracking down every future consumer.
+const FONT_NAME_RE = /^[A-Za-z0-9 '.-]{1,100}$/;
+
 function sanitizeFonts(input) {
   if (typeof input !== "object" || input === null || Array.isArray(input)) return {};
   const out = {};
   for (const key of FONT_KEYS) {
     const val = input[key];
-    if (typeof val === "string" && val.trim().length > 0 && val.trim().length <= 100) out[key] = val.trim();
+    if (typeof val === "string" && FONT_NAME_RE.test(val.trim())) out[key] = val.trim();
   }
   return out;
 }
