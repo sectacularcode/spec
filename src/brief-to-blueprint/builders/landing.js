@@ -1,4 +1,4 @@
-import { nid, mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer, mkDivider, mkIconList, mkForm, mkTestimonialCarousel, mkAccordion } from "./helpers.js";
+import { nid, mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer, mkDivider, mkIconList, mkForm, mkTestimonialCarousel, mkAccordion, mkMapSection } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
 
 // Landing page builder — three distinct conversion-focused layouts.
@@ -146,6 +146,16 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     ], warmWhite, { padY: "80" });
   }
 
+  // Optional map/location section — renders only when the brief supplies a
+  // real address or map link (from a Manifest "map" block, or brief.mapAddress
+  // / brief.mapUrl set directly). Sits after social proof and before the
+  // closing CTA, matching the order Manifest's sample export uses. Returns
+  // null when there's nothing to show — callers must .filter(Boolean).
+  function makeMapSection() {
+    if (!brief.mapAddress && !brief.mapUrl) return null;
+    return mkMapSection(brief.mapAddress, brief.mapUrl, colors, { heading: brief.mapHeading || "Find Us" });
+  }
+
   // ── VARIANT A — Awareness / Feature layout ────────────────────────────────
   if (variant !== "B" && variant !== "C") {
     var heroEyebrow = mkHeading(heroEyebrowText, warmWhite, "h6", { eyebrow: true, align: "center" });
@@ -171,7 +181,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     return {
       version: "0.4", title: he(brandName || "Site") + " — Landing Page", type: "page", page_settings: {},
-      content: [heroA, makeTrustStrip(), ...makeFeatureRows(), checklistSection, makeClosingCta(), makeFaqSection()],
+      content: [heroA, makeTrustStrip(), ...makeFeatureRows(), checklistSection, makeMapSection(), makeClosingCta(), makeFaqSection()].filter(Boolean),
     };
   }
 
@@ -273,7 +283,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     return {
       version: "0.4", title: he(brandName || "Site") + " — Landing Page (Form)", type: "page", page_settings: {},
-      content: [heroB, formSection, testimonialsSection, ...makeFeatureRows(), midCta, makeClosingCta(), makeFaqSection()],
+      content: [heroB, formSection, testimonialsSection, ...makeFeatureRows(), midCta, makeMapSection(), makeClosingCta(), makeFaqSection()].filter(Boolean),
     };
   }
 
@@ -338,6 +348,6 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
   return {
     version: "0.4", title: he(brandName || "Site") + " — Landing Page (Minimal)", type: "page", page_settings: {},
-    content: [heroC, benefitsSection, compactTrust, singleTestimonial, singleCtaSection],
+    content: [heroC, benefitsSection, compactTrust, singleTestimonial, makeMapSection(), singleCtaSection].filter(Boolean),
   };
 }
