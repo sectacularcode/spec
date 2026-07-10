@@ -123,6 +123,17 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
           { heading: brief.feature3Heading || "Results You Can Count On", body: brief.feature3Body || "[Speak to reliability, track record, or outcomes]", imgCaption: "[Photo placeholder]", imageLeft: false },
         ];
 
+    // Per-section layout override — the real mechanism for hand-curating a
+    // page's structure section by section instead of one uniform style for
+    // the whole page. Not exposed in the UI yet; brief.featureLayout is set
+    // directly for now (see manifestImport.js's page-id-keyed override,
+    // its first real usage) until a proper per-section style picker exists
+    // there. When present, this takes over entirely — the uniform
+    // density/inspo style selection below is skipped.
+    if (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0) {
+      return renderFeatureLayout(brief.featureLayout, features);
+    }
+
     var style = selectFeatureRowStyle(inspoContext, features.length);
 
     if (style === "stacked-text") {
@@ -201,6 +212,144 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     });
   }
 
+  // Renders a curated, per-section layout (brief.featureLayout) instead of
+  // one uniform style for every row. Each entry names which feature
+  // index(es) it covers and which style to use — "grouped-header" is the
+  // one case that consumes more than one index per entry (several features
+  // sharing one heading), everything else is a single feature per entry.
+  function renderFeatureLayout(layout, features) {
+    var rendered = [];
+    layout.forEach(function (entry, rowIdx) {
+      var items = (entry.indices || []).map(function (i) { return features[i]; }).filter(Boolean);
+      if (!items.length) return;
+
+      if (entry.style === "grouped-header") {
+        rendered.push(renderGroupedHeader(entry.header || "", items));
+      } else if (entry.style === "centered-cta") {
+        rendered.push(renderCenteredCta(items[0], rowIdx));
+      } else if (entry.style === "embedded-form") {
+        rendered.push(renderEmbeddedForm(items[0]));
+      } else if (entry.style === "map-beside") {
+        rendered.push(renderMapBeside(items[0], rowIdx));
+      } else if (entry.style === "split-right" || entry.style === "split-left") {
+        rendered.push(renderSplitImage(items[0], entry.style === "split-left", rowIdx, false));
+      } else if (entry.style === "split-cta-right" || entry.style === "split-cta-left") {
+        rendered.push(renderSplitImage(items[0], entry.style === "split-cta-left", rowIdx, true));
+      } else {
+        rendered.push(renderPlainRow(items[0], rowIdx));
+      }
+    });
+    return rendered;
+  }
+
+  // Image-split row, explicit side (not alternating by index) and an
+  // optional CTA button in the text column — used for split-right/
+  // split-left/split-cta-right/split-cta-left in a curated featureLayout.
+  function renderSplitImage(f, imageLeft, rowIdx, withButton) {
+    var innerChildren = [
+      mkHeading(f.heading, accent, "h2", { weight: 700, px: 30 }),
+      mkSpacer(14),
+      mkText(he(f.body), text),
+    ];
+    if (withButton) {
+      innerChildren.push(mkSpacer(20));
+      innerChildren.push(mkButton(contactCta, accent, warmWhite));
+    }
+    var innerBox = mkContainer(innerChildren, null, { isInner: true, padY: "30", padX: "30", full: true });
+    innerBox.settings.min_height = { unit: "px", size: 420 };
+    innerBox.settings.min_height_tablet = { unit: "custom", size: "auto" };
+    innerBox.settings.flex_justify_content = "center";
+    innerBox.settings.flex_align_items = "flex-start";
+    var textCol = mkContainer([innerBox], null, { isInner: true, padY: "30", padX: "30", width: 50, full: true });
+    var imgCol  = mkImageBg(f.imgCaption, { width: 50 });
+    var cols    = imageLeft ? [imgCol, textCol] : [textCol, imgCol];
+    return mkContainer(cols, rowIdx % 2 === 0 ? warmWhite : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
+  }
+
+  // Single centered block with a real contact button — for content that's
+  // making a point rather than describing a service, where a photo or a
+  // service-list treatment doesn't fit as naturally.
+  function renderCenteredCta(f, rowIdx) {
+    var body = mkText("<p style='text-align:center'>" + he(f.body) + "</p>", text);
+    return mkContainer([
+      mkHeading(f.heading, ink, "h3", { weight: 700, px: 26, align: "center" }),
+      mkSpacer(12),
+      body,
+      mkSpacer(20),
+      mkButton(contactCta, accent, warmWhite),
+    ], rowIdx % 2 === 0 ? warmWhite : bone, { padY: "56", center: true });
+  }
+
+  // Several features sharing one heading (e.g. two related services under
+  // "Our Services") — a real shared-header grouping, not a coincidence of
+  // adjacent rows.
+  function renderGroupedHeader(header, items) {
+    var colWidth = Math.floor(100 / items.length);
+    var cols = items.map(function (item) {
+      return mkContainer([
+        mkHeading(item.heading, ink, "h4", { weight: 700, px: 18 }),
+        mkSpacer(8),
+        mkText(he(item.body), text),
+      ], null, { isInner: true, padY: "0", padX: "0", width: colWidth, grow: "1" });
+    });
+    return mkContainer([
+      mkHeading(header, accent, "h6", { eyebrow: true }),
+      mkSpacer(20),
+      mkContainer(cols, null, { direction: "row", gap: "32", padY: "0", padX: "0", isInner: true, full: true }),
+    ], warmWhite, { padY: "56", padX: "48" });
+  }
+
+  // Real Elementor Pro form widget embedded mid-page (same mkForm() used
+  // for Variant B's lead-capture form) — for content that's naturally
+  // asking the visitor to reach out (pricing, quotes), not just describing
+  // a service.
+  function renderEmbeddedForm(f) {
+    var fHeading  = f.heading || brief.formHeading || "Get a Quote";
+    var fSubhead  = f.body || brief.formSubhead || "";
+    var fFields   = (Array.isArray(brief.formFields) && brief.formFields.length) ? brief.formFields : ["Name", "Phone", "Message"];
+    var fCtaLabel = brief.formCta || "Request a Quote";
+    var formWidget = mkForm(fFields, fCtaLabel, { formName: (brandName || "Site") + " Quote Request" });
+    return mkContainer([
+      mkHeading(fHeading, ink, "h3", { weight: 700, px: 26 }),
+      mkSpacer(10),
+      fSubhead ? mkText(he(fSubhead), stone) : null,
+      mkSpacer(20),
+      formWidget,
+    ].filter(Boolean), bone, { padY: "56", padX: "48" });
+  }
+
+  // Text beside a map-labeled placeholder — for content about coverage
+  // area or physical location that doesn't have real coordinates to build
+  // Spec's actual map widget from (see manifestImport.js's map_location
+  // handling: a real address builds the real map section instead).
+  function renderMapBeside(f, rowIdx) {
+    var innerChildren = [
+      mkHeading(f.heading, accent, "h2", { weight: 700, px: 30 }),
+      mkSpacer(14),
+      mkText(he(f.body), text),
+    ];
+    var innerBox = mkContainer(innerChildren, null, { isInner: true, padY: "30", padX: "30", full: true });
+    innerBox.settings.flex_justify_content = "center";
+    innerBox.settings.flex_align_items = "flex-start";
+    var textCol = mkContainer([innerBox], null, { isInner: true, padY: "30", padX: "30", width: 50, full: true });
+    var mapCol  = mkImageBg("[Map placeholder]", { width: 50 });
+    return mkContainer([textCol, mapCol], rowIdx % 2 === 0 ? warmWhite : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
+  }
+
+  // A single clean text block, no image — for content the uniform styles
+  // would otherwise handle fine, kept as-is inside a curated layout.
+  function renderPlainRow(f, rowIdx) {
+    var accentLine = mkContainer([], accent, { isInner: true, padY: "0", padX: "0" });
+    accentLine.settings.width = { unit: "px", size: 28 };
+    accentLine.settings.height = { unit: "px", size: 2 };
+    return mkContainer([
+      accentLine, mkSpacer(14),
+      mkHeading(f.heading, ink, "h3", { weight: 700, px: 22 }),
+      mkSpacer(10),
+      mkText(he(f.body), text),
+    ], rowIdx % 2 === 0 ? warmWhite : bone, { padY: "44", padX: "48", full: true });
+  }
+
   function makeClosingCta() {
     return mkContainer([
       mkHeading(closingLine, warmWhite, "h2", { weight: 700, px: 40, align: "center" }),
@@ -254,7 +403,12 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     var checklistItems = brief.servicesList || ["Reduced overall cost", "Reduced downtime", "Proactive planning", "Expert team", "Fast response time", "Tailored reporting", "Direct billing", "Add more below..."];
     var half = Math.ceil(checklistItems.length / 2);
-    var checklistSection = mkContainer([
+    // Skippable per brief — set when the checklist would only show generic
+    // placeholder items with no real content behind them (e.g. no
+    // brief.servicesList and the brief's source format has no equivalent
+    // concept, like a Manifest import), rather than shipping fabricated
+    // "Service one, Service two" text on a real page.
+    var checklistSection = brief.skipServicesChecklist ? null : mkContainer([
       mkHeading(brief.servicesHeading || "What We Do", text, "h2", { weight: 700, px: 36 }),
       mkSpacer(24), mkDivider(accent), mkSpacer(32),
       mkContainer([
