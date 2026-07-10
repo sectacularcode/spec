@@ -2,7 +2,7 @@ import mammoth from "mammoth";
 import { requireAuth, getProfile } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { deepStripHTML } from "./_lib/sanitize.js";
-import { callAnthropic, extractJSON } from "./_lib/anthropic.js";
+import { callAnthropic, extractJSON, extractJSONWithDiagnostics } from "./_lib/anthropic.js";
 import { logUsage } from "./_lib/usage.js";
 
 const EXTRACTION_PROMPT = `Extract every field from this brand brief and return ONLY a single valid JSON object.
@@ -207,24 +207,28 @@ export default async function handler(req, res) {
       });
     }
 
-    const parsed = extractJSON(result.data);
-    if (!parsed) {
-      const rawText = result.data.content?.[0]?.text || "";
-      // stop_reason is the key diagnostic: "max_tokens" means the response
-      // was cut off mid-JSON (a real truncation, needs a higher limit or a
-      // smaller ask); "end_turn" means the model finished normally but
-      // still produced something that didn't parse as valid JSON (a
-      // different problem — malformed output, not a length issue). Without
-      // this, every failure here looks identical from the outside.
+    const diag = extractJSONWithDiagnostics(result.data);
+    if (!diag.parsed) {
+      // stop_reason is the first-level diagnostic: "max_tokens" means the
+      // response was cut off mid-JSON; "end_turn" means the model finished
+      // normally but the output still didn't parse (a different problem —
+      // malformed content, not a length issue). diag carries the actual
+      // JSON.parse error and a text window centered on exactly where it
+      // broke, which stopReason alone can't tell you.
       const stopReason = result.data.stop_reason || "unknown";
-      console.error("parse-brief: extraction failed to parse. stop_reason=" + stopReason + " model=" + result.model + " rawLength=" + rawText.length);
+      console.error(
+        "parse-brief: extraction failed to parse. stop_reason=" + stopReason +
+        " model=" + result.model + " error=" + diag.error +
+        " position=" + diag.position + " rawLength=" + diag.rawLength
+      );
       const genericMsg = "Couldn't read the content of that file. Try again, or try a different file format.";
       return res.status(500).json(
         showDetail
-          ? { error: "Could not parse extraction response.", detail: { stopReason, model: result.model, rawPreview: rawText.slice(0, 500) } }
+          ? { error: "Could not parse extraction response.", detail: { stopReason, model: result.model, ...diag } }
           : { error: genericMsg }
       );
     }
+    const parsed = diag.parsed;
 
     // Log usage after a confirmed-successful parse — client_name comes from
     // the extraction's own brandName, so no frontend change was needed to
