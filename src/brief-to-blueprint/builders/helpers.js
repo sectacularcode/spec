@@ -370,3 +370,42 @@ export function mkTestimonialCarousel(testimonials, opts) {
     elements: [],
   };
 }
+
+// Restricts a URL to safe schemes before it's used as a link href. Content
+// arriving from an external source (e.g. a Manifest export) is untrusted
+// input — a URL-shaped field could carry a javascript: URI or a
+// protocol-relative link pointing at attacker-controlled infrastructure.
+// Falls back to "#" for anything outside the allowlist, matching the
+// no-link default every button already uses.
+var SAFE_URL_PATTERN = /^(https?:|tel:|mailto:|#|\/(?!\/))/i;
+export function sanitizeUrl(url) {
+  if (!url || typeof url !== "string") return "#";
+  var trimmed = url.trim();
+  return SAFE_URL_PATTERN.test(trimmed) ? trimmed : "#";
+}
+
+// Map/location section — address text plus an optional "Get Directions"
+// button linking out to a supplied Google Maps URL. Not an embedded map
+// widget (no API key assumed on Spec's side) — a styled content block that
+// matches the rest of the page. Renders only where the caller has a real
+// address or map link; presence-checking is the caller's job (see
+// makeMapSection() in landing.js).
+export function mkMapSection(address, mapUrl, colors, opts) {
+  opts = opts || {};
+  colors = colors || {};
+  var ink = colors.ink || colors.text || "#1A1A1A";
+  var accent = colors.brass || colors.accent || "#C2A35B";
+  var bone = colors.bone || colors.background || "#F2F2F2";
+  var children = [
+    mkHeading(opts.heading || "Find Us", ink, "h2", { weight: 700, px: 32, align: opts.center ? "center" : "left" }),
+    mkSpacer(16),
+    mkText("<p" + (opts.center ? " style='text-align:center'" : "") + ">" + he(address || "") + "</p>", ink),
+  ];
+  if (mapUrl) {
+    children.push(mkSpacer(20));
+    var btn = mkButton(opts.buttonLabel || "Get Directions", accent, "#FFFFFF");
+    btn.settings.link = { url: sanitizeUrl(mapUrl), is_external: "true" };
+    children.push(btn);
+  }
+  return mkContainer(children, bone, { padY: opts.padY || "60", center: !!opts.center });
+}
