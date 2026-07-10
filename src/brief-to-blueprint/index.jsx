@@ -303,11 +303,14 @@ export default function CustomBuild({ userId, role } = {}) {
           const base64 = e.target.result.split(",")[1];
           const res = await fetch("/api/parse-brief", { method: "POST", headers: await authHeaders(), body: JSON.stringify({ content: base64, type: "pdf", fileName: file.name }) });
           const data = await res.json();
-          if (!res.ok) throw new Error(data.error || "Parsing failed");
+          if (!res.ok) { const e = new Error(data.error || "Parsing failed"); e.detail = data.detail; throw e; }
           setBriefName(file.name); setBriefError("");
           if (data.brandName) setClientName(data.brandName);
           setParsedBriefDraft(data); setShowBriefReview(true);
-        } catch (err) { setBriefError("Could not parse the PDF: " + err.message); }
+        } catch (err) {
+          const detailStr = err.detail ? " (" + err.detail.stopReason + " / " + err.detail.model + ")" : "";
+          setBriefError("Could not parse the PDF: " + err.message + detailStr);
+        }
         finally { setParsing(false); }
       };
       reader.readAsDataURL(file);
@@ -319,11 +322,14 @@ export default function CustomBuild({ userId, role } = {}) {
           const base64 = e.target.result.split(",")[1];
           const res = await fetch("/api/parse-brief", { method: "POST", headers: await authHeaders(), body: JSON.stringify({ content: base64, type: "docx", fileName: file.name }) });
           const data = await res.json();
-          if (!res.ok) throw new Error(data.error || "Parsing failed");
+          if (!res.ok) { const e = new Error(data.error || "Parsing failed"); e.detail = data.detail; throw e; }
           setBriefName(file.name); setBriefError("");
           if (data.brandName) setClientName(data.brandName);
           setParsedBriefDraft(data); setShowBriefReview(true);
-        } catch (err) { setBriefError("Could not parse the Word doc: " + err.message); }
+        } catch (err) {
+          const detailStr = err.detail ? " (" + err.detail.stopReason + " / " + err.detail.model + ")" : "";
+          setBriefError("Could not parse the Word doc: " + err.message + detailStr);
+        }
         finally { setParsing(false); }
       };
       reader.readAsDataURL(file);
@@ -334,11 +340,14 @@ export default function CustomBuild({ userId, role } = {}) {
         try {
           const res = await fetch("/api/parse-brief", { method: "POST", headers: await authHeaders(), body: JSON.stringify({ content: e.target.result, type: "text", fileName: file.name }) });
           const data = await res.json();
-          if (!res.ok) throw new Error(data.error || "Parsing failed");
+          if (!res.ok) { const e = new Error(data.error || "Parsing failed"); e.detail = data.detail; throw e; }
           setBriefName(file.name); setBriefError("");
           if (data.brandName) setClientName(data.brandName);
           setParsedBriefDraft(data); setShowBriefReview(true);
-        } catch (err) { setBriefError("Could not parse the file: " + err.message); }
+        } catch (err) {
+          const detailStr = err.detail ? " (" + err.detail.stopReason + " / " + err.detail.model + ")" : "";
+          setBriefError("Could not parse the file: " + err.message + detailStr);
+        }
         finally { setParsing(false); }
       };
       reader.readAsText(file);
