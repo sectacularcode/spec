@@ -270,9 +270,9 @@ function validateManifestPageDocument(raw) {
 // - The last section, if it carries buttons, is treated as the closing
 //   CTA — confirmed against the real export, where every page ends this
 //   way.
-// - Every other text_section fills the 3 feature-row slots Spec's landing
-//   page supports, in order; anything beyond 3 is flagged in
-//   _unmappedBlocks rather than dropped.
+// - Every other text_section becomes a feature row via brief.features
+//   (landing.js now accepts any number of these — no 3-row cap, so a page
+//   with 10+ real content sections gets all of them placed).
 // - Any section type outside hero/text_section/testimonials is flagged in
 //   _unmappedBlocks rather than dropped.
 function manifestPageDocumentToBrief(raw) {
@@ -311,7 +311,7 @@ function manifestPageDocumentToBrief(raw) {
     });
   }
 
-  var featureCount = 0;
+  var featurePairs = [];
   var faqPairs = [];
 
   sections.forEach(function (section, idx) {
@@ -351,23 +351,19 @@ function manifestPageDocumentToBrief(raw) {
         return;
       }
 
-      featureCount += 1;
-      if (featureCount <= 3) {
-        brief["feature" + featureCount + "Heading"] = headingText;
-        brief["feature" + featureCount + "Body"] = flattenTextSectionBody(section.items);
-      } else {
-        brief._unmappedBlocks.push({
-          elementType: "text_section",
-          reason: "only 3 feature rows supported per landing page",
-          heading: headingText,
-        });
-      }
+      // No cap here — every real content section becomes a feature row.
+      // landing.js's makeFeatureRows() now accepts brief.features as a
+      // variable-length array (see landing.js), so a page with 10+ real
+      // sections gets all of them placed instead of the first 3 kept and
+      // the rest flagged as unmapped.
+      featurePairs.push({ heading: headingText, body: flattenTextSectionBody(section.items) });
       return;
     }
 
     brief._unmappedBlocks.push({ elementType: section.type, reason: "no matching Spec widget yet", heading: headingText });
   });
 
+  if (featurePairs.length) brief.features = featurePairs;
   if (faqPairs.length) brief.faqItems = faqPairs;
 
   return brief;
