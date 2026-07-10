@@ -26,9 +26,15 @@ export async function saveSessionDraft(data) {
 
 export async function clearSessionDraft() {
   try {
+    // keepalive lets this DELETE finish even if the tab is closed or the
+    // user navigates away right after clicking "Clear draft" — without it,
+    // the browser aborts the in-flight request on unload, the session row
+    // never actually gets deleted, and the next visit reloads the "cleared"
+    // draft right back in.
     const res = await fetch("/api/blueprint-drafts?session=1", {
       method: "DELETE",
       headers: await authHeaders(),
+      keepalive: true,
     });
     return res.ok;
   } catch { return false; }
