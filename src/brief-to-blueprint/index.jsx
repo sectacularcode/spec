@@ -1032,10 +1032,18 @@ export default function CustomBuild({ userId, role } = {}) {
           {generated && (() => {
             const activePage = generated.pages.find(p => p.id === previewPage);
             if (!activePage || !activePage.hasVariants) return null;
-            const isLanding = activePage.hasVariantC;
-            const variants = isLanding ? (activePage.hasVariantD ? ["A","B","C","D"] : ["A","B","C"]) : ["A","B"];
+            // Was inferred from hasVariantC alone, which stopped being a
+            // reliable signal once Home also got a third layout (see
+            // generatePages.js) -- checking the actual page id/label
+            // pattern instead, matching how generatePages.js itself
+            // decides which builder to route to.
+            const isLanding = /^(landing|other)(-\d+)?$/.test(activePage.id);
+            const isHome = activePage.id === "home";
+            const variants = isLanding ? (activePage.hasVariantD ? ["A","B","C","D"] : ["A","B","C"]) : (isHome && activePage.hasVariantC ? ["A","B","C"] : ["A","B"]);
             const labels = isLanding
               ? { A: "Awareness", B: "Lead Form", C: "Retargeting", D: "Varied" }
+              : isHome
+              ? { A: "Centered", B: "Split Image", C: "Minimal" }
               : { A: "Layout A", B: "Layout B" };
             const descs = isLanding
               ? {
@@ -1043,6 +1051,12 @@ export default function CustomBuild({ userId, role } = {}) {
                   B: "Inline quote request form with testimonials and feature rows. Best for high-intent traffic ready to convert.",
                   C: "Tight hero, three outcome bullets, single testimonial, one CTA. Best for retargeting warm audiences.",
                   D: "Each section gets a different visual treatment — split image, a centered call-out, a plain block — cycling through automatically. Best for pages with several distinct sections that shouldn't all look the same.",
+                }
+              : isHome
+              ? {
+                  A: "Centered, bold hero with dual CTAs. The default, well-rounded option.",
+                  B: "Hero split with an image alongside the headline. Good when there's real photography to lead with.",
+                  C: "Large minimal hero, no image, single CTA — and a numbered list instead of bordered cards for the services section. Best for a quieter, editorial feel.",
                 }
               : { A: "Primary layout for this page type.", B: "Alternate layout with a different section structure." };
             const current = layoutVariants[previewPage] || activePage.recommended || "A";
