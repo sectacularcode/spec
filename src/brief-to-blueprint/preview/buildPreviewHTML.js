@@ -592,12 +592,12 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       // set, so every existing brief keeps previewing exactly as before.
       var featureRowsData = (Array.isArray(brief.features) && brief.features.length > 0)
         ? brief.features.map(function (f) {
-            return [f.heading || "", f.body || "", makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg)];
+            return [he(f.heading || ""), he(f.body || ""), makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg)];
           })
         : [[f1h, f1b, img1], [f2h, f2b, img2], [f3h, f3b, img3]];
       var featureRowsDataB = (Array.isArray(brief.features) && brief.features.length > 0)
         ? brief.features.map(function (f, i) {
-            return [f.heading || "", f.body || "", makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg), i % 2 === 1];
+            return [he(f.heading || ""), he(f.body || ""), makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg), i % 2 === 1];
           })
         : [[f1h, f1b, img1, false], [f2h, f2b, img2, true], [f3h, f3b, img3, false]];
       var featureRowStyle = selectFeatureRowStyle(inspoContext, featureRowsData.length);
@@ -799,9 +799,9 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
               return "<div class='faq-item' style='border:1px solid #dde0e6;border-top:none;'>" +
                 "<input type='checkbox' id='" + cbId + "' class='faq-toggle' style='display:none;'" + (i === 0 ? " checked" : "") + "/>" +
                 "<label for='" + cbId + "' style='display:flex;align-items:center;gap:10px;padding:18px 20px;cursor:pointer;font-weight:700;font-size:15px;color:#1a1a1a;'>" +
-                  "<span class='faq-icon' style='font-size:16px;color:" + brass + ";width:14px;'></span>" + f.question +
+                  "<span class='faq-icon' style='font-size:16px;color:" + brass + ";width:14px;'></span>" + he(f.question) +
                 "</label>" +
-                "<div class='faq-answer' style='display:none;padding:0 20px 20px 44px;font-size:14px;color:" + stone + ";line-height:1.6;'>" + f.answer + "</div>" +
+                "<div class='faq-answer' style='display:none;padding:0 20px 20px 44px;font-size:14px;color:" + stone + ";line-height:1.6;'>" + he(f.answer) + "</div>" +
               "</div>";
             }).join("") +
             "<style>.faq-icon::before{content:'+';}.faq-toggle:checked ~ label .faq-icon::before{content:'\u2212';}.faq-toggle:checked ~ label{color:" + brass + " !important;}.faq-toggle:checked + label + .faq-answer{display:block !important;}.faq-item:first-child{border-top:1px solid #dde0e6;}</style>" +
@@ -1085,8 +1085,8 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
               members.slice(1).map(function(m) {
                 return "<div style='text-align:center;'>" +
                   "<div style='background:#e0ddd7;aspect-ratio:1;margin-bottom:14px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Photo</div>" +
-                  "<div style='font-size:15px;font-weight:700;color:" + ink + ";'>" + m.name + "</div>" +
-                  "<div style='font-size:13px;color:" + stone + ";margin-top:4px;'>" + m.role + "</div>" +
+                  "<div style='font-size:15px;font-weight:700;color:" + ink + ";'>" + he(m.name) + "</div>" +
+                  "<div style='font-size:13px;color:" + stone + ";margin-top:4px;'>" + he(m.role) + "</div>" +
                 "</div>";
               }).join("") +
             "</div>" +
@@ -1098,8 +1098,8 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
               return "<div style='display:grid;grid-template-columns:100px 1fr;gap:28px;padding:32px 0;border-bottom:1px solid #E2DBCC;align-items:center;'>" +
                 "<div style='background:#e0ddd7;aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:11px;'>Photo</div>" +
                 "<div>" +
-                  "<div style='font-size:16px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + m.name + "</div>" +
-                  "<div style='font-size:13px;color:" + brass + ";font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;'>" + m.role + "</div>" +
+                  "<div style='font-size:16px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + he(m.name) + "</div>" +
+                  "<div style='font-size:13px;color:" + brass + ";font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;'>" + he(m.role) + "</div>" +
                   "<p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>Short bio for this team member — background, focus, and what they bring.</p>" +
                 "</div>" +
               "</div>";
@@ -1110,7 +1110,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         return header +
           "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:32px;max-width:1160px;margin:0 auto;'>" +
             members.map(function(m) {
-              return "<div style='text-align:center;'><div style='background:#e0ddd7;aspect-ratio:1;margin-bottom:16px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Photo</div><div style='font-size:16px;font-weight:700;color:" + ink + ";'>" + m.name + "</div><div style='font-size:14px;color:" + stone + ";margin-top:4px;'>" + m.role + "</div></div>";
+              return "<div style='text-align:center;'><div style='background:#e0ddd7;aspect-ratio:1;margin-bottom:16px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Photo</div><div style='font-size:16px;font-weight:700;color:" + ink + ";'>" + he(m.name) + "</div><div style='font-size:14px;color:" + stone + ";margin-top:4px;'>" + he(m.role) + "</div></div>";
             }).join("") +
           "</div></section>";
       }
@@ -1262,19 +1262,19 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         return "<section style='background:" + ink + ";padding:120px 40px;text-align:center;'>" +
           "<div style='max-width:800px;margin:0 auto;'>" +
             "<div style='font-size:60px;color:" + brass + ";line-height:1;margin-bottom:24px;'>\u201c</div>" +
-            "<p style='font-size:clamp(22px,3vw,32px);color:" + warmWhite + ";line-height:1.5;font-weight:300;margin:0 0 40px;'>" + quotes[0].q + "</p>" +
+            "<p style='font-size:clamp(22px,3vw,32px);color:" + warmWhite + ";line-height:1.5;font-weight:300;margin:0 0 40px;'>" + he(quotes[0].q) + "</p>" +
             "<div style='width:40px;height:2px;background:" + brass + ";margin:0 auto 24px;'></div>" +
-            "<div style='font-size:15px;font-weight:700;color:" + warmWhite + ";'>" + quotes[0].name + "</div>" +
-            "<div style='font-size:13px;color:" + stone + ";margin-top:6px;'>" + quotes[0].role + "</div>" +
+            "<div style='font-size:15px;font-weight:700;color:" + warmWhite + ";'>" + he(quotes[0].name) + "</div>" +
+            "<div style='font-size:13px;color:" + stone + ";margin-top:6px;'>" + he(quotes[0].role) + "</div>" +
           "</div>" +
         "</section>" +
         "<section style='background:" + bone + ";padding:80px 40px 96px;'>" +
           "<div style='display:grid;grid-template-columns:1fr 1fr;gap:32px;max-width:900px;margin:0 auto;'>" +
             quotes.slice(1).map(function(qt) {
               return "<div style='background:#ffffff;border:1px solid #E2DBCC;padding:32px;border-radius:4px;'>" +
-                "<p style='font-size:16px;color:" + ink + ";line-height:1.6;margin:0 0 20px;'>" + qt.q + "</p>" +
-                "<div style='font-size:14px;font-weight:600;color:" + ink + ";'>" + qt.name + "</div>" +
-                "<div style='font-size:13px;color:" + stone + ";'>" + qt.role + "</div>" +
+                "<p style='font-size:16px;color:" + ink + ";line-height:1.6;margin:0 0 20px;'>" + he(qt.q) + "</p>" +
+                "<div style='font-size:14px;font-weight:600;color:" + ink + ";'>" + he(qt.name) + "</div>" +
+                "<div style='font-size:13px;color:" + stone + ";'>" + he(qt.role) + "</div>" +
               "</div>";
             }).join("") +
           "</div>" +
@@ -1287,9 +1287,9 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
               return "<div style='display:grid;grid-template-columns:72px 1fr;gap:24px;padding:40px 0;border-bottom:1px solid #E2DBCC;align-items:start;" + (isRight ? "direction:rtl;" : "") + "'>" +
                 "<div style='background:#e0ddd7;width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:11px;" + (isRight ? "direction:ltr;" : "") + "'>Photo</div>" +
                 "<div style='" + (isRight ? "direction:ltr;text-align:right;" : "") + "'>" +
-                  "<p style='font-size:18px;color:" + ink + ";line-height:1.6;margin:0 0 16px;font-style:italic;'>\u201c" + qt.q + "\u201d</p>" +
-                  "<div style='font-size:14px;font-weight:700;color:" + ink + ";'>" + qt.name + "</div>" +
-                  "<div style='font-size:13px;color:" + stone + ";'>" + qt.role + "</div>" +
+                  "<p style='font-size:18px;color:" + ink + ";line-height:1.6;margin:0 0 16px;font-style:italic;'>\u201c" + he(qt.q) + "\u201d</p>" +
+                  "<div style='font-size:14px;font-weight:700;color:" + ink + ";'>" + he(qt.name) + "</div>" +
+                  "<div style='font-size:13px;color:" + stone + ";'>" + he(qt.role) + "</div>" +
                 "</div>" +
               "</div>";
             }).join("") +
@@ -1299,7 +1299,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         return header +
           "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:32px;max-width:1160px;margin:0 auto;'>" +
             quotes.map(function(qt) {
-              return "<div style='background:#fff;border-left:3px solid " + brass + ";padding:32px;'><p style='font-family:Inter,sans-serif;font-size:18px;color:" + ink + ";line-height:1.5;margin:0 0 20px;'>" + qt.q + "</p><div style='font-size:14px;font-weight:600;color:" + ink + ";'>" + qt.name + "</div><div style='font-size:13px;color:" + stone + ";'>" + qt.role + "</div></div>";
+              return "<div style='background:#fff;border-left:3px solid " + brass + ";padding:32px;'><p style='font-family:Inter,sans-serif;font-size:18px;color:" + ink + ";line-height:1.5;margin:0 0 20px;'>" + he(qt.q) + "</p><div style='font-size:14px;font-weight:600;color:" + ink + ";'>" + he(qt.name) + "</div><div style='font-size:13px;color:" + stone + ";'>" + he(qt.role) + "</div></div>";
             }).join("") +
           "</div></section>";
       }
@@ -1325,9 +1325,9 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
                 return "<div style='background:#ffffff;border:1px solid #E2DBCC;border-radius:6px;overflow:hidden;'>" +
                   "<div style='background:#e0ddd7;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Event image</div>" +
                   "<div style='padding:24px;'>" +
-                    "<div style='font-size:12px;font-weight:800;color:" + brass + ";letter-spacing:1px;margin-bottom:10px;'>" + e.date + "</div>" +
-                    "<h3 style='font-size:17px;font-weight:700;color:" + ink + ";margin:0 0 8px;line-height:1.3;'>" + e.title + "</h3>" +
-                    "<p style='font-size:13px;color:" + stone + ";margin:0 0 20px;'>" + e.meta + "</p>" +
+                    "<div style='font-size:12px;font-weight:800;color:" + brass + ";letter-spacing:1px;margin-bottom:10px;'>" + he(e.date) + "</div>" +
+                    "<h3 style='font-size:17px;font-weight:700;color:" + ink + ";margin:0 0 8px;line-height:1.3;'>" + he(e.title) + "</h3>" +
+                    "<p style='font-size:13px;color:" + stone + ";margin:0 0 20px;'>" + he(e.meta) + "</p>" +
                     "<a style='display:inline-block;padding:10px 24px;background:" + brassDp + ";color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Register</a>" +
                   "</div>" +
                 "</div>";
@@ -1340,9 +1340,9 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           "<div style='max-width:1160px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;'>" +
             "<div>" +
               "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:16px;'>Next Event</div>" +
-              "<div style='font-size:14px;font-weight:800;color:" + brass + ";letter-spacing:2px;margin-bottom:16px;'>" + next.date + "</div>" +
-              "<h2 style='font-size:clamp(28px,4vw,44px);font-weight:800;color:" + warmWhite + ";margin:0 0 16px;line-height:1.15;'>" + next.title + "</h2>" +
-              "<p style='font-size:16px;color:" + warmWhite + ";opacity:.7;margin:0 0 32px;'>" + next.meta + "</p>" +
+              "<div style='font-size:14px;font-weight:800;color:" + brass + ";letter-spacing:2px;margin-bottom:16px;'>" + he(next.date) + "</div>" +
+              "<h2 style='font-size:clamp(28px,4vw,44px);font-weight:800;color:" + warmWhite + ";margin:0 0 16px;line-height:1.15;'>" + he(next.title) + "</h2>" +
+              "<p style='font-size:16px;color:" + warmWhite + ";opacity:.7;margin:0 0 32px;'>" + he(next.meta) + "</p>" +
               "<a style='display:inline-block;padding:14px 36px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Register now</a>" +
             "</div>" +
             "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:6px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Event image</div>" +
@@ -1352,8 +1352,8 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:900px;margin:0 auto;'>" +
           evts.slice(1).map(function(e) {
             return "<div style='display:grid;grid-template-columns:100px 1fr auto;gap:24px;padding:28px 0;border-bottom:1px solid #E2DBCC;align-items:center;'>" +
-              "<div style='font-size:14px;font-weight:800;color:" + brass + ";letter-spacing:1px;'>" + e.date + "</div>" +
-              "<div><div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + e.title + "</div><div style='font-size:14px;color:" + stone + ";'>" + e.meta + "</div></div>" +
+              "<div style='font-size:14px;font-weight:800;color:" + brass + ";letter-spacing:1px;'>" + he(e.date) + "</div>" +
+              "<div><div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + he(e.title) + "</div><div style='font-size:14px;color:" + stone + ";'>" + he(e.meta) + "</div></div>" +
               "<a style='padding:10px 24px;background:" + brassDp + ";color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;white-space:nowrap;border-radius:4px;'>Register</a>" +
             "</div>";
           }).join("") +
@@ -1363,7 +1363,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         return header +
           "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='max-width:900px;margin:0 auto;'>" +
             evts.map(function(e) {
-              return "<div style='display:grid;grid-template-columns:100px 1fr auto;gap:24px;padding:28px 0;border-bottom:1px solid #E2DBCC;align-items:center;'><div style='font-size:14px;font-weight:800;color:" + brass + ";letter-spacing:1px;'>" + e.date + "</div><div><div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + e.title + "</div><div style='font-size:14px;color:" + stone + ";'>" + e.meta + "</div></div><a style='padding:10px 24px;background:" + brassDp + ";color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;white-space:nowrap;border-radius:4px;'>Register</a></div>";
+              return "<div style='display:grid;grid-template-columns:100px 1fr auto;gap:24px;padding:28px 0;border-bottom:1px solid #E2DBCC;align-items:center;'><div style='font-size:14px;font-weight:800;color:" + brass + ";letter-spacing:1px;'>" + he(e.date) + "</div><div><div style='font-size:17px;font-weight:700;color:" + ink + ";margin-bottom:4px;'>" + he(e.title) + "</div><div style='font-size:14px;color:" + stone + ";'>" + he(e.meta) + "</div></div><a style='padding:10px 24px;background:" + brassDp + ";color:#ffffff;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;white-space:nowrap;border-radius:4px;'>Register</a></div>";
             }).join("") +
           "</div></section>";
       }
