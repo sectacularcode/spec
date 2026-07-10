@@ -25,6 +25,7 @@ import { BriefReview } from "./components/BriefReview.jsx";
 import { BulkLocationModal } from "./components/BulkLocationModal.jsx";
 import AdminPanel from "../components/AdminPanel.jsx";
 import { authHeaders } from "../utils/api.js";
+import { estimateGenerationCost } from "./utils/estimateCost.js";
 
 export default function CustomBuild({ userId, role } = {}) {
   const [brief, setBrief]               = useState(null);
@@ -1118,6 +1119,17 @@ export default function CustomBuild({ userId, role } = {}) {
           </button>
           </div>
           {!brief && <div style={{ fontSize: "12px", color: "#9ca3af", textAlign: "center", marginTop: "8px" }}>Upload a brand brief to enable generation</div>}
+          {brief && (() => {
+            // Page generation itself is free — this only reflects
+            // draft-copy.js, which only runs when "Use brief copy only" is
+            // off and something is still blank. See utils/estimateCost.js —
+            // same function a future breakdown panel would call too.
+            const est = estimateGenerationCost(brief, copyBriefOnly);
+            const label = !est.willDraft
+              ? "Estimated cost: $0.00 — using brief copy only"
+              : `Estimated cost: ~$${est.costDollars.toFixed(2)} — AI will draft ${est.blankFieldCount} blank field${est.blankFieldCount !== 1 ? "s" : ""}`;
+            return <div style={{ fontSize: "12px", color: "#9ca3af", textAlign: "center", marginTop: "8px" }}>{label}</div>;
+          })()}
 
           {/* AI Drafted fields approval — gates page generation until reviewed */}
           {draftedFields && Object.keys(draftedFields).length > 0 && (
