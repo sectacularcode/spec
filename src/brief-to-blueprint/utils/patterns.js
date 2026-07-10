@@ -7,11 +7,42 @@
 
 import { LAYOUT_PATTERNS } from "../../constants/patterns.js";
 
-// Scans crawled inspo text for structural keywords and returns a boost map { patternId: score }
+// Scans crawled inspo data for structural signal and returns a boost map
+// { patternId: score }. inspoContext is a string produced by
+// buildInspoContext() in utils/inspo.js — as of the screenshot-based
+// upgrade, that's a JSON payload of { text, patternBoosts }, where
+// patternBoosts comes from real visual classification (see
+// crawl-inspo.js's classifyPageLayout) and is a stronger, more reliable
+// signal than the text-keyword regex below. Older saved drafts may still
+// hold the pre-upgrade plain-text format (buildInspoContext used to return
+// raw joined notes, not JSON) — JSON.parse fails on those, and this falls
+// straight back to scanning the raw string exactly as it always did, so
+// nothing already saved breaks.
 function parseInspoPatterns(inspoContext) {
   if (!inspoContext) return {};
-  var text = inspoContext.toLowerCase();
+
   var boosts = {};
+  var textToScan = inspoContext;
+
+  try {
+    var parsed = JSON.parse(inspoContext);
+    if (parsed && typeof parsed === "object") {
+      if (parsed.patternBoosts) {
+        Object.keys(parsed.patternBoosts).forEach(function(id) {
+          boosts[id] = (boosts[id] || 0) + parsed.patternBoosts[id];
+        });
+      }
+      // Still scan the accompanying text for additional (weaker) signal —
+      // a reference site's notes may mention structural details beyond
+      // what got explicitly classified per section.
+      textToScan = parsed.text || "";
+    }
+  } catch {
+    // Not JSON — old plain-text format. textToScan stays as the raw string.
+  }
+
+  if (!textToScan) return boosts;
+  var text = textToScan.toLowerCase();
   function bump(id, amt) { boosts[id] = (boosts[id] || 0) + (amt || 8); }
 
   if (text.match(/split.{0,20}(hero|left|right)|image.{0,10}(left|right).{0,20}text/)) { bump("split-left"); bump("split-right"); }
