@@ -428,10 +428,24 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   function makeMapSection() {
     if (!brief.mapAddress && !brief.mapUrl) return null;
     // If a curated featureLayout already places a real map inline (see
-    // renderMapBeside), the standalone address-plus-button section would
-    // just duplicate it — skip.
+    // renderMapBeside), the standalone section would just duplicate it —
+    // skip.
     var mapAlreadyPlaced = Array.isArray(brief.featureLayout) && brief.featureLayout.some(function (e) { return e.style === "map-beside"; });
     if (mapAlreadyPlaced) return null;
+    // A real address gets a real, embedded Google Maps widget — the same
+    // upgrade the curated AFS layout got, now generalized so any page
+    // with real location data gets it, not just one brand's hand-built
+    // page. Falls back to the older address-plus-button treatment only
+    // when there's a mapUrl but no structured address to build a real
+    // widget from.
+    if (brief.mapAddress) {
+      var mapWidget = mkGoogleMapsWidget(brief.mapAddress, { height: 420 });
+      return mkContainer([
+        mkHeading(brief.mapHeading || "Find Us", ink, "h2", { weight: 700, px: 32 }),
+        mkSpacer(20),
+        mapWidget,
+      ], bone, { padY: "60" });
+    }
     return mkMapSection(brief.mapAddress, brief.mapUrl, colors, { heading: brief.mapHeading || "Find Us" });
   }
 
