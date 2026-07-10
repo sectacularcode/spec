@@ -881,6 +881,22 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             "</div>" +
           "</section>" +
           (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.featureLayout) :
+          (variant === "D" || variant === "B") ? renderCuratedFeatureLayoutHTML((Array.isArray(brief.features) ? brief.features : []).map(function (_, i) {
+            // Mirrors landing.js's Variant D/B dispatch -- Variant B's
+            // feature rows were falling straight through to the plain
+            // uniform stacked-text/compact-list style with no variety at
+            // all (no featureLayout check, no variant check -- this
+            // occurrence had neither). Confirmed via brace-boundary
+            // tracing that this specific code only runs inside the real
+            // Variant B block, so variant is guaranteed "B" here whenever
+            // this branch is reached from a B page; included the "D"
+            // check too for consistency with the same pattern elsewhere.
+            var hasVideo = !!brief.videoUrl;
+            var cyclePattern = hasVideo
+              ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
+              : ["split-right", "centered-cta", "checklist", "split-left", "split-cta-right", "plain"];
+            return { style: cyclePattern[i % cyclePattern.length], indices: [i] };
+          })) :
           featureRowsData.map(function(f,i) {
             if (featureRowStyle === "stacked-text") {
               return "<section style='background:" + (i%2===0?"#ffffff":bone) + ";padding:56px clamp(24px,6vw,64px);'>" +
