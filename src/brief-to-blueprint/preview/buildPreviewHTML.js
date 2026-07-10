@@ -937,6 +937,35 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             }).join("") +
           "</div>" +
         "</section>") +
+        (function () {
+          // Mirrors landing.js's makeFormSection() -- renders form content
+          // (from a Manifest "form" section, or brief.formHeading/formFields
+          // set directly) when no curated layout is already placing it
+          // inline. Without this, form content on a page with no
+          // page-specific curated layout would be captured but never shown
+          // -- the common case going forward, since most pages won't have
+          // one.
+          var hasForm = brief.formHeading || (Array.isArray(brief.formFields) && brief.formFields.length);
+          if (!hasForm) return "";
+          var formAlreadyPlaced =
+            (Array.isArray(brief.featureLayout) && brief.featureLayout.some(function (e) { return e.style === "embedded-form"; })) ||
+            (Array.isArray(brief.postClosingLayout) && brief.postClosingLayout.some(function (e) { return e.style === "embedded-form"; }));
+          if (formAlreadyPlaced) return "";
+          var ffHeading = brief.formHeading || "Get a Quote";
+          var ffSubhead = brief.formSubhead || "";
+          var ffFields  = (Array.isArray(brief.formFields) && brief.formFields.length) ? brief.formFields : ["Name", "Phone", "Message"];
+          var ffCta     = brief.formCta || "Request a Quote";
+          return "<section style='background:" + bone + ";padding:56px clamp(24px,6vw,64px);'>" +
+              "<div style='max-width:560px;'>" +
+              "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + ffHeading + "</h3>" +
+              (ffSubhead ? "<p style='font-size:14px;color:" + stone + ";margin:0 0 20px;'>" + ffSubhead + "</p>" : "") +
+              ffFields.map(function (lbl) {
+                return "<div style='margin-bottom:12px;'><label style='display:block;font-size:12px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;'>" + lbl + "</label><div style='width:100%;padding:10px 14px;border:1px solid #dde0e6;border-radius:4px;background:#ffffff;font-size:14px;color:#bbb;box-sizing:border-box;'>" + lbl + "...</div></div>";
+              }).join("") +
+              "<button style='padding:12px 28px;background:" + brass + ";color:#fff;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:6px;'>" + ffCta + "</button>" +
+              "</div>" +
+            "</section>";
+        })() +
         "<section class='va-cta' style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
           "<h2 style='font-size:clamp(26px,4vw,42px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
           "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:540px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
