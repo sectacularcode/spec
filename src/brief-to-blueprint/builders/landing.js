@@ -79,11 +79,28 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // Opt-in per brief — most landing pages should NOT get a bordered text
     // box. Only apply it when the brief explicitly asks for it.
     var featureBorder = !!brief.featureTextBorder;
-    var features = [
-      { heading: brief.feature1Heading || "What We Do Best",     body: brief.feature1Body || "[Describe the primary service or capability that sets you apart]", imgCaption: "[Photo placeholder]", imageLeft: false },
-      { heading: brief.feature2Heading || "Built for Your Needs", body: brief.feature2Body || "[Explain how your approach is tailored to the specific customer]", imgCaption: "[Photo placeholder]", imageLeft: true  },
-      { heading: brief.feature3Heading || "Results You Can Count On", body: brief.feature3Body || "[Speak to reliability, track record, or outcomes]", imgCaption: "[Photo placeholder]", imageLeft: false },
-    ];
+
+    // brief.features (an array) takes priority when present — this is what
+    // lets a source with more than 3 real content sections (e.g. a real
+    // Manifest export) place all of them instead of capping at 3 and
+    // flagging the rest. Falls back to the original 3 hardcoded
+    // feature1/2/3 fields when brief.features isn't set, so every existing
+    // brief and test file keeps working exactly as before.
+    var features = Array.isArray(brief.features) && brief.features.length > 0
+      ? brief.features.map(function(f, i) {
+          return {
+            heading: f.heading || "",
+            body: f.body || "",
+            imgCaption: f.imgCaption || "[Photo placeholder]",
+            imageLeft: i % 2 === 1,
+          };
+        })
+      : [
+          { heading: brief.feature1Heading || "What We Do Best",     body: brief.feature1Body || "[Describe the primary service or capability that sets you apart]", imgCaption: "[Photo placeholder]", imageLeft: false },
+          { heading: brief.feature2Heading || "Built for Your Needs", body: brief.feature2Body || "[Explain how your approach is tailored to the specific customer]", imgCaption: "[Photo placeholder]", imageLeft: true  },
+          { heading: brief.feature3Heading || "Results You Can Count On", body: brief.feature3Body || "[Speak to reliability, track record, or outcomes]", imgCaption: "[Photo placeholder]", imageLeft: false },
+        ];
+
     return features.map(function(f, i) {
       var innerChildren = [
         mkHeading(f.heading, accent, "h2", { weight: 700, px: 34 }),
