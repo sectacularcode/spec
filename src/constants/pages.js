@@ -34,6 +34,7 @@ export const ALL_PAGES = [
 // Additional pages — shown in the "+ Add Page" dropdown
 export const ADDITIONAL_PAGE_TYPES = [
   { id: "landing",      label: "Landing Page",      slug: "/landing" },
+  { id: "other",        label: "Other / Custom Page",slug: "/custom" },
   { id: "team",         label: "Team",              slug: "/team" },
   { id: "blog",         label: "Blog / Journal",    slug: "/blog" },
   { id: "blog-post",    label: "Blog Post",         slug: "/blog/post" },
