@@ -438,12 +438,17 @@ function manifestPageDocumentToBrief(raw) {
   if (faqPairs.length) brief.faqItems = faqPairs;
 
   // One-off curated layout for a specific real page, set up directly at
-  // Kalei's request after reviewing a mockup of it (July 2026). The
-  // underlying mechanism (brief.featureLayout, see landing.js's
-  // renderFeatureLayout) is real and reusable — this is just its first
-  // concrete usage, keyed to this exact page.id until a proper per-section
-  // style picker exists in the UI. Should move there once that's built,
-  // not accumulate more page-id special cases here.
+  // Kalei's request after reviewing a mockup of it, then revised once more
+  // (July 2026) to match her actual final, edited-in-Elementor version —
+  // order changed, the form moved to after the closing CTA, and the real
+  // shop address (found in her edited export, not previously available
+  // anywhere in the Manifest data) now drives a real Google Maps widget.
+  // The underlying mechanisms (brief.featureLayout, brief.postClosingLayout
+  // — see landing.js's renderFeatureLayout/makePostClosingRows) are real
+  // and reusable; this is just their first concrete usage, keyed to this
+  // exact page.id until a proper per-section style picker exists in the
+  // UI. Should move there once that's built, not accumulate more page-id
+  // special cases here.
   var AFS_SAGINAW_PAGE_ID = "49c7efb7-c26a-4eb1-a287-7656f10b8472";
   if (page.id === AFS_SAGINAW_PAGE_ID && brief.features && brief.features.length >= 11) {
     brief.featureLayout = [
@@ -452,13 +457,21 @@ function manifestPageDocumentToBrief(raw) {
       { style: "split-left", indices: [2] },
       { style: "grouped-header", header: "Our Services", indices: [3, 4] },
       { style: "split-cta-right", indices: [5] },
-      { style: "embedded-form", indices: [6] },
       { style: "plain", indices: [7] },
       { style: "split-left", indices: [8] },
-      { style: "map-beside", indices: [9] },
       { style: "plain", indices: [10] },
+      { style: "map-beside", indices: [9] },
+    ];
+    // The pricing/form section ended up after the closing CTA in the
+    // actual reviewed page, not with the other feature rows.
+    brief.postClosingLayout = [
+      { style: "embedded-form", indices: [6] },
     ];
     brief.skipServicesChecklist = true;
+    // Real address, confirmed from her own edited export — Manifest's
+    // source data never included one, so this couldn't have been set any
+    // earlier than discovering it there.
+    if (!brief.mapAddress) brief.mapAddress = "1013 Jarvis RD, Saginaw, TX 76179";
   }
 
   return brief;
