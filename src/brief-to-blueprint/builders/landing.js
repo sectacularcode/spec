@@ -1,4 +1,4 @@
-import { nid, mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer, mkDivider, mkIconList, mkForm, mkTestimonialCarousel, mkAccordion, mkMapSection } from "./helpers.js";
+import { nid, mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer, mkDivider, mkIconList, mkForm, mkTestimonialCarousel, mkAccordion, mkMapSection, mkGoogleMapsWidget } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
 import { parseInspoPatterns } from "../utils/patterns.js";
 
@@ -97,18 +97,14 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     return mkContainer(cols, bgColor || bone, { direction: "row", padY: "0", padX: "0", gap: "0" });
   }
 
-  function makeFeatureRows() {
-    // Opt-in per brief — most landing pages should NOT get a bordered text
-    // box. Only apply it when the brief explicitly asks for it.
-    var featureBorder = !!brief.featureTextBorder;
-
-    // brief.features (an array) takes priority when present — this is what
-    // lets a source with more than 3 real content sections (e.g. a real
-    // Manifest export) place all of them instead of capping at 3 and
-    // flagging the rest. Falls back to the original 3 hardcoded
-    // feature1/2/3 fields when brief.features isn't set, so every existing
-    // brief and test file keeps working exactly as before.
-    var features = Array.isArray(brief.features) && brief.features.length > 0
+  // Shared by makeFeatureRows() and makePostClosingRows() — brief.features
+  // (an array) takes priority when present, letting a source with more
+  // than 3 real content sections (e.g. a real Manifest export) place all
+  // of them. Falls back to the original 3 hardcoded feature1/2/3 fields
+  // when brief.features isn't set, so every existing brief keeps working
+  // exactly as before.
+  function buildFeaturesArray() {
+    return Array.isArray(brief.features) && brief.features.length > 0
       ? brief.features.map(function(f, i) {
           return {
             heading: f.heading || "",
@@ -122,6 +118,13 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
           { heading: brief.feature2Heading || "Built for Your Needs", body: brief.feature2Body || "[Explain how your approach is tailored to the specific customer]", imgCaption: "[Photo placeholder]", imageLeft: true  },
           { heading: brief.feature3Heading || "Results You Can Count On", body: brief.feature3Body || "[Speak to reliability, track record, or outcomes]", imgCaption: "[Photo placeholder]", imageLeft: false },
         ];
+  }
+
+  function makeFeatureRows() {
+    // Opt-in per brief — most landing pages should NOT get a bordered text
+    // box. Only apply it when the brief explicitly asks for it.
+    var featureBorder = !!brief.featureTextBorder;
+    var features = buildFeaturesArray();
 
     // Per-section layout override — the real mechanism for hand-curating a
     // page's structure section by section instead of one uniform style for
@@ -214,6 +217,17 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     });
   }
 
+  // A second curated layout slot, rendered AFTER the closing CTA and
+  // before the FAQ — for content that genuinely belongs there rather than
+  // with the main feature rows (confirmed real case: AFS's pricing/form
+  // section ended up positioned after the closing CTA, not before it, in
+  // the actual reviewed-and-approved page). Empty/absent by default; only
+  // renders when brief.postClosingLayout is explicitly set.
+  function makePostClosingRows() {
+    if (!Array.isArray(brief.postClosingLayout) || brief.postClosingLayout.length === 0) return [];
+    return renderFeatureLayout(brief.postClosingLayout, buildFeaturesArray());
+  }
+
   // Renders a curated, per-section layout (brief.featureLayout) instead of
   // one uniform style for every row. Each entry names which feature
   // index(es) it covers and which style to use — "grouped-header" is the
@@ -290,7 +304,6 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var cols = items.map(function (item) {
       return mkContainer([
         mkHeading(item.heading, ink, "h4", { weight: 700, px: 18 }),
-        mkSpacer(8),
         mkText(he(item.body), text),
       ], null, { isInner: true, padY: "0", padX: "0", width: colWidth, grow: "1" });
     });
@@ -320,10 +333,10 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     ].filter(Boolean), bone, { padY: "56", padX: "48" });
   }
 
-  // Text beside a map-labeled placeholder — for content about coverage
-  // area or physical location that doesn't have real coordinates to build
-  // Spec's actual map widget from (see manifestImport.js's map_location
-  // handling: a real address builds the real map section instead).
+  // Text beside a real, native Elementor Google Maps widget when a real
+  // address exists (brief.mapAddress) — confirmed working structure from a
+  // real exported page. Falls back to a labeled placeholder when there's
+  // no real address to build a working map from — never invents one.
   function renderMapBeside(f, rowIdx) {
     var innerChildren = [
       mkHeading(f.heading, accent, "h2", { weight: 700, px: 30 }),
@@ -334,15 +347,18 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     innerBox.settings.flex_justify_content = "center";
     innerBox.settings.flex_align_items = "flex-start";
     var textCol = mkContainer([innerBox], null, { isInner: true, padY: "30", padX: "30", width: 50, full: true });
-    var mapCol  = mkImageBg("[Map placeholder]", { width: 50 });
+    var mapWidget = mkGoogleMapsWidget(brief.mapAddress, { isInner: false });
+    var mapCol = mapWidget
+      ? mkContainer([mapWidget], null, { isInner: true, padY: "0", padX: "0", width: 50, full: true })
+      : mkImageBg("[Map placeholder]", { width: 50 });
     return mkContainer([textCol, mapCol], rowIdx % 2 === 0 ? warmWhite : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
   }
 
-  // A single clean text block, no image — for content the uniform styles
-  // would otherwise handle fine, kept as-is inside a curated layout.
+  // A single clean text block, no image, no divider — for content the
+  // uniform styles would otherwise handle fine, kept as-is inside a
+  // curated layout.
   function renderPlainRow(f, rowIdx) {
     return mkContainer([
-      mkDivider(accent), mkSpacer(14),
       mkHeading(f.heading, ink, "h3", { weight: 700, px: 22 }),
       mkSpacer(10),
       mkText(he(f.body), text),
@@ -385,6 +401,11 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // null when there's nothing to show — callers must .filter(Boolean).
   function makeMapSection() {
     if (!brief.mapAddress && !brief.mapUrl) return null;
+    // If a curated featureLayout already places a real map inline (see
+    // renderMapBeside), the standalone address-plus-button section would
+    // just duplicate it — skip.
+    var mapAlreadyPlaced = Array.isArray(brief.featureLayout) && brief.featureLayout.some(function (e) { return e.style === "map-beside"; });
+    if (mapAlreadyPlaced) return null;
     return mkMapSection(brief.mapAddress, brief.mapUrl, colors, { heading: brief.mapHeading || "Find Us" });
   }
 
@@ -418,7 +439,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     return {
       version: "0.4", title: he(brandName || "Site") + " — Landing Page", type: "page", page_settings: {},
-      content: [heroA, makeTrustStrip(), ...makeFeatureRows(), checklistSection, makeMapSection(), makeClosingCta(), makeFaqSection()].filter(Boolean),
+      content: [heroA, makeTrustStrip(), ...makeFeatureRows(), checklistSection, makeMapSection(), makeClosingCta(), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),
     };
   }
 
@@ -520,7 +541,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     return {
       version: "0.4", title: he(brandName || "Site") + " — Landing Page (Form)", type: "page", page_settings: {},
-      content: [heroB, formSection, testimonialsSection, ...makeFeatureRows(), midCta, makeMapSection(), makeClosingCta(), makeFaqSection()].filter(Boolean),
+      content: [heroB, formSection, testimonialsSection, ...makeFeatureRows(), midCta, makeMapSection(), makeClosingCta(), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),
     };
   }
 
