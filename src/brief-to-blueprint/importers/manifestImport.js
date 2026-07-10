@@ -307,7 +307,26 @@ function manifestPageDocumentToBrief(raw) {
 
   var brief = {
     brandName: brand.name || "",
-    colors: {}, // not carried in this format
+    // brand_tokens.colors/fonts are open key-value objects in the real
+    // schema (any string key), currently unpopulated in every real export
+    // seen so far -- but the field itself already exists, so this reads
+    // it whenever it's there rather than assuming it never will be.
+    // Spec's color slots expect specific keys (ink/brass/brass-deep/bone/
+    // asphalt/stone/warm-white/text) -- Manifest sending those exact names
+    // makes this a direct match; anything else still degrades gracefully,
+    // since every one of Spec's color reads already has its own per-key
+    // fallback (confirmed fix, July 2026 -- see landing.js/buildPreviewHTML.js).
+    colors: (raw.brand_tokens && raw.brand_tokens.colors) || {},
+    // Other builders (home.js, generic.js) read brief.fonts as an array
+    // ([heading, body]), not an object -- Manifest's brand_tokens.fonts is
+    // an open object, so this converts rather than passing through raw,
+    // which would silently mismatch (fonts[1] on an object is undefined,
+    // not a crash, but not the real font either). Recommends "heading"/
+    // "body" as the two keys Manifest sends, since those are what this
+    // maps from.
+    fonts: (raw.brand_tokens && raw.brand_tokens.fonts)
+      ? [raw.brand_tokens.fonts.heading || raw.brand_tokens.fonts.body, raw.brand_tokens.fonts.body || raw.brand_tokens.fonts.heading]
+      : undefined,
     referenceUrls: (raw.brand_tokens && raw.brand_tokens.reference_urls) || [],
     _manifestBrandId: brand.id,
     _manifestPageId: page.id,
