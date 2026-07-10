@@ -3,6 +3,7 @@ import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { deepStripHTML } from "./_lib/sanitize.js";
 import { callAnthropic, extractJSON } from "./_lib/anthropic.js";
 import { logUsage } from "./_lib/usage.js";
+import { DRAFTABLE_FIELDS, isFieldBlank } from "../src/utils/draftableFields.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -24,27 +25,7 @@ export default async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "ANTHROPIC_API_KEY not set" });
 
-  const DRAFTABLE_FIELDS = [
-    { key: "heroHeadline", label: "Hero headline", hint: "A short, punchy headline for the hero section. 5-10 words max. Should include or allude to a primary keyword if possible." },
-    { key: "heroSubhead", label: "Hero subheadline", hint: "A single sentence expanding on the headline. Plain, specific, speaks directly to the target audience." },
-    { key: "hookStatement", label: "Honest hook", hint: "One or two sentences that call out the problem and position this brand as the solution. No buzzwords." },
-    { key: "differenceH2", label: "Difference headline", hint: "A short H2 that names the key differentiator. 4-8 words. Should reflect the competitive differentiator." },
-    { key: "differenceBody", label: "Difference body copy", hint: "2-3 sentences explaining what makes this brand different. Specific, not generic. Reference the competitive differentiator." },
-    { key: "whoH2", label: "Who it is for headline", hint: "A short H2 that names the target audience. 3-6 words." },
-    { key: "whoBody", label: "Who it is for body", hint: "2-3 sentences describing the ideal client using the target audience definition. Be specific." },
-    { key: "aboutStory", label: "About story", hint: "The founder or company story. When it started, what drove it, who it serves." },
-    { key: "whyOneMaker", label: "Why this approach", hint: "2-3 sentences on the approach and why it works for clients. Reference the competitive differentiator." },
-    { key: "processIntro", label: "Process intro", hint: "One sentence about what to expect — calm, specific, no jargon." },
-    { key: "contactIntro", label: "Contact intro", hint: "2-3 sentences inviting the visitor to get in touch. Warm but direct. Reference the key CTA." },
-    { key: "contactReassurance", label: "Contact reassurance", hint: "One short sentence under the form. Specific promise, no sales team language." },
-  ];
-
-  const blankFields = DRAFTABLE_FIELDS.filter(f => {
-    const val = brief[f.key];
-    if (!val || val.trim() === "") return true;
-    if (val.includes("[") && val.includes("]")) return false;
-    return false;
-  });
+  const blankFields = DRAFTABLE_FIELDS.filter(f => isFieldBlank(brief, f.key));
 
   if (blankFields.length === 0) {
     return res.status(200).json({ drafts: {}, message: "No blank fields to draft" });
