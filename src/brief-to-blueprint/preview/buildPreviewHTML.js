@@ -594,10 +594,10 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       // override mechanism, rendered as HTML strings instead of Elementor
       // JSON. When brief.featureLayout is set, this takes over entirely
       // for the feature-row area; the uniform style above is unused.
-      function renderCuratedFeatureLayoutHTML() {
+      function renderCuratedFeatureLayoutHTML(layout) {
         var rawFeatures = Array.isArray(brief.features) ? brief.features : [];
         var htmlParts = [];
-        brief.featureLayout.forEach(function (entry, rowIdx) {
+        layout.forEach(function (entry, rowIdx) {
           var items = (entry.indices || []).map(function (i) { return rawFeatures[i]; }).filter(Boolean);
           if (!items.length) return;
           var bg = rowIdx % 2 === 0 ? "#ffffff" : bone;
@@ -650,13 +650,22 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           }
 
           if (entry.style === "map-beside") {
+            // A real, working Google Maps embed (Google's no-API-key iframe
+            // format) when a real address exists — confirmed real address
+            // for this page came from the actual edited Elementor export,
+            // since Manifest's source data never included one. Falls back
+            // to a labeled placeholder when there's nothing real to embed;
+            // never invents an address.
+            var mapEmbed = brief.mapAddress
+              ? "<iframe src=\"https://maps.google.com/maps?q=" + encodeURIComponent(brief.mapAddress) + "&output=embed\" style='border:0;width:100%;height:100%;min-height:320px;display:block;' loading='lazy'></iframe>"
+              : "<div class='landing-img' style='min-height:320px;height:100%;overflow:hidden;background:" + bone + ";display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:12px;'>Map placeholder</div>";
             htmlParts.push(
               "<section style='background:" + bg + ";display:grid;grid-template-columns:1fr 1fr;'>" +
                 "<div style='padding:56px 48px;display:flex;flex-direction:column;justify-content:center;'>" +
                   "<h2 style='font-size:clamp(20px,2.5vw,28px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + (f.heading || "") + "</h2>" +
                   "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0;'>" + (f.body || "") + "</p>" +
                 "</div>" +
-                "<div class='landing-img' style='min-height:320px;height:100%;overflow:hidden;background:" + bone + ";display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:12px;'>Map placeholder</div>" +
+                "<div style='min-height:320px;height:100%;overflow:hidden;'>" + mapEmbed + "</div>" +
               "</section>"
             );
             return;
@@ -680,10 +689,9 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             return;
           }
 
-          // "plain" fallback
+          // "plain" fallback -- no accent line, matches landing.js
           htmlParts.push(
             "<section style='background:" + bg + ";padding:44px clamp(24px,6vw,64px);'>" +
-              "<div style='width:28px;height:2px;background:" + brass + ";margin-bottom:14px;'></div>" +
               "<h3 style='font-size:clamp(17px,2vw,22px);font-weight:700;color:" + ink + ";margin:0 0 10px;'>" + (f.heading || "") + "</h3>" +
               "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0;'>" + (f.body || "") + "</p>" +
             "</section>"
@@ -806,7 +814,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
               "</div>" +
             "</div>" +
           "</section>" +
-          (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML() :
+          (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.featureLayout) :
           featureRowsData.map(function(f,i) {
             if (featureRowStyle === "stacked-text") {
               return "<section style='background:" + (i%2===0?"#ffffff":bone) + ";padding:56px clamp(24px,6vw,64px);'>" +
@@ -837,6 +845,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
               "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
             "</div>" +
           "</section>" +
+          (Array.isArray(brief.postClosingLayout) && brief.postClosingLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.postClosingLayout) : "") +
           faqHTML;
       }
 
@@ -900,7 +909,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             }).join("") +
           "</div>" +
         "</section>" +
-        (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML() :
+        (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.featureLayout) :
         featureRowsDataB.map(function(f,i) {
           if (featureRowStyle === "stacked-text") {
             return "<section style='background:" + (i%2===0?"#ffffff":bone) + ";padding:52px clamp(24px,6vw,64px);'>" +
@@ -936,6 +945,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
           "</div>" +
         "</section>" +
+        (Array.isArray(brief.postClosingLayout) && brief.postClosingLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.postClosingLayout) : "") +
         faqHTML;
     })(),
 
