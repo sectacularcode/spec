@@ -2,6 +2,7 @@ import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { deepStripHTML } from "./_lib/sanitize.js";
 import { callAnthropic, extractJSON } from "./_lib/anthropic.js";
+import { logUsage } from "./_lib/usage.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -108,6 +109,15 @@ Only include keys for the fields listed above.`;
     });
 
     if (!ok) return res.status(500).json({ error: "API error", drafts: {} });
+
+    await logUsage({
+      userId,
+      clientName: brief.brandName || null,
+      route: "draft-copy",
+      model: "claude-haiku-4-5-20251001",
+      inputTokens: data?.usage?.input_tokens,
+      outputTokens: data?.usage?.output_tokens,
+    });
 
     const parsed = extractJSON(data);
     if (!parsed) return res.status(200).json({ drafts: {}, message: "Could not parse drafts" });
