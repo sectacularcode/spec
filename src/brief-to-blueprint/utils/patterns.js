@@ -18,7 +18,7 @@ import { LAYOUT_PATTERNS } from "../../constants/patterns.js";
 // raw joined notes, not JSON) — JSON.parse fails on those, and this falls
 // straight back to scanning the raw string exactly as it always did, so
 // nothing already saved breaks.
-function parseInspoPatterns(inspoContext) {
+export function parseInspoPatterns(inspoContext) {
   if (!inspoContext) return {};
 
   var boosts = {};
