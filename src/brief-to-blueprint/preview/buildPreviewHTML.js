@@ -47,6 +47,18 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
 
   var patterns = selectPatterns(brief, inspoContext || "");
 
+  // The Home page's A/B/C layouts are fixed hero+services combinations
+  // (see generatePages.js), not something selectPatterns() alone knows
+  // about -- without this override, switching A/B/C in the layout picker
+  // would leave the preview showing the same thing every time, since
+  // patterns.hero/services are otherwise inspo/content-driven only.
+  var baseActivePageForPatterns = activePage.replace(/-\d+$/, "");
+  if (baseActivePageForPatterns === "home") {
+    if (variant === "A") { patterns.hero = "centered-bold"; }
+    else if (variant === "B") { patterns.hero = "split-left"; }
+    else if (variant === "C") { patterns.hero = "minimal"; patterns.services = "numbered-features"; }
+  }
+
   // Strip timestamp suffix so custom pages (e.g. "faq-1718982345678") match
   // the same pattern-setting logic as their base type (e.g. "faq")
   var baseActivePage = activePage.replace(/-\d+$/, "");
@@ -973,22 +985,6 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
               }).join("") +
               "<button style='padding:12px 28px;background:" + brass + ";color:#fff;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:6px;'>" + ffCta + "</button>" +
               "</div>" +
-            "</section>";
-        })() +
-        (function () {
-          // Mirrors landing.js's makeMapSection() -- a real, embedded
-          // Google Maps iframe when a real address exists and no curated
-          // layout is already placing a map inline. Previously the
-          // preview had no equivalent of this at all for the generic
-          // path, so real address data was captured but never actually
-          // shown here.
-          if (!brief.mapAddress && !brief.mapUrl) return "";
-          var mapAlreadyPlaced = Array.isArray(brief.featureLayout) && brief.featureLayout.some(function (e) { return e.style === "map-beside"; });
-          if (mapAlreadyPlaced) return "";
-          if (!brief.mapAddress) return "";
-          return "<section style='background:" + bone + ";padding:60px clamp(24px,6vw,64px);'>" +
-              "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 20px;'>" + (brief.mapHeading || "Find Us") + "</h2>" +
-              "<iframe src=\"https://maps.google.com/maps?q=" + encodeURIComponent(brief.mapAddress) + "&output=embed\" style='border:0;width:100%;height:420px;display:block;' loading='lazy'></iframe>" +
             "</section>";
         })() +
         "<section class='va-cta' style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
