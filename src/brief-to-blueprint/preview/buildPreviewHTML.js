@@ -1,5 +1,25 @@
-import { selectPatterns } from "../utils/patterns.js";
+import { selectPatterns, parseInspoPatterns } from "../utils/patterns.js";
 import { he } from "../utils/htmlEscape.js";
+
+// Mirrors landing.js's selectFeatureRowStyle() exactly — same density
+// thresholds, same inspo-signal override, same relevant pattern IDs. This
+// duplication is deliberate: keeping the logic inline in each file (rather
+// than one importing a shared helper from the other) matches how the rest
+// of this file already mirrors landing.js's structure independently, and
+// avoids a preview-only file depending on an export-only one. If the
+// thresholds or pattern mapping ever change, update both.
+function selectFeatureRowStyle(inspoContext, featureCount) {
+  var densityDefault = featureCount <= 4 ? "split-image" : featureCount <= 8 ? "stacked-text" : "compact-list";
+
+  var boosts = parseInspoPatterns(inspoContext);
+  var relevant = { "alternating-rows": "split-image", "icon-list": "compact-list", "numbered-features": "compact-list", "card-grid": "stacked-text" };
+  var bestId = null, bestScore = 0;
+  Object.keys(relevant).forEach(function (id) {
+    if (boosts[id] && boosts[id] > bestScore) { bestScore = boosts[id]; bestId = id; }
+  });
+
+  return bestId ? relevant[bestId] : densityDefault;
+}
 
 // Generates a complete HTML document string for the preview iframe.
 // All user-controlled brief fields are sanitized via he() before insertion.
@@ -554,6 +574,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             return [f.heading || "", f.body || "", makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg), i % 2 === 1];
           })
         : [[f1h, f1b, img1, false], [f2h, f2b, img2, true], [f3h, f3b, img3, false]];
+      var featureRowStyle = selectFeatureRowStyle(inspoContext, featureRowsData.length);
       var s1    = brief.trustStat1 || "10+";  var l1 = brief.trustLabel1 || "Years in business";
       var s2    = brief.trustStat2 || "500+"; var l2 = brief.trustLabel2 || "Projects completed";
       var s3    = brief.trustStat3 || "98%";  var l3 = brief.trustLabel3 || "Client satisfaction";
@@ -670,6 +691,19 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             "</div>" +
           "</section>" +
           featureRowsData.map(function(f,i) {
+            if (featureRowStyle === "stacked-text") {
+              return "<section style='background:" + (i%2===0?"#ffffff":bone) + ";padding:56px clamp(24px,6vw,64px);'>" +
+                "<div style='width:28px;height:2px;background:" + brass + ";margin-bottom:16px;'></div>" +
+                "<h3 style='font-size:clamp(18px,2.2vw,24px);font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + f[0] + "</h3>" +
+                "<p style='font-size:15px;color:" + text + ";line-height:1.7;margin:0;max-width:760px;'>" + f[1] + "</p>" +
+              "</section>";
+            }
+            if (featureRowStyle === "compact-list") {
+              return "<div style='display:flex;gap:20px;align-items:flex-start;padding:22px clamp(24px,6vw,64px);border-bottom:1px solid #f0f0f0;background:#ffffff;'>" +
+                "<div style='width:36px;height:36px;border-radius:50%;background:" + brass + ";display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#ffffff;font-weight:700;font-size:14px;'>" + (i+1) + "</div>" +
+                "<div><h4 style='font-size:16px;font-weight:700;color:" + ink + ";margin:0 0 6px;'>" + f[0] + "</h4><p style='font-size:14px;color:" + text + ";line-height:1.6;margin:0;'>" + f[1] + "</p></div>" +
+              "</div>";
+            }
             var imgLeft = i%2!==0;
             var cols = imgLeft
               ? "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div><div style='padding:72px 64px;display:flex;flex-direction:column;justify-content:center;'>"
@@ -750,6 +784,19 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           "</div>" +
         "</section>" +
         featureRowsDataB.map(function(f,i) {
+          if (featureRowStyle === "stacked-text") {
+            return "<section style='background:" + (i%2===0?"#ffffff":bone) + ";padding:52px clamp(24px,6vw,64px);'>" +
+              "<div style='width:28px;height:2px;background:" + brass + ";margin-bottom:14px;'></div>" +
+              "<h3 style='font-size:clamp(17px,2vw,22px);font-weight:700;color:" + ink + ";margin:0 0 10px;'>" + f[0] + "</h3>" +
+              "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0;max-width:760px;'>" + f[1] + "</p>" +
+            "</section>";
+          }
+          if (featureRowStyle === "compact-list") {
+            return "<div style='display:flex;gap:18px;align-items:flex-start;padding:20px clamp(24px,6vw,64px);border-bottom:1px solid #f0f0f0;background:#ffffff;'>" +
+              "<div style='width:32px;height:32px;border-radius:50%;background:" + brass + ";display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#ffffff;font-weight:700;font-size:13px;'>" + (i+1) + "</div>" +
+              "<div><h4 style='font-size:15px;font-weight:700;color:" + ink + ";margin:0 0 5px;'>" + f[0] + "</h4><p style='font-size:13px;color:" + text + ";line-height:1.6;margin:0;'>" + f[1] + "</p></div>" +
+            "</div>";
+          }
           var textDiv = "<div class='feature-text' style='padding:72px 64px;display:flex;flex-direction:column;justify-content:center;'><h2 style='font-size:clamp(20px,2.5vw,32px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p><a class='row-btn' style='" + btnDark + "'>" + cta2 + "</a></div>";
           var imgDiv  = "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>";
           return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + (f[3] ? imgDiv+textDiv : textDiv+imgDiv) + "</section>";
