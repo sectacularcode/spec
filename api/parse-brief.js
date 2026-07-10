@@ -34,6 +34,27 @@ Return this exact structure (use empty string "" for any field not found):
   "pricingSubhead": "",
   "pricingCta": "",
   "closingCta": "",
+  "closingBody": "",
+  "phoneCta": "",
+  "trustStat1": "", "trustLabel1": "",
+  "trustStat2": "", "trustLabel2": "",
+  "trustStat3": "", "trustLabel3": "",
+  "feature1Heading": "", "feature1Body": "",
+  "feature2Heading": "", "feature2Body": "",
+  "feature3Heading": "", "feature3Body": "",
+  "servicesHeading": "",
+  "servicesList": ["Item 1", "Item 2"],
+  "faqHeading": "",
+  "faqItems": [{ "question": "", "answer": "" }],
+  "whyUsIntro": "",
+  "benefit1": "", "benefit2": "", "benefit3": "",
+  "formHeading": "", "formSubhead": "",
+  "formFields": ["Field 1", "Field 2"],
+  "formCta": "", "formReassurance": "",
+  "testimonial1Quote": "", "testimonial1Name": "", "testimonial1Title": "",
+  "testimonial2Quote": "", "testimonial2Name": "", "testimonial2Title": "",
+  "testimonial3Quote": "", "testimonial3Name": "", "testimonial3Title": "",
+  "mapAddress": "", "mapUrl": "",
   "aboutEyebrow": "",
   "aboutH1": "",
   "aboutStory": "",
@@ -72,7 +93,11 @@ Rules:
 - For milestones: extract any founder journey, company history, or timeline events from the About section.
 - For pricingTiers: the subtitle is the short descriptor line like "CASH FLOW & TRUST" or "MARGIN & CRAFT".
 - For differenceH2, whoH2, workH1, aboutH1: extract the actual headline copy, not the eyebrow label.
-- If a field is genuinely absent from the brief, use empty string "" — never invent copy.`;
+- If a field is genuinely absent from the brief, use empty string "" — never invent copy.
+- The trustStat/trustLabel, feature, testimonial, benefit, form, and map fields only apply if this brief is for a standalone landing/ad page. If the brief is for a general multi-page site with no landing-page section, leave all of these as empty string "" or empty array [] — do not repurpose Home-page content to fill them.
+- For faqItems: extract each question/answer pair exactly as written. Never invent a question or answer that isn't in the brief.
+- For testimonials: only extract a quote, name, and title if a real testimonial is present in the brief. If a testimonial slot is explicitly blank or marked for AI drafting, leave that testimonial's three fields as empty string "" rather than inventing a quote.
+- For mapUrl: only use a URL that is explicitly written in the brief. Never construct or guess a Google Maps link from an address.`;
 
 // Try models in order until one works. Every ID here is already used
 // successfully elsewhere in this app (generate-copy.js, describeMySite,
