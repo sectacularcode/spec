@@ -37,6 +37,17 @@ export default function AdminPanel({ isAdmin }) {
   const [deleting, setDeleting]     = useState(null);
   const [msg, setMsg]               = useState({ text: "", type: "ok" });
 
+  // Usage & Limits (admin only)
+  const [usageByUser, setUsageByUser]     = useState([]);
+  const [usageByClient, setUsageByClient] = useState([]);
+  const [usageLoading, setUsageLoading]   = useState(false);
+  const [usageMsg, setUsageMsg]           = useState({ text: "", type: "ok" });
+  const [editingLimit, setEditingLimit]   = useState(null); // { scope, scopeId } or null
+  const [limitInput, setLimitInput]       = useState(""); // dollars, as typed
+  const [savingLimit, setSavingLimit]     = useState(false);
+  const [modelHealth, setModelHealth]     = useState(null); // { allLive, models, checkedAt } or null
+  const [checkingModels, setCheckingModels] = useState(false);
+
   function flash(text, type = "ok") {
     setMsg({ text, type });
     setTimeout(() => setMsg({ text: "", type: "ok" }), 3000);
@@ -64,6 +75,82 @@ export default function AdminPanel({ isAdmin }) {
   }
 
   useEffect(() => { if (user?.id) loadUsers(); }, [user?.id]);
+
+  // ── Usage & Limits (admin only) ──────────────────────────────────────────
+  async function loadUsage() {
+    setUsageLoading(true);
+    try {
+      const res = await fetch("/api/usage-summary", { headers: await authHeaders() });
+      const data = await res.json();
+      if (res.ok) {
+        setUsageByUser(data.byUser || []);
+        setUsageByClient(data.byClient || []);
+      } else {
+        setUsageMsg({ text: data.error || "Failed to load usage.", type: "err" });
+      }
+    } catch { setUsageMsg({ text: "Error loading usage.", type: "err" }); }
+    setUsageLoading(false);
+  }
+
+  useEffect(() => { if (isAdmin && user?.id) loadUsage(); }, [isAdmin, user?.id]);
+
+  function startEditLimit(scope, scopeId, currentCents) {
+    setEditingLimit({ scope, scopeId });
+    setLimitInput(currentCents != null ? (currentCents / 100).toFixed(2) : "");
+  }
+
+  async function saveLimit() {
+    if (!editingLimit) return;
+    const dollars = parseFloat(limitInput);
+    if (!Number.isFinite(dollars) || dollars < 0) {
+      setUsageMsg({ text: "Enter a valid dollar amount.", type: "err" });
+      return;
+    }
+    setSavingLimit(true);
+    try {
+      const res = await fetch("/api/usage-limits", {
+        method: "POST",
+        headers: await authHeaders(),
+        body: JSON.stringify({ scope: editingLimit.scope, scopeId: editingLimit.scopeId, monthlyLimitCents: Math.round(dollars * 100) }),
+      });
+      if (res.ok) {
+        setUsageMsg({ text: "Limit saved.", type: "ok" });
+        setEditingLimit(null);
+        loadUsage();
+      } else {
+        const d = await res.json();
+        setUsageMsg({ text: d.error || "Failed to save limit.", type: "err" });
+      }
+    } catch { setUsageMsg({ text: "Error saving limit.", type: "err" }); }
+    setSavingLimit(false);
+    setTimeout(() => setUsageMsg({ text: "", type: "ok" }), 3000);
+  }
+
+  async function removeLimit(scope, scopeId) {
+    try {
+      const res = await fetch(`/api/usage-limits?scope=${encodeURIComponent(scope)}&scopeId=${encodeURIComponent(scopeId)}`, {
+        method: "DELETE",
+        headers: await authHeaders(),
+      });
+      if (res.ok) loadUsage();
+    } catch { /* silent — non-critical, the limit stays visible and can be retried */ }
+  }
+
+  async function checkModelHealth() {
+    setCheckingModels(true);
+    try {
+      const res = await fetch("/api/model-health", { headers: await authHeaders() });
+      const data = await res.json();
+      if (res.ok) setModelHealth(data);
+      else setUsageMsg({ text: data.error || "Model check failed.", type: "err" });
+    } catch { setUsageMsg({ text: "Error checking models.", type: "err" }); }
+    setCheckingModels(false);
+  }
+
+  function formatCents(cents) {
+    if (cents == null) return "—";
+    return "$" + (cents / 100).toFixed(2);
+  }
 
   async function addUser() {
     if (!newUserId.trim()) return;
@@ -285,6 +372,161 @@ export default function AdminPanel({ isAdmin }) {
             ))}
           </tbody>
         </table>
+      )}
+
+      {/* Usage & Limits — admin only, per explicit instruction; managers see
+          the user table above but not spend/limit data. */}
+      {isAdmin && (
+        <div style={{ borderTop: "1px solid #dde0e6" }}>
+          <div style={S.header}>
+            <div style={S.headerTitle}>Usage &amp; Limits — This Month</div>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <button style={S.btnSecondary} onClick={checkModelHealth} disabled={checkingModels}>
+                {checkingModels ? "Checking…" : "Check models"}
+              </button>
+              <button style={S.btnSecondary} onClick={loadUsage} disabled={usageLoading}>Refresh</button>
+            </div>
+          </div>
+
+          {modelHealth && (
+            <div style={{ padding: "14px 20px", borderBottom: "1px solid #dde0e6", background: modelHealth.allLive ? "#f0fdf4" : "#fef2f2" }}>
+              <div style={{ fontSize: "12px", fontWeight: 600, color: modelHealth.allLive ? "#166534" : "#991b1b", marginBottom: "6px" }}>
+                {modelHealth.allLive ? "All configured models are live." : "One or more configured models are no longer available."}
+              </div>
+              {modelHealth.models.map(m => (
+                <div key={m.id} style={{ fontSize: "12px", color: "#3f3f46", display: "flex", gap: "8px", alignItems: "center", marginTop: "2px" }}>
+                  <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: m.live ? "#16a34a" : "#dc2626", display: "inline-block", flexShrink: 0 }} />
+                  <code style={{ fontSize: "11px" }}>{m.id}</code>
+                  <span style={{ color: "#6b7280" }}>({m.usedIn.join(", ")})</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {usageMsg.text && (
+            <div style={{ ...S.msg, padding: "8px 20px 0", color: usageMsg.type === "err" ? "#dc2626" : "#b45309" }}>{usageMsg.text}</div>
+          )}
+
+          {/* By account */}
+          <div style={{ padding: "16px 20px 4px", fontSize: "11px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.06em" }}>By Account</div>
+          {usageLoading ? (
+            <div style={S.empty}>Loading usage…</div>
+          ) : usageByUser.length === 0 ? (
+            <div style={S.empty}>No API calls logged this month yet.</div>
+          ) : (
+            <table style={S.table}>
+              <thead>
+                <tr>
+                  <th style={S.th}>Account</th>
+                  <th style={S.th}>Calls</th>
+                  <th style={S.th}>Spend</th>
+                  <th style={S.th}>Limit</th>
+                  <th style={S.th}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {usageByUser.map(u => (
+                  <tr key={u.userId}>
+                    <td style={S.td}>
+                      <div style={{ fontWeight: 500, fontSize: "13px" }}>{u.name || u.email || u.userId}</div>
+                    </td>
+                    <td style={S.td}>{u.callCount}</td>
+                    <td style={S.td}>
+                      {formatCents(u.costCents)}
+                      {u.limitCents != null && u.costCents > u.limitCents && (
+                        <span style={{ marginLeft: "6px", fontSize: "10px", fontWeight: 700, color: "#dc2626" }}>OVER LIMIT</span>
+                      )}
+                    </td>
+                    <td style={S.td}>
+                      {editingLimit?.scope === "user" && editingLimit?.scopeId === u.userId ? (
+                        <div style={S.editRow}>
+                          <input style={{ ...S.input, width: "80px" }} value={limitInput} onChange={e => setLimitInput(e.target.value)} placeholder="0.00" />
+                          <button style={S.btnSave} onClick={saveLimit} disabled={savingLimit}>{savingLimit ? "…" : "Save"}</button>
+                          <button style={S.btnSecondary} onClick={() => setEditingLimit(null)}>Cancel</button>
+                        </div>
+                      ) : (
+                        <span style={{ fontSize: "12px", color: "#6b7280" }}>{formatCents(u.limitCents)}</span>
+                      )}
+                    </td>
+                    <td style={S.td}>
+                      {!(editingLimit?.scope === "user" && editingLimit?.scopeId === u.userId) && (
+                        <div style={S.editRow}>
+                          <button style={S.btnSecondary} onClick={() => startEditLimit("user", u.userId, u.limitCents)}>
+                            {u.limitCents != null ? "Edit limit" : "Set limit"}
+                          </button>
+                          {u.limitCents != null && (
+                            <button style={S.btnDanger} onClick={() => removeLimit("user", u.userId)}>Remove</button>
+                          )}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+
+          {/* By client/brand */}
+          <div style={{ padding: "16px 20px 4px", fontSize: "11px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.06em" }}>By Client / Brand</div>
+          {usageLoading ? (
+            <div style={S.empty}>Loading usage…</div>
+          ) : usageByClient.length === 0 ? (
+            <div style={S.empty}>No client-tagged calls logged this month yet.</div>
+          ) : (
+            <table style={S.table}>
+              <thead>
+                <tr>
+                  <th style={S.th}>Client</th>
+                  <th style={S.th}>Calls</th>
+                  <th style={S.th}>Spend</th>
+                  <th style={S.th}>Limit</th>
+                  <th style={S.th}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {usageByClient.map(c => (
+                  <tr key={c.clientName}>
+                    <td style={S.td}><div style={{ fontWeight: 500, fontSize: "13px" }}>{c.clientName}</div></td>
+                    <td style={S.td}>{c.callCount}</td>
+                    <td style={S.td}>
+                      {formatCents(c.costCents)}
+                      {c.limitCents != null && c.costCents > c.limitCents && (
+                        <span style={{ marginLeft: "6px", fontSize: "10px", fontWeight: 700, color: "#dc2626" }}>OVER LIMIT</span>
+                      )}
+                    </td>
+                    <td style={S.td}>
+                      {editingLimit?.scope === "client" && editingLimit?.scopeId === c.clientName ? (
+                        <div style={S.editRow}>
+                          <input style={{ ...S.input, width: "80px" }} value={limitInput} onChange={e => setLimitInput(e.target.value)} placeholder="0.00" />
+                          <button style={S.btnSave} onClick={saveLimit} disabled={savingLimit}>{savingLimit ? "…" : "Save"}</button>
+                          <button style={S.btnSecondary} onClick={() => setEditingLimit(null)}>Cancel</button>
+                        </div>
+                      ) : (
+                        <span style={{ fontSize: "12px", color: "#6b7280" }}>{formatCents(c.limitCents)}</span>
+                      )}
+                    </td>
+                    <td style={S.td}>
+                      {!(editingLimit?.scope === "client" && editingLimit?.scopeId === c.clientName) && (
+                        <div style={S.editRow}>
+                          <button style={S.btnSecondary} onClick={() => startEditLimit("client", c.clientName, c.limitCents)}>
+                            {c.limitCents != null ? "Edit limit" : "Set limit"}
+                          </button>
+                          {c.limitCents != null && (
+                            <button style={S.btnDanger} onClick={() => removeLimit("client", c.clientName)}>Remove</button>
+                          )}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+
+          <div style={{ padding: "10px 20px 16px", fontSize: "11px", color: "#9ca3af" }}>
+            Reporting only — limits are informational and don't block generation yet.
+          </div>
+        </div>
       )}
     </div>
   );
