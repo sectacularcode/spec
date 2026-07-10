@@ -152,10 +152,15 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // pattern can't know. Real map/form content is still picked up
     // automatically by makeMapSection()/makeFormSection() regardless.
     if (variant === "D") {
-      var cyclePattern = ["split-right", "centered-cta", "split-left", "split-cta-right", "plain"];
+      var hasVideo = !!brief.videoUrl;
+      var cyclePattern = hasVideo
+        ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
+        : ["split-right", "centered-cta", "checklist", "split-left", "split-cta-right", "plain"];
       return features.map(function (f, i) {
         var cycleStyle = cyclePattern[i % cyclePattern.length];
         if (cycleStyle === "centered-cta") return renderCenteredCta(f, i);
+        if (cycleStyle === "checklist") return renderChecklistRow(f, i);
+        if (cycleStyle === "video") return renderVideoRow(f, i);
         if (cycleStyle === "plain") return renderPlainRow(f, i);
         var imageLeft = cycleStyle === "split-left";
         var withButton = cycleStyle === "split-cta-right";
@@ -389,6 +394,47 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkSpacer(10),
       mkText(he(f.body), text),
     ], rowIdx % 2 === 0 ? warmWhite : bone, { padY: "44", padX: "48", full: true });
+  }
+
+  // A heading with a short checkmark list beneath it — real native
+  // Elementor icon-list widget (mkIconList, already proven and in
+  // production use elsewhere in this file), not a hand-built container.
+  // The list items come from splitting this feature's own body text into
+  // clauses, since a curated layout has no separate "list items" field to
+  // draw from — this is a real limitation for very short or single-clause
+  // bodies, which will show as a one-item list.
+  function renderChecklistRow(f, rowIdx) {
+    var clauses = (f.body || "").split(/\.\s+/).map(function (s) { return s.trim().replace(/\.$/, ""); }).filter(function (s) { return s.length > 0; });
+    if (clauses.length === 0) clauses = [f.body || ""];
+    return mkContainer([
+      mkHeading(f.heading, ink, "h3", { weight: 700, px: 22 }),
+      mkSpacer(16),
+      mkIconList(clauses, accent, text, { fontSize: 15 }),
+    ], rowIdx % 2 === 0 ? warmWhite : bone, { padY: "44", padX: "48", full: true });
+  }
+
+  // A real native Elementor Video widget — UNVERIFIED against an actual
+  // Elementor render, unlike every other widget helper in this file. The
+  // settings shape (video_type / youtube_url) is Elementor's own
+  // long-documented, widely-corroborated control naming, but "widely
+  // documented" is a different confidence level than "confirmed against a
+  // real export," which is the bar every other widget here was held to
+  // (see mkGoogleMapsWidget). Test this specifically before relying on it.
+  // Only renders when a real video URL exists — never a placeholder embed.
+  function renderVideoRow(f, rowIdx) {
+    if (!brief.videoUrl) return renderPlainRow(f, rowIdx);
+    var videoWidget = {
+      id: nid(), elType: "widget", widgetType: "video",
+      settings: { video_type: "youtube", youtube_url: brief.videoUrl },
+      elements: [],
+    };
+    var textCol = mkContainer([
+      mkHeading(f.heading, ink, "h3", { weight: 700, px: 22 }),
+      mkSpacer(10),
+      mkText(he(f.body), text),
+    ], null, { isInner: true, padY: "30", padX: "30", width: 50, full: true });
+    var videoCol = mkContainer([videoWidget], null, { isInner: true, padY: "0", padX: "0", width: 50, full: true });
+    return mkContainer([textCol, videoCol], rowIdx % 2 === 0 ? warmWhite : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
   }
 
   function makeClosingCta() {
