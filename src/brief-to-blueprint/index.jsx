@@ -303,6 +303,13 @@ export default function CustomBuild({ userId, role } = {}) {
             if (parsed.brandName) setClientName(parsed.brandName);
             setParsedBriefDraft(parsed);
             setShowBriefReview(true);
+            // A Manifest import is always a single bespoke page — "Home"
+            // (the default selectedPages value) reads entirely different
+            // field names than what manifestToBrief() populates, so
+            // leaving the default in place silently builds an
+            // empty-looking page. "Other" routes to the same builder that
+            // actually reads brief.features/faqItems/testimonials.
+            setPages(["other"]);
             // Surfaced before generation, not buried — this is Manifest's
             // own audit trail (unverified claims, buttons still pointing at
             // placeholders) plus anything that had no matching Spec widget.
