@@ -7,9 +7,9 @@ export function buildServicesPage(C, brief, _inspoHint) {
       brassDp = C["brass-deep"] || "#9C7E3A", asphalt = C.asphalt || "#2B2823", text = C.text;
 
   var header = mkContainer([
-    mkHeading("Services & pricing", brassDp, "h6", { eyebrow: true }),
+    mkHeading(brief.servicesEyebrow || "Services & Pricing", brassDp, "h6", { eyebrow: true }),
     mkSpacer(16),
-    mkHeading("Every way to put your company on film.", ink, "h1", { weight: 800, px: 56 }),
+    mkHeading(brief.servicesH1 || "Straightforward pricing, upfront.", ink, "h1", { weight: 800, px: 56 }),
     mkSpacer(20),
     mkText("Real prices, in the open. Pick a package, or build a plan. No 30 minute call required to learn what something costs.", text),
   ], bone, { padY: "88" });
@@ -51,59 +51,26 @@ export function buildServicesPage(C, brief, _inspoHint) {
 
   var tiersSection = mkContainer([tiersRow, mkSpacer(24), alwaysIncluded], ink, { padY: "80" });
 
-  // Full menu — grouped by category
-  var menuCategories = [
-    {
-      label: "Proof & Trust",
-      items: [
-        ["Customer Story", "2.5K to 4.5K", "A customer tells their before and after, in their own words.", "Half-day shoot at one location, 1 to 2 minute edit, 2 social cutdowns, 2 revision rounds."],
-        ["Case Study Film", "4K to 8K", "Problem, solution, and the measurable result.", "One or two locations, on-screen data and graphics, 2 to 3 minute edit, 3 cutdowns."],
-        ["Partner Testimonial", "2.5K to 4.5K", "A vendor or partner vouches for you on camera.", "Half-day shoot, 1 to 2 minute edit, 2 cutdowns."],
-        ["Sales Reel", "5K to 10K", "A short capabilities film the team can send to help close.", "Multi-location shoot, b-roll, 2 to 3 minute edit."],
-      ]
-    },
-    {
-      label: "People & Culture",
-      items: [
-        ["Technician Origin Story", "3K to 6K", "Where one of your people came from, and why they stay. The signature piece.", "Half to full-day shoot, 2 to 3 minute edit, photo stills."],
-        ["Day in the Life", "2.5K to 4.5K", "A teammate's real workday, told simply.", "Half-day shoot, 1 to 2 minute edit, 2 cutdowns."],
-        ["Why Work Here", "4K to 8K", "The recruiting film that fills your pipeline.", "Full-day shoot, several voices, 2 minute edit plus 30 and 60 second cuts."],
-        ["Culture & Values Film", "6K to 12K", "What the company stands for, on screen.", "Multi-location shoot, 2 to 4 minute edit, cutdowns."],
-      ]
-    },
-    {
-      label: "Leadership & Vision",
-      items: [
-        ["Founder Story", "6K to 15K", "The origin of the company, told with weight.", "Interview and b-roll, archival photo integration, 3 to 5 minute edit."],
-        ["Leadership Address", "3K to 6K", "A clear message from the top, to the team or the market.", "Studio or on-site shoot, teleprompter, 1 to 3 minute edit."],
-        ["Vision Film", "6K to 12K", "Where the company is headed next.", "Shoot, motion graphics, 2 to 3 minute edit."],
-        ["All-Hands Video", "2.5K to 5K", "Internal comms people actually watch.", "Shoot, 1 to 3 minute edit."],
-      ]
-    },
-    {
-      label: "Exit & Value Creation",
-      items: [
-        ["About-Us Brand Film", "12K to 30K", "The company's story, beautifully told, for the website.", "Multi-day or multi-location shoot, original music, 2 to 4 minute edit, cutdowns."],
-        ["Exit-Ready Company Film", "25K to 75K+", "The narrative buyers see in the room. Built for the data room and the management presentation.", "Discovery, scripting, multi-location shoot, leadership and customer voices, 3 to 6 minute edit, plus short cuts."],
-        ["Milestone Film", "10K to 20K", "Mark a major moment during the hold period.", "Shoot, 2 to 4 minute edit."],
-        ["Portfolio Showcase", "Custom", "One film template across many portfolio companies, made for the firm.", "A repeatable format and a per-company rate. Scoped with the firm."],
-      ]
-    },
-  ];
+  // Full menu — grouped by category. Read entirely from brief.pricingMenu:
+  // an array of { category, items: [{ name, price, desc, includes }] }.
+  // No hardcoded industry content and no bracket-placeholder fallback —
+  // this is an optional supplementary section (the 3-tier row above already
+  // makes a complete page on its own), so when a brief has no menu items,
+  // the section is skipped entirely rather than showing filler.
+  var menuCategories = brief.pricingMenu || [];
 
   var menuSections = menuCategories.map(function(cat) {
-    var rows = cat.items.map(function(item) {
-      var name = item[0]; var price = item[1]; var desc = item[2]; var incl = item[3];
+    var rows = (cat.items || []).map(function(item) {
       var namePrice = mkContainer([
-        mkHeading(name, ink, "h4", { weight: 700, px: 18 }),
-        mkHeading(price, brassDp, "h5", { weight: 600 }),
+        mkHeading(item.name || "", ink, "h4", { weight: 700, px: 18 }),
+        mkHeading(item.price || "", brassDp, "h5", { weight: 600 }),
       ], null, { direction: "row", gap: "20", padY: "0", isInner: true });
       var row = mkContainer([
         namePrice,
         mkSpacer(8),
-        mkText(desc, text),
+        mkText(he(item.desc || ""), text),
         mkSpacer(4),
-        mkText("<em>Includes: " + incl + "</em>", stone),
+        mkText("<em>Includes: " + he(item.includes || "") + "</em>", stone),
         mkSpacer(20),
         mkDivider(),
       ], null, { padY: "0", isInner: true });
@@ -111,26 +78,33 @@ export function buildServicesPage(C, brief, _inspoHint) {
     });
 
     return mkContainer([
-      mkHeading(cat.label, ink, "h3", { weight: 700, px: 22 }),
+      mkHeading(cat.category || "", ink, "h3", { weight: 700, px: 22 }),
       mkSpacer(8),
       mkDivider(brass),
       mkSpacer(24),
     ].concat(rows), null, { padY: "0", isInner: true });
   });
 
-  var menuRow = mkContainer(menuSections, null, { direction: "row", gap: "48", padY: "0", isInner: true });
-  menuRow.settings.flex_wrap = "wrap";
-  var menuSection = mkContainer([
-    mkHeading("The full menu", ink, "h2", { weight: 800, px: 44 }),
-    mkSpacer(48),
-    menuRow,
-  ], bone, { padY: "80" });
+  // Only built when the brief actually supplies menu items — the 3-tier row
+  // above is already a complete page on its own, so this optional section
+  // is omitted entirely rather than showing filler when there's nothing real
+  // to put in it.
+  var menuSection = null;
+  if (menuCategories.length > 0) {
+    var menuRow = mkContainer(menuSections, null, { direction: "row", gap: "48", padY: "0", isInner: true });
+    menuRow.settings.flex_wrap = "wrap";
+    menuSection = mkContainer([
+      mkHeading(brief.pricingMenuHeading || "The full menu", ink, "h2", { weight: 800, px: 44 }),
+      mkSpacer(48),
+      menuRow,
+    ], bone, { padY: "80" });
+  }
 
   // How pricing works
   var pricingNote = mkContainer([
     mkHeading("How pricing works", brassDp, "h6", { eyebrow: true }),
     mkSpacer(16),
-    mkText("Every price is a starting point. It scales with scope: more locations, more people, longer films, and more revision rounds. Most films come in good, better, and best versions, so a client can choose by budget without a negotiation. Rates rise with experience and reputation. Fair to start, and they climb as the work proves itself.", text),
+    mkText(he(brief.pricingNote || "Every price is a starting point. It scales with scope. Most packages come in good, better, and best versions, so a client can choose by budget without a negotiation."), text),
   ], "#ffffff", { padY: "48", padX: "40" });
   pricingNote.settings.border_border = "solid";
   pricingNote.settings.border_width = { unit:"px", top:"1", right:"1", bottom:"1", left:"3", isLinked:false };
@@ -141,11 +115,11 @@ export function buildServicesPage(C, brief, _inspoHint) {
   var closing = mkContainer([
     mkText("Not sure where to start? Tell me about the company.", stone, "center"),
     mkSpacer(24),
-    mkButton("Start a project", brassDp, "#ffffff"),
+    mkButton(brief.headerCta || "Start a project", brassDp, "#ffffff"),
   ], bone, { padY: "80", center: true });
 
   return { version: "0.4", title: "Services & Pricing", type: "page", page_settings: {},
-    content: [header, tiersSection, menuSection, pricingNoteSection, closing] };
+    content: [header, tiersSection, menuSection, pricingNoteSection, closing].filter(Boolean) };
 }
 
 export function buildServicesPageLight(C, brief, _inspoHint) {
@@ -156,7 +130,7 @@ export function buildServicesPageLight(C, brief, _inspoHint) {
   var header = mkContainer([
     mkHeading(brief.servicesEyebrow || "Services & pricing", brassDp, "h6", { eyebrow: true }),
     mkSpacer(16),
-    mkHeading(brief.servicesH1 || "Every way to put your company on film.", ink, "h1", { weight: 800, px: 56 }),
+    mkHeading(brief.servicesH1 || "Straightforward pricing, upfront.", ink, "h1", { weight: 800, px: 56 }),
     mkSpacer(20),
     mkText("Real prices, in the open. Pick a package, or build a plan.", text),
   ], bone, { padY: "88" });
