@@ -390,6 +390,28 @@ export function sanitizeUrl(url) {
 // matches the rest of the page. Renders only where the caller has a real
 // address or map link; presence-checking is the caller's job (see
 // makeMapSection() in landing.js).
+// Native Elementor "google_maps" widget (Elementor core, not Pro) — a real
+// embedded, interactive map, not a placeholder. Settings shape confirmed
+// against a real, working exported widget (AFS Saginaw page, July 2026):
+// just `address` (any string Google Maps can resolve) and `height`. No
+// API key required for this native widget the way some premium map addons
+// need one. Returns null if no address is available — callers should
+// treat that as "nothing to render here," never guess an address to fill
+// the gap.
+export function mkGoogleMapsWidget(address, opts) {
+  if (!address) return null;
+  opts = opts || {};
+  return {
+    id: nid(), elType: "widget", widgetType: "google_maps",
+    settings: {
+      address: address,
+      height: { unit: "px", size: opts.height || 400, sizes: [] },
+    },
+    elements: [],
+    isInner: !!opts.isInner,
+  };
+}
+
 export function mkMapSection(address, mapUrl, colors, opts) {
   opts = opts || {};
   colors = colors || {};
