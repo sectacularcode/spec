@@ -1,15 +1,23 @@
-// Converts a Manifest export (see spec_manifest_export_example.json and the
-// Manifest -> Spec Integration Requirements doc) into the flat brief shape
-// generatePages() and the page builders already consume.
+// Converts a Manifest export into the flat brief shape generatePages() and
+// the page builders already consume. Supports two formats:
 //
-// This is a separate entry point from extractBrief.js on purpose — Manifest's
-// shape (brand / page / blocks[], each block tagged with an elementType) is
-// structurally different from both of extractBrief's supported formats, so it
-// gets its own parser rather than overloading extractBrief with a third shape.
+// 1. manifest.page-document/1 — Manifest's real, already-existing native
+//    export format (confirmed against a real file her system produced,
+//    July 2026): { format, brand, page, provenance, brand_tokens,
+//    sections[] }, each section tagged with a `type` (hero/text_section/
+//    testimonials), not the original spec's `elementType`. This is the
+//    live path — everything she actually sends comes in this shape.
 //
-// NOT wired into the live upload flow yet. Call manifestToBrief() directly
-// against a real exported file to validate the mapping before wiring this
-// into IntakeForm.jsx's upload handler.
+// 2. The original brand/page.blocks[]/elementType shape from the initial
+//    integration requirements doc — kept working for backward
+//    compatibility with anything already built or tested against it
+//    (spec_manifest_export_example.json, the Foothold Bouldering test
+//    file), but not what Manifest actually produces in practice.
+//
+// manifestToBrief() dispatches on the `format` field. Both paths are
+// separate from extractBrief.js on purpose — neither shape matches either
+// of extractBrief's supported formats, so this stays its own entry point
+// rather than overloading extractBrief with a third/fourth shape.
 
 const REQUIRED_BRAND_FIELDS = ["id", "name"];
 const REQUIRED_PAGE_FIELDS = ["id", "status", "blocks"];
@@ -82,10 +90,9 @@ export function validateManifestExport(raw) {
   }
 }
 
-// Converts a validated Manifest export into Spec's flat brief shape.
-// Throws ManifestImportError if validation fails — callers should catch
-// this and show the .issues list rather than a generic parse error.
-export function manifestToBrief(raw) {
+// Converts a validated legacy-format Manifest export into Spec's flat brief
+// shape. Throws ManifestImportError if validation fails.
+function legacyManifestToBrief(raw) {
   validateManifestExport(raw);
 
   var brand = raw.brand;
@@ -187,4 +194,194 @@ export function manifestToBrief(raw) {
   if (context.address && !brief.mapAddress) brief.mapAddress = context.address;
 
   return brief;
+}
+
+// ─── manifest.page-document/1 — the real, live format ──────────────────────
+
+const PAGE_DOCUMENT_FORMAT = "manifest.page-document/1";
+
+// Flattens a rich-text array (e.g. hero.subheading: [{type:"text", text}])
+// into a plain string. Manifest's rich-text arrays can in principle carry
+// more than plain text runs; anything without a .text field is skipped
+// rather than guessed at.
+function flattenRichText(arr) {
+  if (!Array.isArray(arr)) return "";
+  return arr.map(function (item) { return item && item.text ? item.text : ""; }).join("").trim();
+}
+
+// Flattens a text_section's `items` (paragraph blocks, each with its own
+// rich_text array) into a plain string, paragraphs separated by a blank
+// line. Only "paragraph" items are read — other item kinds (if Manifest
+// adds them later) are skipped rather than guessed at.
+function flattenTextSectionBody(items) {
+  if (!Array.isArray(items)) return "";
+  return items
+    .map(function (item) {
+      if (item && item.kind === "paragraph" && Array.isArray(item.rich_text)) {
+        return item.rich_text.map(function (rt) { return rt && rt.text ? rt.text : ""; }).join("");
+      }
+      return "";
+    })
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+// A button's real destination, or "" if it's explicitly marked as a
+// placeholder. destination.kind === "placeholder" is Manifest's own system
+// telling us the real URL isn't decided yet — that's a more reliable
+// signal than guessing, so it's treated the same as "blank."
+function pageDocumentButtonUrl(button) {
+  if (!button || !button.destination) return "";
+  if (button.destination.kind === "external" && button.destination.value) {
+    return sanitizeUrl(button.destination.value);
+  }
+  return "";
+}
+
+function validateManifestPageDocument(raw) {
+  var issues = [];
+  if (!raw.brand || !raw.brand.id) issues.push("brand.id: missing");
+  if (!raw.brand || !raw.brand.name) issues.push("brand.name: missing");
+  if (!raw.page || !raw.page.id) issues.push("page.id: missing");
+  if (!Array.isArray(raw.sections) || raw.sections.length === 0) issues.push("sections: missing or empty");
+
+  var state = raw.provenance && raw.provenance.content_state;
+  if (state && state !== "marketing_approved") {
+    issues.push('provenance.content_state: "' + state + '" — only marketing_approved content should be imported');
+  }
+
+  if (issues.length) {
+    throw new ManifestImportError(
+      "Manifest page-document export failed validation (" + issues.length + " issue" + (issues.length > 1 ? "s" : "") + ").",
+      issues
+    );
+  }
+}
+
+// Converts a validated manifest.page-document/1 export into Spec's flat
+// brief shape. Section-type mapping, grounded against a real export:
+//
+// - "hero" sections map directly.
+// - "testimonials" sections map directly (no title/company field exists in
+//   this format, so testimonial*Title stays blank rather than invented).
+// - Within "text_section" entries, heading.level === 3 is used ONLY for
+//   Q&A pairs in the real export this was built against — a genuine
+//   structural signal already present in the data, not a guess.
+// - The last section, if it carries buttons, is treated as the closing
+//   CTA — confirmed against the real export, where every page ends this
+//   way.
+// - Every other text_section fills the 3 feature-row slots Spec's landing
+//   page supports, in order; anything beyond 3 is flagged in
+//   _unmappedBlocks rather than dropped.
+// - Any section type outside hero/text_section/testimonials is flagged in
+//   _unmappedBlocks rather than dropped.
+function manifestPageDocumentToBrief(raw) {
+  validateManifestPageDocument(raw);
+
+  var brand = raw.brand;
+  var page = raw.page || {};
+  var sections = raw.sections || [];
+  var provenance = raw.provenance || {};
+
+  var brief = {
+    brandName: brand.name || "",
+    colors: {}, // not carried in this format
+    referenceUrls: (raw.brand_tokens && raw.brand_tokens.reference_urls) || [],
+    _manifestBrandId: brand.id,
+    _manifestPageId: page.id,
+    _manifestTitleTag: page.title_tag || "",
+    _manifestMetaDescription: page.meta_description || "",
+    faqItems: [],
+    _unmappedBlocks: [],
+    // Surfaces Manifest's own audit trail — flagged claims needing a real
+    // receipt, buttons still pointing at placeholders — so a human sees
+    // exactly what needs attention before this ships, instead of it
+    // silently disappearing during import.
+    _manifestWarnings: [],
+  };
+
+  if (provenance.clean === false && provenance.clean_reason) {
+    brief._manifestWarnings.push(provenance.clean_reason);
+  }
+  if (provenance.grounding && Array.isArray(provenance.grounding.claim_flags)) {
+    provenance.grounding.claim_flags.forEach(function (cf) {
+      brief._manifestWarnings.push(
+        'Unverified claim: "' + (cf.claim || "") + '" (scope: ' + (cf.scope || "unknown") + ", receipt: " + (cf.receipt || "missing") + ")"
+      );
+    });
+  }
+
+  var featureCount = 0;
+  var faqPairs = [];
+
+  sections.forEach(function (section, idx) {
+    var isLast = idx === sections.length - 1;
+    var headingText = section.heading ? section.heading.text || "" : "";
+    var headingLevel = section.heading ? section.heading.level : null;
+
+    if (section.type === "hero") {
+      var heroButtons = section.buttons || [];
+      brief.heroHeadline = headingText;
+      brief.heroSubhead = flattenRichText(section.subheading);
+      brief.phoneCta = heroButtons[0] ? heroButtons[0].label || "" : "";
+      brief.heroPrimaryUrl = pageDocumentButtonUrl(heroButtons[0]);
+      brief.contactCta = heroButtons[1] ? heroButtons[1].label || "" : "";
+      brief.heroSecondaryUrl = pageDocumentButtonUrl(heroButtons[1]);
+      return;
+    }
+
+    if (section.type === "testimonials") {
+      (section.items || []).slice(0, 3).forEach(function (t, i) {
+        brief["testimonial" + (i + 1) + "Quote"] = t.quote || "";
+        brief["testimonial" + (i + 1) + "Name"] = t.author || "";
+        brief["testimonial" + (i + 1) + "Title"] = "";
+      });
+      return;
+    }
+
+    if (section.type === "text_section") {
+      if (headingLevel === 3) {
+        faqPairs.push({ question: headingText, answer: flattenTextSectionBody(section.items) });
+        return;
+      }
+
+      if (isLast && section.buttons && section.buttons.length) {
+        brief.closingCta = headingText;
+        brief.closingBody = flattenTextSectionBody(section.items);
+        return;
+      }
+
+      featureCount += 1;
+      if (featureCount <= 3) {
+        brief["feature" + featureCount + "Heading"] = headingText;
+        brief["feature" + featureCount + "Body"] = flattenTextSectionBody(section.items);
+      } else {
+        brief._unmappedBlocks.push({
+          elementType: "text_section",
+          reason: "only 3 feature rows supported per landing page",
+          heading: headingText,
+        });
+      }
+      return;
+    }
+
+    brief._unmappedBlocks.push({ elementType: section.type, reason: "no matching Spec widget yet", heading: headingText });
+  });
+
+  if (faqPairs.length) brief.faqItems = faqPairs;
+
+  return brief;
+}
+
+// ─── Public entry point ─────────────────────────────────────────────────────
+
+// Dispatches to the real page-document parser or the legacy schema parser
+// based on the export's own `format` marker. Throws ManifestImportError if
+// validation fails for whichever path is used — callers should catch this
+// and show the .issues list rather than a generic parse error.
+export function manifestToBrief(raw) {
+  if (raw && raw.format === PAGE_DOCUMENT_FORMAT) {
+    return manifestPageDocumentToBrief(raw);
+  }
+  return legacyManifestToBrief(raw);
 }
