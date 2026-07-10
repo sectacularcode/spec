@@ -129,12 +129,38 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // Per-section layout override — the real mechanism for hand-curating a
     // page's structure section by section instead of one uniform style for
     // the whole page. Not exposed in the UI yet; brief.featureLayout is set
-    // directly for now (see manifestImport.js's page-id-keyed override,
+    // directly for now (see manifestImport.js's brand-id-keyed override,
     // its first real usage) until a proper per-section style picker exists
     // there. When present, this takes over entirely — the uniform
     // density/inspo style selection below is skipped.
     if (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0) {
       return renderFeatureLayout(brief.featureLayout, features);
+    }
+
+    // Variant D — a real, reusable template distinct from the uniform
+    // A/B/C styles: a fixed, proven visual rhythm (split-right, a centered
+    // call-out, split-left, split + button, plain, repeating) applied by
+    // position to whatever features exist. Deliberately brand-agnostic —
+    // no content, no colors, no brand-specific data of any kind here.
+    // What made this pattern real originally was one brand's hand-curated
+    // layout (see manifestImport.js) validated against a live page; this
+    // is that same visual variety generalized into something any future
+    // brief can select, not tied to where the idea first came from.
+    // Grouped-header and map-beside are deliberately left out of this
+    // generic cycle — both need real judgment about which content is
+    // related or which is genuinely about a location, which a positional
+    // pattern can't know. Real map/form content is still picked up
+    // automatically by makeMapSection()/makeFormSection() regardless.
+    if (variant === "D") {
+      var cyclePattern = ["split-right", "centered-cta", "split-left", "split-cta-right", "plain"];
+      return features.map(function (f, i) {
+        var cycleStyle = cyclePattern[i % cyclePattern.length];
+        if (cycleStyle === "centered-cta") return renderCenteredCta(f, i);
+        if (cycleStyle === "plain") return renderPlainRow(f, i);
+        var imageLeft = cycleStyle === "split-left";
+        var withButton = cycleStyle === "split-cta-right";
+        return renderSplitImage(f, imageLeft, i, withButton);
+      });
     }
 
     var style = selectFeatureRowStyle(inspoContext, features.length);
