@@ -138,11 +138,12 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     if (style === "stacked-text") {
       return features.map(function(f, i) {
-        var accentLine = mkContainer([], accent, { isInner: true, padY: "0", padX: "0" });
-        accentLine.settings.width = { unit: "px", size: 28 };
-        accentLine.settings.height = { unit: "px", size: 2 };
+        // A native Elementor divider widget, not a hand-sized container —
+        // "height" (as opposed to min_height) has zero precedent anywhere
+        // else in this codebase's containers, and mkDivider is the real,
+        // already-proven way to render a thin accent line.
         var children = [
-          accentLine,
+          mkDivider(accent),
           mkSpacer(14),
           mkHeading(f.heading, ink, "h3", { weight: 700, px: 24 }),
           mkSpacer(10),
@@ -154,14 +155,15 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     if (style === "compact-list") {
       return features.map(function(f, i) {
-        var numberBadge = mkContainer([
-          mkHeading(String(i + 1), warmWhite, "h4", { weight: 700, px: 15, align: "center" }),
-        ], accent, { isInner: true, padY: "0", padX: "0", center: true });
-        numberBadge.settings.width = { unit: "px", size: 36 };
-        numberBadge.settings.height = { unit: "px", size: 36 };
-        numberBadge.settings.border_radius = { unit: "%", top: "50", right: "50", bottom: "50", left: "50", isLinked: true };
-        numberBadge.settings.flex_justify_content = "center";
-        numberBadge.settings.flex_shrink = 0;
+        // A plain bold number, not a circular fixed-size badge — the
+        // circle relied on width/height/border_radius on a container with
+        // zero precedent anywhere else in this codebase (every real
+        // container width uses percentage units, every real height uses
+        // min_height). A number heading uses only primitives already
+        // proven throughout the rest of this file.
+        var numberCol = mkContainer([
+          mkHeading(String(i + 1) + ".", accent, "h4", { weight: 700, px: 22 }),
+        ], null, { isInner: true, padY: "0", padX: "0" });
 
         var textCol = mkContainer([
           mkHeading(f.heading, ink, "h4", { weight: 700, px: 18 }),
@@ -169,7 +171,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
           mkText(he(f.body), text),
         ], null, { isInner: true, padY: "0", padX: "0", grow: "1" });
 
-        var row = mkContainer([numberBadge, textCol], null, { direction: "row", padY: "20", padX: "32", gap: "20", full: true });
+        var row = mkContainer([numberCol, textCol], null, { direction: "row", padY: "20", padX: "32", gap: "20", full: true });
         row.settings.flex_align_items = "flex-start";
         row.settings.border_border = "solid";
         row.settings.border_width = { unit: "px", top: "0", right: "0", bottom: "1", left: "0", isLinked: false };
@@ -339,11 +341,8 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // A single clean text block, no image — for content the uniform styles
   // would otherwise handle fine, kept as-is inside a curated layout.
   function renderPlainRow(f, rowIdx) {
-    var accentLine = mkContainer([], accent, { isInner: true, padY: "0", padX: "0" });
-    accentLine.settings.width = { unit: "px", size: 28 };
-    accentLine.settings.height = { unit: "px", size: 2 };
     return mkContainer([
-      accentLine, mkSpacer(14),
+      mkDivider(accent), mkSpacer(14),
       mkHeading(f.heading, ink, "h3", { weight: 700, px: 22 }),
       mkSpacer(10),
       mkText(he(f.body), text),
