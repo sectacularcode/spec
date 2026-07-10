@@ -67,7 +67,18 @@ export function generatePages(brief, selectedPages, inspoContext, aiRecs, custom
       }
       // Landing pages — three conversion-focused layouts
       // A = Awareness/Feature, B = Lead Capture (form + testimonials), C = Minimal Retargeting
-      if (pid === "landing" || pid.startsWith("landing-")) {
+      //
+      // "other" is an alias for this same builder — for content that
+      // doesn't cleanly fit any of Spec's fixed page types (e.g. a
+      // Manifest import of a single bespoke local-SEO page). It's labeled
+      // separately in the UI so it's not confusing to see "Landing Page"
+      // on something that isn't an ad landing page, but under the hood it
+      // uses the exact same builder, since that's the one that actually
+      // reads brief.features/faqItems/testimonials/closingCta — the fields
+      // manifestImport.js populates. Building this via "home" or another
+      // fixed page type would silently produce an empty-looking page,
+      // since those builders read entirely different field names.
+      if (pid === "landing" || pid === "other" || pid.startsWith("landing-") || pid.startsWith("other-")) {
         var landA = buildLandingPage(colors, brief, inspoContext, "A");
         var landB = buildLandingPage(colors, brief, inspoContext, "B");
         var landC = buildLandingPage(colors, brief, inspoContext, "C");
