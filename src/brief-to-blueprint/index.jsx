@@ -26,6 +26,7 @@ import { BulkLocationModal } from "./components/BulkLocationModal.jsx";
 import AdminPanel from "../components/AdminPanel.jsx";
 import { authHeaders } from "../utils/api.js";
 import { estimateGenerationCost } from "./utils/estimateCost.js";
+import { manifestToBrief, ManifestImportError } from "./importers/manifestImport.js";
 
 export default function CustomBuild({ userId, role } = {}) {
   const [brief, setBrief]               = useState(null);
@@ -76,6 +77,7 @@ export default function CustomBuild({ userId, role } = {}) {
   const [panelCollapsed, setPanelCollapsed] = useState(false); // collapse left panel for full-width preview
   const fileRef = useRef();
   const [parsing, setParsing]           = useState(false);
+  const [uploadSource, setUploadSource] = useState("standard"); // "standard" | "manifest" — which JSON parser handleFile routes through
   const canGenerate = !!brief && selectedPages.length > 0;
   const isAdmin   = role === "admin";
   const isManager = role === "manager" || role === "admin";
@@ -287,13 +289,43 @@ export default function CustomBuild({ userId, role } = {}) {
       reader.onload = e => {
         try {
           const raw = JSON.parse(e.target.result);
+
+          if (uploadSource === "manifest") {
+            // Manifest's shape (brand / page.blocks[], each block tagged
+            // with an elementType) is structurally different from Spec's
+            // own native/flat JSON formats — it needs its own parser, not
+            // extractBrief(), which would just spread the raw object onto
+            // the brief with no real field mapping. No AI call here; this
+            // is a deterministic, zero-token import since the data's
+            // already structured on her end.
+            const parsed = manifestToBrief(raw);
+            setBriefName(file.name);
+            if (parsed.brandName) setClientName(parsed.brandName);
+            setParsedBriefDraft(parsed);
+            setShowBriefReview(true);
+            if (parsed._unmappedBlocks && parsed._unmappedBlocks.length > 0) {
+              setBriefError(
+                parsed._unmappedBlocks.length + " block" + (parsed._unmappedBlocks.length !== 1 ? "s" : "") +
+                " from this import didn't map to a Spec widget yet: " +
+                parsed._unmappedBlocks.map(b => b.elementType).join(", ")
+              );
+            }
+            return;
+          }
+
           const parsed = extractBrief(raw);
           setBriefName(file.name);
           if (parsed.brandName) setClientName(parsed.brandName);
           setParsedBriefDraft(parsed);
           setShowBriefReview(true);
           if (raw.sitemap) setPages(raw.sitemap.map(s => s.pageId));
-        } catch { setBriefError("Could not parse this JSON file."); }
+        } catch (err) {
+          if (err instanceof ManifestImportError) {
+            setBriefError("Manifest import failed (" + err.issues.length + " issue" + (err.issues.length !== 1 ? "s" : "") + "): " + err.issues.join("; "));
+          } else {
+            setBriefError(uploadSource === "manifest" ? "Could not import this Manifest file." : "Could not parse this JSON file.");
+          }
+        }
       };
       reader.readAsText(file);
     } else if (ext === "pdf") {
@@ -930,6 +962,28 @@ export default function CustomBuild({ userId, role } = {}) {
             <div style={{ ...T.surface, border: brief ? "1px solid #dde0e6" : "1px solid #dde0e6" }}>
               {!brief ? (
                 <>
+                  <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
+                    <button
+                      onClick={() => setUploadSource("standard")}
+                      style={{
+                        flex: 1, padding: "10px", fontSize: "12px", fontWeight: 600, borderRadius: "6px", cursor: "pointer",
+                        border: uploadSource === "standard" ? "2px solid #b45309" : "1px solid #dde0e6",
+                        background: uploadSource === "standard" ? "#fffaf3" : "#ffffff",
+                        color: uploadSource === "standard" ? "#09090b" : "#6b7280",
+                      }}>
+                      Standard Brief
+                    </button>
+                    <button
+                      onClick={() => setUploadSource("manifest")}
+                      style={{
+                        flex: 1, padding: "10px", fontSize: "12px", fontWeight: 600, borderRadius: "6px", cursor: "pointer",
+                        border: uploadSource === "manifest" ? "2px solid #b45309" : "1px solid #dde0e6",
+                        background: uploadSource === "manifest" ? "#fffaf3" : "#ffffff",
+                        color: uploadSource === "manifest" ? "#09090b" : "#6b7280",
+                      }}>
+                      Import from Manifest
+                    </button>
+                  </div>
                   <div
                     onClick={() => fileRef.current?.click()}
                     onDragOver={e => e.preventDefault()}
@@ -939,9 +993,19 @@ export default function CustomBuild({ userId, role } = {}) {
                     onMouseOut={e => e.currentTarget.style.borderColor = "#dde0e6"}
                   >
                     <div style={{ fontSize: "24px", marginBottom: "8px" }}>↑</div>
-                    <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "4px" }}>Upload Brand Brief</div>
-                    <div style={{ fontSize: "12px", color: "#6b7280" }}>PDF, DOCX, JSON, or TXT</div>
-                    <input ref={fileRef} type="file" accept=".json,.pdf,.txt,.docx" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
+                    <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "4px" }}>
+                      {uploadSource === "manifest" ? "Upload Manifest Export" : "Upload Brand Brief"}
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#6b7280" }}>
+                      {uploadSource === "manifest" ? "JSON only" : "PDF, DOCX, JSON, or TXT"}
+                    </div>
+                    <input
+                      ref={fileRef}
+                      type="file"
+                      accept={uploadSource === "manifest" ? ".json" : ".json,.pdf,.txt,.docx"}
+                      style={{ display: "none" }}
+                      onChange={e => handleFile(e.target.files[0])}
+                    />
                   </div>
                   <div style={{ textAlign: "center", margin: "12px 0", fontSize: "12px", color: "#9ca3af" }}>or</div>
                   <div style={{ display: "flex", justifyContent: "center" }}>
