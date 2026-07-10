@@ -535,6 +535,25 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       var f2b   = brief.feature2Body    || "Explain how your approach is tailored to the specific customer.";
       var f3h   = brief.feature3Heading || "Results You Can Count On";
       var f3b   = brief.feature3Body    || "Speak to reliability, track record, or outcomes.";
+
+      // Mirrors landing.js's makeFeatureRows(): brief.features (a variable-
+      // length array) takes priority when present — this is what makes the
+      // preview actually match the real export for a source with more than
+      // 3 content sections (e.g. a Manifest import), instead of the
+      // preview silently falling back to its own hardcoded 3-item defaults
+      // while the real export correctly has all of them. Falls back to the
+      // original f1h/f1b/f2h/f2b/f3h/f3b fields when brief.features isn't
+      // set, so every existing brief keeps previewing exactly as before.
+      var featureRowsData = (Array.isArray(brief.features) && brief.features.length > 0)
+        ? brief.features.map(function (f) {
+            return [f.heading || "", f.body || "", makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg)];
+          })
+        : [[f1h, f1b, img1], [f2h, f2b, img2], [f3h, f3b, img3]];
+      var featureRowsDataB = (Array.isArray(brief.features) && brief.features.length > 0)
+        ? brief.features.map(function (f, i) {
+            return [f.heading || "", f.body || "", makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg), i % 2 === 1];
+          })
+        : [[f1h, f1b, img1, false], [f2h, f2b, img2, true], [f3h, f3b, img3, false]];
       var s1    = brief.trustStat1 || "10+";  var l1 = brief.trustLabel1 || "Years in business";
       var s2    = brief.trustStat2 || "500+"; var l2 = brief.trustLabel2 || "Projects completed";
       var s3    = brief.trustStat3 || "98%";  var l3 = brief.trustLabel3 || "Client satisfaction";
@@ -650,7 +669,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
               "</div>" +
             "</div>" +
           "</section>" +
-          [[f1h,f1b,img1],[f2h,f2b,img2],[f3h,f3b,img3]].map(function(f,i) {
+          featureRowsData.map(function(f,i) {
             var imgLeft = i%2!==0;
             var cols = imgLeft
               ? "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div><div style='padding:72px 64px;display:flex;flex-direction:column;justify-content:center;'>"
@@ -730,7 +749,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             }).join("") +
           "</div>" +
         "</section>" +
-        [[f1h,f1b,img1,false],[f2h,f2b,img2,true],[f3h,f3b,img3,false]].map(function(f,i) {
+        featureRowsDataB.map(function(f,i) {
           var textDiv = "<div class='feature-text' style='padding:72px 64px;display:flex;flex-direction:column;justify-content:center;'><h2 style='font-size:clamp(20px,2.5vw,32px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p><a class='row-btn' style='" + btnDark + "'>" + cta2 + "</a></div>";
           var imgDiv  = "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>";
           return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + (f[3] ? imgDiv+textDiv : textDiv+imgDiv) + "</section>";
@@ -1469,6 +1488,12 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
   };
 
   var ap = activePage.toLowerCase();
+  // "other" is an alias for "landing" (see generatePages.js) — same builder,
+  // different label in the UI. The sections dict below only has a
+  // "landing" key; without this alias, an "other" page falls through every
+  // fallback attempt to sections.home, showing the wrong preview entirely
+  // for what's now the default page type on every Manifest import.
+  if (ap === "other" || ap.indexOf("other-") === 0) ap = "landing";
   var body = sections[ap] 
     || sections[ap.replace(/-\d+$/, "")] 
     || sections[ap.split("-")[0]]
