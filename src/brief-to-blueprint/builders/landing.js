@@ -1,5 +1,27 @@
 import { nid, mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer, mkDivider, mkIconList, mkForm, mkTestimonialCarousel, mkAccordion, mkMapSection } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
+import { parseInspoPatterns } from "../utils/patterns.js";
+
+// Picks which visual style to render feature rows in. Real inspiration-URL
+// signal (from the screenshot-based vision classification — see
+// crawl-inspo.js) overrides this when it exists; otherwise falls back to a
+// content-density default. Density is the baseline, not an afterthought:
+// forcing 10+ real content sections through the same big image-split box
+// is a worse layout than a denser style, regardless of what any reference
+// site says — split-image only makes sense for a handful of rows with
+// real photography behind them.
+function selectFeatureRowStyle(inspoContext, featureCount) {
+  var densityDefault = featureCount <= 4 ? "split-image" : featureCount <= 8 ? "stacked-text" : "compact-list";
+
+  var boosts = parseInspoPatterns(inspoContext);
+  var relevant = { "alternating-rows": "split-image", "icon-list": "compact-list", "numbered-features": "compact-list", "card-grid": "stacked-text" };
+  var bestId = null, bestScore = 0;
+  Object.keys(relevant).forEach(function (id) {
+    if (boosts[id] && boosts[id] > bestScore) { bestScore = boosts[id]; bestId = id; }
+  });
+
+  return bestId ? relevant[bestId] : densityDefault;
+}
 
 // Landing page builder — three distinct conversion-focused layouts.
 //
@@ -101,6 +123,51 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
           { heading: brief.feature3Heading || "Results You Can Count On", body: brief.feature3Body || "[Speak to reliability, track record, or outcomes]", imgCaption: "[Photo placeholder]", imageLeft: false },
         ];
 
+    var style = selectFeatureRowStyle(inspoContext, features.length);
+
+    if (style === "stacked-text") {
+      return features.map(function(f, i) {
+        var accentLine = mkContainer([], accent, { isInner: true, padY: "0", padX: "0" });
+        accentLine.settings.width = { unit: "px", size: 28 };
+        accentLine.settings.height = { unit: "px", size: 2 };
+        var children = [
+          accentLine,
+          mkSpacer(14),
+          mkHeading(f.heading, ink, "h3", { weight: 700, px: 24 }),
+          mkSpacer(10),
+          mkText(he(f.body), text),
+        ];
+        return mkContainer(children, i % 2 === 0 ? warmWhite : bone, { padY: "48", padX: "48", full: true });
+      });
+    }
+
+    if (style === "compact-list") {
+      return features.map(function(f, i) {
+        var numberBadge = mkContainer([
+          mkHeading(String(i + 1), warmWhite, "h4", { weight: 700, px: 15, align: "center" }),
+        ], accent, { isInner: true, padY: "0", padX: "0", center: true });
+        numberBadge.settings.width = { unit: "px", size: 36 };
+        numberBadge.settings.height = { unit: "px", size: 36 };
+        numberBadge.settings.border_radius = { unit: "%", top: "50", right: "50", bottom: "50", left: "50", isLinked: true };
+        numberBadge.settings.flex_justify_content = "center";
+        numberBadge.settings.flex_shrink = 0;
+
+        var textCol = mkContainer([
+          mkHeading(f.heading, ink, "h4", { weight: 700, px: 18 }),
+          mkSpacer(6),
+          mkText(he(f.body), text),
+        ], null, { isInner: true, padY: "0", padX: "0", grow: "1" });
+
+        var row = mkContainer([numberBadge, textCol], null, { direction: "row", padY: "20", padX: "32", gap: "20", full: true });
+        row.settings.flex_align_items = "flex-start";
+        row.settings.border_border = "solid";
+        row.settings.border_width = { unit: "px", top: "0", right: "0", bottom: "1", left: "0", isLinked: false };
+        row.settings.border_color = "#DDE0E6";
+        return row;
+      });
+    }
+
+    // "split-image" — the original default style
     return features.map(function(f, i) {
       var innerChildren = [
         mkHeading(f.heading, accent, "h2", { weight: 700, px: 34 }),
