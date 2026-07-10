@@ -110,11 +110,15 @@ Rules:
 // successfully elsewhere in this app (generate-copy.js, describeMySite,
 // GenerateFromKeywordsModal) — no unverified/guessed model IDs, so a brief
 // parse doesn't waste a round-trip on a model that never resolves.
+// Step-down fallback: primary model first, then one tier down on cost/
+// capability. Both IDs verified current as of July 2026 — claude-sonnet-4-6
+// ($3/$15 per MTok) and claude-haiku-4-5-20251001 ($1/$5 per MTok, already
+// proven working elsewhere in this app — see api/draft-copy.js). The old
+// 4-model chain included 3 models retired by Anthropic between Oct 2025 and
+// Apr 2026, so it silently had zero real fallback coverage.
 const MODELS = [
   "claude-sonnet-4-6",
-  "claude-3-5-sonnet-20241022",
-  "claude-3-5-haiku-20241022",
-  "claude-3-haiku-20240307",
+  "claude-haiku-4-5-20251001",
 ];
 
 async function callClaude(apiKey, messages, extraHeaders = {}) {
