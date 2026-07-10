@@ -1,4 +1,4 @@
-import { nid, mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer, mkDivider, mkIconList, mkForm, mkTestimonialCarousel, mkAccordion, mkMapSection, mkGoogleMapsWidget } from "./helpers.js";
+import { nid, mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer, mkDivider, mkIconList, mkForm, mkTestimonialCarousel, mkAccordion, mkMapSection, mkGoogleMapsWidget, sanitizeUrl } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
 import { parseInspoPatterns } from "../utils/patterns.js";
 
@@ -422,10 +422,14 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // (see mkGoogleMapsWidget). Test this specifically before relying on it.
   // Only renders when a real video URL exists — never a placeholder embed.
   function renderVideoRow(f, rowIdx) {
-    if (!brief.videoUrl) return renderPlainRow(f, rowIdx);
+    var safeVideoUrl = sanitizeUrl(brief.videoUrl);
+    // sanitizeUrl() returns "#" for anything unsafe (or absent) -- a
+    // meaningless value for a video widget, so treat it the same as "no
+    // video" rather than embedding a broken/dangerous URL.
+    if (!brief.videoUrl || safeVideoUrl === "#") return renderPlainRow(f, rowIdx);
     var videoWidget = {
       id: nid(), elType: "widget", widgetType: "video",
-      settings: { video_type: "youtube", youtube_url: brief.videoUrl },
+      settings: { video_type: "youtube", youtube_url: safeVideoUrl },
       elements: [],
     };
     var textCol = mkContainer([
