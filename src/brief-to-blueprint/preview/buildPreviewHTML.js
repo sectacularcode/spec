@@ -581,7 +581,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       // (no JS needed for the preview) so the interaction is visible without
       // wiring up click handlers just for this static HTML preview.
       var faqHTML = "<section style='background:#ffffff;padding:80px clamp(24px,6vw,80px);'>" +
-          "<div style='max-width:900px;margin:0 auto;'>" +
+          "<div style='max-width:1140px;margin:0 auto;'>" +
             "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + brass + ";margin:0 0 28px;'>" + (brief.faqHeading || "Frequently Asked Questions") + "</h2>" +
             faqItemsList.map(function(f, i) {
               var cbId = "faq-cb-" + i;
