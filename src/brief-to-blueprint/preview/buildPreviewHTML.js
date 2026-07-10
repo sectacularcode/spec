@@ -606,6 +606,19 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       // override mechanism, rendered as HTML strings instead of Elementor
       // JSON. When brief.featureLayout is set, this takes over entirely
       // for the feature-row area; the uniform style above is unused.
+      // Matches helpers.js's sanitizeUrl() exactly -- this file builds raw
+      // HTML strings directly rather than going through mkButton/mkText's
+      // built-in escaping, so every insertion point needs its own
+      // explicit safety check. Blocks javascript:/data: and other unsafe
+      // schemes; only allows http(s), a bare #, or a same-origin-relative
+      // path.
+      var SAFE_URL_PATTERN_PREVIEW = /^(https?:|#|\/(?!\/))/i;
+      function safeUrl(url) {
+        if (!url || typeof url !== "string") return "";
+        var trimmed = url.trim();
+        return SAFE_URL_PATTERN_PREVIEW.test(trimmed) ? trimmed : "";
+      }
+
       function renderCuratedFeatureLayoutHTML(layout) {
         var rawFeatures = Array.isArray(brief.features) ? brief.features : [];
         var htmlParts = [];
@@ -619,10 +632,10 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             var colWidth = Math.floor(100 / items.length);
             htmlParts.push(
               "<section style='background:#ffffff;padding:56px clamp(24px,6vw,64px);'>" +
-                "<div style='font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:" + brass + ";margin-bottom:20px;'>" + (entry.header || "") + "</div>" +
+                "<div style='font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:" + brass + ";margin-bottom:20px;'>" + he(entry.header || "") + "</div>" +
                 "<div style='display:grid;grid-template-columns:repeat(" + items.length + ",1fr);gap:32px;'>" +
                   items.map(function (it) {
-                    return "<div><h4 style='font-size:16px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + (it.heading || "") + "</h4><p style='font-size:14px;color:" + text + ";line-height:1.6;margin:0;'>" + (it.body || "") + "</p></div>";
+                    return "<div><h4 style='font-size:16px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + he(it.heading || "") + "</h4><p style='font-size:14px;color:" + text + ";line-height:1.6;margin:0;'>" + he(it.body || "") + "</p></div>";
                   }).join("") +
                 "</div>" +
               "</section>"
@@ -633,8 +646,8 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           if (entry.style === "centered-cta") {
             htmlParts.push(
               "<section style='background:" + bg + ";padding:56px clamp(24px,6vw,64px);text-align:center;'>" +
-                "<h3 style='font-size:clamp(18px,2.2vw,24px);font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + (f.heading || "") + "</h3>" +
-                "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0 auto 20px;max-width:640px;'>" + (f.body || "") + "</p>" +
+                "<h3 style='font-size:clamp(18px,2.2vw,24px);font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + he(f.heading || "") + "</h3>" +
+                "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0 auto 20px;max-width:640px;'>" + he(f.body || "") + "</p>" +
                 "<a class='row-btn' style='" + btnDark + "display:inline-block;'>" + cta2 + "</a>" +
               "</section>"
             );
@@ -649,12 +662,13 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             htmlParts.push(
               "<section style='background:" + bone + ";padding:56px clamp(24px,6vw,64px);'>" +
                 "<div style='max-width:560px;'>" +
-                "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + ffHeading + "</h3>" +
-                (ffSubhead ? "<p style='font-size:14px;color:" + stone + ";margin:0 0 20px;'>" + ffSubhead + "</p>" : "") +
+                "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + he(ffHeading) + "</h3>" +
+                (ffSubhead ? "<p style='font-size:14px;color:" + stone + ";margin:0 0 20px;'>" + he(ffSubhead) + "</p>" : "") +
                 ffFields.map(function (lbl) {
-                  return "<div style='margin-bottom:12px;'><label style='display:block;font-size:12px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;'>" + lbl + "</label><div style='width:100%;padding:10px 14px;border:1px solid #dde0e6;border-radius:4px;background:#ffffff;font-size:14px;color:#bbb;box-sizing:border-box;'>" + lbl + "...</div></div>";
+                  var safeLbl = he(String(lbl));
+                  return "<div style='margin-bottom:12px;'><label style='display:block;font-size:12px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;'>" + safeLbl + "</label><div style='width:100%;padding:10px 14px;border:1px solid #dde0e6;border-radius:4px;background:#ffffff;font-size:14px;color:#bbb;box-sizing:border-box;'>" + safeLbl + "...</div></div>";
                 }).join("") +
-                "<button style='padding:12px 28px;background:" + brass + ";color:#fff;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:6px;'>" + ffCta + "</button>" +
+                "<button style='padding:12px 28px;background:" + brass + ";color:#fff;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:6px;'>" + he(ffCta) + "</button>" +
                 "</div>" +
               "</section>"
             );
@@ -667,15 +681,16 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             // for this page came from the actual edited Elementor export,
             // since Manifest's source data never included one. Falls back
             // to a labeled placeholder when there's nothing real to embed;
-            // never invents an address.
+            // never invents an address. encodeURIComponent already makes
+            // this safe for the query-string context.
             var mapEmbed = brief.mapAddress
               ? "<iframe src=\"https://maps.google.com/maps?q=" + encodeURIComponent(brief.mapAddress) + "&output=embed\" style='border:0;width:100%;height:100%;min-height:320px;display:block;' loading='lazy'></iframe>"
               : "<div class='landing-img' style='min-height:320px;height:100%;overflow:hidden;background:" + bone + ";display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:12px;'>Map placeholder</div>";
             htmlParts.push(
               "<section style='background:" + bg + ";display:grid;grid-template-columns:1fr 1fr;'>" +
                 "<div style='padding:56px 48px;display:flex;flex-direction:column;justify-content:center;'>" +
-                  "<h2 style='font-size:clamp(20px,2.5vw,28px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + (f.heading || "") + "</h2>" +
-                  "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0;'>" + (f.body || "") + "</p>" +
+                  "<h2 style='font-size:clamp(20px,2.5vw,28px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + he(f.heading || "") + "</h2>" +
+                  "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0;'>" + he(f.body || "") + "</p>" +
                 "</div>" +
                 "<div style='min-height:320px;height:100%;overflow:hidden;'>" + mapEmbed + "</div>" +
               "</section>"
@@ -688,8 +703,8 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             var withBtn = entry.style === "split-cta-right" || entry.style === "split-cta-left";
             var img = makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg);
             var textBlock = "<div style='padding:56px 48px;display:flex;flex-direction:column;justify-content:center;'>" +
-              "<h2 style='font-size:clamp(20px,2.5vw,28px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + (f.heading || "") + "</h2>" +
-              "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0" + (withBtn ? " 0 20px" : "") + ";'>" + (f.body || "") + "</p>" +
+              "<h2 style='font-size:clamp(20px,2.5vw,28px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + he(f.heading || "") + "</h2>" +
+              "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0" + (withBtn ? " 0 20px" : "") + ";'>" + he(f.body || "") + "</p>" +
               (withBtn ? "<a class='row-btn' style='" + btnDark + "'>" + cta2 + "</a>" : "") +
             "</div>";
             var imgBlock = "<div class='landing-img' style='min-height:320px;height:100%;overflow:hidden;'><img src=\"" + img + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:320px;'/></div>";
@@ -706,10 +721,10 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             if (clauses.length === 0) clauses = [f.body || ""];
             htmlParts.push(
               "<section style='background:" + bg + ";padding:44px clamp(24px,6vw,64px);'>" +
-                "<h3 style='font-size:clamp(17px,2vw,22px);font-weight:700;color:" + ink + ";margin:0 0 16px;'>" + (f.heading || "") + "</h3>" +
+                "<h3 style='font-size:clamp(17px,2vw,22px);font-weight:700;color:" + ink + ";margin:0 0 16px;'>" + he(f.heading || "") + "</h3>" +
                 "<div style='display:flex;flex-direction:column;gap:10px;'>" +
                   clauses.map(function (c) {
-                    return "<div style='display:flex;align-items:flex-start;gap:10px;'><span style='color:" + brass + ";font-weight:700;flex-shrink:0;margin-top:2px;'>&#10003;</span><span style='font-size:15px;color:" + text + ";line-height:1.5;'>" + c + "</span></div>";
+                    return "<div style='display:flex;align-items:flex-start;gap:10px;'><span style='color:" + brass + ";font-weight:700;flex-shrink:0;margin-top:2px;'>&#10003;</span><span style='font-size:15px;color:" + text + ";line-height:1.5;'>" + he(c) + "</span></div>";
                   }).join("") +
                 "</div>" +
               "</section>"
@@ -719,20 +734,22 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
 
           if (entry.style === "video") {
             // Mirrors landing.js's renderVideoRow -- unverified against a
-            // real Elementor render, unlike the other widgets here. This
-            // is just an <iframe>, so it's not subject to the same
-            // settings-shape risk as the real export, but the export side
-            // (the part that actually matters) carries that caveat.
-            if (!brief.videoUrl) { htmlParts.push(""); return; }
-            var ytMatch = String(brief.videoUrl).match(/(?:youtu\.be\/|v=)([\w-]{6,})/);
-            var embedSrc = ytMatch ? "https://www.youtube.com/embed/" + ytMatch[1] : brief.videoUrl;
+            // real Elementor render, unlike the other widgets here.
+            // safeUrl() blocks javascript:/data: and other unsafe schemes
+            // before this ever reaches the iframe src -- videoUrl is
+            // brief-supplied content, not something Spec generated, so it
+            // gets the same treatment as any other untrusted URL.
+            var safeVideoUrl = safeUrl(brief.videoUrl);
+            if (!safeVideoUrl) { htmlParts.push(""); return; }
+            var ytMatch = safeVideoUrl.match(/(?:youtu\.be\/|v=)([\w-]{6,})/);
+            var embedSrc = ytMatch ? "https://www.youtube.com/embed/" + ytMatch[1] : safeVideoUrl;
             htmlParts.push(
               "<section style='background:" + bg + ";display:grid;grid-template-columns:1fr 1fr;'>" +
                 "<div style='padding:44px 48px;display:flex;flex-direction:column;justify-content:center;'>" +
-                  "<h3 style='font-size:clamp(17px,2vw,22px);font-weight:700;color:" + ink + ";margin:0 0 10px;'>" + (f.heading || "") + "</h3>" +
-                  "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0;'>" + (f.body || "") + "</p>" +
+                  "<h3 style='font-size:clamp(17px,2vw,22px);font-weight:700;color:" + ink + ";margin:0 0 10px;'>" + he(f.heading || "") + "</h3>" +
+                  "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0;'>" + he(f.body || "") + "</p>" +
                 "</div>" +
-                "<div style='min-height:280px;height:100%;overflow:hidden;'><iframe src=\"" + embedSrc + "\" style='border:0;width:100%;height:100%;min-height:280px;display:block;' loading='lazy' allowfullscreen></iframe></div>" +
+                "<div style='min-height:280px;height:100%;overflow:hidden;'><iframe src=\"" + he(embedSrc) + "\" style='border:0;width:100%;height:100%;min-height:280px;display:block;' loading='lazy' allowfullscreen></iframe></div>" +
               "</section>"
             );
             return;
@@ -741,8 +758,8 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
           // "plain" fallback -- no accent line, matches landing.js
           htmlParts.push(
             "<section style='background:" + bg + ";padding:44px clamp(24px,6vw,64px);'>" +
-              "<h3 style='font-size:clamp(17px,2vw,22px);font-weight:700;color:" + ink + ";margin:0 0 10px;'>" + (f.heading || "") + "</h3>" +
-              "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0;'>" + (f.body || "") + "</p>" +
+              "<h3 style='font-size:clamp(17px,2vw,22px);font-weight:700;color:" + ink + ";margin:0 0 10px;'>" + he(f.heading || "") + "</h3>" +
+              "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0;'>" + he(f.body || "") + "</p>" +
             "</section>"
           );
         });
