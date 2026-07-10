@@ -30,6 +30,9 @@ import { manifestToBrief, ManifestImportError } from "./importers/manifestImport
 
 export default function CustomBuild({ userId, role } = {}) {
   const [brief, setBrief]               = useState(null);
+  const [savedBrandStyle, setSavedBrandStyle] = useState(null); // fetched style for the current brief's brand, if any
+  const [styleConflict, setStyleConflict]     = useState(null); // { savedStyle, briefColors, brandName } when both exist and differ -- pauses generate() until resolved
+  const [stylePanelStatus, setStylePanelStatus] = useState(""); // brief save/load feedback text
   const [briefName, setBriefName]       = useState("");
   const [briefError, setBriefError]     = useState("");
   const [draftMsg, setDraftMsg]         = useState(""); // transient message for saved-drafts list actions
@@ -494,6 +497,79 @@ export default function CustomBuild({ userId, role } = {}) {
   // Step 3 (analyze inspo) + Step 4 (build pages) + save draft. Runs either
   // immediately (no drafts to review) or after the user approves/discards
   // the drafted-fields review panel.
+  // Brand style guide — a saved color/font profile per brand name,
+  // reusable across every future page for that brand regardless of
+  // upload source (Standard Brief or Manifest both funnel through
+  // generate() below, so this only needs to live in one place).
+
+  async function fetchSavedStyle(brandName) {
+    if (!brandName || !brandName.trim()) return null;
+    try {
+      const res = await fetch("/api/brand-styles?brand_name=" + encodeURIComponent(brandName.trim()), {
+        headers: await authHeaders(),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.style || null;
+    } catch (e) {
+      console.warn("fetchSavedStyle failed:", e.message);
+      return null;
+    }
+  }
+
+  async function saveBrandStyle() {
+    if (!brief || !brief.brandName || !brief.colors) return;
+    setStylePanelStatus("Saving...");
+    try {
+      const res = await fetch("/api/brand-styles", {
+        method: "POST",
+        headers: await authHeaders(),
+        body: JSON.stringify({ brand_name: brief.brandName, colors: brief.colors, fonts: brief.fonts ? { heading: brief.fonts[0], body: brief.fonts[1] } : {} }),
+      });
+      if (res.ok) {
+        setStylePanelStatus("Saved as " + brief.brandName + "'s style guide.");
+        const saved = await fetchSavedStyle(brief.brandName);
+        setSavedBrandStyle(saved);
+      } else {
+        setStylePanelStatus("Couldn't save — try again.");
+      }
+    } catch (e) {
+      setStylePanelStatus("Couldn't save — try again.");
+    }
+    setTimeout(() => setStylePanelStatus(""), 3000);
+  }
+
+  // Two real, non-empty color sets disagreeing on at least one shared key
+  // is a genuine conflict worth asking about — not just "one of them is
+  // present." A saved style with no overlapping keys at all, or identical
+  // values, resolves silently.
+  function colorsConflict(a, b) {
+    if (!a || !b) return false;
+    const aKeys = Object.keys(a).filter(k => a[k]);
+    if (aKeys.length === 0) return false;
+    return aKeys.some(k => b[k] && b[k].toLowerCase() !== a[k].toLowerCase());
+  }
+
+  function resolveStyleConflict(useSaved) {
+    if (!styleConflict) return;
+    if (useSaved) {
+      const s = styleConflict.savedStyle;
+      setBrief(b => ({
+        ...b,
+        colors: s.colors || b.colors,
+        fonts: s.fonts && (s.fonts.heading || s.fonts.body)
+          ? [s.fonts.heading || s.fonts.body, s.fonts.body || s.fonts.heading]
+          : b.fonts,
+      }));
+    }
+    // useSaved === false leaves brief.colors exactly as the import
+    // provided it -- nothing to change.
+    setStyleConflict(null);
+    // Deferred one tick so setBrief above has actually landed before
+    // generate() reads brief.colors again.
+    setTimeout(() => generate(true), 0);
+  }
+
   async function finishGenerate(workingBrief, inspoContext) {
     setGenerating(true);
     setGeneratingStatus("Building pages...");
@@ -571,8 +647,34 @@ export default function CustomBuild({ userId, role } = {}) {
     finishGenerate(pending.briefBase, pending.inspoContext);
   }
 
-  async function generate() {
+  async function generate(skipStyleCheck) {
     if (!canGenerate) return;
+
+    // Check for a saved style guide before anything else -- if it
+    // conflicts with colors already on the brief (from either upload
+    // path), pause and let the person choose rather than silently picking
+    // one. A non-conflicting saved style (brief has no colors of its own,
+    // or the values already match) applies automatically with no prompt.
+    // skipStyleCheck is set by resolveStyleConflict() below, once the
+    // person has already made that choice for this generation attempt --
+    // without it, re-calling generate() would immediately re-detect the
+    // same conflict and re-prompt in a loop.
+    if (!skipStyleCheck) {
+      const savedStyle = await fetchSavedStyle(brief.brandName);
+      setSavedBrandStyle(savedStyle);
+      if (savedStyle && savedStyle.colors && colorsConflict(brief.colors, savedStyle.colors)) {
+        setStyleConflict({ savedStyle, briefColors: brief.colors, brandName: brief.brandName });
+        return;
+      }
+      if (savedStyle && savedStyle.colors && (!brief.colors || Object.keys(brief.colors).length === 0)) {
+        // No conflict, brief just has nothing of its own -- apply quietly.
+        brief.colors = savedStyle.colors;
+        if (savedStyle.fonts && (savedStyle.fonts.heading || savedStyle.fonts.body)) {
+          brief.fonts = [savedStyle.fonts.heading || savedStyle.fonts.body, savedStyle.fonts.body || savedStyle.fonts.heading];
+        }
+      }
+    }
+
     setGenerating(true);
     setGeneratingStatus("Building pages...");
 
@@ -1063,6 +1165,16 @@ export default function CustomBuild({ userId, role } = {}) {
                       ))}
                     </div>
                   )}
+                  {brief.brandName && brief.colors && Object.keys(brief.colors).length > 0 && (
+                    <div style={{ marginBottom: "14px", display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                      <button
+                        onClick={saveBrandStyle}
+                        style={{ padding: "6px 12px", fontSize: "11px", fontWeight: 600, border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", cursor: "pointer" }}>
+                        Save as {brief.brandName}'s style guide
+                      </button>
+                      {stylePanelStatus && <span style={{ fontSize: "11px", color: "#6b7280" }}>{stylePanelStatus}</span>}
+                    </div>
+                  )}
                   <label style={{ ...T.label, marginBottom: "6px", display: "block" }}>Export name</label>
                   <input
                     style={{ ...T.input, marginBottom: "12px", width: "100%", maxWidth: "100%", boxSizing: "border-box" }}
@@ -1465,6 +1577,41 @@ export default function CustomBuild({ userId, role } = {}) {
       </div>
       </>
       )} {/* end !draftsView grid */}
+
+      {/* Brand style guide conflict -- pauses generate() until resolved */}
+      {styleConflict && (
+        <>
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 2000 }} onClick={() => setStyleConflict(null)} />
+          <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "min(480px, 92vw)", background: "#fff", borderRadius: "10px", boxShadow: "0 16px 48px rgba(0,0,0,0.25)", zIndex: 2001, padding: "28px" }}>
+            <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b", marginBottom: "8px" }}>Two color sets for {styleConflict.brandName}</div>
+            <div style={{ fontSize: "13px", color: "#6b7280", lineHeight: 1.5, marginBottom: "20px" }}>
+              This import came with its own colors, and there's also a saved style guide for {styleConflict.brandName}. Which should this page use?
+            </div>
+            <div style={{ display: "flex", gap: "10px", marginBottom: "14px" }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.04em" }}>This import</div>
+                <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
+                  {Object.entries(styleConflict.briefColors || {}).slice(0, 8).map(([id, hex]) => (
+                    <div key={id} title={id + ": " + hex} style={{ width: "20px", height: "20px", borderRadius: "3px", background: hex, border: "1px solid rgba(0,0,0,.1)" }} />
+                  ))}
+                </div>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.04em" }}>Saved style guide</div>
+                <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
+                  {Object.entries(styleConflict.savedStyle.colors || {}).slice(0, 8).map(([id, hex]) => (
+                    <div key={id} title={id + ": " + hex} style={{ width: "20px", height: "20px", borderRadius: "3px", background: hex, border: "1px solid rgba(0,0,0,.1)" }} />
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <button onClick={() => resolveStyleConflict(false)} style={{ flex: 1, padding: "10px", fontSize: "13px", fontWeight: 600, border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", cursor: "pointer" }}>Use this import's colors</button>
+              <button onClick={() => resolveStyleConflict(true)} style={{ flex: 1, padding: "10px", fontSize: "13px", fontWeight: 600, border: "none", borderRadius: "6px", background: "#b45309", color: "#fff", cursor: "pointer" }}>Use saved style guide</button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
