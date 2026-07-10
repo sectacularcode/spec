@@ -303,13 +303,27 @@ export default function CustomBuild({ userId, role } = {}) {
             if (parsed.brandName) setClientName(parsed.brandName);
             setParsedBriefDraft(parsed);
             setShowBriefReview(true);
+            // Surfaced before generation, not buried — this is Manifest's
+            // own audit trail (unverified claims, buttons still pointing at
+            // placeholders) plus anything that had no matching Spec widget.
+            // Nothing here blocks generation; it's a "review before you
+            // ship this" notice, same spirit as the AI-drafted-fields
+            // approval step already gates the standard upload path.
+            const noticeLines = [];
             if (parsed._unmappedBlocks && parsed._unmappedBlocks.length > 0) {
-              setBriefError(
+              noticeLines.push(
                 parsed._unmappedBlocks.length + " block" + (parsed._unmappedBlocks.length !== 1 ? "s" : "") +
                 " from this import didn't map to a Spec widget yet: " +
                 parsed._unmappedBlocks.map(b => b.elementType).join(", ")
               );
             }
+            if (parsed._manifestWarnings && parsed._manifestWarnings.length > 0) {
+              noticeLines.push(
+                "Review before generating (" + parsed._manifestWarnings.length + "):\n" +
+                parsed._manifestWarnings.map(w => "• " + w).join("\n")
+              );
+            }
+            if (noticeLines.length > 0) setBriefError(noticeLines.join("\n\n"));
             return;
           }
 
