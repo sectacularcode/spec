@@ -91,3 +91,41 @@ CREATE TABLE inspo_patterns (
   pool       JSONB NOT NULL DEFAULT '[]'::jsonb,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- api_usage: one row per real Anthropic API call (parse-brief, draft-copy,
+-- generate-copy). client_name is self-derived server-side from the brief's
+-- own brandName field at call time — no frontend passthrough needed.
+-- cost_cents is computed and stored at write time from the pricing table in
+-- api/_lib/usage.js, so historical rows stay accurate even if Anthropic's
+-- prices change later. Reporting-only for now (see api/_lib/usage.js) — no
+-- enforcement/blocking yet.
+CREATE TABLE api_usage (
+  id            BIGSERIAL PRIMARY KEY,
+  user_id       TEXT NOT NULL,
+  client_name   TEXT,
+  route         TEXT NOT NULL,
+  model         TEXT NOT NULL,
+  input_tokens  INTEGER NOT NULL,
+  output_tokens INTEGER NOT NULL,
+  cost_cents    INTEGER,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_api_usage_user_id ON api_usage(user_id);
+CREATE INDEX idx_api_usage_client_name ON api_usage(client_name);
+CREATE INDEX idx_api_usage_created_at ON api_usage(created_at);
+
+-- usage_limits: monthly spend limits, scoped to either a user account or a
+-- client/brand. Reporting-only for now — nothing currently reads this table
+-- to block a request. When enforcement is turned on later (see project
+-- memory), the check belongs at the top of parse-brief.js/draft-copy.js,
+-- before the Anthropic call.
+CREATE TABLE usage_limits (
+  id                 BIGSERIAL PRIMARY KEY,
+  scope              TEXT NOT NULL CHECK (scope IN ('user', 'client')),
+  scope_id           TEXT NOT NULL,
+  monthly_limit_cents INTEGER NOT NULL,
+  updated_by         TEXT NOT NULL,
+  updated_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (scope, scope_id)
+);
+
