@@ -76,6 +76,8 @@ Return this exact structure (use empty string "" for any field not found):
   "contactIntro": "",
   "contactCta": "",
   "contactReassurance": "",
+  "servicesEyebrow": "",
+  "servicesH1": "",
   "pricingTiers": [["Tier name", "Tier subtitle", "Description", "From $X"]],
   "colors": { "ink": "", "brass": "", "brass-deep": "", "bone": "", "asphalt": "", "stone": "", "warm-white": "", "text": "" },
   "fonts": ["Primary font", "Accent font"],
@@ -94,6 +96,7 @@ Rules:
 - For pricingTiers: the subtitle is the short descriptor line like "CASH FLOW & TRUST" or "MARGIN & CRAFT".
 - For differenceH2, whoH2, workH1, aboutH1: extract the actual headline copy, not the eyebrow label.
 - If a field is genuinely absent from the brief, use empty string "" — never invent copy.
+- For servicesEyebrow/servicesH1: these are the standalone Services & Pricing page's own header, distinct from pricingH2/pricingSubhead (which are the short pricing teaser on the Home page). Extract them separately even if the brief only has one pricing section — use that same section's heading for both if there's no separate Services page section.
 - The trustStat/trustLabel, feature, testimonial, benefit, form, and map fields only apply if this brief is for a standalone landing/ad page. If the brief is for a general multi-page site with no landing-page section, leave all of these as empty string "" or empty array [] — do not repurpose Home-page content to fill them.
 - For faqItems: extract each question/answer pair exactly as written. Never invent a question or answer that isn't in the brief.
 - For testimonials: only extract a quote, name, and title if a real testimonial is present in the brief. If a testimonial slot is explicitly blank or marked for AI drafting, leave that testimonial's three fields as empty string "" rather than inventing a quote.
