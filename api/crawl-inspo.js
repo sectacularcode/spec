@@ -15,6 +15,9 @@ import net from "node:net";
 import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { callAnthropic, extractJSON } from "./_lib/anthropic.js";
+import { logUsage } from "./_lib/usage.js";
+import { captureScreenshot } from "./_lib/screenshot.js";
+import { LAYOUT_PATTERNS } from "../src/constants/patterns.js";
 
 const MAX_REDIRECTS = 3;
 const MAX_BODY_BYTES = 2 * 1024 * 1024; // 2MB per page
@@ -204,6 +207,8 @@ export default async function handler(req, res) {
     const navLinks = extractNavLinks(rootHtml, origin);
     const allUrls = [base.href, ...navLinks].filter((u, i, arr) => arr.indexOf(u) === i).slice(0, 8);
 
+    // Fetch HTML (for page-type inference and the text-fallback path) and
+    // attempt a screenshot capture in parallel for every discovered page.
     const pages = await Promise.all(
       allUrls.map(async (pageUrl) => {
         const html = await fetchPage(pageUrl);
@@ -211,7 +216,8 @@ export default async function handler(req, res) {
         const path = new URL(pageUrl).pathname;
         const pageType = inferPageType(path);
         const structure = extractStructure(html);
-        return { url: pageUrl, path, pageType, structure };
+        const screenshot = await captureScreenshot(pageUrl);
+        return { url: pageUrl, path, pageType, structure, screenshot };
       })
     );
 
@@ -219,16 +225,94 @@ export default async function handler(req, res) {
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
-      return res.status(200).json({ origin, pages: discovered, colors: colorExtraction?.colors || null, colorConfidence: colorExtraction?.confidence || null });
+      return res.status(200).json({
+        origin,
+        pages: discovered.map(p => ({ url: p.url, path: p.path, pageType: p.pageType })),
+        colors: colorExtraction?.colors || null,
+        colorConfidence: colorExtraction?.confidence || null,
+      });
     }
 
-    const summary = await summarizeWithClaude(apiKey, origin, discovered);
+    const anyScreenshotSucceeded = discovered.some(p => p.screenshot);
+
+    let patternBoosts = {};
+    let pagesSummaryText = {};
+    let siteNotes = "";
+    let visionAnalysisUsed = false;
+    let totalInputTokens = 0;
+    let totalOutputTokens = 0;
+
+    if (anyScreenshotSucceeded) {
+      visionAnalysisUsed = true;
+      // Classify every page that got a real screenshot. Pages where the
+      // capture failed (site blocked it, timed out, etc.) are simply
+      // skipped rather than falling back per-page — a partial-vision crawl
+      // is still far more reliable than a full-text-only one.
+      const results = await Promise.all(
+        discovered.map(async (p) => {
+          if (!p.screenshot) return { page: p, result: null };
+          const result = await classifyPageLayout(apiKey, p.screenshot, p.pageType);
+          return { page: p, result };
+        })
+      );
+
+      for (const { page, result } of results) {
+        if (!result) continue;
+        totalInputTokens += result.usage?.input_tokens || 0;
+        totalOutputTokens += result.usage?.output_tokens || 0;
+
+        const classification = result.classification || {};
+        const labelParts = [];
+        Object.keys(classification).forEach((sectionType) => {
+          const patternId = classification[sectionType];
+          // Real visual confirmation is a much stronger signal than the old
+          // text-keyword regex match, so it's weighted higher (15 vs the
+          // regex path's 8) in selectPatterns()'s scoring.
+          patternBoosts[patternId] = (patternBoosts[patternId] || 0) + 15;
+          const matchedPattern = (LAYOUT_PATTERNS[sectionType] || []).find(p => p.id === patternId);
+          if (matchedPattern) labelParts.push(matchedPattern.label);
+        });
+        if (labelParts.length) {
+          pagesSummaryText[page.pageType] = labelParts.join("; ");
+        }
+      }
+
+      if (Object.keys(pagesSummaryText).length) {
+        siteNotes = "Layout patterns identified from real screenshots of " + origin + ".";
+      }
+
+      if (totalInputTokens || totalOutputTokens) {
+        await logUsage({
+          userId,
+          clientName: null,
+          route: "crawl-inspo-vision",
+          model: "claude-haiku-4-5-20251001",
+          inputTokens: totalInputTokens,
+          outputTokens: totalOutputTokens,
+        });
+      }
+    }
+
+    // Full fallback to the old text-only analysis — only when screenshot
+    // capture failed for every single page (SNAPRENDER_API_KEY missing,
+    // the API down, or every target blocked automated capture). This keeps
+    // the feature working, just without the visual-accuracy improvement,
+    // instead of failing the whole crawl over one missing dependency.
+    if (!anyScreenshotSucceeded) {
+      const summary = await summarizeWithClaude(apiKey, origin, discovered);
+      if (summary) {
+        siteNotes = summary.siteNotes || "";
+        pagesSummaryText = summary.pages || {};
+      }
+    }
 
     return res.status(200).json({
       origin,
       pageCount: discovered.length,
-      pages: discovered.map(p => ({ url: p.url, path: p.path, pageType: p.pageType })),
-      patterns: summary,
+      pages: discovered.map(p => ({ url: p.url, path: p.path, pageType: p.pageType, hadScreenshot: !!p.screenshot })),
+      patterns: { siteNotes, pages: pagesSummaryText },
+      patternBoosts,
+      visionAnalysisUsed,
       colors: colorExtraction?.colors || null,
       colorConfidence: colorExtraction?.confidence || null,
     });
@@ -349,6 +433,19 @@ function inferPageType(path) {
   return "other";
 }
 
+// Which LAYOUT_PATTERNS section keys are worth checking for a given crawled
+// page type. A "home" page can show multiple section types (hero, services
+// preview, cta); other page types map to one or two relevant sections.
+const PAGE_TYPE_SECTIONS = {
+  home: ["hero", "cta"],
+  work: ["portfolio"],
+  services: ["services", "pricing"],
+  about: ["about"],
+  process: ["process"],
+  contact: ["contact"],
+  other: [],
+};
+
 function extractStructure(html) {
   const clean = html
     .replace(/<script[\s\S]*?<\/script>/gi, "")
@@ -358,6 +455,58 @@ function extractStructure(html) {
     .trim()
     .slice(0, 3000);
   return clean;
+}
+
+// Looks at a real screenshot of a page and classifies which layout pattern
+// actually appears for each relevant section type — grounded against
+// Spec's real pattern catalog (LAYOUT_PATTERNS), not a freeform text guess.
+// This is the fix for the old approach (extractStructure + a text-only
+// Claude summary): stripping all HTML before analysis discarded every real
+// visual signal, so "structural" recommendations were necessarily generic
+// and rarely matched the specific keywords the old regex scorer looked
+// for. A screenshot is the one signal that's genuinely framework-agnostic
+// — it looks the same regardless of what the reference site is built with.
+//
+// Returns null if the screenshot capture failed (missing API key, target
+// site blocked the capture, etc.) — callers must fall back gracefully.
+async function classifyPageLayout(apiKey, screenshot, pageType) {
+  const sectionKeys = PAGE_TYPE_SECTIONS[pageType] || [];
+  if (!screenshot || sectionKeys.length === 0) return null;
+
+  const catalogText = sectionKeys
+    .map(key => key + ": " + (LAYOUT_PATTERNS[key] || []).map(p => p.id + " — " + p.label).join(" | "))
+    .join("\n");
+
+  const prompt = `This is a real screenshot of a ${pageType} page from a reference website.
+
+For each section type below, look at what is ACTUALLY visible in the screenshot and pick the pattern id that best matches the real layout you see. Only classify a section type if you can actually see it in the screenshot — never guess or assume a section exists if it isn't visible.
+
+${catalogText}
+
+Return ONLY valid JSON, one key per section type you could actually identify:
+{ "sectionType": "pattern-id" }
+
+If you cannot confidently identify any of the listed section types in this screenshot, return {}.`;
+
+  try {
+    const { ok, data } = await callAnthropic(apiKey, {
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 300,
+      system: "You are a visual design analyst looking at a real screenshot. Return ONLY valid JSON with no markdown, no explanation. Never classify a section you cannot actually see.",
+      messages: [{
+        role: "user",
+        content: [
+          { type: "image", source: { type: "base64", media_type: screenshot.mediaType, data: screenshot.base64 } },
+          { type: "text", text: prompt },
+        ],
+      }],
+    });
+    if (!ok) return null;
+    const parsed = extractJSON(data);
+    return parsed ? { classification: parsed, usage: data.usage } : null;
+  } catch {
+    return null;
+  }
 }
 
 async function summarizeWithClaude(apiKey, origin, pages) {
