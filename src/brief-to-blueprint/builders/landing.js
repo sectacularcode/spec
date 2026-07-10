@@ -151,7 +151,15 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // related or which is genuinely about a location, which a positional
     // pattern can't know. Real map/form content is still picked up
     // automatically by makeMapSection()/makeFormSection() regardless.
-    if (variant === "D") {
+    //
+    // Variant B (Lead Form) gets the same cycle -- its feature rows were
+    // falling back to the plain uniform stacked-text style same as
+    // everything else, producing the same long monotonous list Variant D
+    // was built to fix in the first place. Safe to share: Variant B's own
+    // lead-capture form lives in its hero area, separate from this cycle,
+    // and "embedded-form" was never one of the cycle's styles to begin
+    // with, so there's no duplicate-form risk.
+    if (variant === "D" || variant === "B") {
       var hasVideo = !!brief.videoUrl;
       var cyclePattern = hasVideo
         ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
