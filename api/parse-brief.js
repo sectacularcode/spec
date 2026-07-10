@@ -3,6 +3,7 @@ import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { deepStripHTML } from "./_lib/sanitize.js";
 import { callAnthropic, extractJSON } from "./_lib/anthropic.js";
+import { logUsage } from "./_lib/usage.js";
 
 const EXTRACTION_PROMPT = `Extract every field from this brand brief and return ONLY a single valid JSON object.
 No markdown, no code fences, no explanation — just the raw JSON.
@@ -203,6 +204,22 @@ export default async function handler(req, res) {
       const rawText = result.data.content?.[0]?.text || "";
       return res.status(500).json({ error: "Could not parse Claude response", raw: rawText.slice(0, 500) });
     }
+
+    // Log usage after a confirmed-successful parse — client_name comes from
+    // the extraction's own brandName, so no frontend change was needed to
+    // pass it through separately. Anthropic's response includes real
+    // input/output token counts on result.data.usage. Awaited deliberately —
+    // Vercel can terminate the function the moment the response is sent, so
+    // a fire-and-forget call here could get cut off before the write lands
+    // (same class of bug as the Clear draft fix).
+    await logUsage({
+      userId,
+      clientName: parsed.brandName || null,
+      route: "parse-brief",
+      model: result.model,
+      inputTokens: result.data?.usage?.input_tokens,
+      outputTokens: result.data?.usage?.output_tokens,
+    });
 
     if (parsed.colors && typeof parsed.colors === "object") {
       // Hard guarantee for docx/text sources (where we have the raw source
