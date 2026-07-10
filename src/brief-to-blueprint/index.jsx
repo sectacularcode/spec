@@ -309,7 +309,11 @@ export default function CustomBuild({ userId, role } = {}) {
           if (data.brandName) setClientName(data.brandName);
           setParsedBriefDraft(data); setShowBriefReview(true);
         } catch (err) {
-          const detailStr = err.detail ? " (" + err.detail.stopReason + " / " + err.detail.model + ")" : "";
+          const detailStr = err.detail
+            ? "\n\n[" + err.detail.stopReason + " / " + err.detail.model + "]\n" + (err.detail.error || "") +
+              (err.detail.position != null ? " (position " + err.detail.position + ")" : "") +
+              (err.detail.snippet ? "\n\nNear:\n" + err.detail.snippet : "")
+            : "";
           setBriefError("Could not parse the PDF: " + err.message + detailStr);
         }
         finally { setParsing(false); }
@@ -328,7 +332,11 @@ export default function CustomBuild({ userId, role } = {}) {
           if (data.brandName) setClientName(data.brandName);
           setParsedBriefDraft(data); setShowBriefReview(true);
         } catch (err) {
-          const detailStr = err.detail ? " (" + err.detail.stopReason + " / " + err.detail.model + ")" : "";
+          const detailStr = err.detail
+            ? "\n\n[" + err.detail.stopReason + " / " + err.detail.model + "]\n" + (err.detail.error || "") +
+              (err.detail.position != null ? " (position " + err.detail.position + ")" : "") +
+              (err.detail.snippet ? "\n\nNear:\n" + err.detail.snippet : "")
+            : "";
           setBriefError("Could not parse the Word doc: " + err.message + detailStr);
         }
         finally { setParsing(false); }
@@ -346,7 +354,11 @@ export default function CustomBuild({ userId, role } = {}) {
           if (data.brandName) setClientName(data.brandName);
           setParsedBriefDraft(data); setShowBriefReview(true);
         } catch (err) {
-          const detailStr = err.detail ? " (" + err.detail.stopReason + " / " + err.detail.model + ")" : "";
+          const detailStr = err.detail
+            ? "\n\n[" + err.detail.stopReason + " / " + err.detail.model + "]\n" + (err.detail.error || "") +
+              (err.detail.position != null ? " (position " + err.detail.position + ")" : "") +
+              (err.detail.snippet ? "\n\nNear:\n" + err.detail.snippet : "")
+            : "";
           setBriefError("Could not parse the file: " + err.message + detailStr);
         }
         finally { setParsing(false); }
@@ -940,7 +952,7 @@ export default function CustomBuild({ userId, role } = {}) {
                   </button>
                   </div>
                   {parsing && <div style={{ marginTop: "12px", padding: "12px", background: "#ffffff", borderRadius: "6px", fontSize: "13px", color: "#09090b" }}>Reading brief — this takes a few seconds...</div>}
-                  {briefError && <div style={{ fontSize: "12px", color: "#dc2626", marginTop: "8px" }}>{briefError}</div>}
+                  {briefError && <div style={{ fontSize: "12px", color: "#dc2626", marginTop: "8px", whiteSpace: "pre-wrap" }}>{briefError}</div>}
                 </>
               ) : (
                 <div style={{ width: "100%", boxSizing: "border-box", overflow: "hidden" }}>
