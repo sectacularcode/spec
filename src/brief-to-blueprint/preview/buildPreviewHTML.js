@@ -975,6 +975,22 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
               "</div>" +
             "</section>";
         })() +
+        (function () {
+          // Mirrors landing.js's makeMapSection() -- a real, embedded
+          // Google Maps iframe when a real address exists and no curated
+          // layout is already placing a map inline. Previously the
+          // preview had no equivalent of this at all for the generic
+          // path, so real address data was captured but never actually
+          // shown here.
+          if (!brief.mapAddress && !brief.mapUrl) return "";
+          var mapAlreadyPlaced = Array.isArray(brief.featureLayout) && brief.featureLayout.some(function (e) { return e.style === "map-beside"; });
+          if (mapAlreadyPlaced) return "";
+          if (!brief.mapAddress) return "";
+          return "<section style='background:" + bone + ";padding:60px clamp(24px,6vw,64px);'>" +
+              "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 20px;'>" + (brief.mapHeading || "Find Us") + "</h2>" +
+              "<iframe src=\"https://maps.google.com/maps?q=" + encodeURIComponent(brief.mapAddress) + "&output=embed\" style='border:0;width:100%;height:420px;display:block;' loading='lazy'></iframe>" +
+            "</section>";
+        })() +
         "<section class='va-cta' style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
           "<h2 style='font-size:clamp(26px,4vw,42px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
           "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:540px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
