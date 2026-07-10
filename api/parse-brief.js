@@ -1,5 +1,5 @@
 import mammoth from "mammoth";
-import { requireAuth } from "./_lib/auth.js";
+import { requireAuth, getProfile } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { deepStripHTML } from "./_lib/sanitize.js";
 import { callAnthropic, extractJSON } from "./_lib/anthropic.js";
@@ -151,6 +151,13 @@ export default async function handler(req, res) {
   const userId = await requireAuth(req);
   if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
+  // Determines whether the response includes technical error detail.
+  // Staff get a plain, non-technical message with no mention of the AI
+  // provider; admins/managers get the real diagnostic (status, stop_reason,
+  // raw response preview) needed to actually debug a failure.
+  const profile = await getProfile(userId);
+  const showDetail = ["admin", "manager"].includes(profile.role);
+
   if (!(await rateLimit(userId, "parse-brief", 10))) return tooMany(res);
 
 
@@ -194,15 +201,29 @@ export default async function handler(req, res) {
     const result = await callClaude(apiKey, messages, extraHeaders);
 
     if (!result.ok) {
+      const genericMsg = "Couldn't process that file right now. Try again in a moment.";
       return res.status(500).json({
-        error: `API error (${result.status}): ${result.error?.slice(0, 300)}`,
+        error: showDetail ? `API error (${result.status}): ${result.error?.slice(0, 300)}` : genericMsg,
       });
     }
 
     const parsed = extractJSON(result.data);
     if (!parsed) {
       const rawText = result.data.content?.[0]?.text || "";
-      return res.status(500).json({ error: "Could not parse Claude response", raw: rawText.slice(0, 500) });
+      // stop_reason is the key diagnostic: "max_tokens" means the response
+      // was cut off mid-JSON (a real truncation, needs a higher limit or a
+      // smaller ask); "end_turn" means the model finished normally but
+      // still produced something that didn't parse as valid JSON (a
+      // different problem — malformed output, not a length issue). Without
+      // this, every failure here looks identical from the outside.
+      const stopReason = result.data.stop_reason || "unknown";
+      console.error("parse-brief: extraction failed to parse. stop_reason=" + stopReason + " model=" + result.model + " rawLength=" + rawText.length);
+      const genericMsg = "Couldn't read the content of that file. Try again, or try a different file format.";
+      return res.status(500).json(
+        showDetail
+          ? { error: "Could not parse extraction response.", detail: { stopReason, model: result.model, rawPreview: rawText.slice(0, 500) } }
+          : { error: genericMsg }
+      );
     }
 
     // Log usage after a confirmed-successful parse — client_name comes from
@@ -250,6 +271,6 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error("parse-brief error:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: showDetail ? err.message : "Something went wrong processing that file." });
   }
 }
