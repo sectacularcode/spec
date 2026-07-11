@@ -99,8 +99,10 @@ export function generatePages(brief, selectedPages, inspoContext, aiRecs, custom
         // awareness-stage structure (social proof moved up, secondary
         // CTAs interleaved), not just another style cycle.
         var landE = buildLandingPage(colors, brief, inspoContext, "E");
-        // Attach C/D/E as named extras so the UI can expose them alongside A/B
+        // Score B/C/D/E against real content signals in the brief instead
+        // of a hardcoded default -- see scoreLandingVariants in landing.js.
         var landRec = scoreLandingVariants(brief);
+        // Attach C/D/E as named extras so the UI can expose them alongside A/B
         var landResult = { id: pid, label: label, data: landA, variantA: landA, variantB: landB, variantC: landC, variantD: landD, variantE: landE, recommended: landRec, recommendedReasoned: true, hasVariants: true, hasVariantC: true, hasVariantD: true, hasVariantE: true };
         return landResult;
       }
