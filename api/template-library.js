@@ -16,9 +16,27 @@
 import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { validId, validText, validJsonSize } from "./_lib/validate.js";
+import { logError } from "./_lib/errorLog.js";
 import { sql } from "@vercel/postgres";
 
 const CAP = 50;
+
+// Self-healing, matching db/schema.sql's template_library_entries
+// definition exactly.
+async function ensureTable() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS template_library_entries (
+      id         TEXT PRIMARY KEY,
+      user_id    TEXT NOT NULL,
+      client     TEXT,
+      entry_date TEXT,
+      source     TEXT,
+      data       JSONB NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS idx_template_library_user_id ON template_library_entries(user_id)`;
+}
 
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
@@ -29,6 +47,8 @@ export default async function handler(req, res) {
   if (!(await rateLimit(userId, "template-library", 60))) return tooMany(res);
 
   try {
+    await ensureTable();
+
     if (req.method === "GET") {
       const { rows } = await sql`
         SELECT id, data FROM template_library_entries
@@ -91,6 +111,7 @@ export default async function handler(req, res) {
 
     return res.status(405).json({ error: "Method not allowed" });
   } catch (err) {
+    await logError("template-library", req.method, userId, 500, err.message);
     return res.status(500).json({ error: err.message });
   }
 }
