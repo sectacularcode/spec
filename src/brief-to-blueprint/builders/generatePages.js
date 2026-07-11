@@ -95,8 +95,12 @@ export function generatePages(brief, selectedPages, inspoContext, aiRecs, custom
         // Variant D — a real, reusable visual-variety template (see
         // landing.js's Variant D dispatch), brand-agnostic by design.
         var landD = buildLandingPage(colors, brief, inspoContext, "D");
-        // Attach C and D as named extras so the UI can expose them alongside A/B
-        var landResult = { id: pid, label: label, data: landA, variantA: landA, variantB: landB, variantC: landC, variantD: landD, recommended: "A", hasVariants: true, hasVariantC: true, hasVariantD: true };
+        // Variant E — Narrative/Trust-First, a genuinely different
+        // awareness-stage structure (social proof moved up, secondary
+        // CTAs interleaved), not just another style cycle.
+        var landE = buildLandingPage(colors, brief, inspoContext, "E");
+        // Attach C/D/E as named extras so the UI can expose them alongside A/B
+        var landResult = { id: pid, label: label, data: landA, variantA: landA, variantB: landB, variantC: landC, variantD: landD, variantE: landE, recommended: "A", hasVariants: true, hasVariantC: true, hasVariantD: true, hasVariantE: true };
         return landResult;
       }
       // Utility pages — no meaningful A/B variation
