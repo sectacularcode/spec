@@ -568,12 +568,16 @@ export default function CustomBuild({ userId, role } = {}) {
         const saved = await fetchSavedStyle(brief.brandName);
         setSavedBrandStyle(saved);
       } else {
-        setStylePanelStatus("Couldn't save — try again.");
+        let serverMsg = "";
+        try { serverMsg = (await res.json()).error || ""; } catch { /* body wasn't JSON */ }
+        console.error("saveBrandStyle failed:", res.status, serverMsg);
+        setStylePanelStatus("Couldn't save (" + res.status + (serverMsg ? ": " + serverMsg : "") + ")");
       }
     } catch (e) {
-      setStylePanelStatus("Couldn't save — try again.");
+      console.error("saveBrandStyle errored:", e.message);
+      setStylePanelStatus("Couldn't save — " + e.message);
     }
-    setTimeout(() => setStylePanelStatus(""), 3000);
+    setTimeout(() => setStylePanelStatus(""), 6000);
   }
 
   // "Load a saved style guide" — a user-triggered picker across every
