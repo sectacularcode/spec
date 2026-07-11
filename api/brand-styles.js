@@ -12,6 +12,29 @@ import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { validText, validJsonSize } from "./_lib/validate.js";
 import { sql } from "@vercel/postgres";
 
+// The table was supposed to already exist in production (created in a
+// prior chat session per that session's own notes) but didn't -- every
+// save hit "relation brand_styles does not exist." Rather than depend on
+// a one-off script having actually run against prod, which is exactly
+// what silently failed here, the handler creates the table itself if it's
+// missing. IF NOT EXISTS makes this cheap to run on every request rather
+// than needing a separate migration step or a "did this already run"
+// flag.
+async function ensureTable() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS brand_styles (
+      id SERIAL PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      brand_name TEXT NOT NULL,
+      colors JSONB NOT NULL DEFAULT '{}'::jsonb,
+      fonts JSONB NOT NULL DEFAULT '{}'::jsonb,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE (user_id, brand_name)
+    )
+  `;
+}
+
 // Only these keys are meaningful to Spec's color system (see landing.js's
 // color fallback chain) — anything else in the submitted object is
 // silently dropped rather than stored, so this table can't accumulate
@@ -59,6 +82,8 @@ export default async function handler(req, res) {
   if (!(await rateLimit(userId, "brand-styles", 60))) return tooMany(res);
 
   try {
+    await ensureTable();
+
     if (req.method === "GET") {
       const brandName = req.query.brand_name;
       if (brandName) {
