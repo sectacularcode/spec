@@ -18,6 +18,7 @@
 import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { validId, validJsonSize } from "./_lib/validate.js";
+import { logError } from "./_lib/errorLog.js";
 import { sql } from "@vercel/postgres";
 
 const CAP = 300;
@@ -25,6 +26,20 @@ const CAP = 300;
 // page of a site — generous enough to never reject a real save, still a
 // hard ceiling against an abusive request.
 const MAX_ENTRIES_PER_REQUEST = 500;
+
+// Self-healing, matching db/schema.sql's section_library_entries
+// definition exactly.
+async function ensureTable() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS section_library_entries (
+      id         TEXT PRIMARY KEY,
+      user_id    TEXT NOT NULL,
+      data       JSONB NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS idx_section_library_user_id ON section_library_entries(user_id)`;
+}
 
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
@@ -35,6 +50,8 @@ export default async function handler(req, res) {
   if (!(await rateLimit(userId, "section-library", 60))) return tooMany(res);
 
   try {
+    await ensureTable();
+
     if (req.method === "GET") {
       const { rows } = await sql`
         SELECT id, data FROM section_library_entries
@@ -103,6 +120,7 @@ export default async function handler(req, res) {
 
     return res.status(405).json({ error: "Method not allowed" });
   } catch (err) {
+    await logError("section-library", req.method, userId, 500, err.message);
     return res.status(500).json({ error: err.message });
   }
 }
