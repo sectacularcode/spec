@@ -623,6 +623,19 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
         var rawFeatures = Array.isArray(brief.features) ? brief.features : [];
         var htmlParts = [];
         layout.forEach(function (entry, rowIdx) {
+          if (entry.style === "midcta") {
+            // A secondary CTA woven mid-list -- needs no feature content
+            // of its own, just the brief's existing phone/contact CTA
+            // fields (already escaped -- top-level brief fields go
+            // through the global he() pass at the top of this function).
+            htmlParts.push(
+              "<section style='background:#ffffff;padding:48px clamp(24px,6vw,64px);text-align:center;'>" +
+                "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:800;color:" + brass + ";margin:0 0 8px;'>" + cta1 + "</h2>" +
+                "<p style='font-size:14px;color:" + stone + ";margin:0;'>" + (brief.midCtaText || ("Questions before you reach out? " + cta2 + " and we'll get back to you within one business day.")) + "</p>" +
+              "</section>"
+            );
+            return;
+          }
           var items = (entry.indices || []).map(function (i) { return rawFeatures[i]; }).filter(Boolean);
           if (!items.length) return;
           var bg = rowIdx % 2 === 0 ? "#ffffff" : bone;
@@ -966,6 +979,78 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
             "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "display:block;max-width:280px;margin:0 auto;text-align:center;'>" + cta1 + "</a>" +
             "<p style='font-size:13px;color:rgba(255,255,255,0.6);margin:16px 0 0;'>" + formR + "</p>" +
           "</section>";
+      }
+
+      // ── VARIANT E — Narrative / Trust-First ─────────────────────────────────
+      // Mirrors landing.js's Variant E: same hero/trust-strip look as
+      // Awareness, but social proof moved up right after the trust strip
+      // instead of only appearing at the bottom, and a secondary CTA
+      // woven in every third feature row via the "midcta" style above
+      // instead of saved for a single push at the end.
+      if (variant === "E") {
+        return "<section class='va-hero' style='position:relative;min-height:70vh;display:flex;align-items:center;padding:clamp(48px,8vh,80px) clamp(24px,6vw,80px);overflow:hidden;'>" +
+            "<img src=\"" + heroImg + "\" alt='hero' style='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;'/>" +
+            "<div style='position:absolute;inset:0;background:" + brass + ";opacity:0.85;z-index:1;'></div>" +
+            "<div class='var-a-wrap' style='position:relative;z-index:2;width:100%;max-width:1100px;margin:0 auto;padding:0 clamp(16px,4vw,60px);'>" +
+            "<div style='max-width:660px;'>" +
+              "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:20px;'>" + (brief.heroEyebrow != null ? brief.heroEyebrow : (brief.brandName||"Brand")) + "</div>" +
+              "<h1 style='font-weight:800;font-size:clamp(32px,5.5vw,62px);color:#ffffff;margin:0 0 20px;line-height:1.08;'>" + h1 + "</h1>" +
+              (hook ? "<p style='font-size:18px;color:rgba(255,255,255,0.9);margin:0 0 12px;line-height:1.6;font-style:italic;'>" + hook + "</p>" : "") +
+              "<p style='font-size:clamp(13px,3.5vw,16px);color:rgba(255,255,255,0.82);margin:0 0 28px;line-height:1.55;max-width:560px;'>" + sub + "</p>" +
+              "<div style='display:flex;gap:16px;flex-wrap:wrap;align-items:center;'>" +
+                "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "display:inline-block;'>" + cta1 + "</a>" +
+                "<a class='cta-btn' style='" + btnOutline + "display:inline-block;'>" + cta2 + "</a>" +
+              "</div>" +
+            "</div></div>" +
+          "</section>" +
+          "<section class='va-trust' style='background:#ffffff;padding:0;border-bottom:1px solid #f0f0f0;'>" +
+            "<div style='display:grid;grid-template-columns:repeat(3,1fr);'>" +
+              [{ s:s1,l:l1 },{ s:s2,l:l2 },{ s:s3,l:l3 }].map(function(t,i) {
+                return "<div class='grid-cell' style='padding:40px 32px;text-align:center;" + (i<2?"border-right:1px solid #f0f0f0;":"") + "'><div style='font-size:42px;font-weight:800;color:" + brass + ";line-height:1;margin-bottom:6px;'>" + t.s + "</div><div style='font-size:14px;color:" + stone + ";font-weight:500;letter-spacing:0.02em;'>" + t.l + "</div></div>";
+              }).join("") +
+            "</div>" +
+          "</section>" +
+          // Social proof moved up here, right after the trust strip --
+          // the actual structural difference from Awareness, not just a
+          // different color cycle.
+          "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
+            "<div style='max-width:640px;margin:0 auto;'>" +
+              "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
+              "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
+              "<p style='font-size:14px;color:rgba(255,255,255,0.7);margin:0 0 22px;'>" + tn1 + " &middot; " + tt1 + "</p>" +
+            "</div>" +
+          "</section>" +
+          (function () {
+            var featuresArr = Array.isArray(brief.features) ? brief.features : [];
+            var dynamicLayout = [];
+            featuresArr.forEach(function (_, i) {
+              var hasVideo = !!brief.videoUrl;
+              var cyclePattern = hasVideo
+                ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
+                : ["split-right", "centered-cta", "checklist", "split-left", "split-cta-right", "plain"];
+              dynamicLayout.push({ style: cyclePattern[i % cyclePattern.length], indices: [i] });
+              if ((i + 1) % 3 === 0 && i < featuresArr.length - 1) dynamicLayout.push({ style: "midcta", indices: [] });
+            });
+            return renderCuratedFeatureLayoutHTML(dynamicLayout);
+          })() +
+          (brief.skipServicesChecklist ? "" :
+          "<section style='background:" + bone + ";padding:80px clamp(24px,6vw,80px);border-top:1px solid rgba(0,0,0,0.08);'>" +
+            "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 32px;'>" + (brief.servicesHeading||"What We Do") + "</h2>" +
+            "<div style='display:grid;grid-template-columns:1fr 1fr;gap:0;max-width:900px;'>" +
+              svcs.map(function(s) {
+                return "<div style='padding:12px 0;border-bottom:1px solid #f0f0f0;font-size:15px;color:" + text + ";display:flex;align-items:center;gap:10px;'><span style='color:" + brass + ";font-weight:700;'>✓</span>" + s + "</div>";
+              }).join("") +
+            "</div>" +
+          "</section>") +
+          "<section style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
+            "<h2 style='font-size:clamp(26px,4vw,42px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
+            "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:540px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
+            "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
+              "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
+              "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
+            "</div>" +
+          "</section>" +
+          faqHTML;
       }
 
       // ── VARIANT A — Awareness / Feature (default) ──────────────────────────
