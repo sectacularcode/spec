@@ -769,7 +769,8 @@ export default function CustomBuild({ userId, role } = {}) {
 
   function downloadPreview(pageId, variant) {
     if (!brief) return;
-    var html = buildPreviewHTML(brief, pageId, variant || layoutVariants[pageId] || "A", generated?.inspoContext || "");
+    var pageForFallback = generated?.pages?.find(pg => pg.id === pageId);
+    var html = buildPreviewHTML(brief, pageId, variant || layoutVariants[pageId] || pageForFallback?.recommended || "A", generated?.inspoContext || "");
     var blob = new Blob([html], { type: "text/html" });
     var a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -783,7 +784,7 @@ export default function CustomBuild({ userId, role } = {}) {
   }
 
   function getPageData(p) {
-    var variant = layoutVariants[p.id] || "A";
+    var variant = layoutVariants[p.id] || p.recommended || "A";
     var baseData = variant === "E" && p.variantE ? p.variantE : variant === "D" && p.variantD ? p.variantD : variant === "C" && p.variantC ? p.variantC : variant === "B" && p.variantB ? p.variantB : p.variantA || p.data;
     // Apply any section overrides for this page
     var overrides = pageOverrides[p.id];
@@ -819,6 +820,16 @@ export default function CustomBuild({ userId, role } = {}) {
       saveToLibrary(brief, generated.pages, layoutVariants, layoutVariants);
     }
   }
+
+  // Shared across the live preview and the layout picker below so both
+  // agree on which page is active. Previously the live preview and the
+  // JSON export (getPageData) fell straight to hardcoded "A" whenever the
+  // person hadn't manually clicked a layout card, ignoring recommended
+  // entirely -- so a page recommending B would show "B" as Active with a
+  // highlighted border in the picker, while the actual rendered preview
+  // and downloaded JSON silently stayed on A. Falling back to recommended
+  // before "A" makes what's shown/exported match what the picker claims.
+  const activePreviewPage = generated?.pages?.find(p => p.id === previewPage);
 
   return (
     <div style={{ minHeight: "100vh", width: "100%", background: "#eeedf1", fontFamily: "'Be Vietnam Pro', sans-serif", boxSizing: "border-box" }}>
@@ -1032,7 +1043,7 @@ export default function CustomBuild({ userId, role } = {}) {
 
           {/* Layout variant picker — shown when generated page has variants */}
           {generated && (() => {
-            const activePage = generated.pages.find(p => p.id === previewPage);
+            const activePage = activePreviewPage;
             if (!activePage || !activePage.hasVariants) return null;
             // Was inferred from hasVariantC alone, which stopped being a
             // reliable signal once Home also got a third layout (see
@@ -1071,7 +1082,7 @@ export default function CustomBuild({ userId, role } = {}) {
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   {variants.map(v => {
                     const active = current === v;
-                    const isRec  = v === (activePage.recommended || "A");
+                    const isRec  = !!activePage.recommendedReasoned && v === (activePage.recommended || "A");
                     return (
                       <div
                         key={v}
@@ -1446,7 +1457,7 @@ export default function CustomBuild({ userId, role } = {}) {
               <div style={{ height: "1px", background: "#dde0e6", margin: "8px 0" }} />
               <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "4px" }}>Preview</div>
               {generated.pages.map(p => (
-                <button key={p.id + "-preview"} onClick={() => downloadPreview(p.id, layoutVariants[p.id] || "A")} style={{ ...T.btnGhost, textAlign: "left", display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                <button key={p.id + "-preview"} onClick={() => downloadPreview(p.id, layoutVariants[p.id] || p.recommended || "A")} style={{ ...T.btnGhost, textAlign: "left", display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
                   <span>{(p.label || p.id).replace(/-\d{5,}$/, "")}</span><span style={{ color: "#9ca3af" }}>↓ .html</span>
                 </button>
               ))}
@@ -1576,7 +1587,7 @@ export default function CustomBuild({ userId, role } = {}) {
 
             <div style={{ flex: 1, overflow: "auto", background: mobilePreview ? "#eeedf1" : "#fff", display: "flex", justifyContent: mobilePreview ? "center" : "stretch", alignItems: mobilePreview ? "flex-start" : "stretch", padding: mobilePreview ? "24px 0" : "0" }}>
               <iframe
-                srcDoc={buildPreviewHTML(brief, previewPage, layoutVariants[previewPage] || "A", generated?.inspoContext || "")}
+                srcDoc={buildPreviewHTML(brief, previewPage, layoutVariants[previewPage] || activePreviewPage?.recommended || "A", generated?.inspoContext || "")}
                 sandbox="allow-scripts"
                 style={{
                   border: mobilePreview ? "1px solid #dde0e6" : "none",
