@@ -555,6 +555,126 @@ export default function CustomBuild({ userId, role } = {}) {
     });
   }
 
+  // ── Section styles picker (landing/other pages) ──────────────────────
+  // Replaces the old AFS_BRAND_ID hardcoded layout in manifestImport.js
+  // with a real UI over the same brief.featureLayout/postClosingLayout
+  // mechanism landing.js and buildPreviewHTML.js already both read.
+
+  var SECTION_STYLE_LABELS = {
+    "split-right": "Split image, right", "split-left": "Split image, left",
+    "split-cta-right": "Split + button, right", "split-cta-left": "Split + button, left",
+    "centered-cta": "Centered callout", "checklist": "Checklist",
+    "video": "Video", "map-beside": "Map beside", "embedded-form": "Embedded form",
+    "plain": "Plain",
+  };
+
+  function defaultRowStyle(i, hasVideo) {
+    var cycle = hasVideo
+      ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
+      : ["split-right", "centered-cta", "checklist", "split-left", "split-cta-right", "plain"];
+    return cycle[i % cycle.length];
+  }
+
+  // Reads the current per-row customization back out of the brief, or
+  // computes sensible defaults (matching the existing auto-cycle) if
+  // nothing valid is set yet. "Valid" means every feature index 0..N-1 is
+  // covered exactly once across featureLayout+postClosingLayout combined
+  // -- anything else (stale data from a different feature count, a
+  // half-written state) falls back to defaults rather than showing a
+  // broken partial picker.
+  function getSectionRows(b, featureCount) {
+    var hasVideo = !!b.videoUrl;
+    var entries = [];
+    (b.featureLayout || []).forEach(function(e) { entries.push({ indices: e.indices || [], style: e.style, header: e.header || "", postClosing: false }); });
+    (b.postClosingLayout || []).forEach(function(e) { entries.push({ indices: e.indices || [], style: e.style, header: e.header || "", postClosing: true }); });
+    var seen = {};
+    var valid = entries.length > 0;
+    entries.forEach(function(e) {
+      e.indices.forEach(function(i) {
+        if (i >= featureCount || seen[i]) valid = false;
+        seen[i] = true;
+      });
+    });
+    for (var i = 0; i < featureCount; i++) { if (!seen[i]) valid = false; }
+    if (valid) {
+      entries.sort(function(a, c) { return (a.indices[0] || 0) - (c.indices[0] || 0); });
+      return entries;
+    }
+    var rows = [];
+    for (var j = 0; j < featureCount; j++) {
+      rows.push({ indices: [j], style: defaultRowStyle(j, hasVideo), header: "", postClosing: false });
+    }
+    return rows;
+  }
+
+  // Regenerates just the active landing page (all its variants) using
+  // generatePages() scoped to a single page id -- reuses the real
+  // dispatch/build logic rather than duplicating it, and costs nothing:
+  // page-building has no AI call, only brief parsing/drafting do (see the
+  // AI cost doc). Needed because generated.pages is a snapshot taken at
+  // the last "Generate" click -- without this, a section-style edit would
+  // update the live preview (which reads brief directly) but not the
+  // actual downloadable JSON, so the two would silently disagree.
+  function regenerateActivePage(updatedBrief) {
+    if (!generated) return;
+    var freshPages = generatePages(updatedBrief, [previewPage], generated.inspoContext, generated.aiRecs, customPages);
+    if (!freshPages.length) return;
+    var freshPage = freshPages[0];
+    setGenerated(g => ({ ...g, pages: g.pages.map(p => p.id === previewPage ? freshPage : p) }));
+  }
+
+  function updateSectionLayout(newRows) {
+    var featureLayout = newRows.filter(function(r) { return !r.postClosing; })
+      .map(function(r) { return { style: r.style, indices: r.indices, header: r.header || undefined }; });
+    var postClosingLayout = newRows.filter(function(r) { return r.postClosing; })
+      .map(function(r) { return { style: r.style, indices: r.indices, header: r.header || undefined }; });
+    var updatedBrief = { ...brief, featureLayout: featureLayout, postClosingLayout: postClosingLayout };
+    setBrief(updatedBrief);
+    regenerateActivePage(updatedBrief);
+  }
+
+  function setSectionRowStyle(rows, rowIdx, style) {
+    updateSectionLayout(rows.map(function(r, i) { return i === rowIdx ? { ...r, style: style } : r; }));
+  }
+
+  function setSectionRowPostClosing(rows, rowIdx, postClosing) {
+    updateSectionLayout(rows.map(function(r, i) { return i === rowIdx ? { ...r, postClosing: postClosing } : r; }));
+  }
+
+  function setSectionRowHeader(rows, rowIdx, header) {
+    updateSectionLayout(rows.map(function(r, i) { return i === rowIdx ? { ...r, header: header } : r; }));
+  }
+
+  // Groups row rowIdx with the next row under one shared header, or -- if
+  // it's already grouped -- splits it back into individual rows with
+  // default styles. Capped at 2-way grouping for now (matches the one
+  // real case this replaces, AFS's "Semi Truck Repair"/"Trailer Repair"
+  // pairing); a 3+ way merge would need a different UI than a single
+  // "group with next" checkbox.
+  function toggleGroupWithNext(rows, rowIdx) {
+    var row = rows[rowIdx];
+    var next = rows[rowIdx + 1];
+    var hasVideo = !!brief.videoUrl;
+    var newRows;
+    if (row.indices.length > 1) {
+      newRows = rows.slice(0, rowIdx)
+        .concat(row.indices.map(function(i) { return { indices: [i], style: defaultRowStyle(i, hasVideo), header: "", postClosing: row.postClosing }; }))
+        .concat(rows.slice(rowIdx + 1));
+    } else if (next && next.indices.length === 1) {
+      var merged = { indices: row.indices.concat(next.indices), style: "grouped-header", header: "", postClosing: row.postClosing };
+      newRows = rows.slice(0, rowIdx).concat([merged]).concat(rows.slice(rowIdx + 2));
+    } else {
+      return;
+    }
+    updateSectionLayout(newRows);
+  }
+
+  function toggleSkipServicesChecklist(checked) {
+    var updatedBrief = { ...brief, skipServicesChecklist: checked };
+    setBrief(updatedBrief);
+    regenerateActivePage(updatedBrief);
+  }
+
   async function saveBrandStyle() {
     if (!brief || !brief.brandName || !brief.colors) return;
     setStylePanelStatus("Saving...");
@@ -1182,6 +1302,81 @@ export default function CustomBuild({ userId, role } = {}) {
                           {active && <span style={{ marginLeft: "auto", fontSize: "11px", color: "#b45309" }}>✓ Active</span>}
                         </div>
                         <span style={{ fontSize: "11px", color: "#6b7280", lineHeight: 1.45 }}>{descs[v]}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Section styles picker — landing/other pages only, matches
+              where brief.featureLayout actually applies. Replaces the old
+              AFS-only hardcoded layout with a real per-brief UI over the
+              same mechanism. */}
+          {generated && (() => {
+            const secPage = activePreviewPage;
+            if (!secPage || !/^(landing|other)(-\d+)?$/.test(secPage.id)) return null;
+            const featureCount = Array.isArray(brief.features) && brief.features.length > 0 ? brief.features.length : 3;
+            const rows = getSectionRows(brief, featureCount);
+            const featureLabel = (idx) => {
+              if (Array.isArray(brief.features) && brief.features[idx]) return brief.features[idx].heading || "(untitled)";
+              const key = "feature" + (idx + 1) + "Heading";
+              return brief[key] || "(untitled)";
+            };
+            return (
+              <div style={{ marginBottom: "28px" }}>
+                <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>
+                  Section Styles
+                </div>
+                <div style={{ fontSize: "11px", color: "#9ca3af", marginBottom: "10px", lineHeight: 1.5 }}>
+                  How each content section renders, regardless of which layout (A–E) is active. Untouched rows use the same automatic pattern as before.
+                </div>
+                <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
+                  <input type="checkbox" checked={!!brief.skipServicesChecklist} onChange={e => toggleSkipServicesChecklist(e.target.checked)} style={{ cursor: "pointer" }} />
+                  Hide the services checklist section
+                </label>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {rows.map((row, rowIdx) => {
+                    const isGrouped = row.indices.length > 1;
+                    const canGroupNext = rowIdx < rows.length - 1 && rows[rowIdx + 1].indices.length === 1;
+                    return (
+                      <div key={rowIdx} style={{ padding: "10px 12px", borderRadius: "6px", border: "1px solid #dde0e6", background: "#ffffff", display: "flex", flexDirection: "column", gap: "8px" }}>
+                        <div style={{ fontSize: "12px", fontWeight: 700, color: "#09090b" }}>
+                          {isGrouped ? row.indices.map(featureLabel).join(" + ") : featureLabel(row.indices[0])}
+                        </div>
+
+                        {isGrouped ? (
+                          <input
+                            value={row.header}
+                            onChange={e => setSectionRowHeader(rows, rowIdx, e.target.value)}
+                            placeholder="Shared heading for this group…"
+                            style={{ padding: "6px 8px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
+                          />
+                        ) : (
+                          <select
+                            value={row.style}
+                            onChange={e => setSectionRowStyle(rows, rowIdx, e.target.value)}
+                            style={{ padding: "6px 8px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", color: "#09090b", background: "#fff", width: "100%" }}>
+                            {Object.entries(SECTION_STYLE_LABELS).map(([val, label]) => (
+                              (val === "video" && !brief.videoUrl) ? null :
+                              <option key={val} value={val}>{label}</option>
+                            ))}
+                          </select>
+                        )}
+
+                        <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                          {(isGrouped || canGroupNext) && (
+                            <label style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "11px", color: "#6b7280", cursor: "pointer" }}>
+                              <input type="checkbox" checked={isGrouped} onChange={() => toggleGroupWithNext(rows, rowIdx)} style={{ cursor: "pointer" }} />
+                              Group with next row
+                            </label>
+                          )}
+                          <label style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "11px", color: "#6b7280", cursor: "pointer" }}>
+                            <input type="checkbox" checked={row.postClosing} onChange={e => setSectionRowPostClosing(rows, rowIdx, e.target.checked)} style={{ cursor: "pointer" }} />
+                            Move after closing CTA
+                          </label>
+                        </div>
                       </div>
                     );
                   })}
