@@ -10,6 +10,7 @@
 import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { validText, validJsonSize } from "./_lib/validate.js";
+import { logError } from "./_lib/errorLog.js";
 import { sql } from "@vercel/postgres";
 
 // The table was supposed to already exist in production (created in a
@@ -132,6 +133,7 @@ export default async function handler(req, res) {
 
     return res.status(405).json({ error: "Method not allowed" });
   } catch (err) {
+    await logError("brand-styles", req.method, userId, 500, err.message);
     return res.status(500).json({ error: err.message });
   }
 }
