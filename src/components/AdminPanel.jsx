@@ -48,6 +48,12 @@ export default function AdminPanel({ isAdmin }) {
   const [modelHealth, setModelHealth]     = useState(null); // { allLive, models, checkedAt } or null
   const [checkingModels, setCheckingModels] = useState(false);
 
+  // Error Log (admin only) — raw failures logged server-side by
+  // api/_lib/errorLog.js's logError(). Read-only.
+  const [errorLogs, setErrorLogs]         = useState([]);
+  const [errorLogsLoading, setErrorLogsLoading] = useState(false);
+  const [errorLogsMsg, setErrorLogsMsg]   = useState({ text: "", type: "ok" });
+
   function flash(text, type = "ok") {
     setMsg({ text, type });
     setTimeout(() => setMsg({ text: "", type: "ok" }), 3000);
@@ -93,6 +99,23 @@ export default function AdminPanel({ isAdmin }) {
   }
 
   useEffect(() => { if (isAdmin && user?.id) loadUsage(); }, [isAdmin, user?.id]);
+
+  // ── Error Log (admin only) ────────────────────────────────────────────
+  async function loadErrorLogs() {
+    setErrorLogsLoading(true);
+    try {
+      const res = await fetch("/api/error-logs", { headers: await authHeaders() });
+      const data = await res.json();
+      if (res.ok) {
+        setErrorLogs(data.logs || []);
+      } else {
+        setErrorLogsMsg({ text: data.error || "Failed to load error log.", type: "err" });
+      }
+    } catch { setErrorLogsMsg({ text: "Error loading error log.", type: "err" }); }
+    setErrorLogsLoading(false);
+  }
+
+  useEffect(() => { if (isAdmin && user?.id) loadErrorLogs(); }, [isAdmin, user?.id]);
 
   function startEditLimit(scope, scopeId, currentCents) {
     setEditingLimit({ scope, scopeId });
@@ -525,6 +548,59 @@ export default function AdminPanel({ isAdmin }) {
 
           <div style={{ padding: "10px 20px 16px", fontSize: "11px", color: "#9ca3af" }}>
             Reporting only — limits are informational and don't block generation yet.
+          </div>
+        </div>
+      )}
+
+      {/* Error Log — admin only. Raw server-side failures (5xx-class only,
+          not routine 400/401 rejections) written by api/_lib/errorLog.js.
+          Read-only; no delete/clear yet. */}
+      {isAdmin && (
+        <div style={{ borderTop: "1px solid #dde0e6" }}>
+          <div style={S.header}>
+            <div style={S.headerTitle}>Error Log</div>
+            <button style={S.btnSecondary} onClick={loadErrorLogs} disabled={errorLogsLoading}>
+              {errorLogsLoading ? "Loading…" : "Refresh"}
+            </button>
+          </div>
+
+          {errorLogsMsg.text && (
+            <div style={{ ...S.msg, padding: "8px 20px 0", color: errorLogsMsg.type === "err" ? "#dc2626" : "#b45309" }}>{errorLogsMsg.text}</div>
+          )}
+
+          {errorLogsLoading ? (
+            <div style={S.empty}>Loading error log…</div>
+          ) : errorLogs.length === 0 ? (
+            <div style={S.empty}>No errors logged. That's a good sign.</div>
+          ) : (
+            <table style={S.table}>
+              <thead>
+                <tr>
+                  <th style={S.th}>Time</th>
+                  <th style={S.th}>Route</th>
+                  <th style={S.th}>Method</th>
+                  <th style={S.th}>User</th>
+                  <th style={S.th}>Status</th>
+                  <th style={S.th}>Message</th>
+                </tr>
+              </thead>
+              <tbody>
+                {errorLogs.map(log => (
+                  <tr key={log.id}>
+                    <td style={S.td}>{new Date(log.occurred_at).toLocaleString()}</td>
+                    <td style={S.td}><code style={{ fontSize: "12px" }}>{log.route}</code></td>
+                    <td style={S.td}>{log.method || "—"}</td>
+                    <td style={S.td}><code style={{ fontSize: "11px" }}>{log.user_id || "—"}</code></td>
+                    <td style={S.td}>{log.status_code || "—"}</td>
+                    <td style={{ ...S.td, maxWidth: "360px", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{log.message}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+
+          <div style={{ padding: "10px 20px 16px", fontSize: "11px", color: "#9ca3af" }}>
+            Shows the 100 most recent unexpected server errors, newest first. Routine validation/auth rejections aren't logged here.
           </div>
         </div>
       )}
