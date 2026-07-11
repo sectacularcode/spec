@@ -136,12 +136,14 @@ export default function CustomBuild({ userId, role } = {}) {
             hasVariants: p.hasVariants,
             hasVariantC: p.hasVariantC,
             hasVariantD: p.hasVariantD,
+            hasVariantE: p.hasVariantE,
             // store full data so preview and download work on return
             data: p.data,
             variantA: p.variantA,
             variantB: p.variantB,
             variantC: p.variantC,
             variantD: p.variantD,
+            variantE: p.variantE,
           }))
         } : null,
       };
@@ -782,7 +784,7 @@ export default function CustomBuild({ userId, role } = {}) {
 
   function getPageData(p) {
     var variant = layoutVariants[p.id] || "A";
-    var baseData = variant === "D" && p.variantD ? p.variantD : variant === "C" && p.variantC ? p.variantC : variant === "B" && p.variantB ? p.variantB : p.variantA || p.data;
+    var baseData = variant === "E" && p.variantE ? p.variantE : variant === "D" && p.variantD ? p.variantD : variant === "C" && p.variantC ? p.variantC : variant === "B" && p.variantB ? p.variantB : p.variantA || p.data;
     // Apply any section overrides for this page
     var overrides = pageOverrides[p.id];
     if (!overrides || Object.keys(overrides).length === 0) return baseData;
@@ -1039,9 +1041,9 @@ export default function CustomBuild({ userId, role } = {}) {
             // decides which builder to route to.
             const isLanding = /^(landing|other)(-\d+)?$/.test(activePage.id);
             const isHome = activePage.id === "home";
-            const variants = isLanding ? (activePage.hasVariantD ? ["A","B","C","D"] : ["A","B","C"]) : (isHome && activePage.hasVariantC ? ["A","B","C"] : ["A","B"]);
+            const variants = isLanding ? (activePage.hasVariantE ? ["A","B","C","D","E"] : activePage.hasVariantD ? ["A","B","C","D"] : ["A","B","C"]) : (isHome && activePage.hasVariantC ? ["A","B","C"] : ["A","B"]);
             const labels = isLanding
-              ? { A: "Awareness", B: "Lead Form", C: "Retargeting", D: "Varied" }
+              ? { A: "Awareness", B: "Lead Form", C: "Retargeting", D: "Varied", E: "Narrative" }
               : isHome
               ? { A: "Centered", B: "Split Image", C: "Minimal" }
               : { A: "Layout A", B: "Layout B" };
@@ -1051,6 +1053,7 @@ export default function CustomBuild({ userId, role } = {}) {
                   B: "Inline quote request form with testimonials and feature rows. Best for high-intent traffic ready to convert.",
                   C: "Tight hero, three outcome bullets, single testimonial, one CTA. Best for retargeting warm audiences.",
                   D: "Each section gets a different visual treatment — split image, a centered call-out, a plain block — cycling through automatically. Best for pages with several distinct sections that shouldn't all look the same.",
+                  E: "Same hero as Awareness, but social proof moves up right after the trust strip instead of sitting at the bottom, and a secondary CTA appears every few sections instead of just once at the end. Best for cold traffic on longer pages that need trust built in early.",
                 }
               : isHome
               ? {
