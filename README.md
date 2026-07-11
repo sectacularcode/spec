@@ -3,7 +3,7 @@
 A browser-based planning tool for WordPress designers. Converts brand briefs into structured, importable page templates for Elementor (primary) and Divi (secondary).
 
 **Live:** [specish.com](https://specish.com)
-**Repo:** `sectacularcode/elementor-builder2`
+**Repo:** `sectacularcode/spec`
 **Stack:** React 19 + Vite v8, deployed on Vercel Pro, Postgres (Neon) for data storage, Upstash Redis for rate limiting
 
 ---
