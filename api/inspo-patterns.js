@@ -14,7 +14,19 @@
 import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { validJsonSize } from "./_lib/validate.js";
+import { logError } from "./_lib/errorLog.js";
 import { sql } from "@vercel/postgres";
+
+// Self-healing, matching db/schema.sql's inspo_patterns definition exactly.
+async function ensureTable() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS inspo_patterns (
+      user_id    TEXT PRIMARY KEY,
+      pool       JSONB NOT NULL DEFAULT '[]'::jsonb,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+}
 
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
@@ -25,6 +37,8 @@ export default async function handler(req, res) {
   if (!(await rateLimit(userId, "inspo-patterns", 60))) return tooMany(res);
 
   try {
+    await ensureTable();
+
     if (req.method === "GET") {
       const { rows } = await sql`SELECT pool FROM inspo_patterns WHERE user_id = ${userId}`;
       return res.status(200).json({ pool: rows[0]?.pool ?? "" });
@@ -54,6 +68,7 @@ export default async function handler(req, res) {
 
     return res.status(405).json({ error: "Method not allowed" });
   } catch (err) {
+    await logError("inspo-patterns", req.method, userId, 500, err.message);
     return res.status(500).json({ error: err.message });
   }
 }
