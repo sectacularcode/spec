@@ -8,7 +8,7 @@ import { buildProcessPage } from "./process.js";
 import { buildContactPage } from "./contact.js";
 import { buildGenericPage } from "./generic.js";
 import { buildLocationPageA, buildLocationPageB } from "./location.js";
-import { buildLandingPage } from "./landing.js";
+import { buildLandingPage, scoreLandingVariants } from "./landing.js";
 
 // Orchestrates all page builders into a list of page objects.
 // Each page object includes both variantA and variantB Elementor JSON
@@ -53,13 +53,13 @@ export function generatePages(brief, selectedPages, inspoContext, aiRecs, custom
       var homeC = buildHomePage(colors, brief, inspoContext, homePatternsC);
       var homeRec = (patterns.hero === "split-left" || patterns.hero === "split-right") ? "B" : "A";
       var homeData = homeRec === "B" ? homeB : homeA;
-      return { id: pid, label: label, data: homeData, variantA: homeA, variantB: homeB, variantC: homeC, recommended: homeRec, hasVariants: true, hasVariantC: true };
+      return { id: pid, label: label, data: homeData, variantA: homeA, variantB: homeB, variantC: homeC, recommended: homeRec, recommendedReasoned: true, hasVariants: true, hasVariantC: true };
     }
     if (pid === "services") {
       var svcA = buildServicesPage(colors, brief, inspoContext);
       var svcB = buildServicesPageLight(colors, brief, inspoContext);
       var svcRec = (patterns.pricing === "simple-list" || patterns.pricing === "two-tier") ? "B" : "A";
-      return { id: pid, label: label, data: svcRec === "B" ? svcB : svcA, variantA: svcA, variantB: svcB, recommended: svcRec, hasVariants: true };
+      return { id: pid, label: label, data: svcRec === "B" ? svcB : svcA, variantA: svcA, variantB: svcB, recommended: svcRec, recommendedReasoned: true, hasVariants: true };
     }
     if (pid === "work")    result = buildWorkPage(colors, brief, inspoContext);
     if (pid === "about")   result = buildAboutPage(colors, brief, inspoContext, patterns);
@@ -73,7 +73,7 @@ export function generatePages(brief, selectedPages, inspoContext, aiRecs, custom
         var locData = brief.locationData || {};
         var locA = buildLocationPageA(colors, brief, locData);
         var locB = buildLocationPageB(colors, brief, locData);
-        return { id: pid, label: label, data: locA, variantA: locA, variantB: locB, recommended: "A", hasVariants: true };
+        return { id: pid, label: label, data: locA, variantA: locA, variantB: locB, recommended: "A", recommendedReasoned: false, hasVariants: true };
       }
       // Landing pages — three conversion-focused layouts
       // A = Awareness/Feature, B = Lead Capture (form + testimonials), C = Minimal Retargeting
@@ -100,7 +100,8 @@ export function generatePages(brief, selectedPages, inspoContext, aiRecs, custom
         // CTAs interleaved), not just another style cycle.
         var landE = buildLandingPage(colors, brief, inspoContext, "E");
         // Attach C/D/E as named extras so the UI can expose them alongside A/B
-        var landResult = { id: pid, label: label, data: landA, variantA: landA, variantB: landB, variantC: landC, variantD: landD, variantE: landE, recommended: "A", hasVariants: true, hasVariantC: true, hasVariantD: true, hasVariantE: true };
+        var landRec = scoreLandingVariants(brief);
+        var landResult = { id: pid, label: label, data: landA, variantA: landA, variantB: landB, variantC: landC, variantD: landD, variantE: landE, recommended: landRec, recommendedReasoned: true, hasVariants: true, hasVariantC: true, hasVariantD: true, hasVariantE: true };
         return landResult;
       }
       // Utility pages — no meaningful A/B variation
@@ -114,18 +115,18 @@ export function generatePages(brief, selectedPages, inspoContext, aiRecs, custom
         var pA = buildServicesPage(colors, brief, inspoContext);
         var pB = buildServicesPageLight(colors, brief, inspoContext);
         var pRec = (patterns.pricing === "simple-list" || patterns.pricing === "two-tier") ? "B" : "A";
-        return { id: pid, label: label, data: pRec === "B" ? pB : pA, variantA: pA, variantB: pB, recommended: pRec, hasVariants: true };
+        return { id: pid, label: label, data: pRec === "B" ? pB : pA, variantA: pA, variantB: pB, recommended: pRec, recommendedReasoned: true, hasVariants: true };
       }
       // Standalone portfolio page — reuse work builders
       if (pid === "portfolio") {
         var portResult = buildWorkPage(colors, brief, inspoContext);
         var portRec = portResult.recommended || "A";
-        return { id: pid, label: label, data: portRec === "B" ? portResult.variantB : portResult.variantA, variantA: portResult.variantA, variantB: portResult.variantB, recommended: portRec, hasVariants: true };
+        return { id: pid, label: label, data: portRec === "B" ? portResult.variantB : portResult.variantA, variantA: portResult.variantA, variantB: portResult.variantB, recommended: portRec, recommendedReasoned: true, hasVariants: true };
       }
       // All other pattern-driven pages — A = light hero, B = dark hero
       var gA = buildGenericPage(colors, brief, pageDef, inspoContext, "A");
       var gB = buildGenericPage(colors, brief, pageDef, inspoContext, "B");
-      return { id: pid, label: label, data: gA, variantA: gA, variantB: gB, recommended: "A", hasVariants: true };
+      return { id: pid, label: label, data: gA, variantA: gA, variantB: gB, recommended: "A", recommendedReasoned: false, hasVariants: true };
     }
 
     var recommended = (recs[pid] && recs[pid].variant) ? recs[pid].variant : result.recommended;
@@ -137,6 +138,7 @@ export function generatePages(brief, selectedPages, inspoContext, aiRecs, custom
       variantA: result.variantA,
       variantB: result.variantB,
       recommended: recommended,
+      recommendedReasoned: true,
       hasVariants: true,
     };
   }).filter(function(p) { return p !== null; });
