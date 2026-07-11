@@ -331,6 +331,14 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   function renderFeatureLayout(layout, features) {
     var rendered = [];
     layout.forEach(function (entry, rowIdx) {
+      // midcta needs no feature content of its own -- checked before the
+      // items/indices guard below, matching buildPreviewHTML.js's
+      // renderCuratedFeatureLayoutHTML ordering exactly.
+      if (entry.style === "midcta") {
+        rendered.push(renderMidCta(rowIdx));
+        return;
+      }
+
       var items = (entry.indices || []).map(function (i) { return features[i]; }).filter(Boolean);
       if (!items.length) return;
 
@@ -346,6 +354,10 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         rendered.push(renderSplitImage(items[0], entry.style === "split-left", rowIdx, false));
       } else if (entry.style === "split-cta-right" || entry.style === "split-cta-left") {
         rendered.push(renderSplitImage(items[0], entry.style === "split-cta-left", rowIdx, true));
+      } else if (entry.style === "checklist") {
+        rendered.push(renderChecklistRow(items[0], rowIdx));
+      } else if (entry.style === "video") {
+        rendered.push(renderVideoRow(items[0], rowIdx));
       } else {
         rendered.push(renderPlainRow(items[0], rowIdx));
       }
@@ -389,6 +401,22 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkSpacer(20),
       mkButton(contactCta, accent, warmWhite),
     ], rowIdx % 2 === 0 ? warmWhite : bone, { padY: "56", center: true });
+  }
+
+  // A secondary CTA woven mid-list -- needs no feature content of its own,
+  // just the brief's existing phone/contact CTA fields. Extracted from
+  // Variant E's inline makeMidCtaE() (see below) so a curated featureLayout
+  // can also place one via renderFeatureLayout, matching what
+  // buildPreviewHTML.js's "midcta" style already renders in preview.
+  // rowIdx isn't used for alternating background here (always warm white,
+  // matching Variant E's original), but is accepted for signature
+  // consistency with the other render* functions.
+  function renderMidCta(rowIdx) {
+    return mkContainer([
+      mkHeading(phoneCta, accent, "h2", { weight: 800, px: 32, align: "center" }),
+      mkSpacer(8),
+      mkText("<p style='text-align:center'>" + he(brief.midCtaText || "Questions before you reach out? " + contactCta + " and we'll get back to you within one business day.") + "</p>", stone),
+    ], warmWhite, { padY: "48", center: true });
   }
 
   // Several features sharing one heading (e.g. two related services under
@@ -630,13 +658,10 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     // A fresh element each call -- not a single reused block -- since
     // this gets interleaved more than once and every Elementor element
-    // needs its own unique id.
+    // needs its own unique id. Delegates to the shared renderMidCta (see
+    // above) rather than duplicating the same markup a second time.
     function makeMidCtaE() {
-      return mkContainer([
-        mkHeading(phoneCta, accent, "h2", { weight: 800, px: 32, align: "center" }),
-        mkSpacer(8),
-        mkText("<p style='text-align:center'>" + he(brief.midCtaText || "Questions before you reach out? " + contactCta + " and we'll get back to you within one business day.") + "</p>", stone),
-      ], warmWhite, { padY: "48", center: true });
+      return renderMidCta();
     }
 
     // Same variety cycle as Variant D/B, with a secondary CTA woven in
