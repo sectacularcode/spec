@@ -24,7 +24,7 @@ import { IntakeForm } from "./components/IntakeForm.jsx";
 import { BriefReview } from "./components/BriefReview.jsx";
 import { BulkLocationModal } from "./components/BulkLocationModal.jsx";
 import AdminPanel from "../components/AdminPanel.jsx";
-import { authHeaders } from "../utils/api.js";
+import { authHeaders, formatErrorMessage } from "../utils/api.js";
 import { estimateGenerationCost } from "./utils/estimateCost.js";
 import { manifestToBrief, ManifestImportError } from "./importers/manifestImport.js";
 
@@ -51,6 +51,7 @@ export default function CustomBuild({ userId, role } = {}) {
   const [showStylePicker, setShowStylePicker] = useState(false); // "Load a saved style guide" dropdown open/closed
   const [savedStylesList, setSavedStylesList] = useState([]);    // all of this user's saved brand styles, for the picker
   const [loadingStyles, setLoadingStyles]     = useState(false);
+  const [pickerError, setPickerError]         = useState(""); // set when the picker's fetch fails, distinct from "no styles saved yet"
   const [briefName, setBriefName]       = useState("");
   const [briefError, setBriefError]     = useState("");
   const [draftMsg, setDraftMsg]         = useState(""); // transient message for saved-drafts list actions
@@ -571,11 +572,11 @@ export default function CustomBuild({ userId, role } = {}) {
         let serverMsg = "";
         try { serverMsg = (await res.json()).error || ""; } catch { /* body wasn't JSON */ }
         console.error("saveBrandStyle failed:", res.status, serverMsg);
-        setStylePanelStatus("Couldn't save (" + res.status + (serverMsg ? ": " + serverMsg : "") + ")");
+        setStylePanelStatus(formatErrorMessage(role, res.status, serverMsg, "Couldn't save — try again."));
       }
     } catch (e) {
       console.error("saveBrandStyle errored:", e.message);
-      setStylePanelStatus("Couldn't save — " + e.message);
+      setStylePanelStatus(formatErrorMessage(role, null, e.message, "Couldn't save — try again."));
     }
     setTimeout(() => setStylePanelStatus(""), 6000);
   }
@@ -587,19 +588,27 @@ export default function CustomBuild({ userId, role } = {}) {
   async function openStylePicker() {
     setShowStylePicker(true);
     setLoadingStyles(true);
+    setPickerError("");
     try {
       const res = await fetch("/api/brand-styles", { headers: await authHeaders() });
       if (res.ok) {
         const data = await res.json();
         setSavedStylesList(data.styles || []);
       } else {
+        let serverMsg = "";
+        try { serverMsg = (await res.json()).error || ""; } catch { /* body wasn't JSON */ }
+        console.error("openStylePicker failed:", res.status, serverMsg);
         setSavedStylesList([]);
+        setPickerError(formatErrorMessage(role, res.status, serverMsg, "Couldn't load saved styles — try again."));
       }
     } catch (e) {
+      console.error("openStylePicker errored:", e.message);
       setSavedStylesList([]);
+      setPickerError(formatErrorMessage(role, null, e.message, "Couldn't load saved styles — try again."));
     }
     setLoadingStyles(false);
   }
+
 
   // Applies a picked style the same way resolveStyleConflict's "use saved"
   // branch does, so both entry points behave identically.
@@ -1317,7 +1326,10 @@ export default function CustomBuild({ userId, role } = {}) {
                       {showStylePicker && (
                         <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, zIndex: 20, width: "280px", maxHeight: "320px", overflowY: "auto", background: "#fff", border: "1px solid #dde0e6", borderRadius: "8px", boxShadow: "0 8px 24px rgba(0,0,0,0.1)", padding: "8px" }}>
                           {loadingStyles && <div style={{ fontSize: "12px", color: "#6b7280", padding: "8px" }}>Loading saved styles...</div>}
-                          {!loadingStyles && savedStylesList.length === 0 && (
+                          {!loadingStyles && pickerError && (
+                            <div style={{ fontSize: "12px", color: "#dc2626", padding: "8px" }}>{pickerError}</div>
+                          )}
+                          {!loadingStyles && !pickerError && savedStylesList.length === 0 && (
                             <div style={{ fontSize: "12px", color: "#6b7280", padding: "8px" }}>
                               No saved style guides yet. Save one from the button above and it'll show up here.
                             </div>
