@@ -20,12 +20,30 @@
 import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { validId, validText, validJsonSize } from "./_lib/validate.js";
+import { logError } from "./_lib/errorLog.js";
 import { sql } from "@vercel/postgres";
 
 const SNAPSHOT_CAP = 20;
 
 function sessionDraftId(userId) {
   return "session:" + userId;
+}
+
+// Self-healing, matching db/schema.sql's blueprint_drafts definition
+// exactly, including its user_id index — see api/brand-styles.js's history
+// for why this can't depend on a one-off migration having actually run.
+async function ensureTable() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS blueprint_drafts (
+      id          TEXT PRIMARY KEY,
+      user_id     TEXT NOT NULL,
+      client_name TEXT,
+      data        JSONB NOT NULL,
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS idx_blueprint_drafts_user_id ON blueprint_drafts(user_id)`;
 }
 
 export default async function handler(req, res) {
@@ -46,6 +64,8 @@ export default async function handler(req, res) {
   if (!(await rateLimit(userId, bucket, limit))) return tooMany(res);
 
   try {
+    await ensureTable();
+
     if (req.method === "GET") {
       if (isSession) {
         const { rows } = await sql`
@@ -140,6 +160,7 @@ export default async function handler(req, res) {
 
     return res.status(405).json({ error: "Method not allowed" });
   } catch (err) {
+    await logError("blueprint-drafts", req.method, userId, 500, err.message);
     return res.status(500).json({ error: err.message });
   }
 }
