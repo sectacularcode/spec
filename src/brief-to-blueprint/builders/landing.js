@@ -159,7 +159,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // lead-capture form lives in its hero area, separate from this cycle,
     // and "embedded-form" was never one of the cycle's styles to begin
     // with, so there's no duplicate-form risk.
-    if (variant === "D" || variant === "B") {
+    if (variant === "D" || variant === "B" || variant === "E") {
       var hasVideo = !!brief.videoUrl;
       var cyclePattern = hasVideo
         ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
@@ -538,8 +538,82 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     ].filter(Boolean), bone, { padY: "56", padX: "48" });
   }
 
+  // ── VARIANT E — Narrative / Trust-First layout ────────────────────────────
+  // A genuinely different structure from Awareness, not just a different
+  // cycle of styles -- informed by real research on awareness-stage pages:
+  // social proof moved up near the top instead of buried at the bottom,
+  // a secondary CTA woven in every few sections instead of just once at
+  // the very end, and the same proven variety cycle for feature rows
+  // (reused from Variant D/B, not reinvented). Every piece here is a
+  // reuse of an already-built, already-tested block -- the hero, the
+  // trust strip, the testimonial carousel (Variant B's exact pattern),
+  // the mid-page CTA (Variant B's exact pattern) -- just arranged
+  // differently and repeated where Variant B only uses it once.
+  if (variant === "E") {
+    var heroEyebrowE = mkHeading(heroEyebrowText, warmWhite, "h6", { eyebrow: true, align: "center" });
+    var heroH1ElE    = mkHeading(heroH1, warmWhite, "h1", { weight: 800, px: 58, align: "center" });
+    var heroSubElE   = mkText("<p style='text-align:center'>" + he(heroSub) + "</p>", "rgba(255,255,255,0.85)");
+    heroSubElE.settings.text_align = heroSubElE.settings.text_align_tablet = heroSubElE.settings.text_align_mobile = "center";
+    var heroE = mkContainer(
+      [heroEyebrowE, mkSpacer(16), heroH1ElE, mkSpacer(20), heroSubElE, mkSpacer(32), makeDualBtnRow(phoneCta, contactCta)],
+      dark, { padY: "100", center: true }
+    );
+
+    // Social proof moved up, right after the trust strip -- real research
+    // on awareness-stage pages consistently flags trust cues appearing
+    // only near the bottom as a missed opportunity; cold traffic decides
+    // whether to keep reading well before they'd ever scroll that far.
+    var testimonialsE = [
+      { quote: brief.testimonial1Quote || "[Client testimonial — specific result or outcome]", name: brief.testimonial1Name || "Client Name", title: brief.testimonial1Title || "Title, Company" },
+      { quote: brief.testimonial2Quote || "[Second testimonial — different benefit angle]",    name: brief.testimonial2Name || "Client Name", title: brief.testimonial2Title || "Title, Company" },
+      { quote: brief.testimonial3Quote || "[Third testimonial — reliability or speed]",        name: brief.testimonial3Name || "Client Name", title: brief.testimonial3Title || "Title, Company" },
+    ];
+    var testimonialsSectionE = mkContainer([
+      mkTestimonialCarousel(testimonialsE, { textColor: warmWhite, nameColor: warmWhite, jobColor: "rgba(255,255,255,0.7)" }),
+    ], dark, { padY: "72", center: true });
+
+    // A fresh element each call -- not a single reused block -- since
+    // this gets interleaved more than once and every Elementor element
+    // needs its own unique id.
+    function makeMidCtaE() {
+      return mkContainer([
+        mkHeading(phoneCta, accent, "h2", { weight: 800, px: 32, align: "center" }),
+        mkSpacer(8),
+        mkText("<p style='text-align:center'>" + he(brief.midCtaText || "Questions before you reach out? " + contactCta + " and we'll get back to you within one business day.") + "</p>", stone),
+      ], warmWhite, { padY: "48", center: true });
+    }
+
+    // Same variety cycle as Variant D/B, with a secondary CTA woven in
+    // every third row rather than saved for a single push at the very
+    // end -- real research on feature-heavy pages consistently
+    // recommends this instead of making cold traffic scroll to the
+    // bottom before they get another chance to act.
+    var featureRowsE = makeFeatureRows();
+    var interleavedE = [];
+    featureRowsE.forEach(function (row, i) {
+      interleavedE.push(row);
+      if ((i + 1) % 3 === 0 && i < featureRowsE.length - 1) interleavedE.push(makeMidCtaE());
+    });
+
+    var checklistItemsE = brief.servicesList || ["Reduced overall cost", "Reduced downtime", "Proactive planning", "Expert team", "Fast response time", "Tailored reporting", "Direct billing", "Add more below..."];
+    var halfE = Math.ceil(checklistItemsE.length / 2);
+    var checklistSectionE = brief.skipServicesChecklist ? null : mkContainer([
+      mkHeading(brief.servicesHeading || "What We Do", text, "h2", { weight: 700, px: 36 }),
+      mkSpacer(24), mkDivider(accent), mkSpacer(32),
+      mkContainer([
+        mkIconList(checklistItemsE.slice(0, halfE), accent, text, { width: 50 }),
+        mkIconList(checklistItemsE.slice(halfE), accent, text, { width: 50 }),
+      ], null, { direction: "row", gap: "48", padY: "0", isInner: true, full: true }),
+    ], warmWhite, { padY: "80" });
+
+    return {
+      version: "0.4", title: he(brandName || "Site") + " — Landing Page (Narrative)", type: "page", page_settings: {},
+      content: [heroE, makeTrustStrip(), testimonialsSectionE, ...interleavedE, checklistSectionE, makeFormSection(), makeMapSection(), makeClosingCta(), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),
+    };
+  }
+
   // ── VARIANT A — Awareness / Feature layout ────────────────────────────────
-  if (variant !== "B" && variant !== "C") {
+  if (variant !== "B" && variant !== "C" && variant !== "E") {
     var heroEyebrow = mkHeading(heroEyebrowText, warmWhite, "h6", { eyebrow: true, align: "center" });
     var heroH1El    = mkHeading(heroH1, warmWhite, "h1", { weight: 800, px: 58, align: "center" });
     var heroSubEl   = mkText("<p style='text-align:center'>" + he(heroSub) + "</p>", "rgba(255,255,255,0.85)");
