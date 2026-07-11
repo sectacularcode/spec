@@ -620,7 +620,13 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       }
 
       function renderCuratedFeatureLayoutHTML(layout) {
-        var rawFeatures = Array.isArray(brief.features) ? brief.features : [];
+        var rawFeatures = Array.isArray(brief.features) && brief.features.length > 0
+          ? brief.features
+          : [
+              { heading: brief.feature1Heading || "", body: brief.feature1Body || "" },
+              { heading: brief.feature2Heading || "", body: brief.feature2Body || "" },
+              { heading: brief.feature3Heading || "", body: brief.feature3Body || "" },
+            ];
         var htmlParts = [];
         layout.forEach(function (entry, rowIdx) {
           if (entry.style === "midcta") {
