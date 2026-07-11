@@ -7,8 +7,9 @@
 //   from the token, never from the request body or query string, so admin
 //   actions cannot be spoofed by passing someone else's user ID.
 
-import { requireAuth, getProfile } from "./_lib/auth.js";
+import { requireAuth, getProfile, ensureProfilesTable } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
+import { logError } from "./_lib/errorLog.js";
 import { sql } from "@vercel/postgres";
 
 const CLERK_SECRET = process.env.CLERK_SECRET_KEY;
@@ -47,6 +48,11 @@ export default async function handler(req, res) {
   const requesterRole = requesterProfile.role || "staff";
 
   try {
+    // getProfile() above already self-heals the table on the read path;
+    // called again here so the write path below (INSERT/DELETE) doesn't
+    // implicitly depend on that ordering staying true.
+    await ensureProfilesTable();
+
     if (req.method === "GET") {
       const queried = req.query.userId;
       // Only admins may read someone else's profile.
@@ -117,6 +123,7 @@ export default async function handler(req, res) {
 
     return res.status(405).json({ error: "Method not allowed" });
   } catch (err) {
+    await logError("user-role", req.method, requesterId, 500, err.message);
     return res.status(500).json({ error: err.message });
   }
 }
