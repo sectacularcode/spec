@@ -23,6 +23,62 @@ function selectFeatureRowStyle(inspoContext, featureCount) {
   return bestId ? relevant[bestId] : densityDefault;
 }
 
+// Scores each landing variant against real content signals already in the
+// brief -- no AI call, just field-presence checks, so this stays free and
+// instant like generation itself. A field only counts as "real" if the
+// person filled it in; blank fields are what Spec would draft, not signal.
+// Ties fall back to "A" (scores.A starts with a floor no other variant can
+// tie against at zero). Among B/C/D/E, first to strictly exceed the
+// current best wins, so the check order (B, C, D, E) is the tie-break.
+export function scoreLandingVariants(brief) {
+  function real(v) { return typeof v === "string" && v.trim().length > 0; }
+
+  var testimonialCount = [1, 2, 3].filter(function (n) {
+    return real(brief["testimonial" + n + "Quote"]) && real(brief["testimonial" + n + "Name"]);
+  }).length;
+
+  var featureBodies = [1, 2, 3].map(function (n) { return brief["feature" + n + "Body"]; });
+  var featureCount = featureBodies.filter(real).length;
+  var avgFeatureLen = featureCount > 0
+    ? featureBodies.filter(real).reduce(function (sum, b) { return sum + b.length; }, 0) / featureCount
+    : 0;
+
+  var faqCount = Array.isArray(brief.faqItems)
+    ? brief.faqItems.filter(function (item) { return item && real(item.question) && real(item.answer); }).length
+    : 0;
+
+  var hasForm = real(brief.formHeading) || (Array.isArray(brief.formFields) && brief.formFields.length > 0);
+  var hasVideo = real(brief.videoUrl);
+  var benefitCount = [1, 2, 3].filter(function (n) { return real(brief["benefit" + n]); }).length;
+
+  var scores = { A: 1, B: 0, C: 0, D: 0, E: 0 };
+
+  // B -- Lead Form: declared form intent, backed by real social proof
+  if (hasForm) scores.B += 6;
+  scores.B += testimonialCount * 3;
+
+  // C -- Retargeting: feature copy deliberately sparse AND benefits written
+  // instead -- both signals together, not just blank features on their own
+  // (a brief that's simply empty everywhere should fall to A, not C).
+  if (featureCount === 0 && benefitCount > 0) scores.C += 4;
+  scores.C += benefitCount * 3;
+
+  // D -- Varied: enough distinct real content to justify cycling treatments
+  if (featureCount === 3) scores.D += 6;
+  scores.D += faqCount * 2;
+  if (hasVideo) scores.D += 4;
+
+  // E -- Narrative: strong social proof plus long-form feature copy
+  scores.E += testimonialCount * 3;
+  if (avgFeatureLen > 220) scores.E += 5;
+
+  var best = "A", bestScore = scores.A;
+  ["B", "C", "D", "E"].forEach(function (v) {
+    if (scores[v] > bestScore) { best = v; bestScore = scores[v]; }
+  });
+  return best;
+}
+
 // Landing page builder — three distinct conversion-focused layouts.
 //
 // Variant A — Awareness/Feature layout (default)
