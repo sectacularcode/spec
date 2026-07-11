@@ -10,9 +10,25 @@
 import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { validId, validText, validJsonSize } from "./_lib/validate.js";
+import { logError } from "./_lib/errorLog.js";
 import { sql } from "@vercel/postgres";
 
 const CAP = 50;
+
+// Self-healing, matching db/schema.sql's keyword_builds definition exactly.
+async function ensureTable() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS keyword_builds (
+      id         TEXT PRIMARY KEY,
+      user_id    TEXT NOT NULL,
+      keywords   TEXT,
+      build_date TEXT,
+      data       JSONB NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS idx_keyword_builds_user_id ON keyword_builds(user_id)`;
+}
 
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
@@ -23,6 +39,8 @@ export default async function handler(req, res) {
   if (!(await rateLimit(userId, "keyword-builds", 60))) return tooMany(res);
 
   try {
+    await ensureTable();
+
     if (req.method === "GET") {
       const { rows } = await sql`
         SELECT id, data FROM keyword_builds
@@ -80,6 +98,7 @@ export default async function handler(req, res) {
 
     return res.status(405).json({ error: "Method not allowed" });
   } catch (err) {
+    await logError("keyword-builds", req.method, userId, 500, err.message);
     return res.status(500).json({ error: err.message });
   }
 }
