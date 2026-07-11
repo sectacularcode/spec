@@ -412,20 +412,42 @@ export function mkGoogleMapsWidget(address, opts) {
   };
 }
 
+// mode: "pin" (default) is a real storefront -- address, an embedded pin,
+// and a "Get Directions" route. "service_area" (manifest.page-document/1,
+// 1.2.0) is a mobile/no-storefront business -- per that spec's own words,
+// "show coverage, not a storefront pin," so this skips the pinned embed
+// entirely and reframes the address as a base of operations rather than a
+// destination. opts.heading/opts.buttonLabel always win when supplied
+// (Manifest's own copy) -- the mode-based defaults below only fill in when
+// the caller has nothing more specific, same as every other builder default
+// in this file.
 export function mkMapSection(address, mapUrl, colors, opts) {
   opts = opts || {};
   colors = colors || {};
+  var mode = opts.mode === "service_area" ? "service_area" : "pin";
   var ink = colors.ink || colors.text || "#1A1A1A";
   var accent = colors.brass || colors.accent || "#C2A35B";
   var bone = colors.bone || colors.background || "#F2F2F2";
+  var heading = opts.heading || (mode === "service_area" ? "Areas We Serve" : "Find Us");
   var children = [
-    mkHeading(opts.heading || "Find Us", ink, "h2", { weight: 700, px: 32, align: opts.center ? "center" : "left" }),
+    mkHeading(heading, ink, "h2", { weight: 700, px: 32, align: opts.center ? "center" : "left" }),
     mkSpacer(16),
-    mkText("<p" + (opts.center ? " style='text-align:center'" : "") + ">" + he(address || "") + "</p>", ink),
   ];
+  if (address) {
+    var addressLine = mode === "service_area"
+      ? (opts.coverageText || ("Based in " + address + " -- serving the surrounding area."))
+      : address;
+    children.push(mkText("<p" + (opts.center ? " style='text-align:center'" : "") + ">" + he(addressLine) + "</p>", ink));
+  }
+  if (mode === "pin" && address) {
+    children.push(mkSpacer(20));
+    var mapWidget = mkGoogleMapsWidget(address, { height: opts.mapHeight || 400 });
+    if (mapWidget) children.push(mapWidget);
+  }
   if (mapUrl) {
     children.push(mkSpacer(20));
-    var btn = mkButton(opts.buttonLabel || "Get Directions", accent, "#FFFFFF");
+    var btnLabel = opts.buttonLabel || (mode === "service_area" ? "Check Your Area" : "Get Directions");
+    var btn = mkButton(btnLabel, accent, "#FFFFFF");
     btn.settings.link = { url: sanitizeUrl(mapUrl), is_external: "true" };
     children.push(btn);
   }

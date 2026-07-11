@@ -416,10 +416,36 @@ function manifestPageDocumentToBrief(raw) {
       var loc = section.location || {};
       var addressParts = [loc.street, loc.city, loc.region, loc.postal_code].filter(Boolean);
       var noteText = flattenRichText(section.note);
+      // mode (1.2.0, additive): "pin" is a real storefront customers visit;
+      // "service_area" is a mobile/no-storefront business with no single
+      // destination to send someone to. Missing mode = pin, matching the
+      // format spec's own stated default.
+      var mode = section.mode === "service_area" ? "service_area" : "pin";
       if (addressParts.length) {
         brief.mapAddress = addressParts.join(", ");
-        var mapBtnUrl = pageDocumentButtonUrl(section.button);
-        if (mapBtnUrl) brief.mapUrl = mapBtnUrl;
+        brief.mapMode = mode;
+        // Manifest's own section heading/button label were previously
+        // discarded here in favor of the builder's hardcoded "Find Us" /
+        // "Get Directions" -- inconsistent with every other section type in
+        // this file, which all prefer real supplied copy over an invented
+        // default. Pass them through; the builder still falls back to its
+        // own defaults when either is absent.
+        if (headingText) brief.mapHeading = headingText;
+        if (section.button && section.button.label) brief.mapButtonLabel = section.button.label;
+        // directions_url / maps_url (1.2.0) are computed straight from the
+        // governed address -- prefer them outright over the button's own
+        // destination, which is very often an unresolved placeholder (real
+        // case: the AFS Saginaw sample ships one, so brief.mapUrl was
+        // silently ending up empty and the whole "Get Directions" button
+        // was quietly not rendering). Pin mode wants a real point-to-point
+        // route (directions_url); service-area mode has no single
+        // destination to route to, so the general maps_url search link is
+        // the one that actually fits there. Both fall back to the button
+        // URL for pre-1.2.0 exports that don't carry the new fields yet.
+        var btnUrl = pageDocumentButtonUrl(section.button);
+        var directionsUrl = section.directions_url || btnUrl;
+        var viewUrl = section.maps_url || btnUrl;
+        brief.mapUrl = mode === "service_area" ? (viewUrl || directionsUrl) : (directionsUrl || viewUrl);
         if (noteText) brief._manifestMapNote = noteText;
       } else if (noteText) {
         // No structured address to build the real map widget from -- the

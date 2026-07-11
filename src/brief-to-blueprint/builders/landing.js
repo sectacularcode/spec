@@ -470,7 +470,11 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     innerBox.settings.flex_justify_content = "center";
     innerBox.settings.flex_align_items = "flex-start";
     var textCol = mkContainer([innerBox], null, { isInner: true, padY: "30", padX: "30", width: 50, full: true });
-    var mapWidget = mkGoogleMapsWidget(brief.mapAddress, { isInner: false });
+    // A pinned map implies "come to this exact spot" -- wrong for a
+    // service-area business with no single storefront (mode, 1.2.0). Same
+    // rule mkMapSection applies to the auto map section below; falls back
+    // to the existing "no real address" placeholder image, unchanged.
+    var mapWidget = brief.mapMode === "service_area" ? null : mkGoogleMapsWidget(brief.mapAddress, { isInner: false });
     var mapCol = mapWidget
       ? mkContainer([mapWidget], null, { isInner: true, padY: "0", padX: "0", width: 50, full: true })
       : mkImageBg("[Map placeholder]", { width: 50 });
@@ -574,21 +578,18 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // skip.
     var mapAlreadyPlaced = Array.isArray(brief.featureLayout) && brief.featureLayout.some(function (e) { return e.style === "map-beside"; });
     if (mapAlreadyPlaced) return null;
-    // A real address gets a real, embedded Google Maps widget — the same
-    // upgrade the curated AFS layout got, now generalized so any page
-    // with real location data gets it, not just one brand's hand-built
-    // page. Falls back to the older address-plus-button treatment only
-    // when there's a mapUrl but no structured address to build a real
-    // widget from.
-    if (brief.mapAddress) {
-      var mapWidget = mkGoogleMapsWidget(brief.mapAddress, { height: 420 });
-      return mkContainer([
-        mkHeading(brief.mapHeading || "Find Us", ink, "h2", { weight: 700, px: 32 }),
-        mkSpacer(20),
-        mapWidget,
-      ], bone, { padY: "60" });
-    }
-    return mkMapSection(brief.mapAddress, brief.mapUrl, colors, { heading: brief.mapHeading || "Find Us" });
+    // Previously this branch reimplemented a simplified version of
+    // mkMapSection by hand (heading + bare embed) whenever a structured
+    // address existed, which meant the "Get Directions" button never
+    // rendered at all in that case -- only the no-address fallback path
+    // below ever got one. Delegating to mkMapSection for both cases fixes
+    // that and adds mode/heading/button-label support (all from real
+    // Manifest copy when present) in one place instead of two.
+    return mkMapSection(brief.mapAddress, brief.mapUrl, colors, {
+      heading: brief.mapHeading,
+      buttonLabel: brief.mapButtonLabel,
+      mode: brief.mapMode,
+    });
   }
 
   // Optional lead-capture form section — renders only when the brief
