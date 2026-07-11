@@ -5,6 +5,9 @@
 
 import { requireAuth, getProfile } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
+import { logError } from "./_lib/errorLog.js";
+import { ensureApiUsageTable } from "./_lib/usage.js";
+import { ensureUsageLimitsTable } from "./usage-limits.js";
 import { sql } from "@vercel/postgres";
 
 const CLERK_SECRET = process.env.CLERK_SECRET_KEY;
@@ -45,6 +48,12 @@ export default async function handler(req, res) {
   if (!(await rateLimit(requesterId, "usage-summary", 30))) return tooMany(res);
 
   try {
+    // This route reads api_usage and usage_limits without owning either
+    // table's writes (see api/_lib/usage.js and api/usage-limits.js) — it
+    // ensures both here rather than assuming one of those routes ran first.
+    await ensureApiUsageTable();
+    await ensureUsageLimitsTable();
+
     // Current calendar month, in UTC — matches created_at's TIMESTAMPTZ storage.
     const { rows: byUser } = await sql`
       SELECT user_id,
@@ -99,6 +108,7 @@ export default async function handler(req, res) {
       })),
     });
   } catch (err) {
+    await logError("usage-summary", req.method, requesterId, 500, err.message);
     return res.status(500).json({ error: err.message });
   }
 }
