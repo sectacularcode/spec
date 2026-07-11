@@ -124,6 +124,14 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   } catch (err) {
     await logError("user-role", req.method, requesterId, 500, err.message);
-    return res.status(500).json({ error: err.message });
+    // formatErrorMessage() in src/utils/api.js only changes what the UI
+    // *displays* for non-admins -- it never stopped the raw message from
+    // being sent over the wire in the first place, so it was visible to
+    // any Manager/Staff caller who opened DevTools. Gate it here instead,
+    // at the source, so the detailed message never leaves the server for
+    // a non-admin request. Fallback text matches formatErrorMessage's own
+    // default so the two layers agree.
+    const message = requesterRole === "admin" ? err.message : "Something went wrong — try again in a moment.";
+    return res.status(500).json({ error: message });
   }
 }
