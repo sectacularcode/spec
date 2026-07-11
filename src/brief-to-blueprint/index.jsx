@@ -1043,16 +1043,15 @@ export default function CustomBuild({ userId, role } = {}) {
 
           {/* Layout variant picker — shown when generated page has variants */}
           {generated && (() => {
-            const activePage = activePreviewPage;
-            if (!activePage || !activePage.hasVariants) return null;
+            if (!activePreviewPage || !activePreviewPage.hasVariants) return null;
             // Was inferred from hasVariantC alone, which stopped being a
             // reliable signal once Home also got a third layout (see
             // generatePages.js) -- checking the actual page id/label
             // pattern instead, matching how generatePages.js itself
             // decides which builder to route to.
-            const isLanding = /^(landing|other)(-\d+)?$/.test(activePage.id);
-            const isHome = activePage.id === "home";
-            const variants = isLanding ? (activePage.hasVariantE ? ["A","B","C","D","E"] : activePage.hasVariantD ? ["A","B","C","D"] : ["A","B","C"]) : (isHome && activePage.hasVariantC ? ["A","B","C"] : ["A","B"]);
+            const isLanding = /^(landing|other)(-\d+)?$/.test(activePreviewPage.id);
+            const isHome = activePreviewPage.id === "home";
+            const variants = isLanding ? (activePreviewPage.hasVariantE ? ["A","B","C","D","E"] : activePreviewPage.hasVariantD ? ["A","B","C","D"] : ["A","B","C"]) : (isHome && activePreviewPage.hasVariantC ? ["A","B","C"] : ["A","B"]);
             const labels = isLanding
               ? { A: "Awareness", B: "Lead Form", C: "Retargeting", D: "Varied", E: "Narrative" }
               : isHome
@@ -1073,16 +1072,16 @@ export default function CustomBuild({ userId, role } = {}) {
                   C: "Large minimal hero, no image, single CTA — and a numbered list instead of bordered cards for the services section. Best for a quieter, editorial feel.",
                 }
               : { A: "Primary layout for this page type.", B: "Alternate layout with a different section structure." };
-            const current = layoutVariants[previewPage] || activePage.recommended || "A";
+            const current = layoutVariants[previewPage] || activePreviewPage.recommended || "A";
             return (
               <div style={{ marginBottom: "28px" }}>
                 <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>
-                  Layout — {(activePage.label || previewPage).replace(/-\d+$/, "")}
+                  Layout — {(activePreviewPage.label || previewPage).replace(/-\d+$/, "")}
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   {variants.map(v => {
                     const active = current === v;
-                    const isRec  = !!activePage.recommendedReasoned && v === (activePage.recommended || "A");
+                    const isRec  = !!activePreviewPage.recommendedReasoned && v === (activePreviewPage.recommended || "A");
                     return (
                       <div
                         key={v}
