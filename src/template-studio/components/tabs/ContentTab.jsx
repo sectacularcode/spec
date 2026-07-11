@@ -1,17 +1,28 @@
+import { useState } from "react";
 import { Section } from "../Section.jsx";
 import { Icon } from "../Icon.jsx";
 import { I } from "../../styles.js";
 import { PAGE_TYPES, SECTION_OPTIONS } from "../../constants/ui.jsx";
+import { ConfirmDialog } from "../../../components/ConfirmDialog.jsx";
 
 export default function ContentTab({ ctx }) {
   const { page, updPage, clearDemoContent, toggleSection } = ctx;
+  const [confirmClear, setConfirmClear] = useState(false);
   return (
             <>
+              <ConfirmDialog
+                open={confirmClear}
+                title="Clear demo content?"
+                message="This wipes every field on this page (hero, about, services, portfolio, and the rest) back to blank. This can't be undone."
+                confirmLabel="Clear it"
+                onConfirm={() => { clearDemoContent(); setConfirmClear(false); }}
+                onCancel={() => setConfirmClear(false)}
+              />
               <div style={{ maxWidth: "1080px", margin: "0 auto", width: "100%", padding: "24px 24px 40px" }}>
               {(!!(page.heroHeading || page.heroSubhead || page.aboutBody || page.services || page.process || page.testimonials || page.faq || page.portfolio || page.stats || page.pricing || page.blog || page.leaders)) && (
                 <div style={{ marginBottom: "16px", padding: "12px 16px", background: "#ffffff", border: "1px solid #dde0e6", borderLeft: "3px solid #b45309", borderRadius: "8px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
                   <div style={{ fontSize: "13px", color: "#6b7280" }}>This page has demo content from the template. Clear it to start fresh with your client's copy.</div>
-                  <button onClick={clearDemoContent} style={{ padding: "6px 14px", background: "#ffffff", color: "#b45309", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>Clear demo content</button>
+                  <button onClick={() => setConfirmClear(true)} style={{ padding: "6px 14px", background: "#ffffff", color: "#b45309", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>Clear demo content</button>
                 </div>
               )}
               <Section id="page-setup" title="Page Setup" icon="">

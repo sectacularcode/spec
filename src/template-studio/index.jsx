@@ -26,6 +26,7 @@ import { previewHTML } from "./preview/previewHTML.js";
 // Components
 // Section component used in tab components directly
 import { Icon } from "./components/Icon.jsx";
+import { ConfirmDialog } from "../components/ConfirmDialog.jsx";
 import { GenerateFromKeywordsModal } from "./components/GenerateFromKeywordsModal.jsx";
 
 // Tab components
@@ -101,6 +102,8 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
   const [briefDirty, setBriefDirty] = useState(false);
   const [importMsg, setImportMsg] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState(null); // project id pending delete confirmation
+  const [confirmResetId, setConfirmResetId] = useState(null); // project id pending reset-to-blank confirmation
+  const [confirmKeywordDeleteId, setConfirmKeywordDeleteId] = useState(null); // keyword build id pending delete confirmation
   const [savedBuilds, setSavedBuilds] = useState([]); // Blueprint builds saved to library
   const [keywordBuilds, setKeywordBuilds] = useState([]); // Keyword-generated custom builds
   const [libraryFilter, setLibraryFilter] = useState({ visual: "", industry: "" }); // browser filters
@@ -1565,6 +1568,14 @@ Rules:
         }
       `}</style>
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
+        <ConfirmDialog
+          open={!!confirmKeywordDeleteId}
+          title="Delete this keyword build?"
+          message="This removes it from your saved keyword builds. This can't be undone."
+          confirmLabel="Delete"
+          onConfirm={() => { deleteKeywordBuild(confirmKeywordDeleteId); setConfirmKeywordDeleteId(null); }}
+          onCancel={() => setConfirmKeywordDeleteId(null)}
+        />
         <h1 style={{ fontSize: "36px", margin: "0 0 6px", fontWeight: 200, letterSpacing: "0", color: "#09090b" }}>Projects</h1>
         <p style={{ color: "#09090b", fontSize: "14px", margin: "0 0 32px", lineHeight: 1.6 }}>Plan, spec, and export Elementor or Divi templates.</p>
 
@@ -1814,7 +1825,7 @@ Rules:
                           Regenerate
                         </button>
                         <button
-                          onClick={() => deleteKeywordBuild(build.id)}
+                          onClick={() => setConfirmKeywordDeleteId(build.id)}
                           style={{ padding: "8px 10px", fontSize: "11px", background: "#fff", color: "#6b7280", border: "1px solid #dde0e6", borderRadius: "5px", cursor: "pointer" }}>
                           Remove
                         </button>
@@ -1967,8 +1978,9 @@ Rules:
             const displayName = p.name || p.brand.name || "Untitled";
             const hasDescription = !!p.brand.industry;
             const isPendingDelete = confirmDeleteId === p.id;
+            const isPendingReset = confirmResetId === p.id;
             return (
-              <div key={p.id} style={{ background: "#ffffff", border: isPendingDelete ? "1px solid #fecaca" : "1px solid #dde0e6", padding: "18px 20px", borderRadius: "10px", display: "flex", flexDirection: "column", gap: "12px", overflow: "hidden", minWidth: 0 }}>
+              <div key={p.id} style={{ background: "#ffffff", border: (isPendingDelete || isPendingReset) ? "1px solid #fecaca" : "1px solid #dde0e6", padding: "18px 20px", borderRadius: "10px", display: "flex", flexDirection: "column", gap: "12px", overflow: "hidden", minWidth: 0 }}>
                 <div onClick={() => { setActiveId(p.id); setView("editor"); setPageIdx(0); }} style={{ cursor: "pointer", flex: 1 }}>
                   <div style={{ fontSize: "14px", fontWeight: 500, marginBottom: "4px", color: "#09090b", letterSpacing: "0" }}>{displayName}</div>
                   <div style={{ fontSize: "12px", color: "#09090b", marginBottom: "12px" }}>
@@ -2006,6 +2018,11 @@ Rules:
                       <button onClick={(e) => { e.stopPropagation(); deleteProject(p.id); }} style={{ flex: 1, padding: "8px 10px", background: "#c93939", color: "#fff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer" }}>Yes, delete "{displayName}"</button>
                       <button onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(null); }} style={{ padding: "8px 12px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Cancel</button>
                     </>
+                  ) : isPendingReset ? (
+                    <>
+                      <button onClick={(e) => { e.stopPropagation(); resetProject(p.id); setConfirmResetId(null); }} style={{ flex: 1, padding: "8px 10px", background: "#c93939", color: "#fff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer" }}>Yes, reset "{displayName}" to blank</button>
+                      <button onClick={(e) => { e.stopPropagation(); setConfirmResetId(null); }} style={{ padding: "8px 12px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Cancel</button>
+                    </>
                   ) : (
                     <>
                       <button onClick={(e) => { e.stopPropagation(); setActiveId(p.id); setView("editor"); setPageIdx(0); }} style={{ flex: 1, padding: "8px 10px", background: "#3f3f46", color: "#fff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Open</button>
@@ -2015,7 +2032,7 @@ Rules:
                       <button onClick={(e) => { e.stopPropagation(); exportProjectFile(p); }} title="Download as JSON backup file" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
                         <Icon name="download" size={14} color="#09090b" />
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); resetProject(p.id); }} title="Reset to blank" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
+                      <button onClick={(e) => { e.stopPropagation(); setConfirmResetId(p.id); }} title="Reset to blank" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
                         <Icon name="refresh" size={14} color="#09090b" />
                       </button>
                       <button onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(p.id); }} title="Delete this project" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", background: "transparent", color: "#c93939", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
