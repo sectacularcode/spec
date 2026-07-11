@@ -33,6 +33,9 @@ export default function CustomBuild({ userId, role } = {}) {
   const [savedBrandStyle, setSavedBrandStyle] = useState(null); // fetched style for the current brief's brand, if any
   const [styleConflict, setStyleConflict]     = useState(null); // { savedStyle, briefColors, brandName } when both exist and differ -- pauses generate() until resolved
   const [stylePanelStatus, setStylePanelStatus] = useState(""); // brief save/load feedback text
+  const [showStylePicker, setShowStylePicker] = useState(false); // "Load a saved style guide" dropdown open/closed
+  const [savedStylesList, setSavedStylesList] = useState([]);    // all of this user's saved brand styles, for the picker
+  const [loadingStyles, setLoadingStyles]     = useState(false);
   const [briefName, setBriefName]       = useState("");
   const [briefError, setBriefError]     = useState("");
   const [draftMsg, setDraftMsg]         = useState(""); // transient message for saved-drafts list actions
@@ -541,6 +544,42 @@ export default function CustomBuild({ userId, role } = {}) {
     setTimeout(() => setStylePanelStatus(""), 3000);
   }
 
+  // "Load a saved style guide" — a user-triggered picker across every
+  // saved brand, not just an exact match on the brief's current brand
+  // name. Opening the picker is the "yes"; closing it without picking is
+  // the "no" -- no separate confirm step needed on top of that.
+  async function openStylePicker() {
+    setShowStylePicker(true);
+    setLoadingStyles(true);
+    try {
+      const res = await fetch("/api/brand-styles", { headers: await authHeaders() });
+      if (res.ok) {
+        const data = await res.json();
+        setSavedStylesList(data.styles || []);
+      } else {
+        setSavedStylesList([]);
+      }
+    } catch (e) {
+      setSavedStylesList([]);
+    }
+    setLoadingStyles(false);
+  }
+
+  // Applies a picked style the same way resolveStyleConflict's "use saved"
+  // branch does, so both entry points behave identically.
+  function applySavedStyle(style) {
+    setBrief(b => ({
+      ...b,
+      colors: (style.colors && Object.keys(style.colors).length > 0) ? style.colors : b.colors,
+      fonts: style.fonts && (style.fonts.heading || style.fonts.body)
+        ? [style.fonts.heading || style.fonts.body, style.fonts.body || style.fonts.heading]
+        : b.fonts,
+    }));
+    setShowStylePicker(false);
+    setStylePanelStatus("Applied " + style.brand_name + "'s style guide.");
+    setTimeout(() => setStylePanelStatus(""), 3000);
+  }
+
   // Two real, non-empty color sets disagreeing on at least one shared key
   // is a genuine conflict worth asking about — not just "one of them is
   // present." A saved style with no overlapping keys at all, or identical
@@ -558,7 +597,7 @@ export default function CustomBuild({ userId, role } = {}) {
       const s = styleConflict.savedStyle;
       setBrief(b => ({
         ...b,
-        colors: s.colors || b.colors,
+        colors: (s.colors && Object.keys(s.colors).length > 0) ? s.colors : b.colors,
         fonts: s.fonts && (s.fonts.heading || s.fonts.body)
           ? [s.fonts.heading || s.fonts.body, s.fonts.body || s.fonts.heading]
           : b.fonts,
@@ -1192,14 +1231,48 @@ export default function CustomBuild({ userId, role } = {}) {
                       ))}
                     </div>
                   )}
-                  {brief.brandName && brief.colors && Object.keys(brief.colors).length > 0 && (
-                    <div style={{ marginBottom: "14px", display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                      <button
-                        onClick={saveBrandStyle}
-                        style={{ padding: "6px 12px", fontSize: "11px", fontWeight: 600, border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", cursor: "pointer" }}>
-                        Save as {brief.brandName}'s style guide
-                      </button>
-                      {stylePanelStatus && <span style={{ fontSize: "11px", color: "#6b7280" }}>{stylePanelStatus}</span>}
+                  {brief.brandName && (
+                    <div style={{ marginBottom: "14px", position: "relative" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                        {brief.colors && Object.keys(brief.colors).length > 0 && (
+                          <button
+                            onClick={saveBrandStyle}
+                            style={{ padding: "6px 12px", fontSize: "11px", fontWeight: 600, border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", cursor: "pointer" }}>
+                            Save as {brief.brandName}'s style guide
+                          </button>
+                        )}
+                        <button
+                          onClick={() => showStylePicker ? setShowStylePicker(false) : openStylePicker()}
+                          style={{ padding: "6px 12px", fontSize: "11px", fontWeight: 600, border: "1px solid #dde0e6", borderRadius: "6px", background: showStylePicker ? "#f3f4f6" : "#fff", color: "#09090b", cursor: "pointer" }}>
+                          Load a saved style guide
+                        </button>
+                        {stylePanelStatus && <span style={{ fontSize: "11px", color: "#6b7280" }}>{stylePanelStatus}</span>}
+                      </div>
+                      {showStylePicker && (
+                        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, zIndex: 20, width: "280px", maxHeight: "320px", overflowY: "auto", background: "#fff", border: "1px solid #dde0e6", borderRadius: "8px", boxShadow: "0 8px 24px rgba(0,0,0,0.1)", padding: "8px" }}>
+                          {loadingStyles && <div style={{ fontSize: "12px", color: "#6b7280", padding: "8px" }}>Loading saved styles...</div>}
+                          {!loadingStyles && savedStylesList.length === 0 && (
+                            <div style={{ fontSize: "12px", color: "#6b7280", padding: "8px" }}>
+                              No saved style guides yet. Save one from the button above and it'll show up here.
+                            </div>
+                          )}
+                          {!loadingStyles && savedStylesList.map(style => (
+                            <div
+                              key={style.brand_name}
+                              onClick={() => applySavedStyle(style)}
+                              style={{ padding: "8px", borderRadius: "6px", cursor: "pointer", display: "flex", flexDirection: "column", gap: "6px" }}
+                              onMouseEnter={e => e.currentTarget.style.background = "#f9fafb"}
+                              onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                              <span style={{ fontSize: "12px", fontWeight: 600, color: "#09090b" }}>{style.brand_name}</span>
+                              <div style={{ display: "flex", gap: "4px" }}>
+                                {Object.entries(style.colors || {}).slice(0, 8).map(([id, hex]) => (
+                                  <div key={id} title={id + ": " + hex} style={{ width: "16px", height: "16px", borderRadius: "3px", background: hex, border: "1px solid rgba(0,0,0,.1)" }} />
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                   <label style={{ ...T.label, marginBottom: "6px", display: "block" }}>Export name</label>
