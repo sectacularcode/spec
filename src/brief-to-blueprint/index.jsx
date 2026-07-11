@@ -28,6 +28,21 @@ import { authHeaders } from "../utils/api.js";
 import { estimateGenerationCost } from "./utils/estimateCost.js";
 import { manifestToBrief, ManifestImportError } from "./importers/manifestImport.js";
 
+// Fixed 8-slot color model used everywhere else in Brief to Blueprint (see
+// COLOR_KEYS in api/brand-styles.js and colorNames in IntakeForm.jsx) --
+// keys are canonical and not user-renameable, only the hex values are
+// editable here.
+const COLOR_FIELDS = [
+  { key: "ink",        label: "Ink" },
+  { key: "brass",      label: "Accent" },
+  { key: "brass-deep", label: "Accent Deep" },
+  { key: "bone",       label: "Background" },
+  { key: "asphalt",    label: "Dark Panel" },
+  { key: "stone",      label: "Muted" },
+  { key: "warm-white", label: "Warm White" },
+  { key: "text",       label: "Text" },
+];
+
 export default function CustomBuild({ userId, role } = {}) {
   const [brief, setBrief]               = useState(null);
   const [savedBrandStyle, setSavedBrandStyle] = useState(null); // fetched style for the current brief's brand, if any
@@ -520,6 +535,23 @@ export default function CustomBuild({ userId, role } = {}) {
       console.warn("fetchSavedStyle failed:", e.message);
       return null;
     }
+  }
+
+  // Inline color/font editing for the loaded brief -- needed because
+  // Manifest imports deliberately arrive with no colors ("that's Spec's
+  // job now," per the integration doc), and previously there was no way
+  // to add them once a brief was already loaded; the swatch row was
+  // read-only. Initializes brief.colors/fonts if they don't exist yet
+  // rather than requiring them to already be present.
+  function setBriefColor(key, hex) {
+    setBrief(b => ({ ...b, colors: { ...(b.colors || {}), [key]: hex } }));
+  }
+  function setBriefFont(index, value) {
+    setBrief(b => {
+      const fonts = Array.isArray(b.fonts) ? [...b.fonts] : ["", ""];
+      fonts[index] = value;
+      return { ...b, fonts };
+    });
   }
 
   async function saveBrandStyle() {
@@ -1224,13 +1256,43 @@ export default function CustomBuild({ userId, role } = {}) {
               ) : (
                 <div style={{ width: "100%", boxSizing: "border-box", overflow: "hidden" }}>
                   <div style={{ fontSize: "13px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>{brief.brandName || "Brand loaded"}</div>
-                  {brief.colors && (
-                    <div style={{ display: "flex", gap: "6px", marginBottom: "12px", flexWrap: "wrap" }}>
-                      {Object.entries(brief.colors).slice(0, 8).map(([id, hex]) => (
-                        <div key={id} title={id + ": " + hex} style={{ width: "24px", height: "24px", borderRadius: "4px", background: hex, border: "1px solid rgba(0,0,0,.1)" }} />
+                  <div style={{ marginBottom: "14px" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                      {COLOR_FIELDS.map(f => (
+                        <div key={f.key} style={{ display: "grid", gridTemplateColumns: "84px 30px 1fr", gap: "6px", alignItems: "center" }}>
+                          <span style={{ fontSize: "11px", color: "#6b7280" }}>{f.label}</span>
+                          <input
+                            type="color"
+                            value={(brief.colors && brief.colors[f.key]) || "#ffffff"}
+                            onChange={e => setBriefColor(f.key, e.target.value)}
+                            style={{ width: "30px", height: "30px", border: "1px solid #dde0e6", borderRadius: "4px", cursor: "pointer", padding: "2px" }}
+                          />
+                          <input
+                            value={(brief.colors && brief.colors[f.key]) || ""}
+                            onChange={e => setBriefColor(f.key, e.target.value)}
+                            placeholder="#000000"
+                            style={{ padding: "6px 8px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", fontFamily: "monospace", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
+                          />
+                        </div>
                       ))}
                     </div>
-                  )}
+                    <div style={{ display: "grid", gridTemplateColumns: "84px 1fr", gap: "6px", alignItems: "center", marginTop: "10px" }}>
+                      <span style={{ fontSize: "11px", color: "#6b7280" }}>Heading font</span>
+                      <input
+                        value={(brief.fonts && brief.fonts[0]) || ""}
+                        onChange={e => setBriefFont(0, e.target.value)}
+                        placeholder="e.g. Inter"
+                        style={{ padding: "6px 8px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
+                      />
+                      <span style={{ fontSize: "11px", color: "#6b7280" }}>Body font</span>
+                      <input
+                        value={(brief.fonts && brief.fonts[1]) || ""}
+                        onChange={e => setBriefFont(1, e.target.value)}
+                        placeholder="e.g. Inter"
+                        style={{ padding: "6px 8px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
+                      />
+                    </div>
+                  </div>
                   {brief.brandName && (
                     <div style={{ marginBottom: "14px", position: "relative" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
