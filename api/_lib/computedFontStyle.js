@@ -104,5 +104,20 @@ export async function extractComputedFonts(safeUrl) {
   }
   if (!json || typeof json !== "object") return { ok: false, reason: "empty_response" };
 
-  return { ok: true, heading: json.heading || null, body: json.body || null };
+  // The Puppeteer function returns { data: result, type: "application/json" }
+  // per Browserless's documented /function contract ("data" becomes the
+  // response body, "type" controls Content-Type) -- but their docs are
+  // ambiguous about whether "data" gets unwrapped into the literal response
+  // body or the whole { data, type } envelope comes back verbatim. Live
+  // testing showed ok:true with empty heading/body, consistent with reading
+  // the wrong nesting level, so this checks both shapes rather than
+  // assuming one.
+  const payload = (json.data && typeof json.data === "object") ? json.data : json;
+  if (!payload.heading && !payload.body) {
+    // Neither field resolved after checking both possible shapes -- surface
+    // the raw response so a genuinely empty page (vs. a still-wrong shape
+    // assumption) is distinguishable without another blind round trip.
+    return { ok: false, reason: `empty_fonts:${JSON.stringify(json).slice(0, 300)}` };
+  }
+  return { ok: true, heading: payload.heading || null, body: payload.body || null };
 }
