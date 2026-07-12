@@ -295,10 +295,21 @@ export default function StyleGuide({ role }) {
       });
       const data = await res.json();
       if (res.ok) {
-        const note = droppedCustomColors > 0
-          ? ` (${droppedCustomColors} custom color${droppedCustomColors > 1 ? "s" : ""} shown here isn't saved to the library yet — still in this session's document/exports.)`
-          : "";
-        setSaveStatus(`Saved as ${data.brand_name}'s style guide.${note}`);
+        const notes = [];
+        if (droppedCustomColors > 0) {
+          notes.push(`${droppedCustomColors} custom color${droppedCustomColors > 1 ? "s" : ""} shown here isn't saved to the library yet — still in this session's document/exports`);
+        }
+        if (droppedExtraFonts > 0) {
+          notes.push(`${droppedExtraFonts} extra font${droppedExtraFonts > 1 ? "s" : ""} beyond Heading/Body isn't saved to the library yet — still in this session's document/exports`);
+        }
+        if (data.droppedFontKeys?.length) {
+          notes.push(`⚠ your ${data.droppedFontKeys.join(" and ")} font name has characters that couldn't be saved (check for a stray comma or quote mark)`);
+        }
+        if (data.droppedColorKeys?.length) {
+          notes.push(`⚠ ${data.droppedColorKeys.join(", ")} color${data.droppedColorKeys.length > 1 ? "s" : ""} weren't valid hex values and didn't save`);
+        }
+        const noteText = notes.length ? ` (${notes.join("; ")}.)` : "";
+        setSaveStatus(`Saved as ${data.brand_name}'s style guide.${noteText}`);
         loadSavedStyles();
       } else {
         setSaveStatus(formatErrorMessage(role, res.status, data.error, "Couldn't save — try again."));
@@ -306,7 +317,7 @@ export default function StyleGuide({ role }) {
     } catch (e) {
       setSaveStatus(formatErrorMessage(role, null, e.message, "Couldn't save — try again."));
     }
-    setTimeout(() => setSaveStatus(""), 8000);
+    setTimeout(() => setSaveStatus(""), 12000);
   }
 
   function applyStyle(style) {
