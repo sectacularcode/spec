@@ -5,136 +5,20 @@
 // - SSRF protection: only http/https, hostname must not resolve to private,
 //   loopback, link-local, or cloud-metadata IP ranges. Redirects are followed
 //   manually and every hop is re-validated. Response bodies are size-capped.
+//   (See api/_lib/safeFetch.js -- shared with api/extract-style.js, which
+//   needs the exact same protection for the exact same class of request.)
 // - Per-user rate limit — crawling is expensive (up to 8 page fetches, plus
 //   up to 6 CSS fetches for color extraction, plus one Anthropic call per
 //   request — roughly 14 fetches worst case, still bounded by the same
 //   per-user rate limit below).
 
-import dns from "node:dns/promises";
-import net from "node:net";
 import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { callAnthropic, extractJSON } from "./_lib/anthropic.js";
 import { logUsage } from "./_lib/usage.js";
 import { captureScreenshot } from "./_lib/screenshot.js";
 import { LAYOUT_PATTERNS } from "../src/constants/patterns.js";
-
-const MAX_REDIRECTS = 3;
-const MAX_BODY_BYTES = 2 * 1024 * 1024; // 2MB per page
-const FETCH_TIMEOUT_MS = 8000;
-
-function isPrivateIPv4(ip) {
-  const parts = ip.split(".").map(Number);
-  if (parts.length !== 4 || parts.some(n => Number.isNaN(n))) return true;
-  const [a, b] = parts;
-  return (
-    a === 0 || a === 10 || a === 127 ||
-    (a === 100 && b >= 64 && b <= 127) ||
-    (a === 169 && b === 254) ||
-    (a === 172 && b >= 16 && b <= 31) ||
-    (a === 192 && b === 0) ||
-    (a === 192 && b === 168) ||
-    (a === 198 && (b === 18 || b === 19)) ||
-    a >= 224
-  );
-}
-
-function isPrivateIp(ip) {
-  if (net.isIPv6(ip)) {
-    const lower = ip.toLowerCase();
-    if (lower.startsWith("::ffff:")) {
-      const mapped = lower.slice(7);
-      return net.isIPv4(mapped) ? isPrivateIPv4(mapped) : true;
-    }
-    return (
-      lower === "::" || lower === "::1" ||
-      lower.startsWith("fc") || lower.startsWith("fd") ||
-      lower.startsWith("fe80")
-    );
-  }
-  return isPrivateIPv4(ip);
-}
-
-// Validates protocol and resolves the hostname to confirm it points at a
-// public address. Returns true only when every resolved address is public.
-async function isSafeUrl(urlString) {
-  let parsed;
-  try {
-    parsed = new URL(urlString);
-  } catch {
-    return false;
-  }
-  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return false;
-
-  const host = parsed.hostname.replace(/^\[|\]$/g, "");
-  if (!host || host === "localhost" || host.endsWith(".local") || host.endsWith(".internal")) return false;
-  if (net.isIP(host)) return !isPrivateIp(host);
-
-  try {
-    const addrs = await dns.lookup(host, { all: true, verbatim: true });
-    if (!addrs.length) return false;
-    return addrs.every(a => !isPrivateIp(a.address));
-  } catch {
-    return false;
-  }
-}
-
-// Fetches a page with manual redirect handling. Every redirect target is
-// re-validated against the SSRF rules before following.
-async function fetchResource(url, expectedType) {
-  const acceptHeader = expectedType === "css" ? "text/css,*/*;q=0.1" : "text/html";
-  let current = url;
-  for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
-    if (!(await isSafeUrl(current))) return null;
-    let res;
-    try {
-      res = await fetch(current, {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; SpecCrawler/1.0)",
-          "Accept": acceptHeader,
-        },
-        redirect: "manual",
-        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      });
-    } catch {
-      return null;
-    }
-
-    if (res.status >= 300 && res.status < 400) {
-      const location = res.headers.get("location");
-      if (!location) return null;
-      try {
-        current = new URL(location, current).href;
-      } catch {
-        return null;
-      }
-      continue;
-    }
-
-    if (!res.ok) return null;
-
-    const contentType = res.headers.get("content-type") || "";
-    const typeOk = expectedType === "css"
-      ? (contentType.includes("text/css") || contentType.includes("octet-stream") || contentType === "")
-      : contentType.includes("text/html");
-    if (!typeOk) return null;
-
-    const declared = parseInt(res.headers.get("content-length") || "0", 10);
-    if (declared > MAX_BODY_BYTES) return null;
-
-    try {
-      const text = await res.text();
-      return text.length > MAX_BODY_BYTES ? text.slice(0, MAX_BODY_BYTES) : text;
-    } catch {
-      return null;
-    }
-  }
-  return null;
-}
-
-async function fetchPage(url) {
-  return fetchResource(url, "html");
-}
+import { isSafeUrl, fetchResource, fetchPage } from "./_lib/safeFetch.js";
 
 // Elementor's Kit-level Global Colors are almost never inline in the HTML
 // response — they live in linked stylesheets. Pull the handful of

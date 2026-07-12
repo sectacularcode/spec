@@ -129,3 +129,25 @@ CREATE TABLE usage_limits (
   UNIQUE (scope, scope_id)
 );
 
+-- brand_styles: one saved color/font profile per (user, brand name),
+-- reusable across every future page for that brand regardless of upload
+-- source (Standard Brief, Manifest import, or the Style Guide tool's
+-- URL-scrape/upload). Matching on brand_name is case-insensitive at the
+-- application layer (see api/brand-styles.js) rather than a DB-level
+-- constraint, so this UNIQUE stays a plain exact-match index -- the
+-- case-folding logic lives in the handler, not the schema.
+-- source_url is optional: null for anything entered manually, set when the
+-- style came from a URL scrape or an uploaded file. Self-healing via
+-- ALTER TABLE ... ADD COLUMN IF NOT EXISTS in api/brand-styles.js, since
+-- it was added after this table was already live.
+CREATE TABLE brand_styles (
+  id         SERIAL PRIMARY KEY,
+  user_id    TEXT NOT NULL,
+  brand_name TEXT NOT NULL,
+  colors     JSONB NOT NULL DEFAULT '{}'::jsonb,
+  fonts      JSONB NOT NULL DEFAULT '{}'::jsonb,
+  source_url TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (user_id, brand_name)
+);

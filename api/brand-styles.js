@@ -29,11 +29,19 @@ async function ensureTable() {
       brand_name TEXT NOT NULL,
       colors JSONB NOT NULL DEFAULT '{}'::jsonb,
       fonts JSONB NOT NULL DEFAULT '{}'::jsonb,
+      source_url TEXT,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       UNIQUE (user_id, brand_name)
     )
   `;
+  // CREATE TABLE IF NOT EXISTS only runs the column list for a brand-new
+  // table -- it does nothing to a table that already exists, which is the
+  // real case here (brand_styles has been live since before source_url
+  // existed). ADD COLUMN IF NOT EXISTS is the self-healing step for that:
+  // cheap on every request once the column is already there, and doesn't
+  // require a separate one-off migration to have actually been run.
+  await sql`ALTER TABLE brand_styles ADD COLUMN IF NOT EXISTS source_url TEXT`;
 }
 
 // Only these keys are meaningful to Spec's color system (see landing.js's
@@ -99,7 +107,7 @@ export default async function handler(req, res) {
         // this fix, this deterministically returns the most recently
         // updated one rather than an arbitrary row.
         const { rows } = await sql`
-          SELECT brand_name, colors, fonts, updated_at FROM brand_styles
+          SELECT brand_name, colors, fonts, source_url, updated_at FROM brand_styles
           WHERE user_id = ${userId} AND LOWER(brand_name) = LOWER(${brandName})
           ORDER BY updated_at DESC
           LIMIT 1
@@ -107,7 +115,7 @@ export default async function handler(req, res) {
         return res.status(200).json({ style: rows[0] || null });
       }
       const { rows } = await sql`
-        SELECT brand_name, colors, fonts, updated_at FROM brand_styles
+        SELECT brand_name, colors, fonts, source_url, updated_at FROM brand_styles
         WHERE user_id = ${userId}
         ORDER BY updated_at DESC
       `;
@@ -115,7 +123,7 @@ export default async function handler(req, res) {
     }
 
     if (req.method === "POST") {
-      const { brand_name, colors, fonts } = req.body || {};
+      const { brand_name, colors, fonts, source_url } = req.body || {};
       if (!validText(brand_name, 200) || brand_name.trim().length === 0) {
         return res.status(400).json({ error: "Invalid brand_name" });
       }
@@ -123,6 +131,32 @@ export default async function handler(req, res) {
       const cleanFonts = sanitizeFonts(fonts);
       if (!validJsonSize(cleanColors) || !validJsonSize(cleanFonts)) {
         return res.status(400).json({ error: "Invalid colors/fonts payload" });
+      }
+      // Optional -- a manually-entered style guide has no source URL at
+      // all, which is fine. When present it's validated the same as any
+      // other URL Spec accepts from a user (length-bounded, must actually
+      // parse as a URL) rather than trusted as-is.
+      let cleanSourceUrl = null;
+      if (source_url != null) {
+        if (typeof source_url !== "string" || source_url.length > 2000) {
+          return res.status(400).json({ error: "Invalid source_url" });
+        }
+        let parsed;
+        try {
+          parsed = new URL(source_url);
+        } catch {
+          return res.status(400).json({ error: "Invalid source_url" });
+        }
+        // Explicit reject, not a silent fallback to null -- a
+        // javascript:/data:/ftp: scheme is a syntactically valid URL (so
+        // the try/catch above alone doesn't catch it) and this field can
+        // end up rendered as a clickable link in the saved-styles list.
+        // Silently discarding it and letting the rest of the save succeed
+        // would hide exactly the case worth surfacing to the caller.
+        if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+          return res.status(400).json({ error: "Invalid source_url" });
+        }
+        cleanSourceUrl = parsed.href;
       }
 
       const trimmedName = brand_name.trim();
@@ -150,13 +184,14 @@ export default async function handler(req, res) {
         // handler rather than a special "keep the old casing" carve-out.
         await sql`
           UPDATE brand_styles
-          SET brand_name = ${trimmedName}, colors = ${cleanColors}, fonts = ${cleanFonts}, updated_at = NOW()
+          SET brand_name = ${trimmedName}, colors = ${cleanColors}, fonts = ${cleanFonts},
+              source_url = COALESCE(${cleanSourceUrl}, source_url), updated_at = NOW()
           WHERE user_id = ${userId} AND brand_name = ${existing[0].brand_name}
         `;
       } else {
         await sql`
-          INSERT INTO brand_styles (user_id, brand_name, colors, fonts, updated_at)
-          VALUES (${userId}, ${trimmedName}, ${cleanColors}, ${cleanFonts}, NOW())
+          INSERT INTO brand_styles (user_id, brand_name, colors, fonts, source_url, updated_at)
+          VALUES (${userId}, ${trimmedName}, ${cleanColors}, ${cleanFonts}, ${cleanSourceUrl}, NOW())
         `;
       }
       return res.status(200).json({ ok: true, brand_name: trimmedName, colors: cleanColors, fonts: cleanFonts });
