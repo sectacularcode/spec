@@ -14,7 +14,7 @@ import { pickReadableColor, bestTextColor, MIN_CONTRAST_LARGE_TEXT } from "../..
 // exportRef.innerHTML verbatim, and PNG/JPEG capture targets exportRef
 // directly, so neither one can ever include the buttons that triggered
 // them, regardless of what gets added to this component later.
-export default function StyleDocument({ brandName, sourceUrl, colors, fonts }) {
+export default function StyleDocument({ brandName, sourceUrl, colors, fonts, buttons = [] }) {
   const exportRef = useRef(null);
 
   const mainColors = colors.filter(c => !c.custom);
@@ -59,7 +59,7 @@ export default function StyleDocument({ brandName, sourceUrl, colors, fonts }) {
   const lightPanelHex = mainColors.find(c => c.role === "Background")?.hex || "#FFFFFF";
   const darkPanelDemoHex = darkPanelHex || "#1a1a1a";
 
-  const exportData = { brandName, sourceUrl, colors, fonts };
+  const exportData = { brandName, sourceUrl, colors, fonts, buttons };
 
   return (
     <div>
@@ -131,20 +131,37 @@ export default function StyleDocument({ brandName, sourceUrl, colors, fonts }) {
                   </p>
                 </div>
                 <div style={typeRow}>
-                  <div style={typeLabel}>Button</div>
+                  <div style={typeLabel}>Button{buttons.length !== 1 ? "s" : ""}</div>
                   <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-                    <div style={buttonDemoPanel(lightPanelHex)}>
-                      <p style={buttonDemoLabel(false)}>On light</p>
-                      <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: accentHex }}>
-                        <span style={{ fontFamily: `'${bodyFont.name}', sans-serif`, fontWeight: 600, fontSize: "13px", color: buttonTextColor, letterSpacing: "0.02em" }}>Call to action</span>
-                      </div>
-                    </div>
-                    <div style={buttonDemoPanel(darkPanelDemoHex)}>
-                      <p style={buttonDemoLabel(true)}>On dark</p>
-                      <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: accentHex }}>
-                        <span style={{ fontFamily: `'${bodyFont.name}', sans-serif`, fontWeight: 600, fontSize: "13px", color: buttonTextColor, letterSpacing: "0.02em" }}>Call to action</span>
-                      </div>
-                    </div>
+                    {buttons.length > 0 ? (
+                      buttons.map((b, i) => (
+                        <div key={i} style={buttonDemoPanel(lightPanelHex)}>
+                          {b.name && <p style={buttonDemoLabel(false)}>{b.name}</p>}
+                          <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: b.background || "#333" }}>
+                            <span style={{ fontFamily: `'${bodyFont.name}', sans-serif`, fontWeight: 600, fontSize: "13px", color: b.textColor || "#fff", letterSpacing: "0.02em" }}>Call to action</span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      // No explicit buttons defined (older saved style, or
+                      // just not built yet) -- fall back to the auto
+                      // Accent-fill button shown on both a light and dark
+                      // surface, same as before this feature existed.
+                      <>
+                        <div style={buttonDemoPanel(lightPanelHex)}>
+                          <p style={buttonDemoLabel(false)}>On light</p>
+                          <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: accentHex }}>
+                            <span style={{ fontFamily: `'${bodyFont.name}', sans-serif`, fontWeight: 600, fontSize: "13px", color: buttonTextColor, letterSpacing: "0.02em" }}>Call to action</span>
+                          </div>
+                        </div>
+                        <div style={buttonDemoPanel(darkPanelDemoHex)}>
+                          <p style={buttonDemoLabel(true)}>On dark</p>
+                          <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: accentHex }}>
+                            <span style={{ fontFamily: `'${bodyFont.name}', sans-serif`, fontWeight: 600, fontSize: "13px", color: buttonTextColor, letterSpacing: "0.02em" }}>Call to action</span>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
