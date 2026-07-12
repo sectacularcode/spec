@@ -41,6 +41,7 @@ import { authHeaders } from "../utils/api.js";
 import { listProjects, saveProjectsBatch } from "../utils/projects.js";
 import { listTemplateLibrary, deleteTemplateLibraryEntry } from "../utils/templateLibrary.js";
 import { listKeywordBuilds, saveKeywordBuildEntry, deleteKeywordBuildEntry } from "../utils/keywordBuilds.js";
+import { logTemplateQuery } from "../utils/templateQueries.js";
 
 // Styles
 
@@ -856,11 +857,25 @@ Rules:
       // "Cannot access 'text' before initialization" on every call.
       const responseText = data.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
       const clean = responseText.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+      const parsedResult = JSON.parse(clean);
+      // Log every resolved attempt regardless of outcome -- someone typing
+      // "hair salon" and clicking Discard should still count toward "how
+      // many times has this been typed", same as if they'd created the
+      // project. Fire-and-forget: not awaited, and logTemplateQuery never
+      // throws, so this can never affect the actual recommendation flow.
+      if (text) {
+        logTemplateQuery(
+          lockedTpl ? "describe_site_locked" : "describe_site",
+          text,
+          lockedTpl ? false : !!parsedResult.isCustom,
+          lockedTpl ? lockedTpl.id : (parsedResult.templateId || null)
+        );
+      }
       // Drop this result if a newer request has been issued since (e.g. the
       // user clicked "Regenerate" again before this one finished) — otherwise
       // a slow first response can overwrite a fresher second one.
       if (briefRecReqRef.current !== reqId) return;
-      setBriefRec(verifyCustomColorReasoning(JSON.parse(clean)));
+      setBriefRec(verifyCustomColorReasoning(parsedResult));
     } catch (e) {
       if (briefRecReqRef.current !== reqId) return;
       const msg = e.name === "AbortError"

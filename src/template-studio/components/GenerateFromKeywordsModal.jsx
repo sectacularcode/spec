@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { authHeaders } from "../../utils/api.js";
+import { logTemplateQuery } from "../../utils/templateQueries.js";
 
 // GenerateFromKeywordsModal
 // Opened from the "Generate from keywords" option in the Add Page dropdown.
@@ -92,6 +93,10 @@ Research what this theme looks, sounds, and feels like. Use authentic colors fro
       const newPage = buildPageFromAI(parsed, keywords.trim());
       setResults(prev => [newPage, ...prev]);
       setSelected(0);
+      // This tool never matches against WEBSITE_TEMPLATES -- every result
+      // here is effectively isCustom by design, so logged as such with no
+      // matched template. Fire-and-forget, never blocks the UI.
+      logTemplateQuery("keywords_modal", keywords.trim(), true, null);
     } catch(e) {
       const msg = e.name === "AbortError"
         ? "Request timed out — try again."

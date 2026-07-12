@@ -54,6 +54,14 @@ export default function AdminPanel({ isAdmin }) {
   const [errorLogsLoading, setErrorLogsLoading] = useState(false);
   const [errorLogsMsg, setErrorLogsMsg]   = useState({ text: "", type: "ok" });
 
+  // Template Queries (admin only) — aggregated counts of what people type
+  // into "Describe your site" and "Generate from keywords", grouped by
+  // normalized query text. Surfaces which niches keep going isCustom, i.e.
+  // real candidates for new Template Studio templates.
+  const [templateQueries, setTemplateQueries] = useState([]);
+  const [templateQueriesLoading, setTemplateQueriesLoading] = useState(false);
+  const [templateQueriesMsg, setTemplateQueriesMsg] = useState({ text: "", type: "ok" });
+
   function flash(text, type = "ok") {
     setMsg({ text, type });
     setTimeout(() => setMsg({ text: "", type: "ok" }), 3000);
@@ -116,6 +124,23 @@ export default function AdminPanel({ isAdmin }) {
   }
 
   useEffect(() => { if (isAdmin && user?.id) loadErrorLogs(); }, [isAdmin, user?.id]);
+
+  // ── Template Queries (admin only) ───────────────────────────────────────
+  async function loadTemplateQueries() {
+    setTemplateQueriesLoading(true);
+    try {
+      const res = await fetch("/api/template-queries", { headers: await authHeaders() });
+      const data = await res.json();
+      if (res.ok) {
+        setTemplateQueries(data.queries || []);
+        setTemplateQueriesMsg({ text: "", type: "ok" });
+      } else {
+        setTemplateQueriesMsg({ text: data.error || "Failed to load template queries.", type: "err" });
+      }
+    } catch { setTemplateQueriesMsg({ text: "Error loading template queries.", type: "err" }); }
+    setTemplateQueriesLoading(false);
+  }
+  useEffect(() => { if (isAdmin && user?.id) loadTemplateQueries(); }, [isAdmin, user?.id]);
 
   function startEditLimit(scope, scopeId, currentCents) {
     setEditingLimit({ scope, scopeId });
@@ -601,6 +626,60 @@ export default function AdminPanel({ isAdmin }) {
 
           <div style={{ padding: "10px 20px 16px", fontSize: "11px", color: "#9ca3af" }}>
             Shows the 100 most recent unexpected server errors, newest first. Routine validation/auth rejections aren't logged here.
+          </div>
+        </div>
+      )}
+
+      {/* Template Queries — admin only. Aggregated counts of what people
+          type into "Describe your site" and "Generate from keywords",
+          grouped by normalized query text -- captures every resolved
+          attempt, not just ones the person explicitly saved. Read-only. */}
+      {isAdmin && (
+        <div style={{ borderTop: "1px solid #dde0e6" }}>
+          <div style={S.header}>
+            <div style={S.headerTitle}>Template Queries</div>
+            <button style={S.btnSecondary} onClick={loadTemplateQueries} disabled={templateQueriesLoading}>
+              {templateQueriesLoading ? "Loading…" : "Refresh"}
+            </button>
+          </div>
+
+          {templateQueriesMsg.text && (
+            <div style={{ ...S.msg, padding: "8px 20px 0", color: templateQueriesMsg.type === "err" ? "#dc2626" : "#b45309" }}>{templateQueriesMsg.text}</div>
+          )}
+
+          {templateQueriesLoading ? (
+            <div style={S.empty}>Loading template queries…</div>
+          ) : templateQueries.length === 0 ? (
+            <div style={S.empty}>Nothing logged yet.</div>
+          ) : (
+            <table style={S.table}>
+              <thead>
+                <tr>
+                  <th style={S.th}>Query</th>
+                  <th style={S.th}>Total</th>
+                  <th style={S.th}>Custom</th>
+                  <th style={S.th}>Matched</th>
+                  <th style={S.th}>Top Matched Template</th>
+                  <th style={S.th}>Last Seen</th>
+                </tr>
+              </thead>
+              <tbody>
+                {templateQueries.map(q => (
+                  <tr key={q.normalized_query}>
+                    <td style={S.td}>{q.normalized_query}</td>
+                    <td style={S.td}>{q.total_count}</td>
+                    <td style={S.td}>{q.custom_count > 0 ? q.custom_count : "—"}</td>
+                    <td style={S.td}>{q.matched_count > 0 ? q.matched_count : "—"}</td>
+                    <td style={S.td}><code style={{ fontSize: "12px" }}>{q.top_matched_template_id || "—"}</code></td>
+                    <td style={S.td}>{new Date(q.last_seen).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+
+          <div style={{ padding: "10px 20px 16px", fontSize: "11px", color: "#9ca3af" }}>
+            Top 200 queries by frequency, grouped by normalized text. A high "Custom" count with no matched template is a real candidate for a new Template Studio template.
           </div>
         </div>
       )}
