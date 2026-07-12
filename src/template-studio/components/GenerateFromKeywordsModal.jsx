@@ -35,6 +35,7 @@ Return ONLY valid JSON — no preamble, no markdown fences:
     "card": "#hex — card/surface background color"
   },
   "headingFont": "One of: Manrope, Inter, Playfair Display, Oswald, Fraunces, Space Mono, Cormorant Garamond",
+  "imageCategory": "One of: marketing, production, product, lifestyle, editorial, portrait, trades, automotive, default",
   "sections": ["array of 4-7 section types from: Hero, About, Service Cards, Portfolio Carousel, Stats, Testimonials, Blog, FAQ, Form, CTA, Marquee, Pricing, Leadership, Process, Team, Logo Carousel, Video"],
   "copy": {
     "heroEyebrow": "2-4 word eyebrow label",
@@ -49,11 +50,12 @@ Return ONLY valid JSON — no preamble, no markdown fences:
 }
 
 Rules:
-- Colors must come from the actual theme (e.g. Ninja Turtles = green/purple/orange, not generic blue)
+- Colors must come from the actual theme described, never a generic default palette -- base every choice entirely on what the user typed, not on any example elsewhere in this prompt
 - Copy must sound authentically niche — a comic collector site sounds different from a fleet maintenance site
 - Sections should make sense for the page type and theme
 - If the theme is pop culture, entertainment, collector, hobby, or creative — lean into it fully
-- Font choice should match the vibe (editorial serif for luxury/art, mono for tech/gaming, sans for modern)`;
+- Font choice should match the vibe (editorial serif for luxury/art, mono for tech/gaming, sans for modern)
+- imageCategory: pick whichever of marketing|production|product|lifestyle|editorial|portrait|trades|automotive|default is the closest real visual match to the theme. "editorial" specifically means beauty/skincare/fashion photography, not a generic catch-all. Use "default" (generic office/workspace) when nothing genuinely fits rather than forcing a mismatch.`;
 
     const userPrompt = `Generate a themed webpage for these keywords: ${keywords.trim()}
 
@@ -99,6 +101,8 @@ Research what this theme looks, sounds, and feels like. Use authentic colors fro
     }
   }
 
+  const VALID_IMAGE_CATEGORIES = ["marketing", "production", "product", "lifestyle", "editorial", "portrait", "trades", "automotive", "default"];
+
   function buildPageFromAI(ai, keywords) {
     const id = "custom-" + Date.now();
     return {
@@ -114,6 +118,13 @@ Research what this theme looks, sounds, and feels like. Use authentic colors fro
       // Store AI colors and font as overrides to apply when page is added
       _aiColors: ai.colors || {},
       _aiFont: ai.headingFont || "",
+      // Validated against the real IMAGE_LIBRARY categories -- an
+      // unrecognized or missing value falls through to "default" (generic
+      // office/workspace) rather than an unvalidated string reaching
+      // imgOrPlaceholder(), which would just silently fall back to ITS
+      // OWN default ("editorial" = beauty/skincare/fashion) if it doesn't
+      // recognize the category -- same failure mode this is meant to fix.
+      _aiImageCategory: VALID_IMAGE_CATEGORIES.includes(ai.imageCategory) ? ai.imageCategory : "default",
       _aiTheme: ai.theme || "",
       _aiTagline: ai.copy?.tagline || "",
       _aiCta: ai.copy?.cta || "",

@@ -65,7 +65,7 @@ export function previewHTML(page, brand) {
 
   const section = (s) => {
     if (s === "Hero") {
-      const heroBg = imgOrPlaceholder(page.heroImage, `${brand.name}-hero`, 1600, 1000, brand.imageCategory);
+      const heroBg = imgOrPlaceholder(page.heroImage, `${brand.name}-hero`, 1600, 1000, page._imageCategory || brand.imageCategory);
       const heading = page.heroHeading || brand.tagline;
       const subhead = page.heroSubhead || (brand.keyMessages || "").split(".")[0];
       const v = layout.heroVariant || "left-standard";
@@ -182,7 +182,7 @@ export function previewHTML(page, brand) {
     }
 
     if (s === "About") {
-      const aboutImg = imgOrPlaceholder(page.aboutImage, `${brand.name}-about`, 800, 1000, brand.imageCategory);
+      const aboutImg = imgOrPlaceholder(page.aboutImage, `${brand.name}-about`, 800, 1000, page._imageCategory || brand.imageCategory);
       return `<section style="background:${card};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;" class="about-grid">
           <div>
@@ -313,7 +313,7 @@ export function previewHTML(page, brand) {
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;">
           ${items.map((line, i) => {
             const [title, cat, meta] = line.split("|");
-            const postImg = imgOrPlaceholder("", `${brand.name}-blog-${i}`, 800, 500, brand.imageCategory);
+            const postImg = imgOrPlaceholder("", `${brand.name}-blog-${i}`, 800, 500, page._imageCategory || brand.imageCategory);
             return `<article>
               <div style="aspect-ratio:16/10;background:url('${postImg}') center/cover no-repeat;margin:0 0 20px;"></div>
               <p style="font-family:'${bf}',sans-serif;font-size:11px;color:${ac};letter-spacing:.15em;text-transform:uppercase;margin:0 0 12px;">${cat || ""}</p>
@@ -335,7 +335,7 @@ export function previewHTML(page, brand) {
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;">
           ${items.map((line, i) => {
             const [t, c, img] = line.split("|");
-            const portImg = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, 800, 1000, brand.imageCategory);
+            const portImg = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, 800, 1000, page._imageCategory || brand.imageCategory);
             return `<div>
               <div style="aspect-ratio:4/5;background:url('${portImg}') center/cover no-repeat;margin:0 0 20px;"></div>
               <h3 style="font-family:'${hf}',serif;font-size:22px;color:${cardHc};margin:0 0 6px;font-weight:400;">${t || ""}</h3>
@@ -484,7 +484,7 @@ export function previewHTML(page, brand) {
       const portLines = (page.portfolio || "").split("\n").filter(Boolean);
       const cards = portLines.map((line, i) => {
         const [title, cat, img] = line.split("|");
-        const src = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, 1000, 750, brand.imageCategory);
+        const src = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, 1000, 750, page._imageCategory || brand.imageCategory);
         return `<div style="min-width:0;">
           <img src="${src}" alt="${title || ""}" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block;"/>
           <h3 style="font-family:'${hf}',serif;font-size:20px;color:${cardHc};margin:16px 0 4px;font-weight:500;">${title || ""}</h3>
@@ -560,7 +560,7 @@ export function previewHTML(page, brand) {
         const [t, c, img] = line.split("|");
         const ratio = ratios[i % ratios.length];
         const isWide = ratio === "4/3" || ratio === "16/9";
-        const portImg = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, isWide ? 1200 : 800, isWide ? 800 : 1200, brand.imageCategory);
+        const portImg = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, isWide ? 1200 : 800, isWide ? 800 : 1200, page._imageCategory || brand.imageCategory);
         return `<div style="min-width:0;${isWide ? "grid-column:span 2;" : ""}">
           <div style="aspect-ratio:${ratio};background:url('${portImg}') center/cover no-repeat;overflow:hidden;"></div>
           ${t ? `<p style="font-family:'${bf}',sans-serif;font-size:12px;color:${ts};margin:10px 0 2px;font-weight:500;">${t}</p>` : ""}
@@ -603,7 +603,7 @@ export function previewHTML(page, brand) {
       const items = ((page.portfolio && page.portfolio.trim()) ? page.portfolio : (isPhotoPortfolio || isVideoPortfolio ? DEMO_PORTFOLIO : "")).split("\n").filter(Boolean);
       const tiles = items.map((line, i) => {
         const [t, c, img] = line.split("|");
-        const portImg = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, 1600, 900, brand.imageCategory);
+        const portImg = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, 1600, 900, page._imageCategory || brand.imageCategory);
         return `<div style="min-width:0;position:relative;">
           <div style="aspect-ratio:16/9;background:url('${portImg}') center/cover no-repeat;overflow:hidden;">
             <div style="position:absolute;inset:0;background:rgba(0,0,0,0);display:flex;align-items:center;justify-content:center;">

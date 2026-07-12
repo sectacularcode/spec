@@ -656,8 +656,15 @@ Return ONLY the new ${fieldName} value as plain text.`;
   }
 
   // AI Site Brief — describe your site, get template/layout/theme/colors/fonts/brief recommendations
-  const describeMySite = async () => {
-    if (!briefText.trim() && !lockedTemplateId) return;
+  const describeMySite = async (overrideText) => {
+    // overrideText lets a caller (e.g. "Regenerate" on a saved Keyword
+    // Build) pass the text to use directly, rather than calling
+    // setBriefText() and hoping this function's closure sees the updated
+    // state on the same tick -- React state updates aren't synchronous, so
+    // reading briefText here right after a setBriefText() call would still
+    // see the OLD value.
+    const text = (overrideText !== undefined ? overrideText : briefText).trim();
+    if (!text && !lockedTemplateId) return;
     const reqId = ++briefRecReqRef.current;
     setBriefLoading(true);
     setBriefError("");
@@ -762,7 +769,7 @@ INDUSTRY COLOR & FONT GUIDANCE — real-world convention research, apply unless 
 Rules:
 - ONLY use a templateId if the user's description clearly matches one of the industries above
 - If it does NOT match — beauty salons, nail artists, spas, tattoo studios, barbershops, pet care, florists, bakeries, gaming, esports, comic books, collectors, fan sites, hobby niches, pop culture, entertainment, art studios, dance studios, yoga, pilates, music, podcasts, churches, or ANYTHING else not in the list above — set isCustom: true and templateId: null
-- For isCustom projects: generate AUTHENTIC colors from the actual theme (nail art = pastels/metallics/bold brights, not generic blue; Ninja Turtles = green/purple/orange)
+- For isCustom projects: generate AUTHENTIC colors pulled specifically from the actual theme described, never a generic default palette. Base the palette entirely on what the user actually described, not on any example elsewhere in this prompt.
 - themeReason MUST accurately describe the ACTUAL hex values in customColors — never name a color family (e.g. "green", "purple") in themeReason unless that color is genuinely present in background/accent/text/card. Write themeReason by looking at the hex values you actually chose, not from the theme's general vibe.
 - customColors must ALWAYS be provided for isCustom projects — never leave it null when isCustom is true
 - sections should match what that type of site actually needs
@@ -803,8 +810,8 @@ Rules:
           model: "claude-sonnet-4-6",
           max_tokens: 800,
           system: systemPrompt,
-          messages: [{ role: "user", content: briefText.trim()
-            ? `Describe of the site I want to build:\n\n${briefText}${contextBlock}`
+          messages: [{ role: "user", content: text
+            ? `Describe of the site I want to build:\n\n${text}${contextBlock}`
             : `I've already chosen the ${lockedTpl?.name || "template"}. Give me your best recommendations for layout, colors, fonts, goal, outcome, keywords, tagline, hero eyebrow, and a clean project name that fits this template.${contextBlock}` }],
         }),
         signal: controller.signal,
@@ -1003,6 +1010,15 @@ Rules:
       npWithContent._aiTheme = pageConfig._aiTheme;
       npWithContent._aiSlug = pageConfig._aiSlug;
       npWithContent._keywords = pageConfig._keywords;
+    }
+    // Page-level image category override -- previewHTML.js checks
+    // page._imageCategory before falling back to brand.imageCategory, so a
+    // keyword-generated page themed differently from its parent project
+    // (e.g. a "vintage record shop" page added to an otherwise-unrelated
+    // project) gets its own matching image pool instead of silently
+    // inheriting whatever the rest of the project happens to be set to.
+    if (pageConfig._aiImageCategory) {
+      npWithContent._imageCategory = pageConfig._aiImageCategory;
     }
 
     setProjects(ps => ps.map(p => p.id === activeId ? { ...p, pages: [...p.pages, npWithContent] } : p));
@@ -1921,7 +1937,19 @@ Rules:
                       )}
                       <div style={{ display: "flex", gap: "6px" }}>
                         <button
-                          onClick={() => { setBriefText(build.keywords); setShowKeywordsModal(true); }}
+                          onClick={() => {
+                            setBriefText(build.keywords);
+                            if (build.type === "project") {
+                              // Full-project builds regenerate through the same
+                              // "describe your site" flow that created them --
+                              // the keywords modal only ever adds a page to
+                              // whatever project is currently open, which isn't
+                              // the right tool for a saved full-project build.
+                              describeMySite(build.keywords);
+                            } else {
+                              setShowKeywordsModal(true);
+                            }
+                          }}
                           style={{ flex: 1, padding: "8px 0", fontSize: "11px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer" }}>
                           Regenerate
                         </button>
