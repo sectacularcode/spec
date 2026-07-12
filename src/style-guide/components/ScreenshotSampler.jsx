@@ -29,7 +29,7 @@ const MAX_DISPLAY_WIDTH = 900; // caps the image's BUFFER size on load, not
 
 const ZOOM_LEVELS = [1, 1.5, 2, 3, 4, 6, 8]; // multiples of the fitted buffer size
 
-export default function ScreenshotSampler({ onSample }) {
+export default function ScreenshotSampler({ onSample, existingHexes = [] }) {
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -45,6 +45,7 @@ export default function ScreenshotSampler({ onSample }) {
   // grid up top in one shot, instead of round-tripping to the top of the
   // page and back for every single color.
   const [pendingList, setPendingList] = useState([]); // [{ id, hex, role }]
+  const [duplicateNotice, setDuplicateNotice] = useState("");
 
   const zoom = ZOOM_LEVELS[zoomIndex];
 
@@ -113,6 +114,20 @@ export default function ScreenshotSampler({ onSample }) {
     const [r, g, b] = ctx.getImageData(px, py, 1, 1).data;
     const hex = "#" + [r, g, b].map(v => v.toString(16).padStart(2, "0")).join("").toUpperCase();
 
+    // Check against both this batch's not-yet-added samples AND colors
+    // already sitting in the grid up top -- clicking the same spot (or
+    // any spot that resolves to the same hex) twice shouldn't silently
+    // queue a second copy.
+    const alreadyPending = pendingList.some(p => p.hex === hex);
+    const alreadyInGrid = existingHexes.some(h => (h || "").toUpperCase() === hex);
+    if (alreadyPending || alreadyInGrid) {
+      setDuplicateNotice(`${hex} is already ${alreadyInGrid ? "in your Colors grid" : "in this list"}.`);
+      window.clearTimeout(handleCanvasClick._noticeTimer);
+      handleCanvasClick._noticeTimer = window.setTimeout(() => setDuplicateNotice(""), 3000);
+      return;
+    }
+    setDuplicateNotice("");
+
     setPendingList(list => {
       const usedRoles = new Set(list.map(p => p.role));
       const nextRole = TEMPLATE_ROLES.find(role => !usedRoles.has(role)) || "Custom";
@@ -132,6 +147,7 @@ export default function ScreenshotSampler({ onSample }) {
     if (pendingList.length === 0) return;
     pendingList.forEach(p => onSample(p.hex, p.role));
     setPendingList([]);
+    setDuplicateNotice("");
   }
 
   function reset() {
@@ -140,6 +156,7 @@ export default function ScreenshotSampler({ onSample }) {
     setBufferSize({ width: 0, height: 0 });
     setZoomIndex(0);
     setPendingList([]);
+    setDuplicateNotice("");
     setError("");
     setIsDragging(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -231,6 +248,12 @@ export default function ScreenshotSampler({ onSample }) {
           />
         </div>
         <p style={{ fontSize: "11px", color: "#B0B0B0", margin: "8px 0 0" }}>{fileName}</p>
+
+        {duplicateNotice && (
+          <p style={{ fontSize: "12px", color: "#B45309", background: "#FEF3E2", border: "1px solid #FBEBD1", borderRadius: "6px", padding: "8px 10px", margin: "8px 0 0" }}>
+            {duplicateNotice}
+          </p>
+        )}
 
         {pendingList.length > 0 && (
           <div style={{ marginTop: "14px", padding: "12px 14px", background: "#FEF3E2", border: "1px solid #FBEBD1", borderRadius: "8px" }}>
