@@ -478,9 +478,24 @@ export default async function handler(req, res) {
     // or Google Fonts declaration) is already trustworthy on its own.
     const headingConfirmed = fonts.some(f => f.role === "Heading" && f.confidence === "confirmed");
     const bodyConfirmed = fonts.some(f => f.role === "Body" && f.confidence === "confirmed");
+    // Diagnostic surfaced in the response itself (prefixed _ to signal it's
+    // not a stable field) -- lets this be checked directly in the browser's
+    // Network tab instead of needing server logs pulled for every "why no
+    // computed badge" question. attempted:false means the regex pass already
+    // confidently resolved both roles, so Browserless was never called --
+    // not a failure, just unnecessary.
+    let fontExtractionDebug = { attempted: false };
     if (!headingConfirmed || !bodyConfirmed) {
       const computed = await extractComputedFonts(base.href);
-      if (computed) {
+      fontExtractionDebug = { attempted: true, ok: computed.ok, reason: computed.ok ? undefined : computed.reason };
+      if (!computed.ok) {
+        // Not an errorLog.js entry -- that table is explicitly scoped to
+        // genuine unexpected errors an admin needs to review, not routine
+        // "the enhancement path degraded gracefully" outcomes. Plain
+        // console.error for Vercel's function logs is the right channel;
+        // _fontExtractionDebug above is the primary diagnostic surface.
+        console.error("extract-style: computed font extraction failed:", computed.reason);
+      } else {
         // Once the Browserless call has already fired (because at least one
         // role wasn't confirmed), upgrading the OTHER role too costs
         // nothing extra and "computed" is strictly more trustworthy than
@@ -498,13 +513,11 @@ export default async function handler(req, res) {
           if (idx >= 0) fonts[idx] = entry; else fonts.splice(1, 0, entry);
         }
       }
-      // computed === null (missing key, navigation failure, timeout) means
-      // the regex result stands as-is -- degrade gracefully, never throw.
     }
 
     const brandNameGuess = guessBrandName(html);
 
-    return res.status(200).json({ origin, brandNameGuess, colors, fonts });
+    return res.status(200).json({ origin, brandNameGuess, colors, fonts, _fontExtractionDebug: fontExtractionDebug });
   } catch (err) {
     await logError("extract-style", req.method, userId, 500, err.message);
     return res.status(500).json({ error: err.message });

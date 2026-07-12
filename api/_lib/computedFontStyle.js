@@ -68,25 +68,41 @@ function buildFunctionCode(safeUrl) {
 };`;
 }
 
-// Returns { heading, body } (either may be null if the selector wasn't
-// found or had no resolvable font) or null on any failure.
+// Returns { ok: true, heading, body } on success, or { ok: false, reason }
+// on any failure -- missing key, bad response, timeout, exception. Never
+// throws. Callers decide whether/how to log a failure; this function stays
+// pure so it's easy to test in isolation.
 export async function extractComputedFonts(safeUrl) {
   const apiKey = process.env.BROWSERLESS_API_KEY;
-  if (!apiKey) return null;
+  if (!apiKey) return { ok: false, reason: "no_api_key" };
 
+  let response;
   try {
-    const response = await fetch(`${BROWSERLESS_FUNCTION_URL}?token=${encodeURIComponent(apiKey)}`, {
+    response = await fetch(`${BROWSERLESS_FUNCTION_URL}?token=${encodeURIComponent(apiKey)}`, {
       method: "POST",
       headers: { "Content-Type": "application/javascript" },
       body: buildFunctionCode(safeUrl),
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
-    if (!response.ok) return null;
-
-    const json = await response.json();
-    if (!json || typeof json !== "object") return null;
-    return { heading: json.heading || null, body: json.body || null };
-  } catch {
-    return null;
+  } catch (err) {
+    return { ok: false, reason: `fetch_exception:${err.name === "TimeoutError" ? "timeout" : err.message}` };
   }
+
+  if (!response.ok) {
+    // Capture a short body snippet -- Browserless returns useful detail on
+    // 4xx (bad token, bad code) that a bare status code alone would hide.
+    let detail = "";
+    try { detail = (await response.text()).slice(0, 200); } catch {}
+    return { ok: false, reason: `bad_status:${response.status}${detail ? ":" + detail : ""}` };
+  }
+
+  let json;
+  try {
+    json = await response.json();
+  } catch (err) {
+    return { ok: false, reason: `bad_json:${err.message}` };
+  }
+  if (!json || typeof json !== "object") return { ok: false, reason: "empty_response" };
+
+  return { ok: true, heading: json.heading || null, body: json.body || null };
 }
