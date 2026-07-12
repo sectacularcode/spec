@@ -13,7 +13,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Lead Generation", "Awareness & Brand Building"],
     desc: "Bold ad-creative agency. Marquee tickers, work grids, service cards. Like Superside, VaynerMedia, Cohley.",
     layoutId: "editorial-bold", themeId: "midnight", accentColor: "#c8ff00",
-    themeAlternates: [{ themeId: "neon-mono", accentColor: "#39ff14" }, { themeId: "slate-amber", accentColor: "#d4901a" }],
+    themeAlternates: [{ themeId: "neon-mono", accentColor: "#39ff14" }, { themeId: "pure-minimal", accentColor: "#0a0a0a" }],
     headingFont: "Manrope", bodyFont: "Inter", imageCategory: "marketing",
     homepageSections: ["Hero", "Marquee", "Logo Carousel", "Service Cards", "Process", "Portfolio Carousel", "Stats", "Testimonials", "Blog", "CTA"],
     defaults: {
@@ -85,7 +85,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Direct Sales / E-commerce", "Community & Newsletter Growth"],
     desc: "Product-led brand. Top promo banner, full-bleed image hero, category grids. Built for fashion and consumer goods.",
     layoutId: "studio-modern", themeId: "pure-minimal", accentColor: "#0a0a0a",
-    themeAlternates: [{ themeId: "charcoal-blush", accentColor: "#3a2828" }, { themeId: "hot-pink-mono", accentColor: "#ff2d87" }],
+    themeAlternates: [{ themeId: "hot-pink-mono", accentColor: "#ff2d87" }, { themeId: "neon-mono", accentColor: "#39ff14" }],
     headingFont: "Inter", bodyFont: "Inter", imageCategory: "product",
     homepageSections: ["Promo Banner", "Hero", "Logo Carousel", "Service Cards", "Portfolio Carousel", "Testimonials", "Form"],
     defaults: {
@@ -119,7 +119,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Awareness & Brand Building", "Community & Newsletter Growth"],
     desc: "Magazine-style personal brand or lifestyle blog. Centered hero, featured articles, author bio. Like Poosh, Goop.",
     layoutId: "magazine", themeId: "linen-clay", accentColor: "#a64f30",
-    themeAlternates: [{ themeId: "sage-stone", accentColor: "#4a5d44" }, { themeId: "ash-copper", accentColor: "#b05e2a" }],
+    themeAlternates: [{ themeId: "sage-stone", accentColor: "#4a5d44" }, { themeId: "hot-pink-mono", accentColor: "#ff2d87" }],
     headingFont: "Playfair Display", bodyFont: "Inter", imageCategory: "lifestyle",
     homepageSections: ["Hero", "About", "Blog", "Leadership", "Portfolio Carousel", "Stats", "Form"],
     defaults: {
@@ -185,7 +185,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Lead Generation", "Awareness & Brand Building"],
     desc: "Solo expert positioning. Personal hero, services, work samples, FAQ. For writers, designers, devs, consultants flying solo.",
     layoutId: "studio-modern", themeId: "bone-ink", accentColor: "#3b3b58",
-    themeAlternates: [{ themeId: "ivory-violet", accentColor: "#6b4fa0" }, { themeId: "ash-copper", accentColor: "#b05e2a" }],
+    themeAlternates: [{ themeId: "ivory-violet", accentColor: "#6b4fa0" }, { themeId: "pure-minimal", accentColor: "#0a0a0a" }],
     headingFont: "Inter", bodyFont: "Inter", imageCategory: "marketing",
     homepageSections: ["Hero", "About", "Services", "Process", "Portfolio Carousel", "Testimonials", "FAQ", "Form"],
     defaults: {
@@ -324,7 +324,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Lead Generation", "Bookings & Reservations"],
     desc: "Hyper-local personal brand. Photo hero, recent listings, neighborhood expertise, big stats. Built for getting buyers and sellers.",
     layoutId: "apple-minimal", themeId: "bone-ink", accentColor: "#1f2940",
-    themeAlternates: [{ themeId: "sage-stone", accentColor: "#4a5d44" }, { themeId: "ash-copper", accentColor: "#b05e2a" }],
+    themeAlternates: [{ themeId: "pure-minimal", accentColor: "#0a0a0a" }, { themeId: "ash-copper", accentColor: "#b05e2a" }],
     headingFont: "Playfair Display", bodyFont: "Inter", imageCategory: "lifestyle",
     homepageSections: ["Hero", "Service Cards", "Process", "Portfolio Carousel", "Stats", "Leadership", "Testimonials", "FAQ", "Form"],
     defaults: {
@@ -495,8 +495,8 @@ export const WEBSITE_TEMPLATES = [
     industry: "Personal Trainers, Gyms, Fitness Coaches, Wellness",
     goals: ["Bookings & Reservations", "Lead Generation"],
     desc: "High-energy fitness brand. Transformation hero, programs, results, testimonials. Built for getting clients signed up.",
-    layoutId: "modern-tech", themeId: "charcoal-blush", accentColor: "#c8ff00",
-    themeAlternates: [{ themeId: "hot-pink-mono", accentColor: "#ff2d87" }, { themeId: "pure-minimal", accentColor: "#0a0a0a" }],
+    layoutId: "modern-tech", themeId: "pure-minimal", accentColor: "#c8ff00",
+    themeAlternates: [{ themeId: "hot-pink-mono", accentColor: "#ff2d87" }, { themeId: "sage-stone", accentColor: "#4a5d44" }],
     headingFont: "Manrope", bodyFont: "Inter", imageCategory: "lifestyle",
     homepageSections: ["Hero", "Service Cards", "Process", "Portfolio Carousel", "Stats", "Testimonials", "Pricing", "FAQ", "Form"],
     defaults: {
@@ -564,7 +564,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Applications & Sign-ups", "Lead Generation"],
     desc: "Student-outcome focused. Big curriculum, testimonials, results, instructor bio, pricing. Built for course enrollment.",
     layoutId: "modern-tech", themeId: "midnight", accentColor: "#7c3aed",
-    themeAlternates: [{ themeId: "neon-mono", accentColor: "#39ff14" }, { themeId: "slate-amber", accentColor: "#d4901a" }],
+    themeAlternates: [{ themeId: "neon-mono", accentColor: "#39ff14" }, { themeId: "editorial-dark", accentColor: "#c9a86a" }],
     headingFont: "Manrope", bodyFont: "Inter", imageCategory: "marketing",
     homepageSections: ["Hero", "Service Cards", "Process", "Portfolio Carousel", "Stats", "Leadership", "Testimonials", "Pricing", "FAQ", "Form"],
     defaults: {
@@ -600,7 +600,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Lead Generation", "Applications & Sign-ups"],
     desc: "24/7 fleet operation. Bold yellow CTAs, urgent hero, coast-to-coast service map. Like TopTech Fleet, Epika Fleet.",
     layoutId: "modern-tech", themeId: "midnight", accentColor: "#fbbf24",
-    themeAlternates: [{ themeId: "slate-amber", accentColor: "#d4901a" }, { themeId: "espresso", accentColor: "#e8c8a0" }],
+    themeAlternates: [{ themeId: "harbor-blue", accentColor: "#3b82c4" }, { themeId: "espresso", accentColor: "#e8c8a0" }],
     headingFont: "Manrope", bodyFont: "Inter", imageCategory: "trades",
     homepageSections: ["Promo Banner", "Hero", "Service Cards", "Process", "Stats", "Portfolio Carousel", "Logo Carousel", "Testimonials", "FAQ", "Form"],
     defaults: {
@@ -635,7 +635,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Bookings & Reservations", "Lead Generation"],
     desc: "Romantic event planner. Fullbleed hero, serif type, booking-led. Soft palette, couple-focused storytelling.",
     layoutId: "wedding-editorial", themeId: "linen-clay", accentColor: "#9c6b56",
-    themeAlternates: [{ themeId: "ivory-violet", accentColor: "#6b4fa0" }, { themeId: "sage-stone", accentColor: "#4a5d44" }],
+    themeAlternates: [{ themeId: "charcoal-blush", accentColor: "#3a2828" }, { themeId: "sage-stone", accentColor: "#4a5d44" }],
     headingFont: "Cormorant Garamond", bodyFont: "Inter", imageCategory: "lifestyle",
     homepageSections: ["Hero", "About", "Service Cards", "Process", "Portfolio Carousel", "Pricing", "Testimonials", "Leadership", "FAQ", "Form"],
     defaults: {
