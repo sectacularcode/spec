@@ -39,8 +39,10 @@ export default function SavedLibrary({ styles, loading, onApply, onDelete, statu
           </p>
         ) : (
           styles.map((style, i) => {
+            const realButton = Array.isArray(style.buttons) && style.buttons.length > 0 ? style.buttons[0] : null;
             const accentHex = style.colors?.brass;
-            const buttonTextColor = accentHex ? bestTextColor(accentHex, style.colors?.text || "#1a1a1a") : null;
+            const buttonBg = realButton?.background || accentHex;
+            const buttonTextColor = realButton?.textColor || (accentHex ? bestTextColor(accentHex, style.colors?.text || "#1a1a1a") : null);
             return (
             <div
               key={style.brand_name}
@@ -54,9 +56,11 @@ export default function SavedLibrary({ styles, loading, onApply, onDelete, statu
                   <div key={j} style={{ width: "18px", height: "18px", borderRadius: "4px", background: hex }} />
                 ))}
               </div>
-              {accentHex && (
-                <div style={{ flexShrink: 0, padding: "5px 10px", borderRadius: "4px", background: accentHex }}>
-                  <span style={{ fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: "10px", fontWeight: 600, color: buttonTextColor, whiteSpace: "nowrap" }}>Button</span>
+              {buttonBg && (
+                <div style={{ flexShrink: 0, padding: "5px 10px", borderRadius: "4px", background: buttonBg }}>
+                  <span style={{ fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: "10px", fontWeight: 600, color: buttonTextColor, whiteSpace: "nowrap" }}>
+                    {realButton?.name || "Button"}
+                  </span>
                 </div>
               )}
               <div style={{ flex: 1, minWidth: 0 }}>
