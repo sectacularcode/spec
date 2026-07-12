@@ -144,9 +144,9 @@ export function mkText(html, color, align) {
 }
 
 // Button widget. `label` is always plain copy — safe to escape unconditionally.
-export function mkButton(label, bgColor, textColor) {
+export function mkButton(label, bgColor, textColor, url) {
   return { id: nid(), elType: "widget", widgetType: "button", settings: {
-    text: he(label), link: { url: "#" },
+    text: he(label), link: { url: url || "#" },
     background_color: bgColor, button_text_color: textColor,
     border_radius: { unit:"px", top:"2", right:"2", bottom:"2", left:"2", isLinked:true },
     typography_typography: "custom", typography_font_family: "Inter",

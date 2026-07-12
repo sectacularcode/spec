@@ -137,8 +137,8 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   var lightCtxBtnText = (definedBtn && definedBtn.textColor) || bestTextColor(lightCtxBtnBg, text);
 
   // ── Shared helpers ────────────────────────────────────────────────────────
-  function makeOutlineBtn(label) {
-    var btn = mkButton(label, "transparent", warmWhite);
+  function makeOutlineBtn(label, url) {
+    var btn = mkButton(label, "transparent", warmWhite, url);
     btn.settings.border_border = "solid";
     btn.settings.border_width  = { unit: "px", top: "2", right: "2", bottom: "2", left: "2", isLinked: true };
     btn.settings.border_color  = warmWhite;
@@ -146,8 +146,8 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     return btn;
   }
 
-  function makeDualBtnRow(primaryLabel, secondaryLabel) {
-    return mkContainer([mkButton(primaryLabel, darkCtxBtnBg, darkCtxBtnText), makeOutlineBtn(secondaryLabel)], null, {
+  function makeDualBtnRow(primaryLabel, secondaryLabel, primaryUrl, secondaryUrl) {
+    return mkContainer([mkButton(primaryLabel, darkCtxBtnBg, darkCtxBtnText, primaryUrl), makeOutlineBtn(secondaryLabel, secondaryUrl)], null, {
       isInner: true, direction: "row", buttonRow: true, gap: "16", padY: "0", padX: "0", center: true
     });
   }
@@ -300,7 +300,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         mkSpacer(16),
         mkText(he(f.body), text),
         mkSpacer(24),
-        mkButton(contactCta, lightCtxBtnBg, lightCtxBtnText),
+        mkButton(contactCta, lightCtxBtnBg, lightCtxBtnText, brief.heroSecondaryUrl),
       ];
       // Always-on: content lives inside an inner box with min_height 508px,
       // matching CS Repair's confirmed production template. This is what
@@ -391,7 +391,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     ];
     if (withButton) {
       innerChildren.push(mkSpacer(20));
-      innerChildren.push(mkButton(contactCta, lightCtxBtnBg, lightCtxBtnText));
+      innerChildren.push(mkButton(contactCta, lightCtxBtnBg, lightCtxBtnText, brief.heroSecondaryUrl));
     }
     var innerBox = mkContainer(innerChildren, null, { isInner: true, padY: "30", padX: "30", full: true });
     innerBox.settings.min_height = { unit: "px", size: 420 };
@@ -414,7 +414,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkSpacer(12),
       body,
       mkSpacer(20),
-      mkButton(contactCta, lightCtxBtnBg, lightCtxBtnText),
+      mkButton(contactCta, lightCtxBtnBg, lightCtxBtnText, brief.heroSecondaryUrl),
     ], rowIdx % 2 === 0 ? warmWhite : bone, { padY: "56", center: true });
   }
 
@@ -558,7 +558,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkSpacer(12),
       mkText("<p style='text-align:center'>" + he(closingBody) + "</p>", "rgba(255,255,255,0.8)"),
       mkSpacer(28),
-      makeDualBtnRow(phoneCta, contactCta),
+      makeDualBtnRow(phoneCta, contactCta, brief.heroPrimaryUrl, brief.heroSecondaryUrl),
     ], dark, { padY: "80", center: true });
   }
 
@@ -656,7 +656,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var heroSubElE   = mkText("<p style='text-align:center'>" + he(heroSub) + "</p>", "rgba(255,255,255,0.85)");
     heroSubElE.settings.text_align = heroSubElE.settings.text_align_tablet = heroSubElE.settings.text_align_mobile = "center";
     var heroE = mkContainer(
-      [heroEyebrowE, mkSpacer(16), heroH1ElE, mkSpacer(20), heroSubElE, mkSpacer(32), makeDualBtnRow(phoneCta, contactCta)],
+      [heroEyebrowE, mkSpacer(16), heroH1ElE, mkSpacer(20), heroSubElE, mkSpacer(32), makeDualBtnRow(phoneCta, contactCta, brief.heroPrimaryUrl, brief.heroSecondaryUrl)],
       dark, { padY: "100", center: true }
     );
 
@@ -718,7 +718,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     heroSubEl.settings.text_align = heroSubEl.settings.text_align_tablet = heroSubEl.settings.text_align_mobile = "center";
 
     var heroA = mkContainer(
-      [heroEyebrow, mkSpacer(16), heroH1El, mkSpacer(20), heroSubEl, mkSpacer(32), makeDualBtnRow(phoneCta, contactCta)],
+      [heroEyebrow, mkSpacer(16), heroH1El, mkSpacer(20), heroSubEl, mkSpacer(32), makeDualBtnRow(phoneCta, contactCta, brief.heroPrimaryUrl, brief.heroSecondaryUrl)],
       dark, { padY: "100", center: true }
     );
 
@@ -756,7 +756,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkSpacer(12),
       mkText("<p style='text-align:center'>" + he(brief.hookStatement || "[What sets you apart in one line]") + "</p>", "rgba(255,255,255,0.7)"),
       mkSpacer(32),
-      mkButton(phoneCta, darkCtxBtnBg, darkCtxBtnText),
+      mkButton(phoneCta, darkCtxBtnBg, darkCtxBtnText, brief.heroPrimaryUrl),
     ], dark, { padY: "80", center: true });
 
     // Lead form section
@@ -856,7 +856,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     mkSpacer(16),
     mkText("<p style='text-align:center'>" + he(heroSub) + "</p>", "rgba(255,255,255,0.85)"),
     mkSpacer(32),
-    makeDualBtnRow(phoneCta, contactCta),
+    makeDualBtnRow(phoneCta, contactCta, brief.heroPrimaryUrl, brief.heroSecondaryUrl),
   ], dark, { padY: "80", center: true });
 
   // 3 outcome-focused benefit bullets
@@ -900,7 +900,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   var singleCtaSection = mkContainer([
     mkHeading(closingLine, warmWhite, "h2", { weight: 700, px: 40, align: "center" }),
     mkSpacer(24),
-    mkButton(phoneCta, darkCtxBtnBg, darkCtxBtnText),
+    mkButton(phoneCta, darkCtxBtnBg, darkCtxBtnText, brief.heroPrimaryUrl),
     mkSpacer(16),
     mkText("<p style='text-align:center;font-size:14px'>" + he(brief.formReassurance || "No sales team. A real reply within one business day.") + "</p>", "rgba(255,255,255,0.7)"),
   ], dark, { padY: "100", center: true });
