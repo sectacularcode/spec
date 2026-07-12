@@ -102,21 +102,24 @@ export default function StyleGuide({ role }) {
   // directly in the status pill -- so "why no Computed badge" is answerable
   // right there in the UI, no DevTools/Network tab needed for the common
   // cases. The raw reason still gets appended (truncated) after the label
-  // so a real code is always visible, per that being the actual ask.
+  // so a real code is always visible, per that being the actual ask. Covers
+  // both fonts and colors now -- same underlying Browserless pass reads
+  // Heading/Body/Background/Accent/Muted colors alongside heading/body
+  // fonts, so a single note covers whichever of those actually ran.
   function describeFontExtraction(debug) {
     if (!debug || !debug.attempted) return "";
-    if (debug.ok) return " Verified fonts by rendering the live page.";
+    if (debug.ok) return " Verified fonts and colors by rendering the live page.";
     const reason = debug.reason || "unknown";
     const code = reason.split(":")[0];
     const LABELS = {
-      no_api_key: "live font check isn't configured",
-      fetch_exception: "live font check couldn't connect",
+      no_api_key: "live style check isn't configured",
+      fetch_exception: "live style check couldn't connect",
       bad_status: "Browserless rejected the request",
-      bad_json: "live font check returned an unreadable response",
-      empty_response: "live font check returned nothing",
-      empty_fonts: "page rendered but no font was found",
+      bad_json: "live style check returned an unreadable response",
+      empty_response: "live style check returned nothing",
+      empty_result: "page rendered but nothing usable was found",
     };
-    const label = LABELS[code] || "live font check failed";
+    const label = LABELS[code] || "live style check failed";
     return ` (${label} — ${reason.slice(0, 150)})`;
   }
 

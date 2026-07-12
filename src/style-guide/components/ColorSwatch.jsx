@@ -19,6 +19,11 @@ const CONFIDENCE_STYLES = {
   // but they're different kinds of trustworthy and deserve an honest,
   // separate label rather than being folded into one bucket.
   sampled:   { background: "#E3F2FA", color: "#1D6FA5" },
+  // Also distinct from "sampled" -- this is a headless browser reading the
+  // real getComputedStyle() value automatically (Heading/Body text/
+  // Background), or a filtered heuristic read (Accent/Muted, from a
+  // styled link or footer), not a person confirming a pixel by eye.
+  computed:  { background: "#E0F5F1", color: "#0D7862" },
 };
 
 const TEMPLATE_ROLES = [

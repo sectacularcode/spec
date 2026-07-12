@@ -13,7 +13,7 @@ import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { logError } from "./_lib/errorLog.js";
 import { isSafeUrl, fetchPage, fetchCss } from "./_lib/safeFetch.js";
-import { extractComputedFonts } from "./_lib/computedFontStyle.js";
+import { extractComputedStyles } from "./_lib/computedFontStyle.js";
 
 const MAX_CSS_FETCHES = 10;
 
@@ -470,23 +470,32 @@ export default async function handler(req, res) {
     const fonts = buildFontSet(html, css);
 
     // Regex extraction hits a real structural ceiling on sites where fonts
-    // never appear as a literal "font-family: X" string in source CSS (Wix's
-    // proprietary rendering, Tailwind utility classes, CSS-variable font
-    // stacks) -- confirmed against real sites, not theoretical. Only spend a
-    // Browserless call when the cheap path didn't already confidently
-    // resolve both roles; a "confirmed" regex match (an explicit @font-face
-    // or Google Fonts declaration) is already trustworthy on its own.
-    const headingConfirmed = fonts.some(f => f.role === "Heading" && f.confidence === "confirmed");
-    const bodyConfirmed = fonts.some(f => f.role === "Body" && f.confidence === "confirmed");
+    // and colors never appear as literal strings in source CSS (Wix's
+    // proprietary rendering, Tailwind utility classes, CSS-variable font/
+    // color stacks) -- confirmed against real sites, not theoretical. Only
+    // spend a Browserless call when the cheap path didn't already
+    // confidently resolve every role; a "confirmed" match (an explicit
+    // @font-face/Google Fonts declaration, or a real --accent/--brand CSS
+    // variable) is already trustworthy on its own.
+    const headingFontConfirmed = fonts.some(f => f.role === "Heading" && f.confidence === "confirmed");
+    const bodyFontConfirmed = fonts.some(f => f.role === "Body" && f.confidence === "confirmed");
+    const headingColorConfirmed = colors.some(c => c.role === "Heading" && c.confidence === "confirmed");
+    const bodyColorConfirmed = colors.some(c => c.role === "Body text" && c.confidence === "confirmed");
+    const backgroundConfirmed = colors.some(c => c.role === "Background" && c.confidence === "confirmed");
+    const accentConfirmed = colors.some(c => c.role === "Accent" && c.confidence === "confirmed");
+    const mutedConfirmed = colors.some(c => c.role === "Muted" && c.confidence === "confirmed");
+    const needsComputedPass = !headingFontConfirmed || !bodyFontConfirmed
+      || !headingColorConfirmed || !bodyColorConfirmed || !backgroundConfirmed || !accentConfirmed || !mutedConfirmed;
+
     // Diagnostic surfaced in the response itself (prefixed _ to signal it's
     // not a stable field) -- lets this be checked directly in the browser's
     // Network tab instead of needing server logs pulled for every "why no
     // computed badge" question. attempted:false means the regex pass already
-    // confidently resolved both roles, so Browserless was never called --
+    // confidently resolved everything, so Browserless was never called --
     // not a failure, just unnecessary.
     let fontExtractionDebug = { attempted: false };
-    if (!headingConfirmed || !bodyConfirmed) {
-      const computed = await extractComputedFonts(base.href);
+    if (needsComputedPass) {
+      const computed = await extractComputedStyles(base.href);
       fontExtractionDebug = { attempted: true, ok: computed.ok, reason: computed.ok ? undefined : computed.reason };
       if (!computed.ok) {
         // Not an errorLog.js entry -- that table is explicitly scoped to
@@ -494,14 +503,14 @@ export default async function handler(req, res) {
         // "the enhancement path degraded gracefully" outcomes. Plain
         // console.error for Vercel's function logs is the right channel;
         // _fontExtractionDebug above is the primary diagnostic surface.
-        console.error("extract-style: computed font extraction failed:", computed.reason);
+        console.error("extract-style: computed style extraction failed:", computed.reason);
       } else {
         // Once the Browserless call has already fired (because at least one
-        // role wasn't confirmed), upgrading the OTHER role too costs
-        // nothing extra and "computed" is strictly more trustworthy than
-        // "confirmed" anyway -- a regex match assumes the declared rule is
-        // what's actually applied, computed style is what the browser
-        // actually resolved. Not gated per-field on purpose.
+        // role wasn't confirmed), upgrading every OTHER unambiguous role too
+        // costs nothing extra and "computed" is strictly more trustworthy
+        // than "confirmed" anyway for fields with one obvious DOM target --
+        // a regex match assumes the declared rule is what's actually
+        // applied, computed style is what the browser actually resolved.
         if (computed.heading) {
           const idx = fonts.findIndex(f => f.role === "Heading");
           const entry = { role: "Heading", name: computed.heading, confidence: "computed" };
@@ -512,6 +521,28 @@ export default async function handler(req, res) {
           const entry = { role: "Body", name: computed.body, confidence: "computed" };
           if (idx >= 0) fonts[idx] = entry; else fonts.splice(1, 0, entry);
         }
+
+        // upsertColor's forceUpgrade flag distinguishes the two kinds of
+        // color role here: Heading/Body text/Background map onto one
+        // unambiguous DOM target (h1, body, body background) same as
+        // fonts, so computed always wins once it's available. Accent and
+        // Muted are heuristic reads (first meaningfully-styled link,
+        // footer text) -- a real, deliberately-named --accent/--brand CSS
+        // variable is a stronger, more intentional signal than a
+        // heuristic guess, so those only fill in a missing/estimated role
+        // and never overwrite an already-confirmed one.
+        function upsertColor(role, hex, forceUpgrade) {
+          if (!hex) return;
+          const idx = colors.findIndex(c => c.role === role);
+          if (idx >= 0 && colors[idx].confidence === "confirmed" && !forceUpgrade) return;
+          const entry = { role, hex, confidence: "computed", custom: false };
+          if (idx >= 0) colors[idx] = entry; else colors.push(entry);
+        }
+        upsertColor("Heading", computed.headingColor, true);
+        upsertColor("Body text", computed.bodyColor, true);
+        upsertColor("Background", computed.backgroundColor, true);
+        upsertColor("Accent", computed.accentColor, false);
+        upsertColor("Muted", computed.mutedColor, false);
       }
     }
 
