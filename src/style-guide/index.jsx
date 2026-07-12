@@ -3,10 +3,12 @@ import { authHeaders, formatErrorMessage } from "../utils/api.js";
 import ColorSwatch from "./components/ColorSwatch.jsx";
 import ScreenshotSampler from "./components/ScreenshotSampler.jsx";
 import FontCard from "./components/FontCard.jsx";
+import ButtonEditor from "./components/ButtonEditor.jsx";
 import SavedLibrary from "./components/SavedLibrary.jsx";
 import StyleDocument from "./components/StyleDocument.jsx";
 import { parseStyleGuideHtml } from "./utils/export.js";
 import { ConfirmDialog } from "../components/ConfirmDialog.jsx";
+import { bestTextColor } from "../utils/contrast.js";
 
 // Spec's 8 template color roles <-> the fixed keys brand_styles actually
 // stores (see api/brand-styles.js's COLOR_KEYS). Custom/"Additional"
@@ -58,6 +60,7 @@ export default function StyleGuide({ role }) {
   const [brandName, setBrandName] = useState("");
   const [colors, setColors] = useState([]);
   const [fonts, setFonts] = useState([]);
+  const [buttons, setButtons] = useState([]);
   const [sourceUrl, setSourceUrl] = useState("");
 
   const [analyzing, setAnalyzing] = useState(false);
@@ -174,6 +177,7 @@ export default function StyleGuide({ role }) {
       setBrandName(parsed.brandName || "");
       setColors(Array.isArray(parsed.colors) ? parsed.colors : []);
       setFonts(Array.isArray(parsed.fonts) ? parsed.fonts : []);
+      setButtons(Array.isArray(parsed.buttons) ? parsed.buttons : []);
       setSourceUrl(parsed.sourceUrl || "");
       setUploadStatus("Loaded from " + file.name + ".");
     } catch (e) {
@@ -256,6 +260,23 @@ export default function StyleGuide({ role }) {
     setFonts(fs => [...fs, { custom: true, role: "", name: "", confidence: "confirmed" }]);
   }
 
+  function updateButton(index, updated) {
+    setButtons(bs => bs.map((b, i) => i === index ? updated : b));
+  }
+  function removeButton(index) {
+    setButtons(bs => bs.filter((_, i) => i !== index));
+  }
+  // Seeds a real starting point from whatever's already in the Colors
+  // grid (Accent for the fill, a contrast-checked pick for the text)
+  // rather than a blank or arbitrary default -- still just a starting
+  // point, both fields are freely editable right after.
+  function addButton() {
+    const accentHex = colors.find(c => c.role === "Accent")?.hex;
+    const background = accentHex || "#B45309";
+    const textColor = bestTextColor(background, colors.find(c => c.role === "Body text")?.hex || "#1a1a1a");
+    setButtons(bs => [...bs, { name: "", background, textColor }]);
+  }
+
   // Clearing an analyzed/edited section is real potential data loss --
   // re-typing 8 colors by hand isn't "trivial" the way removing one row
   // is (which is why individual swatch/font removal above doesn't
@@ -264,23 +285,27 @@ export default function StyleGuide({ role }) {
   function requestClearAll() { setPendingClear("all"); }
   function requestClearColors() { setPendingClear("colors"); }
   function requestClearFonts() { setPendingClear("fonts"); }
+  function requestClearButtons() { setPendingClear("buttons"); }
 
   function confirmClear() {
     if (pendingClear === "all") {
-      setBrandName(""); setUrl(""); setColors([]); setFonts([]); setSourceUrl("");
+      setBrandName(""); setUrl(""); setColors([]); setFonts([]); setButtons([]); setSourceUrl("");
       setAnalyzeStatus(""); setUploadStatus(""); setSaveStatus("");
     } else if (pendingClear === "colors") {
       setColors([]);
     } else if (pendingClear === "fonts") {
       setFonts([]);
+    } else if (pendingClear === "buttons") {
+      setButtons([]);
     }
     setPendingClear(null);
   }
 
   const clearDialogCopy = {
-    all: { title: "Start a new style guide?", message: "This clears the brand name, colors, and fonts on this page. Anything already saved to the library is unaffected.", confirmLabel: "Start new" },
+    all: { title: "Start a new style guide?", message: "This clears the brand name, colors, fonts, and buttons on this page. Anything already saved to the library is unaffected.", confirmLabel: "Start new" },
     colors: { title: "Clear all colors?", message: "Removes every color shown here, including anything found by analyzing a site. This only affects this page -- nothing saved to the library is touched.", confirmLabel: "Clear colors" },
     fonts: { title: "Clear all fonts?", message: "Removes every font shown here. This only affects this page -- nothing saved to the library is touched.", confirmLabel: "Clear fonts" },
+    buttons: { title: "Clear all buttons?", message: "Removes every button defined here. This only affects this page -- nothing saved to the library is touched.", confirmLabel: "Clear buttons" },
   };
 
   // Custom ("Additional colors") entries and any font beyond Heading/Body
@@ -306,6 +331,7 @@ export default function StyleGuide({ role }) {
           brand_name: brandName.trim(),
           colors: colorsToKeyedObject(colors),
           fonts: fontsToKeyedObject(fonts),
+          buttons,
           source_url: sourceUrl || undefined,
         }),
       });
@@ -324,6 +350,9 @@ export default function StyleGuide({ role }) {
         if (data.droppedColorKeys?.length) {
           notes.push(`⚠ ${data.droppedColorKeys.join(", ")} color${data.droppedColorKeys.length > 1 ? "s" : ""} weren't valid hex values and didn't save`);
         }
+        if (data.droppedButtonCount) {
+          notes.push(`⚠ ${data.droppedButtonCount} button${data.droppedButtonCount > 1 ? "s" : ""} had an invalid color and didn't save`);
+        }
         const noteText = notes.length ? ` (${notes.join("; ")}.)` : "";
         setSaveStatus(`Saved as ${data.brand_name}'s style guide.${noteText}`);
         loadSavedStyles();
@@ -340,6 +369,7 @@ export default function StyleGuide({ role }) {
     setBrandName(style.brand_name);
     setColors(keyedObjectToColors(style.colors));
     setFonts(keyedObjectToFonts(style.fonts));
+    setButtons(Array.isArray(style.buttons) ? style.buttons : []);
     setSourceUrl(style.source_url || "");
     setSaveStatus(`Loaded ${style.brand_name}'s style guide for editing.`);
     setTimeout(() => setSaveStatus(""), 4000);
@@ -455,6 +485,25 @@ export default function StyleGuide({ role }) {
       </Card>
 
       <Card>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+          <CardLabel noMargin>Buttons {buttons.length > 0 ? `(${buttons.length})` : ""}</CardLabel>
+          {buttons.length > 0 && <button onClick={requestClearButtons} style={clearLink}>Clear buttons</button>}
+        </div>
+        <p style={{ fontSize: "12px", color: "#6B7280", margin: "0 0 14px" }}>
+          A background and text color you pick directly -- not guessed from "Accent," which could mean an icon, a hover state, or a button. Add 1-3 real button styles.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "14px" }}>
+          {buttons.map((b, i) => (
+            <ButtonEditor key={i} button={b} onChange={updated => updateButton(i, updated)} onRemove={() => removeButton(i)} />
+          ))}
+          <button onClick={addButton} style={{ ...addTile, minHeight: "180px" }}>
+            <span style={{ fontSize: "20px", lineHeight: 1 }}>+</span>
+            <span>Add button</span>
+          </button>
+        </div>
+      </Card>
+
+      <Card>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
           <CardLabel noMargin>Fonts {fonts.length > 0 ? `(${fonts.length})` : ""}</CardLabel>
           {fonts.length > 0 && <button onClick={requestClearFonts} style={clearLink}>Clear fonts</button>}
@@ -474,7 +523,7 @@ export default function StyleGuide({ role }) {
         </div>
       </Card>
 
-      {colors.length + fonts.length > 0 && (
+      {colors.length + fonts.length + buttons.length > 0 && (
         <div style={{
           display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px",
           background: "#FEF3E2", border: "1px solid #FBEBD1", borderRadius: "10px", padding: "16px 20px", marginBottom: "20px",
@@ -484,7 +533,7 @@ export default function StyleGuide({ role }) {
             <p style={{ fontSize: "11px", color: "#6B7280", margin: 0 }}>Brand name, swatches, and full type specimens on one shareable page.</p>
           </div>
           <button
-            onClick={() => { setDocumentSource({ brandName, sourceUrl, colors, fonts }); setView("document"); }}
+            onClick={() => { setDocumentSource({ brandName, sourceUrl, colors, fonts, buttons }); setView("document"); }}
             style={{ ...primaryBtn, flexShrink: 0 }}
           >
             View brand sheet
