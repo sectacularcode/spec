@@ -623,7 +623,17 @@ Return ONLY the new ${fieldName} value as plain text.`;
     red: "red", crimson: "red", scarlet: "red", maroon: "red",
     orange: "orange", amber: "orange", rust: "orange", coral: "orange", tangerine: "orange",
     brown: "orange", tan: "orange", bronze: "orange", copper: "orange", terracotta: "orange", clay: "orange",
-    yellow: "yellow", gold: "yellow", mustard: "yellow",
+    // "gold" is deliberately mapped to orange, not yellow -- every real
+    // gold/champagne/bronze accent color already used in this app's own
+    // theme library (editorial-dark #c9a86a, onyx-bronze #b87333,
+    // slate-amber #d4901a) computes to "orange" via hexHueFamily's hue
+    // bucketing, not "yellow". Leaving "gold" mapped to yellow meant the AI
+    // accurately describing its own accent color as "gold" was flagged as
+    // a mismatch against the real orange-bucketed hex every time, silently
+    // overwriting specific reasoning with the generic "keyed to orange
+    // tones" fallback -- confirmed as the source of that boilerplate text
+    // repeating verbatim across otherwise-unrelated custom projects.
+    yellow: "yellow", gold: "orange", mustard: "yellow",
     green: "green", emerald: "green", sage: "green", olive: "green", forest: "green", mint: "green", sewer: "green",
     teal: "teal", turquoise: "teal", cyan: "teal", aqua: "teal",
     blue: "blue", navy: "blue", cobalt: "blue", indigo: "blue",
