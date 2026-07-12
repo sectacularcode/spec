@@ -1,8 +1,8 @@
 // One color swatch card. Two modes:
 // - Template role (color.custom is false): one of Spec's 8 fixed roles
 //   (Heading, Body text, Accent, Accent — hover, Background, Dark panel,
-//   Muted, Text on dark), shown with a Confirmed/Derived/Estimated badge
-//   reflecting how the value was actually produced -- never invented.
+//   Muted, Text on dark), shown with a Confirmed/Derived/Estimated/Sampled
+//   badge reflecting how the value was actually produced -- never invented.
 // - Custom (color.custom is true): a color that doesn't map to any of the
 //   8 roles. Free-text name AND usage note, both optional, both editable
 //   by the person -- never constrained to a fixed dropdown, since a real
@@ -13,6 +13,12 @@ const CONFIDENCE_STYLES = {
   confirmed: { background: "#E8F3E9", color: "#2F6E3E" },
   derived:   { background: "#EEEEF8", color: "#5450A3" },
   estimated: { background: "#FEF3E2", color: "#B45309" },
+  // Distinct from "confirmed" on purpose -- confirmed means a real CSS
+  // signal matched algorithmically, sampled means a person looked at the
+  // actual rendered pixel and picked it themselves. Both are trustworthy,
+  // but they're different kinds of trustworthy and deserve an honest,
+  // separate label rather than being folded into one bucket.
+  sampled:   { background: "#E3F2FA", color: "#1D6FA5" },
 };
 
 const TEMPLATE_ROLES = [

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { authHeaders, formatErrorMessage } from "../utils/api.js";
 import ColorSwatch from "./components/ColorSwatch.jsx";
+import ScreenshotSampler from "./components/ScreenshotSampler.jsx";
 import FontCard from "./components/FontCard.jsx";
 import SavedLibrary from "./components/SavedLibrary.jsx";
 import StyleDocument from "./components/StyleDocument.jsx";
@@ -141,6 +142,18 @@ export default function StyleGuide({ role }) {
   }
   function addColor() {
     setColors(cs => [...cs, { custom: true, hex: "#6B6B6B", name: "", usage: "" }]);
+  }
+  // From ScreenshotSampler -- a person clicked an actual pixel in an
+  // uploaded image and confirmed it, which is why this gets its own
+  // "sampled" confidence rather than being folded into "confirmed"
+  // (confirmed means a real CSS signal matched algorithmically; this is a
+  // different, arguably stronger kind of real, and the badge should say so).
+  function addSampledColor(hex, role) {
+    if (role === "Custom") {
+      setColors(cs => [...cs, { custom: true, hex, name: "", usage: "", confidence: "sampled" }]);
+    } else {
+      setColors(cs => [...cs, { role, hex, confidence: "sampled", custom: false }]);
+    }
   }
 
   function updateFont(index, updated) {
@@ -296,6 +309,8 @@ export default function StyleGuide({ role }) {
           <span style={{ ...secondaryBtn, flexShrink: 0 }}>Choose file</span>
         </label>
       </Card>
+
+      <ScreenshotSampler onSample={addSampledColor} />
 
       <Card>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
