@@ -119,12 +119,15 @@ export const eTxtRaw = (html, color = "#666", font = "Inter", size = 16, align =
   };
 };
 
-export const eBtn = (text, link = "#", bg = "#000", color = "#fff", font = "Inter", align = "left") => ({
-  id: uid(), elType: "widget", widgetType: "button", elements: [],
-  settings: {
+// variant "solid" (default) is the original fully-backward-compatible behavior.
+// variant "outline" renders a transparent-fill button with a border, for pairing
+// a lower-emphasis Secondary CTA next to a solid Primary one. borderColor defaults
+// to the text color, matching buttonVariations().secondary's {border, text} pair.
+export const eBtn = (text, link = "#", bg = "#000", color = "#fff", font = "Inter", align = "left", variant = "solid", borderColor = color) => {
+  const settings = {
     text, link: { url: link, is_external: "", nofollow: "" }, align,
     align_tablet: align, align_mobile: align,
-    button_text_color: color, background_color: bg,
+    button_text_color: color, background_color: variant === "outline" ? "transparent" : bg,
     typography_typography: "custom", typography_font_family: font,
     typography_font_size: { unit: "px", size: 12, sizes: [] },
     typography_font_size_mobile: { unit: "px", size: 11, sizes: [] },
@@ -133,8 +136,25 @@ export const eBtn = (text, link = "#", bg = "#000", color = "#fff", font = "Inte
     button_padding: { unit: "px", top: "16", right: "32", bottom: "16", left: "32", isLinked: false },
     button_padding_mobile: { unit: "px", top: "14", right: "24", bottom: "14", left: "24", isLinked: false },
     border_radius: { unit: "px", top: "0", right: "0", bottom: "0", left: "0", isLinked: true },
-  },
-});
+  };
+  if (variant === "outline") {
+    settings.border_border = "solid";
+    settings.border_width = { unit: "px", top: "2", right: "2", bottom: "2", left: "2", isLinked: true };
+    settings.border_color = borderColor;
+  }
+  return { id: uid(), elType: "widget", widgetType: "button", elements: [], settings };
+};
+
+// Row wrapper for pairing 1-2 buttons together (e.g. Primary + Secondary CTA).
+// Unlike eRow's usual multi-column use, buttons are pushed in directly (no eCol),
+// so each keeps its natural content width instead of stretching to a column width.
+// Wraps to stacked full-width on mobile via the same flex_direction_mobile as eRow.
+export const eBtnRow = (align = "left", gap = 16) => {
+  const row = eRow(gap);
+  row.settings.flex_justify_content = align === "center" ? "center" : align === "right" ? "flex-end" : "flex-start";
+  row.settings.flex_align_items = "center";
+  return row;
+};
 
 export const eSpacer = (h = 40) => ({
   id: uid(), elType: "widget", widgetType: "spacer", elements: [],

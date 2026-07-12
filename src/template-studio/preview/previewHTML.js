@@ -7,7 +7,7 @@ import { he } from "../utils/htmlEscape.js";
 import { getLayout, eyebrowText } from "../constants/layouts.js";
 import { SVG } from "../utils/svg.js";
 import { imgOrPlaceholder } from "../utils/images.js";
-import { luminance, textOn, mutedTextOn, buttonOn } from "../utils/colors.js";
+import { luminance, textOn, mutedTextOn, buttonOn, buttonVariations } from "../utils/colors.js";
 
 export function previewHTML(page, brand) {
   // Sanitize all brand string fields before any HTML insertion
@@ -66,6 +66,17 @@ export function previewHTML(page, brand) {
       const v = layout.heroVariant || "left-standard";
       const eyebrow = eyebrowText(layout.eyebrowStyle, page.heroEyebrow || page.pageType || "Welcome");
       const btnTxtColor = textOn(ac);
+      // Hero CTA markup: single Primary link, or Primary + Secondary pair when
+      // brand.cta2 has a value -- keeps the live preview matching what buildPageJSON.js
+      // and buildDiviPage.js now actually export instead of only ever showing Primary.
+      const heroVars = buttonVariations(pc, ac);
+      const heroCtaHtml = (align = "left", hPad = 36, primaryBg = heroVars.primary.bg, primaryText = heroVars.primary.text, secText = heroVars.secondary.text, secBorder = heroVars.secondary.border) => {
+        const primaryBtn = `<a data-edit="brand.cta1" href="#contact" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:${primaryText};background:${primaryBg};padding:18px ${hPad}px;text-decoration:none;display:inline-block;font-weight:600;">${brand.cta1}</a>`;
+        if (!brand.cta2) return primaryBtn;
+        const secondaryBtn = `<a data-edit="brand.cta2" href="#contact" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:${secText};background:transparent;border:2px solid ${secBorder};padding:16px ${hPad - 2}px;text-decoration:none;display:inline-block;font-weight:600;">${brand.cta2}</a>`;
+        const justify = align === "center" ? "center" : align === "right" ? "flex-end" : "flex-start";
+        return `<div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:${justify};">${primaryBtn}${secondaryBtn}</div>`;
+      };
 
       // INTERIOR PAGE HEADER — clean text-only header for non-homepage pages
       const interiorTypes = ["About / Studio", "Services", "Work / Portfolio", "Case Study", "Blog Index", "Blog Post", "Blog Post — Recipe", "Pricing", "Press / Awards", "Careers", "Contact", "Leadership / Founder"];
@@ -112,7 +123,7 @@ export function previewHTML(page, brand) {
               <p data-edit="page.heroEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 28px;">${eyebrow}</p>
               <h1 data-edit="page.heroHeading" style="font-family:'${hf}',sans-serif;font-size:clamp(40px,6vw,${layout.heroHeading}px);color:${headingColor};margin:0 0 28px;font-weight:700;line-height:1.05;letter-spacing:-0.02em;">${heading}</h1>
               <p data-edit="page.heroSubhead" style="font-family:'${bf}',sans-serif;font-size:clamp(15px,1.4vw,18px);color:${ts};margin:0 0 40px;line-height:1.7;">${subhead}</p>
-              <a data-edit="brand.cta1" href="#contact" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:${btnTxtColor};background:${ac};padding:18px 36px;text-decoration:none;display:inline-block;font-weight:600;">${brand.cta1}</a>
+              ${heroCtaHtml("left")}
             </div>
             <div style="aspect-ratio:4/5;background:url('${heroBg}') center/cover no-repeat;border-radius:${radius};"></div>
           </div>
@@ -125,7 +136,7 @@ export function previewHTML(page, brand) {
           <p data-edit="page.heroEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 32px;">${eyebrow}</p>
           <h1 data-edit="page.heroHeading" style="font-family:'${hf}',serif;font-size:clamp(44px,7vw,${layout.heroHeading}px);color:${headingColor};margin:0 auto 32px;font-weight:400;line-height:1.1;max-width:1200px;font-style:italic;">${heading}</h1>
           <p data-edit="page.heroSubhead" style="font-family:'${bf}',sans-serif;font-size:clamp(16px,1.5vw,20px);color:${ts};max-width:680px;margin:0 auto 48px;line-height:1.7;">${subhead}</p>
-          <a data-edit="brand.cta1" href="#contact" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:${btnTxtColor};background:${ac};padding:18px 40px;text-decoration:none;display:inline-block;font-weight:600;">${brand.cta1}</a>
+          ${heroCtaHtml("center", 40)}
         </section>`;
       }
 
@@ -134,7 +145,7 @@ export function previewHTML(page, brand) {
         return `<section style="background:${pc};padding:clamp(40px,6vw,80px) clamp(24px,8vw,100px) clamp(60px,10vw,120px);">
           <p data-edit="page.heroEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 60px;">${eyebrow}</p>
           <h1 data-edit="page.heroHeading" style="font-family:'${hf}',sans-serif;font-size:clamp(56px,12vw,${layout.heroHeading}px);color:${headingColor};margin:0 0 60px;font-weight:900;line-height:0.95;letter-spacing:-0.04em;text-transform:uppercase;">${heading}</h1>
-          <a data-edit="brand.cta1" href="#contact" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:${btnTxtColor};background:${ac};padding:18px 36px;text-decoration:none;display:inline-block;font-weight:600;">${brand.cta1}</a>
+          ${heroCtaHtml("left")}
         </section>`;
       }
 
@@ -146,7 +157,7 @@ export function previewHTML(page, brand) {
             <p data-edit="page.heroEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#ffffff;margin:0 0 24px;opacity:0.9;">${eyebrow}</p>
             <h1 data-edit="page.heroHeading" style="font-family:'${hf}',sans-serif;font-size:clamp(40px,7vw,${layout.heroHeading}px);color:#ffffff;margin:0 0 24px;font-weight:700;line-height:1.05;max-width:900px;">${heading}</h1>
             <p data-edit="page.heroSubhead" style="font-family:'${bf}',sans-serif;font-size:clamp(15px,1.4vw,18px);color:rgba(255,255,255,0.85);max-width:600px;margin:0 0 40px;line-height:1.6;">${subhead}</p>
-            <a data-edit="brand.cta1" href="#contact" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#0a0a0a;background:#ffffff;padding:18px 36px;text-decoration:none;display:inline-block;font-weight:600;">${brand.cta1}</a>
+            ${heroCtaHtml("left", 36, "#ffffff", "#0a0a0a", "#ffffff", "#ffffff")}
           </div>
         </section>`;
       }
@@ -160,7 +171,7 @@ export function previewHTML(page, brand) {
           <p data-edit="page.heroEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 32px;">${eyebrow}</p>
           <h1 data-edit="page.heroHeading" style="font-family:'${hf}',serif;font-size:clamp(48px,8vw,${layout.heroHeading}px);color:${headingColor};margin:0 0 32px;font-weight:400;line-height:1.05;max-width:1100px;">${heading}</h1>
           <p data-edit="page.heroSubhead" style="font-family:'${bf}',sans-serif;font-size:clamp(15px,1.4vw,19px);color:${ts};max-width:640px;margin:0 0 56px;line-height:1.7;">${subhead}</p>
-          <div><a data-edit="brand.cta1" href="#contact" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:${btnTxtColor};background:${ac};padding:18px 36px;text-decoration:none;display:inline-block;">${brand.cta1}</a></div>
+          <div>${heroCtaHtml(layout.heroAlign)}</div>
         </div>
       </section>`;
     }
@@ -732,7 +743,7 @@ export function previewHTML(page, brand) {
         h2[style*="margin:0 0 80px"]{margin-bottom:24px !important;}
         h2[style*="margin:0 0 60px"]{margin-bottom:20px !important;}
         h2[style*="margin:0 0 40px"]{margin-bottom:16px !important;}
-        a[style*="display:inline-block"]{white-space:normal !important;text-align:center !important;width:100% !important;box-sizing:border-box !important;}box-sizing:border-box !important;
+        a[style*="display:inline-block"]{white-space:normal !important;text-align:center !important;width:100% !important;box-sizing:border-box !important;}
         nav{padding:14px 20px !important;}
         .cta-grid{grid-template-columns:1fr !important;}
         [style*="min-height:80vh"],[style*="min-height: 80vh"]{min-height:50vh !important;}

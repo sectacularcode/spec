@@ -1,7 +1,7 @@
 import { THEMES } from "../constants/themes.js";
 import { imgOrPlaceholder } from "../utils/images.js";
 import { he } from "../utils/htmlEscape.js";
-import { textOn, mutedTextOn, buttonOn } from "../utils/colors.js";
+import { textOn, mutedTextOn, buttonOn, buttonVariations } from "../utils/colors.js";
 // Builds Divi shortcode format for a page (secondary export format)
 // Returns a plain string of Divi [et_pb_*] shortcodes.
 export function buildDiviPage(page, brand) {
@@ -39,8 +39,13 @@ export function buildDiviPage(page, brand) {
   };
   const dTxt = (html, color = ts, font = bf, size = 16, align = "left") =>
     `[et_pb_text text_font="${font}||||" text_text_color="${color}" ${dFontAttr("text_font_size", size, 0.95, 0.85, 13)} text_orientation="${align}"]<p>${he(html)}</p>[/et_pb_text]`;
-  const dBtn = (text, link = "#", bg = ac, color = textOn(bg), align = "left") =>
-    `[et_pb_button button_text="${he(text)}" button_url="${link}" button_alignment="${align}" custom_button="on" button_text_color="${color}" button_bg_color="${bg}" button_font="${bf}|700|on|on|||||" button_letter_spacing="2px" button_text_size="11px" custom_padding="16px|36px|16px|36px|true|true" custom_padding_tablet="14px|28px|14px|28px|true|true" custom_padding_phone="12px|24px|12px|24px|true|true" custom_padding_last_edited="on|desktop"][/et_pb_button]`;
+  // variant "solid" (default) is the original behavior. variant "outline" renders
+  // a transparent-fill bordered button, for pairing a Secondary CTA next to Primary.
+  const dBtn = (text, link = "#", bg = ac, color = textOn(bg), align = "left", variant = "solid", borderColor = color) => {
+    const bgAttr = variant === "outline" ? `button_bg_color="rgba(0,0,0,0)"` : `button_bg_color="${bg}"`;
+    const borderAttr = variant === "outline" ? `button_border_width="2px" button_border_color="${borderColor}"` : "";
+    return `[et_pb_button button_text="${he(text)}" button_url="${link}" button_alignment="${align}" custom_button="on" button_text_color="${color}" ${bgAttr} ${borderAttr} button_font="${bf}|700|on|on|||||" button_letter_spacing="2px" button_text_size="11px" custom_padding="16px|36px|16px|36px|true|true" custom_padding_tablet="14px|28px|14px|28px|true|true" custom_padding_phone="12px|24px|12px|24px|true|true" custom_padding_last_edited="on|desktop"][/et_pb_button]`;
+  };
   const dImg = (url, alt = "") =>
     `[et_pb_image src="${url}" alt="${he(alt)}" align="center"][/et_pb_image]`;
   const dDiv = (h = 40) =>
@@ -70,11 +75,21 @@ export function buildDiviPage(page, brand) {
   page.sections.forEach(s => {
     if (s === "Hero") {
       const img = imgOrPlaceholder(page.heroImage, `${brand.name}-hero`, 1600, 1000, brand.imageCategory);
+      // Primary-only when brand.cta2 is blank (unchanged); Primary + Secondary side by
+      // side in a two-column row when it's filled in, same pairing logic as the
+      // Elementor builder so Divi export doesn't silently drop the Secondary CTA text.
+      const heroVars = buttonVariations(pc, ac);
+      const heroBtns = brand.cta2
+        ? dRow("1_2,1_2",
+            dCol("1_2", dBtn(brand.cta1, "#contact", heroVars.primary.bg, heroVars.primary.text, "left")) +
+            dCol("1_2", dBtn(brand.cta2, "#contact", "transparent", heroVars.secondary.text, "left", "outline", heroVars.secondary.border))
+          )
+        : dBtn(brand.cta1, "#contact", heroVars.primary.bg, heroVars.primary.text, "left");
       const inner = dRow("4_4", dCol("4_4",
         dTxt(`●  STUDIO`, ac, bf, 11, "left") + dDiv(24) +
         dHead(page.heroHeading || brand.tagline, "h1", hc, hf, 84, "left") + dDiv(28) +
         dTxt(page.heroSubhead || (brand.keyMessages || "").split(".")[0], ts, bf, 18, "left") + dDiv(48) +
-        dBtn(brand.cta1, "#contact", ac, textOn(ac), "left")
+        heroBtns
       ));
       sections.push(`[et_pb_section fb_built="1" background_color="${pc}" background_image="${img}" background_blend="overlay" ${dPad(160, 20, 160, 20)}]${inner}[/et_pb_section]`);
     }

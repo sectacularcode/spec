@@ -1,8 +1,8 @@
 import { THEMES } from "../constants/themes.js";
 import { getLayout, eyebrowText } from "../constants/layouts.js";
-import { isLight, textOn, mutedTextOn, buttonOn } from "../utils/colors.js";
+import { isLight, textOn, mutedTextOn, buttonOn, buttonVariations } from "../utils/colors.js";
 import { imgOrPlaceholder } from "../utils/images.js";
-import { eSection, eRow, eCol, eHead, eTxt, eTxtRaw, eBtn, eSpacer, eImg, eIconBox, eCounter, eAccordion, eSocial, eVideo, eCarousel, eForm, eShortcode, eHTML, eMarquee } from "./helpers.js";
+import { eSection, eRow, eCol, eHead, eTxt, eTxtRaw, eBtn, eBtnRow, eSpacer, eImg, eIconBox, eCounter, eAccordion, eSocial, eVideo, eCarousel, eForm, eShortcode, eHTML, eMarquee } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
 // Builds Elementor JSON for a single page based on its section list and brand settings.
 // Iterates the page.sections array and routes each section type to the right widget builder.
@@ -44,6 +44,21 @@ export function buildPageJSON(page, brand) {
       const heroImg = imgOrPlaceholder(page.heroImage, `${brand.name}-hero`, 1200, 900, brand.imageCategory);
       const v = layout.heroVariant || "left-standard";
 
+      // Hero CTA: single Primary button, or Primary + Secondary pair when brand.cta2
+      // has a real value (that field already existed in the intake UI but was never
+      // wired into generation until now). Secondary uses the same buttonVariations()
+      // pairing already relied on elsewhere, so it stays contrast-safe automatically.
+      const heroVars = buttonVariations(pc, ac);
+      const heroCta = (align, primaryBg = heroVars.primary.bg, primaryText = heroVars.primary.text, secText = heroVars.secondary.text, secBorder = heroVars.secondary.border) => {
+        if (!brand.cta2) return eBtn(brand.cta1, "#contact", primaryBg, primaryText, bf, align);
+        const row = eBtnRow(align);
+        push(row,
+          eBtn(brand.cta1, "#contact", primaryBg, primaryText, bf, align),
+          eBtn(brand.cta2, "#contact", "transparent", secText, bf, align, "outline", secBorder),
+        );
+        return row;
+      };
+
       // CASE STUDY — editorial dark header with accent rule + metadata strip
       // Intercept before layout variant handling so all Case Study pages get this treatment
       if (page.pageType === "Case Study") {
@@ -73,7 +88,7 @@ export function buildPageJSON(page, brand) {
           eSpacer(24),
           eTxt(subhead, bColor, bf, 18, "left"),
           eSpacer(40),
-          eBtn(brand.cta1, "#contact", ac, textOn(ac), bf, "left"),
+          heroCta("left"),
         );
         const colImg = eCol(40);
         const img = eImg(heroImg, "Hero");
@@ -94,7 +109,7 @@ export function buildPageJSON(page, brand) {
           eSpacer(28),
           eTxt(subhead, bColor, bf, 20, "center"),
           eSpacer(48),
-          eBtn(brand.cta1, "#contact", ac, textOn(ac), bf, "center"),
+          heroCta("center"),
         );
         sections.push(sec);
       } else if (v === "minimal-text") {
@@ -105,7 +120,7 @@ export function buildPageJSON(page, brand) {
           eSpacer(60),
           eHead(heading, "h1", hColor, hf, layout.heroHeading, "left"),
           eSpacer(60),
-          eBtn(brand.cta1, "#contact", ac, textOn(ac), bf, "left"),
+          heroCta("left"),
         );
         sections.push(sec);
       } else if (v === "fullbleed-overlay") {
@@ -124,7 +139,7 @@ export function buildPageJSON(page, brand) {
           eSpacer(24),
           eTxt(subhead, "rgba(255,255,255,0.85)", bf, 18, "left"),
           eSpacer(40),
-          eBtn(brand.cta1, "#contact", "#ffffff", "#0a0a0a", bf, "left"),
+          heroCta("left", "#ffffff", "#0a0a0a", "#ffffff", "#ffffff"),
         );
         sections.push(sec);
       } else {
@@ -145,7 +160,7 @@ export function buildPageJSON(page, brand) {
           eSpacer(24),
           eTxt(subhead, bColor, bf, 18, layout.heroAlign),
           eSpacer(40),
-          eBtn(brand.cta1, "#contact", ac, textOn(ac), bf, layout.heroAlign),
+          heroCta(layout.heroAlign),
         );
         sections.push(sec);
       }
