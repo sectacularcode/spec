@@ -829,8 +829,17 @@ Rules:
         const detail = data?.error || data?.anthropic_error?.message || JSON.stringify(data).slice(0, 200);
         throw new Error(`API ${res.status}: ${detail}`);
       }
-      const text = data.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
-      const clean = text.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+      // Named responseText, not text -- describeMySite already has an
+      // outer `const text` (the resolved user input, declared above) in
+      // the SAME function. A second `const text` in this try block would
+      // shadow it for every reference to the bare name `text` anywhere in
+      // this block, including the earlier one building the userPrompt --
+      // since const/let resolve to the nearest enclosing block's
+      // declaration regardless of source order, that earlier reference
+      // would sit in the TDZ until this line ran, throwing exactly
+      // "Cannot access 'text' before initialization" on every call.
+      const responseText = data.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
+      const clean = responseText.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
       // Drop this result if a newer request has been issued since (e.g. the
       // user clicked "Regenerate" again before this one finished) — otherwise
       // a slow first response can overwrite a fresher second one.
