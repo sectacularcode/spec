@@ -4,7 +4,7 @@ import { useState } from "react";
 // regardless of source (manual entry, Style Guide URL-scrape, or a
 // previous upload) -- brand_styles doesn't distinguish, and neither does
 // this list; source_url just renders differently per row when present.
-export default function SavedLibrary({ styles, loading, onApply, onView, onDownload }) {
+export default function SavedLibrary({ styles, loading, onApply }) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -54,8 +54,6 @@ export default function SavedLibrary({ styles, loading, onApply, onView, onDownl
                 </p>
               </div>
               <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
-                <button onClick={() => onDownload(style)} style={secondaryBtn}>Download PDF</button>
-                <button onClick={() => onView(style)} style={secondaryBtn}>View document</button>
                 <button onClick={() => onApply(style)} style={applyBtn}>Apply</button>
               </div>
             </div>
