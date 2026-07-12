@@ -89,9 +89,19 @@ export default async function handler(req, res) {
       const brandName = req.query.brand_name;
       if (brandName) {
         if (!validText(brandName, 200)) return res.status(400).json({ error: "Invalid brand_name" });
+        // Case-insensitive: "Northbound Supply Co." and "northbound supply
+        // co." are the same saved style. A Manifest import or a Style
+        // Guide URL-scrape supplies brand.name however the source cased
+        // it, which won't reliably match whatever casing a human typed by
+        // hand in Brief to Blueprint -- so an exact match here silently
+        // missed real matches. ORDER BY + LIMIT 1 is a deliberate
+        // safety net: if any case-only duplicate rows exist from before
+        // this fix, this deterministically returns the most recently
+        // updated one rather than an arbitrary row.
         const { rows } = await sql`
           SELECT brand_name, colors, fonts, updated_at FROM brand_styles
-          WHERE user_id = ${userId} AND brand_name = ${brandName}
+          WHERE user_id = ${userId} AND LOWER(brand_name) = LOWER(${brandName})
+          ORDER BY updated_at DESC
           LIMIT 1
         `;
         return res.status(200).json({ style: rows[0] || null });
@@ -115,19 +125,51 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "Invalid colors/fonts payload" });
       }
 
-      await sql`
-        INSERT INTO brand_styles (user_id, brand_name, colors, fonts, updated_at)
-        VALUES (${userId}, ${brand_name.trim()}, ${cleanColors}, ${cleanFonts}, NOW())
-        ON CONFLICT (user_id, brand_name)
-        DO UPDATE SET colors = ${cleanColors}, fonts = ${cleanFonts}, updated_at = NOW()
+      const trimmedName = brand_name.trim();
+
+      // Case-insensitive upsert, done at the application layer rather than
+      // a DB-level case-insensitive unique constraint. A constraint-based
+      // fix would require a migration that fails outright if any
+      // case-only duplicate rows already exist in production -- and there
+      // was no way to confirm the live table is clean before writing this.
+      // A plain SELECT-then-update-or-insert sidesteps that risk entirely:
+      // it works correctly regardless of what's already in the table, and
+      // any pre-existing duplicates self-heal naturally the next time
+      // either one gets saved again, rather than needing a one-time
+      // cleanup pass run against prod.
+      const { rows: existing } = await sql`
+        SELECT brand_name FROM brand_styles
+        WHERE user_id = ${userId} AND LOWER(brand_name) = LOWER(${trimmedName})
+        ORDER BY updated_at DESC
+        LIMIT 1
       `;
-      return res.status(200).json({ ok: true, brand_name: brand_name.trim(), colors: cleanColors, fonts: cleanFonts });
+
+      if (existing.length > 0) {
+        // Latest save wins for the display casing too, same as it already
+        // does for colors/fonts -- consistent with the rest of this
+        // handler rather than a special "keep the old casing" carve-out.
+        await sql`
+          UPDATE brand_styles
+          SET brand_name = ${trimmedName}, colors = ${cleanColors}, fonts = ${cleanFonts}, updated_at = NOW()
+          WHERE user_id = ${userId} AND brand_name = ${existing[0].brand_name}
+        `;
+      } else {
+        await sql`
+          INSERT INTO brand_styles (user_id, brand_name, colors, fonts, updated_at)
+          VALUES (${userId}, ${trimmedName}, ${cleanColors}, ${cleanFonts}, NOW())
+        `;
+      }
+      return res.status(200).json({ ok: true, brand_name: trimmedName, colors: cleanColors, fonts: cleanFonts });
     }
 
     if (req.method === "DELETE") {
       const brandName = req.query.brand_name;
       if (!validText(brandName, 200)) return res.status(400).json({ error: "Invalid brand_name" });
-      await sql`DELETE FROM brand_styles WHERE user_id = ${userId} AND brand_name = ${brandName}`;
+      // Same case-insensitive matching as GET/POST -- an exact-match
+      // delete against a case-mismatched name would silently no-op and
+      // leave the row behind, looking like the delete succeeded when it
+      // did nothing.
+      await sql`DELETE FROM brand_styles WHERE user_id = ${userId} AND LOWER(brand_name) = LOWER(${brandName})`;
       return res.status(200).json({ ok: true });
     }
 
