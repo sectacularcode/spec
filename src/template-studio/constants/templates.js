@@ -920,7 +920,12 @@ export const BLANK_BRAND = {
   primaryKeywords: "",
   brandColors: { background: "", accent: "", text: "", card: "" },
   templateId: "",
-  imageCategory: "editorial",
+  // "default" (generic office/workspace) is the safe universal fallback --
+  // "editorial" specifically means beauty/skincare/fashion photography in
+  // IMAGE_LIBRARY, so it silently mismatched every isCustom project (any
+  // AI-generated niche the app has no real template for) until the AI
+  // brief-recommendation flow started supplying its own imageCategory.
+  imageCategory: "default",
   themeId: "pure-minimal",
   themeMode: "light",
   layoutId: "editorial-minimal",

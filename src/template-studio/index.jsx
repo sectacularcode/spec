@@ -721,6 +721,7 @@ Return ONLY a valid JSON object — no preamble, no markdown fences:
   "headingFont": "Manrope|Inter|Playfair Display|Cormorant Garamond|Yeseva One|Italiana|Oswald|Space Mono|Fraunces",
   "bodyFont": "Inter|DM Sans|Lato|Manrope|Space Mono",
   "fontReason": "1 short sentence",
+  "imageCategory": "ONLY used when isCustom is true (ignored otherwise) — one of: marketing|production|product|lifestyle|editorial|portrait|trades|automotive|default. Pick whichever real category is the closest visual match to the theme. \"editorial\" is beauty/skincare/fashion photography specifically — do NOT use it as a generic catch-all. If nothing genuinely fits (hobby, fandom, collector, pop-culture, or any theme with no real visual overlap to these categories), use \"default\" rather than forcing a mismatch.",
   "goals": ["array of 1-3 goals from this list — Lead Generation, Direct Sales / E-commerce, Bookings & Reservations, Awareness & Brand Building, Community & Newsletter Growth, Applications & Sign-ups, Donations & Fundraising"],
   "outcome": "1 specific sentence",
   "primaryKeywords": "5 comma-separated keywords",
@@ -851,11 +852,21 @@ Rules:
         sections: r.sections && r.sections.length ? r.sections : page.sections,
       };
       // Layer AI brand settings
+      const VALID_IMAGE_CATEGORIES = ["marketing", "production", "product", "lifestyle", "editorial", "portrait", "trades", "automotive", "default"];
       brand = {
         ...brand,
         layoutId: r.layoutId || brand.layoutId,
         headingFont: r.headingFont || brand.headingFont,
         bodyFont: r.bodyFont || brand.bodyFont,
+        // isCustom projects have no real template.imageCategory to fall back
+        // on -- without this, BLANK_BRAND's default ("editorial" = beauty/
+        // skincare/fashion photography) silently applies to every custom
+        // theme regardless of what it actually is. Validate against the
+        // real IMAGE_LIBRARY categories rather than trusting the AI's
+        // string outright -- an unrecognized value falls through to
+        // "default" (generic office/workspace) instead of leaking through
+        // to something equally wrong.
+        imageCategory: VALID_IMAGE_CATEGORIES.includes(r.imageCategory) ? r.imageCategory : "default",
         goals: Array.isArray(r.goals) && r.goals.length ? r.goals : (brand.goals || []),
         goal: Array.isArray(r.goals) && r.goals.length ? r.goals[0] : brand.goal,
         outcome: r.outcome || brand.outcome,
