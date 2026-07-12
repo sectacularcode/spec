@@ -389,6 +389,8 @@ export default function StyleGuide({ role }) {
         <input value={brandName} onChange={e => setBrandName(e.target.value)} placeholder="e.g. Glow Society" style={nameInput} />
       </Card>
 
+      <ScreenshotSampler onSample={addSampledColor} existingHexes={colors.map(c => c.hex)} />
+
       <Card>
         <CardLabel>Website URL</CardLabel>
         <p style={{ fontSize: "12px", color: "#6B7280", margin: "-8px 0 14px" }}>
@@ -404,8 +406,6 @@ export default function StyleGuide({ role }) {
           </div>
         )}
       </Card>
-
-      <ScreenshotSampler onSample={addSampledColor} existingHexes={colors.map(c => c.hex)} />
 
       <Card>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
