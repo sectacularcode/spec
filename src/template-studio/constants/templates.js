@@ -531,7 +531,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Donations & Fundraising", "Awareness & Brand Building", "Community & Newsletter Growth"],
     desc: "Mission-led organization. Impact hero, programs, leadership, stories, donation form. Built for engagement and giving.",
     layoutId: "editorial-minimal", themeId: "sage-stone", accentColor: "#4a5d44",
-    themeAlternates: [{ themeId: "linen-clay", accentColor: "#a64f30" }, { themeId: "bone-ink", accentColor: "#1f2940" }],
+    themeAlternates: [{ themeId: "linen-clay", accentColor: "#a64f30" }, { themeId: "hot-pink-mono", accentColor: "#ff2d87" }],
     headingFont: "Playfair Display", bodyFont: "Inter", imageCategory: "lifestyle",
     homepageSections: ["Hero", "About", "Service Cards", "Stats", "Leadership", "Portfolio Carousel", "Testimonials", "Form"],
     defaults: {
