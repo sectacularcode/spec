@@ -24,6 +24,13 @@ export default function StyleDocument({ brandName, sourceUrl, colors, fonts, but
   const headingFont = fonts.find(f => f.role === "Heading") || fonts[0];
   const bodyFont = fonts.find(f => f.role === "Body") || fonts[1];
   const otherFonts = fonts.filter(f => f !== headingFont && f !== bodyFont);
+  // A site with only one detectable font (or a body-tag CSS selector that
+  // never matched -- see fontsToKeyedObject's comment in index.jsx for
+  // the same root cause) leaves bodyFont undefined. That shouldn't ALSO
+  // erase the Eyebrow/Body specimens and the entire Button section, which
+  // is what happened when they were both gated behind {bodyFont && ...}.
+  const textFont = bodyFont || headingFont;
+  const buttonFontFamily = textFont?.name ? `'${textFont.name}', sans-serif` : undefined;
 
   // The extracted "Heading" color has no memory of what background it sat
   // on at the source -- a light heading pulled from a dark hero section
@@ -115,57 +122,66 @@ export default function StyleDocument({ brandName, sourceUrl, colors, fonts, but
               </div>
             )}
 
-            {headingFont && bodyFont && <div style={{ borderTop: "1px solid #ececec", margin: "32px 0" }} />}
+            {headingFont && textFont && <div style={{ borderTop: "1px solid #ececec", margin: "32px 0" }} />}
 
-            {bodyFont && (
+            {textFont && (
               <div style={{ marginBottom: "36px" }}>
-                <div style={fontMeta}><span style={fontRoleLabel}>Body</span><span style={fontNameLabel}>{bodyFont.name}</span></div>
+                {bodyFont && (
+                  <div style={fontMeta}><span style={fontRoleLabel}>Body</span><span style={fontNameLabel}>{bodyFont.name}</span></div>
+                )}
                 <div style={typeRow}>
                   <div style={typeLabel}>Eyebrow</div>
-                  <p style={{ fontSize: "12px", letterSpacing: "0.12em", textTransform: "uppercase", color: "#8a8a8a", margin: 0, fontFamily: `'${bodyFont.name}', sans-serif`, fontWeight: 600 }}>Eyebrow / label</p>
+                  <p style={{ fontSize: "12px", letterSpacing: "0.12em", textTransform: "uppercase", color: "#8a8a8a", margin: 0, fontFamily: `'${textFont.name}', sans-serif`, fontWeight: 600 }}>Eyebrow / label</p>
                 </div>
                 <div style={typeRow}>
                   <div style={typeLabel}>Body<small style={typeLabelSmall}>15px</small></div>
-                  <p style={{ fontSize: "15px", lineHeight: 1.65, color: "#3a3a3a", margin: 0, maxWidth: "520px", fontFamily: `'${bodyFont.name}', sans-serif` }}>
+                  <p style={{ fontSize: "15px", lineHeight: 1.65, color: "#3a3a3a", margin: 0, maxWidth: "520px", fontFamily: `'${textFont.name}', sans-serif` }}>
                     This is what body copy looks like in the extracted font, set at a normal reading size across a couple of full sentences.
                   </p>
                 </div>
-                <div style={typeRow}>
-                  <div style={typeLabel}>Button{buttons.length !== 1 ? "s" : ""}</div>
-                  <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-                    {buttons.length > 0 ? (
-                      buttons.map((b, i) => (
-                        <div key={i} style={buttonDemoPanel(lightPanelHex)}>
-                          {b.name && <p style={buttonDemoLabel(false)}>{b.name}</p>}
-                          <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: b.background || "#333" }}>
-                            <span style={{ fontFamily: `'${bodyFont.name}', sans-serif`, fontWeight: 600, fontSize: "13px", color: b.textColor || "#fff", letterSpacing: "0.02em" }}>Call to action</span>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      // No explicit buttons defined (older saved style, or
-                      // just not built yet) -- fall back to the auto
-                      // Accent-fill button shown on both a light and dark
-                      // surface, same as before this feature existed.
-                      <>
-                        <div style={buttonDemoPanel(lightPanelHex)}>
-                          <p style={buttonDemoLabel(false)}>On light</p>
-                          <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: accentHex }}>
-                            <span style={{ fontFamily: `'${bodyFont.name}', sans-serif`, fontWeight: 600, fontSize: "13px", color: buttonTextColor, letterSpacing: "0.02em" }}>Call to action</span>
-                          </div>
-                        </div>
-                        <div style={buttonDemoPanel(darkPanelDemoHex)}>
-                          <p style={buttonDemoLabel(true)}>On dark</p>
-                          <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: accentHex }}>
-                            <span style={{ fontFamily: `'${bodyFont.name}', sans-serif`, fontWeight: 600, fontSize: "13px", color: buttonTextColor, letterSpacing: "0.02em" }}>Call to action</span>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
               </div>
             )}
+
+            {/* Button demo -- deliberately its own block now, not nested
+                inside the Body font section above. The button preview is
+                the whole point of this feature; it shouldn't disappear
+                just because extraction didn't find a distinct body font. */}
+            <div style={{ marginBottom: "36px" }}>
+              <div style={typeRow}>
+                <div style={typeLabel}>Button{buttons.length !== 1 ? "s" : ""}</div>
+                <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+                  {buttons.length > 0 ? (
+                    buttons.map((b, i) => (
+                      <div key={i} style={buttonDemoPanel(lightPanelHex)}>
+                        {b.name && <p style={buttonDemoLabel(false)}>{b.name}</p>}
+                        <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: b.background || "#333" }}>
+                          <span style={{ fontFamily: buttonFontFamily, fontWeight: 600, fontSize: "13px", color: b.textColor || "#fff", letterSpacing: "0.02em" }}>Call to action</span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    // No explicit buttons defined (older saved style, or
+                    // just not built yet) -- fall back to the auto
+                    // Accent-fill button shown on both a light and dark
+                    // surface, same as before this feature existed.
+                    <>
+                      <div style={buttonDemoPanel(lightPanelHex)}>
+                        <p style={buttonDemoLabel(false)}>On light</p>
+                        <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: accentHex }}>
+                          <span style={{ fontFamily: buttonFontFamily, fontWeight: 600, fontSize: "13px", color: buttonTextColor, letterSpacing: "0.02em" }}>Call to action</span>
+                        </div>
+                      </div>
+                      <div style={buttonDemoPanel(darkPanelDemoHex)}>
+                        <p style={buttonDemoLabel(true)}>On dark</p>
+                        <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: accentHex }}>
+                          <span style={{ fontFamily: buttonFontFamily, fontWeight: 600, fontSize: "13px", color: buttonTextColor, letterSpacing: "0.02em" }}>Call to action</span>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
 
             {otherFonts.map(f => (
               <div key={f.role + f.name} style={{ marginBottom: "36px" }}>
