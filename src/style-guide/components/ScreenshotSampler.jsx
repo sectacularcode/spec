@@ -22,18 +22,31 @@ const TEMPLATE_ROLES = [
   "Background", "Dark panel", "Muted", "Text on dark",
 ];
 
-const MAX_DISPLAY_WIDTH = 900; // keeps large screenshots from overflowing
-                                 // the panel; still plenty of resolution
-                                 // to click individual UI elements precisely
+const MAX_DISPLAY_WIDTH = 900; // caps the image's BUFFER size on load, not
+                                 // its on-screen size -- keeps memory/canvas
+                                 // cost sane on huge screenshots while zoom
+                                 // (below) handles on-screen precision.
+
+const ZOOM_LEVELS = [1, 1.5, 2, 3, 4, 6, 8]; // multiples of the fitted buffer size
 
 export default function ScreenshotSampler({ onSample }) {
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [fileName, setFileName] = useState("");
-  const [pending, setPending] = useState(null); // { hex, role } | null -- the most recent click, not yet added
+  const [bufferSize, setBufferSize] = useState({ width: 0, height: 0 });
+  const [zoomIndex, setZoomIndex] = useState(0);
   const [error, setError] = useState("");
   const [isDragging, setIsDragging] = useState(false);
+
+  // Every click adds to this queue instead of firing onSample immediately,
+  // so a person can sample several colors from the image in a row -- all
+  // reviewed and role-assigned right here -- then push them to the Colors
+  // grid up top in one shot, instead of round-tripping to the top of the
+  // page and back for every single color.
+  const [pendingList, setPendingList] = useState([]); // [{ id, hex, role }]
+
+  const zoom = ZOOM_LEVELS[zoomIndex];
 
   // The canvas is ALWAYS mounted (visibility toggled via CSS, never
   // conditionally rendered) so canvasRef.current is guaranteed to exist
@@ -59,16 +72,21 @@ export default function ScreenshotSampler({ onSample }) {
           setError("Couldn't prepare the canvas for that image -- try again.");
           return;
         }
-        // The canvas's own pixel buffer IS the displayed size here (no
-        // separate CSS scale factor to track) -- simplest way to keep
-        // click coordinates and pixel data in the same space.
-        const scale = Math.min(1, MAX_DISPLAY_WIDTH / img.width);
-        canvas.width = Math.round(img.width * scale);
-        canvas.height = Math.round(img.height * scale);
+        // The canvas's pixel BUFFER is capped at MAX_DISPLAY_WIDTH so we're
+        // not holding a giant retina screenshot in memory. On-screen size
+        // is controlled separately via CSS width/height driven by `zoom`,
+        // so zooming in never touches or re-reads the source image.
+        const fitScale = Math.min(1, MAX_DISPLAY_WIDTH / img.width);
+        const w = Math.round(img.width * fitScale);
+        const h = Math.round(img.height * fitScale);
+        canvas.width = w;
+        canvas.height = h;
         const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, w, h);
+        setBufferSize({ width: w, height: h });
         setImageLoaded(true);
-        setPending(null);
+        setZoomIndex(0);
+        setPendingList([]);
       };
       img.onerror = () => setError("Couldn't load that image -- try a different file.");
       img.src = reader.result;
@@ -82,32 +100,59 @@ export default function ScreenshotSampler({ onSample }) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
-    // rect can differ from the canvas's own pixel buffer if CSS further
-    // constrains its display width -- scaling the click point back into
-    // buffer space keeps the sampled pixel accurate either way.
+    // rect reflects the CURRENT on-screen size, which changes with zoom;
+    // canvas.width/height is the fixed pixel buffer set on load. Scaling
+    // the click point by that ratio keeps the sampled pixel accurate at
+    // any zoom level, including zoomed-in clicks on a single-pixel-wide
+    // font stroke that would be impossible to hit at 100%.
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-    const px = Math.floor((e.clientX - rect.left) * scaleX);
-    const py = Math.floor((e.clientY - rect.top) * scaleY);
+    const px = Math.min(canvas.width - 1, Math.max(0, Math.floor((e.clientX - rect.left) * scaleX)));
+    const py = Math.min(canvas.height - 1, Math.max(0, Math.floor((e.clientY - rect.top) * scaleY)));
     const ctx = canvas.getContext("2d");
     const [r, g, b] = ctx.getImageData(px, py, 1, 1).data;
     const hex = "#" + [r, g, b].map(v => v.toString(16).padStart(2, "0")).join("").toUpperCase();
-    setPending({ hex, role: pending?.role || "Accent" });
+
+    setPendingList(list => {
+      const usedRoles = new Set(list.map(p => p.role));
+      const nextRole = TEMPLATE_ROLES.find(role => !usedRoles.has(role)) || "Custom";
+      return [...list, { id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, hex, role: nextRole }];
+    });
   }
 
-  function confirmAdd() {
-    if (!pending) return;
-    onSample(pending.hex, pending.role);
-    setPending(null);
+  function updatePendingRole(id, role) {
+    setPendingList(list => list.map(p => (p.id === id ? { ...p, role } : p)));
+  }
+
+  function removePending(id) {
+    setPendingList(list => list.filter(p => p.id !== id));
+  }
+
+  function confirmAddAll() {
+    if (pendingList.length === 0) return;
+    pendingList.forEach(p => onSample(p.hex, p.role));
+    setPendingList([]);
   }
 
   function reset() {
     setImageLoaded(false);
     setFileName("");
-    setPending(null);
+    setBufferSize({ width: 0, height: 0 });
+    setZoomIndex(0);
+    setPendingList([]);
     setError("");
     setIsDragging(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  function zoomIn() {
+    setZoomIndex(i => Math.min(ZOOM_LEVELS.length - 1, i + 1));
+  }
+  function zoomOut() {
+    setZoomIndex(i => Math.max(0, i - 1));
+  }
+  function resetZoom() {
+    setZoomIndex(0);
   }
 
   function handleDragOver(e) {
@@ -115,13 +160,11 @@ export default function ScreenshotSampler({ onSample }) {
     e.stopPropagation();
     if (!isDragging) setIsDragging(true);
   }
-
   function handleDragLeave(e) {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
   }
-
   function handleDrop(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -129,6 +172,9 @@ export default function ScreenshotSampler({ onSample }) {
     const file = e.dataTransfer.files?.[0];
     handleFile(file);
   }
+
+  const displayWidth = Math.round(bufferSize.width * zoom);
+  const displayHeight = Math.round(bufferSize.height * zoom);
 
   return (
     <div style={{ background: "#fff", border: "1px solid #DDE0E6", borderRadius: "10px", padding: "20px", marginBottom: "20px" }}>
@@ -141,7 +187,7 @@ export default function ScreenshotSampler({ onSample }) {
         )}
       </div>
       <p style={{ fontSize: "12px", color: "#6B7280", margin: "0 0 14px" }}>
-        Upload a screenshot, a design export, or a photo of a brand guide, then click anywhere on it to pick up the exact color at that spot.
+        Upload a screenshot, a design export, or a photo of a brand guide. Zoom in to click precisely, sample as many colors as you want, then add them all at once.
       </p>
 
       {/* Dropzone: hidden via CSS once an image is loaded, never unmounted
@@ -169,30 +215,53 @@ export default function ScreenshotSampler({ onSample }) {
       {/* Canvas is ALWAYS in the DOM -- just hidden until an image is
           loaded -- so the ref is available the first time handleFile runs. */}
       <div style={{ display: imageLoaded ? "block" : "none" }}>
-        <canvas
-          ref={canvasRef}
-          onClick={handleCanvasClick}
-          style={{ maxWidth: "100%", height: "auto", display: "block", borderRadius: "6px", border: "1px solid #DDE0E6", cursor: "crosshair" }}
-        />
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+          <button onClick={zoomOut} disabled={zoomIndex === 0} style={{ ...ghostBtn, ...zoomBtnStyle, opacity: zoomIndex === 0 ? 0.4 : 1 }}>−</button>
+          <span style={{ fontSize: "12px", color: "#6B7280", minWidth: "42px", textAlign: "center" }}>{Math.round(zoom * 100)}%</span>
+          <button onClick={zoomIn} disabled={zoomIndex === ZOOM_LEVELS.length - 1} style={{ ...ghostBtn, ...zoomBtnStyle, opacity: zoomIndex === ZOOM_LEVELS.length - 1 ? 0.4 : 1 }}>+</button>
+          {zoomIndex > 0 && <button onClick={resetZoom} style={clearLink}>Reset zoom</button>}
+          <span style={{ fontSize: "11px", color: "#B0B0B0", marginLeft: "auto" }}>Zoom in for thin text or small details</span>
+        </div>
+
+        <div style={{ overflow: "auto", maxHeight: "480px", border: "1px solid #DDE0E6", borderRadius: "6px", background: "#F5F5F5" }}>
+          <canvas
+            ref={canvasRef}
+            onClick={handleCanvasClick}
+            style={{ display: "block", cursor: "crosshair", width: displayWidth ? `${displayWidth}px` : "auto", height: displayHeight ? `${displayHeight}px` : "auto" }}
+          />
+        </div>
         <p style={{ fontSize: "11px", color: "#B0B0B0", margin: "8px 0 0" }}>{fileName}</p>
 
-        {pending && (
-          <div style={{
-            display: "flex", alignItems: "center", gap: "10px", marginTop: "14px",
-            padding: "12px 14px", background: "#FEF3E2", border: "1px solid #FBEBD1", borderRadius: "8px",
-          }}>
-            <div style={{ width: "32px", height: "32px", borderRadius: "6px", background: pending.hex, border: "1px solid rgba(0,0,0,0.1)", flexShrink: 0 }} />
-            <span style={{ fontFamily: "'Inter', monospace", fontSize: "13px", fontWeight: 600, color: "#09090B" }}>{pending.hex}</span>
-            <select
-              value={pending.role}
-              onChange={e => setPending(p => ({ ...p, role: e.target.value }))}
-              style={{ ...inputStyle, width: "auto", flex: 1, marginBottom: 0 }}
-            >
-              {TEMPLATE_ROLES.map(role => <option key={role} value={role}>{role}</option>)}
-              <option value="Custom">Custom color</option>
-            </select>
-            <button onClick={confirmAdd} style={primaryBtn}>Add</button>
-            <button onClick={() => setPending(null)} style={ghostBtn}>Cancel</button>
+        {pendingList.length > 0 && (
+          <div style={{ marginTop: "14px", padding: "12px 14px", background: "#FEF3E2", border: "1px solid #FBEBD1", borderRadius: "8px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+              <span style={{ fontSize: "12px", fontWeight: 600, color: "#09090B" }}>
+                {pendingList.length} color{pendingList.length === 1 ? "" : "s"} sampled
+              </span>
+              <button onClick={() => setPendingList([])} style={ghostBtn}>Clear all</button>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "12px" }}>
+              {pendingList.map(p => (
+                <div key={p.id} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div style={{ width: "28px", height: "28px", borderRadius: "6px", background: p.hex, border: "1px solid rgba(0,0,0,0.1)", flexShrink: 0 }} />
+                  <span style={{ fontFamily: "'Inter', monospace", fontSize: "12px", fontWeight: 600, color: "#09090B", width: "70px", flexShrink: 0 }}>{p.hex}</span>
+                  <select
+                    value={p.role}
+                    onChange={e => updatePendingRole(p.id, e.target.value)}
+                    style={{ ...inputStyle, flex: 1, marginBottom: 0 }}
+                  >
+                    {TEMPLATE_ROLES.map(role => <option key={role} value={role}>{role}</option>)}
+                    <option value="Custom">Custom color</option>
+                  </select>
+                  <button onClick={() => removePending(p.id)} style={ghostBtn}>✕</button>
+                </div>
+              ))}
+            </div>
+
+            <button onClick={confirmAddAll} style={{ ...primaryBtn, width: "100%" }}>
+              Add {pendingList.length} color{pendingList.length === 1 ? "" : "s"} to grid
+            </button>
           </div>
         )}
       </div>
@@ -222,6 +291,10 @@ const primaryBtn = {
 const ghostBtn = {
   height: "30px", padding: "0 12px", background: "transparent", color: "#6B7280", border: "none",
   fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: "12px", fontWeight: 600, cursor: "pointer",
+};
+const zoomBtnStyle = {
+  border: "1px solid #DDE0E6", borderRadius: "6px", width: "28px", height: "28px", padding: 0,
+  display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px",
 };
 const clearLink = {
   background: "none", border: "none", color: "#B45309", fontFamily: "'Be Vietnam Pro', sans-serif",
