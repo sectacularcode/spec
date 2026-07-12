@@ -1,10 +1,19 @@
 import { mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
+import { bestTextColor } from "../../utils/contrast.js";
 
 export function buildHomePage(C, brief, inspoHint, patterns) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
+  // Real button colors from the Style Guide's Buttons section when the
+  // brand has one defined. Falls back to exactly the same brassDp fill
+  // this always used when it doesn't -- only the TEXT color changes, from
+  // a blind hardcoded white to a computed-safe one, since brassDp was
+  // never guaranteed dark enough for white text to actually read against.
+  var definedBtn = brief.buttons && brief.buttons[0];
+  var btnBg = (definedBtn && definedBtn.background) || brassDp;
+  var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, text || "#1a1a1a");
   var heroPattern = (patterns && patterns.hero) || "centered-bold";
 
   // ── HERO — pattern-driven ──────────────────────────────────────────────────
@@ -19,7 +28,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
       mkText(he(brief.heroSubhead || "Your subheadline here."), warmWhite),
       mkSpacer(40),
       mkContainer([
-        mkButton(brief.heroCta1 || "See the work", brassDp, "#ffffff"),
+        mkButton(brief.heroCta1 || "See the work", btnBg, btnText),
         mkButton(brief.heroCta2 || "See pricing", "rgba(0,0,0,0)", warmWhite),
       ], null, { direction: "row", gap: "16", padY: "0", isInner: true, buttonRow: true }),
     ], null, { padY: "0", width: 50, isInner: true });
@@ -37,7 +46,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
       mkText(he(brief.heroSubhead || "Your subheadline here."), warmWhite),
       mkSpacer(40),
       mkContainer([
-        mkButton(brief.heroCta1 || "See the work", brassDp, "#ffffff"),
+        mkButton(brief.heroCta1 || "See the work", btnBg, btnText),
         mkButton(brief.heroCta2 || "See pricing", "rgba(0,0,0,0)", warmWhite),
       ], null, { direction: "row", gap: "16", padY: "0", isInner: true, buttonRow: true }),
     ], null, { padY: "0", width: 50, isInner: true });
@@ -49,7 +58,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
       mkHeading(brief.heroHeadline || "Your headline here.", warmWhite, "h1",
         { font: "Fraunces", weight: 300, px: 80, align: "center" }),
       mkSpacer(48),
-      mkContainer([mkButton(brief.heroCta1 || "See the work", brassDp, "#ffffff")],
+      mkContainer([mkButton(brief.heroCta1 || "See the work", btnBg, btnText)],
         null, { padY: "0", center: true, isInner: true }),
     ], ink, { padY: "140", minH: 80, center: true });
   } else {
@@ -63,7 +72,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
       mkText(he(brief.heroSubhead || "Your subheadline here."), warmWhite, "center"),
       mkSpacer(40),
       mkContainer([
-        mkButton(brief.heroCta1 || "See the work", brassDp, "#ffffff"),
+        mkButton(brief.heroCta1 || "See the work", btnBg, btnText),
         mkButton(brief.heroCta2 || "See pricing", "rgba(0,0,0,0)", warmWhite),
       ], null, { direction: "row", gap: "16", padY: "0", center: true, isInner: true, buttonRow: true }),
     ], ink, { padY: "80", minH: 0, center: true });
@@ -173,7 +182,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
     mkSpacer(24),
     mkText(he(brief.pricingSubhead || "Pick a package or build a plan, with real numbers in the open."), stone, "center"),
     mkSpacer(40),
-    mkContainer([mkButton(brief.pricingCta || "See packages", brassDp, "#ffffff")],
+    mkContainer([mkButton(brief.pricingCta || "See packages", btnBg, btnText)],
       null, { padY: "0", center: true, isInner: true }),
   ], bone, { padY: "112", center: true });
 
@@ -181,7 +190,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
     mkHeading(brief.tagline || "The stories that move a company forward.", warmWhite, "h1",
       { font: "Fraunces", weight: 300, px: 64, italic: true, align: "center" }),
     mkSpacer(48),
-    mkContainer([mkButton(brief.closingCta || "Start a project", brassDp, "#ffffff")],
+    mkContainer([mkButton(brief.closingCta || "Start a project", btnBg, btnText)],
       null, { padY: "0", center: true, isInner: true }),
   ], ink, { padY: "120", minH: 70, center: true });
 

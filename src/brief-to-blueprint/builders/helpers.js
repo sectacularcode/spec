@@ -428,6 +428,13 @@ export function mkMapSection(address, mapUrl, colors, opts) {
   var ink = colors.ink || colors.text || "#1A1A1A";
   var accent = colors.brass || colors.accent || "#C2A35B";
   var bone = colors.bone || colors.background || "#F2F2F2";
+  // Optional real button colors from the caller (a defined Style Guide
+  // button) -- falls back to the same accent/#FFFFFF pairing this always
+  // used when not supplied, so any future caller that doesn't pass this
+  // still gets identical behavior to before.
+  var btnColors = opts.buttonColors || {};
+  var mapBtnBg = btnColors.background || accent;
+  var mapBtnText = btnColors.textColor || "#FFFFFF";
   var heading = opts.heading || (mode === "service_area" ? "Areas We Serve" : "Find Us");
   var children = [
     mkHeading(heading, ink, "h2", { weight: 700, px: 32, align: opts.center ? "center" : "left" }),
@@ -447,7 +454,7 @@ export function mkMapSection(address, mapUrl, colors, opts) {
   if (mapUrl) {
     children.push(mkSpacer(20));
     var btnLabel = opts.buttonLabel || (mode === "service_area" ? "Check Your Area" : "Get Directions");
-    var btn = mkButton(btnLabel, accent, "#FFFFFF");
+    var btn = mkButton(btnLabel, mapBtnBg, mapBtnText);
     btn.settings.link = { url: sanitizeUrl(mapUrl), is_external: "true" };
     children.push(btn);
   }

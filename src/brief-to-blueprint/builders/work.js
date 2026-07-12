@@ -1,11 +1,19 @@
 import { mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer } from "./helpers.js";
 import { inspoMatchesVariant } from "../utils/inspo.js";
 import { he } from "../utils/htmlEscape.js";
+import { bestTextColor } from "../../utils/contrast.js";
 
 export function buildWorkPage(C, brief, inspoHint) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
       stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
+  // Real button colors for genuine CTAs ("Start a project", "View
+  // project") -- NOT applied to the filter-tab pills below, which use
+  // mkButton as a rendering primitive for category tabs, not a call to
+  // action, and intentionally keep their own brass/brassDp pairing.
+  var definedBtn = brief.buttons && brief.buttons[0];
+  var btnBg = (definedBtn && definedBtn.background) || brassDp;
+  var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, text || "#1a1a1a");
 
   var header = mkContainer([
     mkHeading(brief.workEyebrow || "Work", brassDp, "h6", { eyebrow: true }),
@@ -15,7 +23,7 @@ export function buildWorkPage(C, brief, inspoHint) {
     mkText(he(brief.workIntro || "A look at the stories so far. Customer and team films, brand work, and the films that help a company show what it has become."), text),
   ], bone, { padY: "88" });
 
-  var closing = mkContainer([mkButton("Start a project", brassDp, "#ffffff")], bone, { padY: "80", center: true });
+  var closing = mkContainer([mkButton("Start a project", btnBg, btnText)], bone, { padY: "80", center: true });
 
   // ── Variant A: Standard grid with filter row ──────────────────────────────
   var filterCategories = brief.workCategories || ["All", "Stories & testimonials", "People & culture", "Brand & leadership", "Exit"];
@@ -81,7 +89,7 @@ export function buildWorkPage(C, brief, inspoHint) {
       mkSpacer(12),
       mkText("[Add a one paragraph description of this project when publishing.]", text),
       mkSpacer(24),
-      mkButton("View project", brassDp, "#ffffff"),
+      mkButton("View project", btnBg, btnText),
     ], null, { padY: "48", grow: 1, isInner: true }),
   ], "#ffffff", { direction: "row", gap: "0", padY: "0" });
   featuredTile.settings.border_border = "solid";

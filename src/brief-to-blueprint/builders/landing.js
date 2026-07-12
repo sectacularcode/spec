@@ -1,6 +1,7 @@
 import { nid, mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer, mkDivider, mkIconList, mkForm, mkTestimonialCarousel, mkAccordion, mkMapSection, mkGoogleMapsWidget, sanitizeUrl } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
 import { parseInspoPatterns } from "../utils/patterns.js";
+import { bestTextColor } from "../../utils/contrast.js";
 
 // Picks which visual style to render feature rows in. Real inspiration-URL
 // signal (from the screenshot-based vision classification — see
@@ -121,6 +122,20 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   var closingLine = brief.closingCta   || brief.tagline  || "Ready to get started?";
   var closingBody = brief.closingBody  || "[One sentence that removes hesitation and drives action]";
 
+  // Landing pages have two real button contexts: dark hero/closing
+  // sections (which have always inverted -- a light button pops against
+  // a dark backdrop) and light feature-row sections (which have always
+  // used the brand accent directly). A real defined button from the
+  // Style Guide's Buttons section applies to both, since it's the
+  // person's explicit choice either way; each context keeps its own
+  // historical fallback color when no button has been defined yet --
+  // only the previously-hardcoded text color becomes computed-safe.
+  var definedBtn = brief.buttons && brief.buttons[0];
+  var darkCtxBtnBg = (definedBtn && definedBtn.background) || warmWhite;
+  var darkCtxBtnText = (definedBtn && definedBtn.textColor) || bestTextColor(darkCtxBtnBg, dark);
+  var lightCtxBtnBg = (definedBtn && definedBtn.background) || accent;
+  var lightCtxBtnText = (definedBtn && definedBtn.textColor) || bestTextColor(lightCtxBtnBg, text);
+
   // ── Shared helpers ────────────────────────────────────────────────────────
   function makeOutlineBtn(label) {
     var btn = mkButton(label, "transparent", warmWhite);
@@ -132,7 +147,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   }
 
   function makeDualBtnRow(primaryLabel, secondaryLabel) {
-    return mkContainer([mkButton(primaryLabel, warmWhite, dark), makeOutlineBtn(secondaryLabel)], null, {
+    return mkContainer([mkButton(primaryLabel, darkCtxBtnBg, darkCtxBtnText), makeOutlineBtn(secondaryLabel)], null, {
       isInner: true, direction: "row", buttonRow: true, gap: "16", padY: "0", padX: "0", center: true
     });
   }
@@ -285,7 +300,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         mkSpacer(16),
         mkText(he(f.body), text),
         mkSpacer(24),
-        mkButton(contactCta, accent, warmWhite),
+        mkButton(contactCta, lightCtxBtnBg, lightCtxBtnText),
       ];
       // Always-on: content lives inside an inner box with min_height 508px,
       // matching CS Repair's confirmed production template. This is what
@@ -376,7 +391,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     ];
     if (withButton) {
       innerChildren.push(mkSpacer(20));
-      innerChildren.push(mkButton(contactCta, accent, warmWhite));
+      innerChildren.push(mkButton(contactCta, lightCtxBtnBg, lightCtxBtnText));
     }
     var innerBox = mkContainer(innerChildren, null, { isInner: true, padY: "30", padX: "30", full: true });
     innerBox.settings.min_height = { unit: "px", size: 420 };
@@ -399,7 +414,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkSpacer(12),
       body,
       mkSpacer(20),
-      mkButton(contactCta, accent, warmWhite),
+      mkButton(contactCta, lightCtxBtnBg, lightCtxBtnText),
     ], rowIdx % 2 === 0 ? warmWhite : bone, { padY: "56", center: true });
   }
 
@@ -589,6 +604,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       heading: brief.mapHeading,
       buttonLabel: brief.mapButtonLabel,
       mode: brief.mapMode,
+      buttonColors: { background: lightCtxBtnBg, textColor: lightCtxBtnText },
     });
   }
 
@@ -740,7 +756,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkSpacer(12),
       mkText("<p style='text-align:center'>" + he(brief.hookStatement || "[What sets you apart in one line]") + "</p>", "rgba(255,255,255,0.7)"),
       mkSpacer(32),
-      mkButton(phoneCta, warmWhite, dark),
+      mkButton(phoneCta, darkCtxBtnBg, darkCtxBtnText),
     ], dark, { padY: "80", center: true });
 
     // Lead form section
@@ -884,7 +900,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   var singleCtaSection = mkContainer([
     mkHeading(closingLine, warmWhite, "h2", { weight: 700, px: 40, align: "center" }),
     mkSpacer(24),
-    mkButton(phoneCta, warmWhite, dark),
+    mkButton(phoneCta, darkCtxBtnBg, darkCtxBtnText),
     mkSpacer(16),
     mkText("<p style='text-align:center;font-size:14px'>" + he(brief.formReassurance || "No sales team. A real reply within one business day.") + "</p>", "rgba(255,255,255,0.7)"),
   ], dark, { padY: "100", center: true });

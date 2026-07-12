@@ -1,10 +1,14 @@
 import { mkContainer, mkHeading, mkText, mkButton, mkSpacer } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
+import { bestTextColor } from "../../utils/contrast.js";
 
 export function buildContactPage(C, brief, inspoHint, patterns) {
   var ink = C.ink, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
+  var definedBtn = brief.buttons && brief.buttons[0];
+  var btnBg = (definedBtn && definedBtn.background) || brassDp;
+  var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, text || "#1a1a1a");
 
   var formPlaceholder = mkContainer([
     mkText("Form fields: Name · Company · Email · What do you need? · Budget range (optional) · Message", stone),
@@ -34,7 +38,7 @@ export function buildContactPage(C, brief, inspoHint, patterns) {
   var formSectionA = mkContainer([
     formPlaceholder,
     mkSpacer(32),
-    mkContainer([mkButton(brief.contactCta || "Send it over", brassDp, "#ffffff")], null, { padY: "0", isInner: true }),
+    mkContainer([mkButton(brief.contactCta || "Send it over", btnBg, btnText)], null, { padY: "0", isInner: true }),
     mkSpacer(24),
     mkText(he(brief.contactReassurance || "No sales team. No automated funnel. A real reply from a real person."), stone),
   ], bone, { padY: "64" });
@@ -71,7 +75,7 @@ export function buildContactPage(C, brief, inspoHint, patterns) {
   var formRight = mkContainer([
     formPlaceholder,
     mkSpacer(24),
-    mkButton(brief.contactCta || "Send it over", brassDp, "#ffffff"),
+    mkButton(brief.contactCta || "Send it over", btnBg, btnText),
   ], null, { padY: "0", grow: 1, isInner: true });
 
   var splitRow = mkContainer([statementLeft, formRight], null, { direction: "row", gap: "80", padY: "0", isInner: true });

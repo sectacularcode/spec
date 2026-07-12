@@ -1,5 +1,6 @@
 import { he } from "../../utils/htmlEscape.js";
 import { parseInspoPatterns } from "../../utils/patterns.js";
+import { bestTextColor } from "../../../utils/contrast.js";
 
 // Extracted from buildPreviewHTML.js's single-file "sections" object (July
 // 2026) -- landing was the largest section by far (~650 lines, five
@@ -38,6 +39,15 @@ function selectFeatureRowStyle(inspoContext, featureCount) {
 export function buildLandingPreview(brief, variant, inspoContext, colors) {
   var ink = colors.ink, brass = colors.brass, bone = colors.bone, warmWhite = colors.warmWhite,
       stone = colors.stone, brassDp = colors.brassDp, asphalt = colors.asphalt, text = colors.text;
+  // All three lead-form buttons in this file sit on light (bone/white)
+  // backgrounds -- same "light context" as landing.js's Elementor-JSON
+  // output. A real defined button applies here too; the fallback used to
+  // hardcode white text on the raw accent color with no contrast check
+  // at all (the same class of bug already found and fixed on the Style
+  // Guide brand sheet), so that becomes computed-safe instead.
+  var definedBtn = brief.buttons && brief.buttons[0];
+  var lightCtxBtnBg = (definedBtn && definedBtn.background) || brass;
+  var lightCtxBtnText = (definedBtn && definedBtn.textColor) || bestTextColor(lightCtxBtnBg, text);
 
   return (function() {
       // Derive an Unsplash image keyword from the brief to get contextual imagery
@@ -216,7 +226,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
                   var safeLbl = he(String(lbl));
                   return "<div style='margin-bottom:12px;'><label style='display:block;font-size:12px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;'>" + safeLbl + "</label><div style='width:100%;padding:10px 14px;border:1px solid #dde0e6;border-radius:4px;background:#ffffff;font-size:14px;color:#bbb;box-sizing:border-box;'>" + safeLbl + "...</div></div>";
                 }).join("") +
-                "<button style='padding:12px 28px;background:" + brass + ";color:#fff;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:6px;'>" + he(ffCta) + "</button>" +
+                "<button style='padding:12px 28px;background:" + lightCtxBtnBg + ";color:" + lightCtxBtnText + ";font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:6px;'>" + he(ffCta) + "</button>" +
                 "</div>" +
               "</section>"
             );
@@ -373,7 +383,18 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
       var formC = brief.formCta        || "Send It Over";
       var formR = brief.formReassurance|| "No sales team. A real reply.";
 
-      var btnStyle = "display:inline-block;padding:14px 32px;background:" + brass + ";color:#ffffff;font-weight:700;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:3px;";
+      // Every call site below immediately string-replaced this template's
+      // background away from brass to #ffffff and its text color to
+      // whatever the surrounding section needed -- meaning brass was
+      // never actually rendered here, and the text color (dark or brass,
+      // inconsistently across variants) was never contrast-checked
+      // against the white it always ended up on. Building it correctly
+      // once, with real button data honored when defined, replaces every
+      // one of those fragile .replace() chains below with a plain
+      // reference to this same, already-correct string.
+      var darkCtxBtnBg = (definedBtn && definedBtn.background) || "#ffffff";
+      var darkCtxBtnText = (definedBtn && definedBtn.textColor) || bestTextColor(darkCtxBtnBg, dark);
+      var btnStyle = "display:inline-block;padding:14px 32px;background:" + darkCtxBtnBg + ";color:" + darkCtxBtnText + ";font-weight:700;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:3px;";
       var btnOutline = "display:inline-block;padding:13px 28px;background:transparent;color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:2px solid rgba(255,255,255,0.6);border-radius:3px;";
       var btnDark = "display:inline-block;padding:10px 24px;background:transparent;color:" + ink + ";font-weight:600;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border:2px solid " + brass + ";border-radius:3px;align-self:flex-start;width:fit-content;";
 
@@ -386,7 +407,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<h1 style='font-weight:800;font-size:clamp(32px,5vw,56px);color:#ffffff;margin:0 0 18px;line-height:1.08;'>" + h1 + "</h1>" +
               (hook ? "<p style='font-size:18px;color:rgba(255,255,255,0.85);margin:0 0 12px;line-height:1.6;font-style:italic;'>" + hook + "</p>" : "") +
               "<p style='font-size:clamp(14px,3.5vw,16px);color:rgba(255,255,255,0.8);margin:0 0 24px;line-height:1.55;max-width:580px;margin-left:auto;margin-right:auto;'>" + sub + "</p>" +
-              "<a style='" + btnStyle.replace("background:"+brass, "background:#ffffff").replace("color:#ffffff", "color:"+dark) + "'>" + cta1 + "</a>" +
+              "<a style='" + btnStyle + "'>" + cta1 + "</a>" +
             "</div>" +
           "</section>" +
           "<section style='background:" + bone + ";padding:80px clamp(24px,6vw,80px);'>" +
@@ -411,7 +432,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
                 formFieldsB.map(function(f) {
                   return "<div style='margin-bottom:14px;'><label style='display:block;font-size:12px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;'>" + f + "</label><div style='width:100%;padding:10px 14px;border:1px solid #dde0e6;border-radius:4px;background:#f9f9f9;font-size:14px;color:#bbb;box-sizing:border-box;'>" + f + "...</div></div>";
                 }).join("") +
-                "<button style='width:100%;padding:14px;background:" + brass + ";color:#fff;font-weight:700;font-size:14px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:8px;'>" + formC + "</button>" +
+                "<button style='width:100%;padding:14px;background:" + lightCtxBtnBg + ";color:" + lightCtxBtnText + ";font-weight:700;font-size:14px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:8px;'>" + formC + "</button>" +
                 "<p style='font-size:12px;color:" + stone + ";text-align:center;margin:10px 0 0;'>" + formR + "</p>" +
               "</div>" +
             "</div>" +
@@ -471,7 +492,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             "<h2 style='font-size:clamp(26px,4vw,40px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
             "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:560px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
             "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
-              "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+dark) + "'>" + cta1 + "</a>" +
+              "<a class='cta-btn' style='" + btnStyle + "'>" + cta1 + "</a>" +
               "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
             "</div>" +
           "</section>" +
@@ -487,7 +508,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<h1 style='font-weight:800;font-size:clamp(36px,6vw,72px);color:#ffffff;margin:0 0 20px;line-height:1.05;'>" + h1 + "</h1>" +
               "<p style='font-size:clamp(14px,1.5vw,18px);color:rgba(255,255,255,0.85);margin:0 0 32px;line-height:1.55;max-width:520px;margin-left:auto;margin-right:auto;'>" + sub + "</p>" +
               "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
-                "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
+                "<a class='cta-btn' style='" + btnStyle + "'>" + cta1 + "</a>" +
                 "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
               "</div>" +
             "</div>" +
@@ -511,7 +532,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           "<section style='background:" + brass + ";padding:100px 40px;text-align:center;'>" +
             "<h2 style='font-size:clamp(26px,4vw,44px);font-weight:800;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
             "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 36px;max-width:480px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
-            "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "display:block;max-width:280px;margin:0 auto;text-align:center;'>" + cta1 + "</a>" +
+            "<a class='cta-btn' style='" + btnStyle + "display:block;max-width:280px;margin:0 auto;text-align:center;'>" + cta1 + "</a>" +
             "<p style='font-size:13px;color:rgba(255,255,255,0.6);margin:16px 0 0;'>" + formR + "</p>" +
           "</section>";
       }
@@ -533,7 +554,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               (hook ? "<p style='font-size:18px;color:rgba(255,255,255,0.9);margin:0 0 12px;line-height:1.6;font-style:italic;'>" + hook + "</p>" : "") +
               "<p style='font-size:clamp(13px,3.5vw,16px);color:rgba(255,255,255,0.82);margin:0 0 28px;line-height:1.55;max-width:560px;'>" + sub + "</p>" +
               "<div style='display:flex;gap:16px;flex-wrap:wrap;align-items:center;'>" +
-                "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "display:inline-block;'>" + cta1 + "</a>" +
+                "<a class='cta-btn' style='" + btnStyle + "display:inline-block;'>" + cta1 + "</a>" +
                 "<a class='cta-btn' style='" + btnOutline + "display:inline-block;'>" + cta2 + "</a>" +
               "</div>" +
             "</div></div>" +
@@ -581,7 +602,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             "<h2 style='font-size:clamp(26px,4vw,42px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
             "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:540px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
             "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
-              "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
+              "<a class='cta-btn' style='" + btnStyle + "'>" + cta1 + "</a>" +
               "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
             "</div>" +
           "</section>" +
@@ -599,7 +620,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             (hook ? "<p style='font-size:18px;color:rgba(255,255,255,0.9);margin:0 0 12px;line-height:1.6;font-style:italic;'>" + hook + "</p>" : "") +
             "<p style='font-size:clamp(13px,3.5vw,16px);color:rgba(255,255,255,0.82);margin:0 0 28px;line-height:1.55;max-width:560px;'>" + sub + "</p>" +
             "<div style='display:flex;gap:16px;flex-wrap:wrap;align-items:center;'>" +
-              "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "display:inline-block;'>" + cta1 + "</a>" +
+              "<a class='cta-btn' style='" + btnStyle + "display:inline-block;'>" + cta1 + "</a>" +
               "<a class='cta-btn' style='" + btnOutline + "display:inline-block;'>" + cta2 + "</a>" +
             "</div>" +
           "</div></div>" +
@@ -675,7 +696,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               ffFields.map(function (lbl) {
                 return "<div style='margin-bottom:12px;'><label style='display:block;font-size:12px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;'>" + lbl + "</label><div style='width:100%;padding:10px 14px;border:1px solid #dde0e6;border-radius:4px;background:#ffffff;font-size:14px;color:#bbb;box-sizing:border-box;'>" + lbl + "...</div></div>";
               }).join("") +
-              "<button style='padding:12px 28px;background:" + brass + ";color:#fff;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:6px;'>" + ffCta + "</button>" +
+              "<button style='padding:12px 28px;background:" + lightCtxBtnBg + ";color:" + lightCtxBtnText + ";font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:6px;'>" + ffCta + "</button>" +
               "</div>" +
             "</section>";
         })() +
@@ -683,7 +704,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           "<h2 style='font-size:clamp(26px,4vw,42px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
           "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:540px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
           "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
-            "<a class='cta-btn' style='" + btnStyle.replace("background:"+brass,"background:#ffffff").replace("color:#ffffff","color:"+brass) + "'>" + cta1 + "</a>" +
+            "<a class='cta-btn' style='" + btnStyle + "'>" + cta1 + "</a>" +
             "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
           "</div>" +
         "</section>" +

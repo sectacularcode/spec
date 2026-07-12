@@ -1,5 +1,6 @@
 import { mkContainer, mkHeading, mkText, mkButton, mkSpacer } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
+import { bestTextColor } from "../../utils/contrast.js";
 
 export function buildGenericPage(colors, brief, pageDef, inspoContext, variant) {
   var ink = colors.ink || "#1C1A17";
@@ -10,6 +11,9 @@ export function buildGenericPage(colors, brief, pageDef, inspoContext, variant) 
   var text = colors.text || "#2A2722";
   var stone = colors.stone || "#8A8170";
   var asphalt = colors.asphalt || "#2B2823";
+  var definedBtn = brief.buttons && brief.buttons[0];
+  var btnBg = (definedBtn && definedBtn.background) || brassDp;
+  var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, text);
   var label = pageDef.label;
   var pid = pageDef.id;
   var isDark = (variant === "B");
@@ -72,7 +76,7 @@ export function buildGenericPage(colors, brief, pageDef, inspoContext, variant) 
       mkSpacer(16),
       mkText(he(brief.hookStatement || "[Landing page subheadline — specific and direct]"), stone),
       mkSpacer(24),
-      mkButton(brief.heroCta1 || "Get started", brassDp, "#ffffff"),
+      mkButton(brief.heroCta1 || "Get started", btnBg, btnText),
     ], bone, { padY: "80", center: true }));
   } else if (pid === "thank-you") {
     sections.push(mkContainer([
@@ -94,7 +98,7 @@ export function buildGenericPage(colors, brief, pageDef, inspoContext, variant) 
       mkSpacer(16),
       mkText("The page you're looking for doesn't exist or has moved.", stone),
       mkSpacer(24),
-      mkButton("Go home", brassDp, "#ffffff"),
+      mkButton("Go home", btnBg, btnText),
     ], bone, { padY: "80", center: true }));
   } else {
     // Generic fallback
@@ -109,7 +113,7 @@ export function buildGenericPage(colors, brief, pageDef, inspoContext, variant) 
   sections.push(mkContainer([
     mkHeading(brief.tagline || brief.closingCta || "Ready to get started?", warmWhite, "h2", { font: (brief.fonts && brief.fonts[1]) || "Inter", weight: 400, px: 40 }),
     mkSpacer(24),
-    mkButton(brief.headerCta || "Start a project", brassDp, "#ffffff"),
+    mkButton(brief.headerCta || "Start a project", btnBg, btnText),
   ], asphalt, { padY: "80", center: true }));
 
   return { version: "0.4", title: he(brief.brandName || "Site") + " — " + he(label), type: "page", page_settings: {}, content: sections };

@@ -685,7 +685,7 @@ export default function CustomBuild({ userId, role } = {}) {
       const res = await fetch("/api/brand-styles", {
         method: "POST",
         headers: await authHeaders(),
-        body: JSON.stringify({ brand_name: brief.brandName, colors: brief.colors, fonts: brief.fonts ? { heading: brief.fonts[0], body: brief.fonts[1] } : {} }),
+        body: JSON.stringify({ brand_name: brief.brandName, colors: brief.colors, fonts: brief.fonts ? { heading: brief.fonts[0], body: brief.fonts[1] } : {}, buttons: brief.buttons || [] }),
       });
       if (res.ok) {
         setStylePanelStatus("Saved as " + brief.brandName + "'s style guide.");
@@ -742,6 +742,7 @@ export default function CustomBuild({ userId, role } = {}) {
       fonts: style.fonts && (style.fonts.heading || style.fonts.body)
         ? [style.fonts.heading || style.fonts.body, style.fonts.body || style.fonts.heading]
         : b.fonts,
+      buttons: (Array.isArray(style.buttons) && style.buttons.length > 0) ? style.buttons : b.buttons,
     }));
     setShowStylePicker(false);
     setStylePanelStatus("Applied " + style.brand_name + "'s style guide.");
@@ -769,6 +770,7 @@ export default function CustomBuild({ userId, role } = {}) {
         fonts: s.fonts && (s.fonts.heading || s.fonts.body)
           ? [s.fonts.heading || s.fonts.body, s.fonts.body || s.fonts.heading]
           : b.fonts,
+        buttons: (Array.isArray(s.buttons) && s.buttons.length > 0) ? s.buttons : b.buttons,
       }));
     }
     // useSaved === false leaves brief.colors exactly as the import
@@ -880,6 +882,9 @@ export default function CustomBuild({ userId, role } = {}) {
         brief.colors = savedStyle.colors;
         if (savedStyle.fonts && (savedStyle.fonts.heading || savedStyle.fonts.body)) {
           brief.fonts = [savedStyle.fonts.heading || savedStyle.fonts.body, savedStyle.fonts.body || savedStyle.fonts.heading];
+        }
+        if (Array.isArray(savedStyle.buttons) && savedStyle.buttons.length > 0 && (!brief.buttons || brief.buttons.length === 0)) {
+          brief.buttons = savedStyle.buttons;
         }
       }
     }

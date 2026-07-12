@@ -1,9 +1,16 @@
 import { mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
+import { bestTextColor } from "../../utils/contrast.js";
 
 export function buildAboutPage(C, brief, inspoHint, patterns) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
       brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
+  // Real button colors from the Style Guide's Buttons section when
+  // defined; otherwise the same brassDp fill as always, with a computed
+  // (not blindly hardcoded) safe text color.
+  var definedBtn = brief.buttons && brief.buttons[0];
+  var btnBg = (definedBtn && definedBtn.background) || brassDp;
+  var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, text || "#1a1a1a");
 
   var header = mkContainer([
     mkHeading(brief.aboutEyebrow || "About", brassDp, "h6", { eyebrow: true }),
@@ -11,7 +18,7 @@ export function buildAboutPage(C, brief, inspoHint, patterns) {
     mkHeading(brief.aboutH1 || "One person. Every frame.", ink, "h1", { weight: 800, px: 64 }),
   ], bone, { padY: "88" });
 
-  var closing = mkContainer([mkButton("Start a project", brassDp, "#ffffff")], bone, { padY: "80", center: true });
+  var closing = mkContainer([mkButton("Start a project", btnBg, btnText)], bone, { padY: "80", center: true });
 
   // ── Variant A: Story + portrait split ─────────────────────────────────────
   var storyLeft = mkContainer([
@@ -89,7 +96,7 @@ export function buildAboutPage(C, brief, inspoHint, patterns) {
       mkSpacer(16),
       mkText(he(brief.whyOneMaker || "[Why this approach — pulled from brief.]"), text),
       mkSpacer(32),
-      mkButton("Start a project", brassDp, "#ffffff"),
+      mkButton("Start a project", btnBg, btnText),
     ], null, { padY: "0", width: 50, isInner: true }),
   ], bone, { direction: "row", gap: "64", padY: "80" });
 

@@ -13,6 +13,7 @@
 
 import { nid, mkContainer, mkHeading, mkText, mkButton, mkImageBg, mkSpacer } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
+import { bestTextColor } from "../../utils/contrast.js";
 
 function getColors(colors) {
   return {
@@ -94,6 +95,9 @@ function mkInfoBlock(loc, ink, stone, bone) {
 export function buildLocationPageA(colors, brief, loc) {
   var C = getColors(colors);
   var loc = loc || brief.locationData || {};
+  var definedBtn = brief.buttons && brief.buttons[0];
+  var btnBg = (definedBtn && definedBtn.background) || C.brassDp;
+  var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, C.text);
 
   var city         = loc.city         || "[City]";
   var state        = loc.state        || "[State]";
@@ -114,7 +118,7 @@ export function buildLocationPageA(colors, brief, loc) {
     mkSpacer(20),
     mkText(he(city) + ", " + he(state), C.stone),
     mkSpacer(32),
-    mkButton(ctaText, C.brassDp, "#ffffff"),
+    mkButton(ctaText, btnBg, btnText),
   ], C.ink, { padY: "80", center: false }));
 
   // Address / phone / hours info strip
@@ -142,7 +146,7 @@ export function buildLocationPageA(colors, brief, loc) {
     mkSpacer(16),
     mkText(he(supportBody), C.text),
     mkSpacer(24),
-    mkButton(ctaText, C.brassDp, "#ffffff"),
+    mkButton(ctaText, btnBg, btnText),
   ], null, { padY: "0", width: 50, isInner: true });
 
   var supportImg = mkImageBg(city + " location photo", { width: 50 });
@@ -165,7 +169,7 @@ export function buildLocationPageA(colors, brief, loc) {
   sections.push(mkContainer([
     mkHeading("Ready to get started in " + city + "?", C.warmWhite, "h2", { weight: 700, px: 40, align: "center" }),
     mkSpacer(24),
-    mkButton(ctaText, C.brassDp, "#ffffff"),
+    mkButton(ctaText, btnBg, btnText),
   ], C.asphalt, { padY: "80", center: true }));
 
   return {
@@ -181,6 +185,9 @@ export function buildLocationPageA(colors, brief, loc) {
 export function buildLocationPageB(colors, brief, loc) {
   var C = getColors(colors);
   var loc = loc || brief.locationData || {};
+  var definedBtn = brief.buttons && brief.buttons[0];
+  var btnBg = (definedBtn && definedBtn.background) || C.brassDp;
+  var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, C.text);
 
   var city         = loc.city         || "[City]";
   var state        = loc.state        || "[State]";
@@ -201,7 +208,7 @@ export function buildLocationPageB(colors, brief, loc) {
       mkSpacer(16),
       mkText(he(intro), C.warmWhite),
       mkSpacer(28),
-      mkButton(ctaText, C.brassDp, "#ffffff"),
+      mkButton(ctaText, btnBg, btnText),
     ], C.asphalt, { padY: "60" }),
   ], C.asphalt, { padY: "0", gap: "0" }));
 
@@ -214,7 +221,7 @@ export function buildLocationPageB(colors, brief, loc) {
     mkSpacer(16),
     mkServicesList(services, C.text, C.brass),
     mkSpacer(24),
-    mkButton(ctaText, C.brassDp, "#ffffff"),
+    mkButton(ctaText, btnBg, btnText),
   ], C.warmWhite, { padY: "60" }));
 
   // Map embed — prominent
@@ -228,7 +235,7 @@ export function buildLocationPageB(colors, brief, loc) {
   sections.push(mkContainer([
     mkHeading("Serving " + city + " and surrounding areas.", C.warmWhite, "h2", { weight: 700, px: 36, align: "center" }),
     mkSpacer(24),
-    mkButton(ctaText, C.brassDp, "#ffffff"),
+    mkButton(ctaText, btnBg, btnText),
   ], C.asphalt, { padY: "72", center: true }));
 
   return {

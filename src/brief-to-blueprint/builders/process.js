@@ -1,10 +1,14 @@
 import { mkContainer, mkHeading, mkText, mkButton, mkSpacer, mkDivider } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
+import { bestTextColor } from "../../utils/contrast.js";
 
 export function buildProcessPage(C, brief, inspoHint, patterns) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7",
       brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
+  var definedBtn = brief.buttons && brief.buttons[0];
+  var btnBg = (definedBtn && definedBtn.background) || brassDp;
+  var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, text || "#1a1a1a");
 
   var header = mkContainer([
     mkHeading(brief.processEyebrow || "Process", brassDp, "h6", { eyebrow: true }),
@@ -29,7 +33,7 @@ export function buildProcessPage(C, brief, inspoHint, patterns) {
     mkText(he(brief.calloutBody || "[What to expect — timeline and delivery details. Fill in from client brief.]"), warmWhite),
   ], ink, { padY: "80" });
 
-  var closing = mkContainer([mkButton("Start a project", brassDp, "#ffffff")], bone, { padY: "80", center: true });
+  var closing = mkContainer([mkButton("Start a project", btnBg, btnText)], bone, { padY: "80", center: true });
 
   // ── Variant A: Two-column numbered grid ───────────────────────────────────
   var gridSteps = steps.map(function(step, i) {

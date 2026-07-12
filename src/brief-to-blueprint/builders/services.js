@@ -1,10 +1,15 @@
 import { mkContainer, mkHeading, mkText, mkButton, mkSpacer, mkDivider } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
 
+import { bestTextColor } from "../../utils/contrast.js";
+
 export function buildServicesPage(C, brief, _inspoHint) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", asphalt = C.asphalt || "#2B2823", text = C.text;
+  var definedBtn = brief.buttons && brief.buttons[0];
+  var btnBg = (definedBtn && definedBtn.background) || brassDp;
+  var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, text || "#1a1a1a");
 
   var header = mkContainer([
     mkHeading(brief.servicesEyebrow || "Services & Pricing", brassDp, "h6", { eyebrow: true }),
@@ -115,7 +120,7 @@ export function buildServicesPage(C, brief, _inspoHint) {
   var closing = mkContainer([
     mkText("Not sure where to start? Tell me about the company.", stone, "center"),
     mkSpacer(24),
-    mkButton(brief.headerCta || "Start a project", brassDp, "#ffffff"),
+    mkButton(brief.headerCta || "Start a project", btnBg, btnText),
   ], bone, { padY: "80", center: true });
 
   return { version: "0.4", title: "Services & Pricing", type: "page", page_settings: {},
@@ -126,6 +131,9 @@ export function buildServicesPageLight(C, brief, _inspoHint) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#9C7E3A", asphalt = C.asphalt || "#2B2823", text = C.text;
+  var definedBtn = brief.buttons && brief.buttons[0];
+  var btnBg = (definedBtn && definedBtn.background) || brassDp;
+  var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, text || "#1a1a1a");
 
   var header = mkContainer([
     mkHeading(brief.servicesEyebrow || "Services & pricing", brassDp, "h6", { eyebrow: true }),
@@ -152,7 +160,7 @@ export function buildServicesPageLight(C, brief, _inspoHint) {
       mkSpacer(20),
       mkHeading(tier[3] || "", featured ? brass : brassDp, "h4", { weight: 700, px: 28 }),
       mkSpacer(24),
-      mkButton("Learn more", featured ? brassDp : "transparent", featured ? "#ffffff" : brassDp),
+      mkButton("Learn more", featured ? btnBg : "transparent", featured ? btnText : btnBg),
     ], featured ? asphalt : "#ffffff", { padY: "44", padX: "36", isInner: true });
     card.settings._flex_grow = 1;
     if (!featured) {
@@ -170,7 +178,7 @@ export function buildServicesPageLight(C, brief, _inspoHint) {
   var closing = mkContainer([
     mkText("Not sure where to start? Tell us about the company.", stone, "center"),
     mkSpacer(24),
-    mkButton(brief.headerCta || "Start a project", brassDp, "#ffffff"),
+    mkButton(brief.headerCta || "Start a project", btnBg, btnText),
   ], bone, { padY: "80", center: true });
 
   return { version: "0.4", title: "Services & Pricing", type: "page", page_settings: {},

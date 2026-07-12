@@ -1,5 +1,6 @@
 import { nid, mkContainer, mkHeading, mkText, mkButton, mkSpacer } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
+import { bestTextColor } from "../../utils/contrast.js";
 
 // Global header and footer JSON builders.
 // Export as separate templates — import via Elementor Theme Builder.
@@ -9,6 +10,9 @@ export function buildHeaderJSON(C, brief, inspoContext) {
   var brass = C.brass || "#C2A35B";
   var brassDp = C["brass-deep"] || "#9C7E3A";
   var warmWhite = C["warm-white"] || "#FBFAF7";
+  var definedBtn = brief.buttons && brief.buttons[0];
+  var btnBg = (definedBtn && definedBtn.background) || brassDp;
+  var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, C.text || "#1a1a1a");
 
   // Determine header style from inspo context
   var inspo = (inspoContext || "").toLowerCase();
@@ -39,7 +43,7 @@ export function buildHeaderJSON(C, brief, inspoContext) {
   };
 
   // CTA button
-  var ctaBtn = mkButton(brief.headerCta || "Start a project", brassDp, "#ffffff");
+  var ctaBtn = mkButton(brief.headerCta || "Start a project", btnBg, btnText);
   ctaBtn.settings.padding = { unit: "px", top: "12", right: "24", bottom: "12", left: "24", isLinked: false };
 
   // Nav menu widget — single widget for all links
