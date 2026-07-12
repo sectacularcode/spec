@@ -63,6 +63,7 @@ export default function StyleGuide({ role }) {
   const [view, setView] = useState("edit"); // "edit" | "document"
   const [documentSource, setDocumentSource] = useState(null); // the style shown when view === "document"
   const [pendingClear, setPendingClear] = useState(null); // "all" | "colors" | "fonts" | null -- drives the confirm dialog below
+  const [pendingAnalyzeResult, setPendingAnalyzeResult] = useState(null); // holds a fetched result when the grid already has colors/fonts, until the person picks merge or replace
 
   const loadSavedStyles = useCallback(async () => {
     setLoadingStyles(true);
@@ -95,11 +96,15 @@ export default function StyleGuide({ role }) {
       });
       const data = await res.json();
       if (res.ok) {
-        setColors((data.colors || []).map(c => ({ ...c, custom: c.custom ?? false })));
-        setFonts((data.fonts || []).map(f => ({ ...f, custom: f.custom ?? false })));
-        if (data.brandNameGuess && !brandName) setBrandName(data.brandNameGuess);
-        setSourceUrl(data.origin || trimmed);
-        setAnalyzeStatus(`Found ${data.colors?.length || 0} colors, ${data.fonts?.length || 0} fonts.`);
+        const result = { colors: data.colors || [], fonts: data.fonts || [], brandNameGuess: data.brandNameGuess, origin: data.origin || trimmed };
+        // Only interrupt with a choice if there's actually something on
+        // the page that a silent overwrite could destroy -- an empty grid
+        // has nothing to lose, so apply straight through same as before.
+        if (colors.length > 0 || fonts.length > 0) {
+          setPendingAnalyzeResult(result);
+        } else {
+          applyAnalyzeResult(result, "replace");
+        }
       } else {
         setAnalyzeStatus(formatErrorMessage(role, res.status, data.error, "Couldn't analyze that site — try again."));
       }
@@ -107,6 +112,36 @@ export default function StyleGuide({ role }) {
       setAnalyzeStatus(formatErrorMessage(role, null, e.message, "Couldn't analyze that site — try again."));
     }
     setAnalyzing(false);
+  }
+
+  // mode "replace" mirrors the old always-overwrite behavior. mode "merge"
+  // appends only colors/fonts not already present (matched by hex / by
+  // font name) so re-analyzing after sampling a few colors by hand doesn't
+  // wipe them out.
+  function applyAnalyzeResult(result, mode) {
+    if (mode === "replace") {
+      setColors(result.colors.map(c => ({ ...c, custom: c.custom ?? false })));
+      setFonts(result.fonts.map(f => ({ ...f, custom: f.custom ?? false })));
+    } else {
+      setColors(cs => {
+        const existingHexes = new Set(cs.map(c => (c.hex || "").toUpperCase()));
+        const additions = result.colors
+          .map(c => ({ ...c, custom: c.custom ?? false }))
+          .filter(c => c.hex && !existingHexes.has(c.hex.toUpperCase()));
+        return [...cs, ...additions];
+      });
+      setFonts(fs => {
+        const existingNames = new Set(fs.map(f => (f.name || "").toLowerCase()));
+        const additions = result.fonts
+          .map(f => ({ ...f, custom: f.custom ?? false }))
+          .filter(f => f.name && !existingNames.has(f.name.toLowerCase()));
+        return [...fs, ...additions];
+      });
+    }
+    if (result.brandNameGuess && !brandName) setBrandName(result.brandNameGuess);
+    setSourceUrl(result.origin);
+    setAnalyzeStatus(`Found ${result.colors.length} colors, ${result.fonts.length} fonts.`);
+    setPendingAnalyzeResult(null);
   }
 
   // Only supports re-importing a Spec-generated HTML export in this pass
@@ -282,6 +317,9 @@ export default function StyleGuide({ role }) {
 
       <Card>
         <CardLabel>Website URL</CardLabel>
+        <p style={{ fontSize: "12px", color: "#6B7280", margin: "-8px 0 14px" }}>
+          Pulls colors and font families it can find directly from a live site's CSS.
+        </p>
         <div style={{ display: "flex", gap: "10px" }}>
           <input value={url} onChange={e => setUrl(e.target.value)} onKeyDown={e => e.key === "Enter" && analyzeUrl()} placeholder="https://example.com" style={urlInput} />
           <button onClick={analyzeUrl} disabled={analyzing} style={primaryBtn}>{analyzing ? "Analyzing…" : "Analyze site"}</button>
@@ -291,23 +329,6 @@ export default function StyleGuide({ role }) {
             {analyzeStatus.startsWith("Found") ? "✓ " : ""}{analyzeStatus}
           </div>
         )}
-
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "20px 0" }}>
-          <div style={{ flex: 1, height: "1px", background: "#DDE0E6" }} />
-          <span style={{ fontSize: "11px", color: "#6B7280", fontWeight: 600 }}>OR</span>
-          <div style={{ flex: 1, height: "1px", background: "#DDE0E6" }} />
-        </div>
-
-        <label style={{ border: "1.5px dashed #DDE0E6", borderRadius: "8px", padding: "18px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
-          <div>
-            <p style={{ fontSize: "13px", fontWeight: 600, margin: "0 0 2px" }}>Upload a style guide</p>
-            <p style={{ fontSize: "11px", color: "#6B7280", margin: 0 }}>
-              {uploadStatus || "A Spec export (.html) reloads instantly and free."}
-            </p>
-          </div>
-          <input type="file" accept=".html" style={{ display: "none" }} onChange={e => e.target.files[0] && handleFileUpload(e.target.files[0])} />
-          <span style={{ ...secondaryBtn, flexShrink: 0 }}>Choose file</span>
-        </label>
       </Card>
 
       <ScreenshotSampler onSample={addSampledColor} existingHexes={colors.map(c => c.hex)} />
@@ -366,6 +387,16 @@ export default function StyleGuide({ role }) {
         </div>
       )}
 
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", padding: "0 2px", marginBottom: "12px" }}>
+        <p style={{ fontSize: "12px", color: "#6B7280", margin: 0 }}>
+          {uploadStatus || "Have a Spec-exported .html file? Restore it instead of starting over."}
+        </p>
+        <label style={{ ...secondaryBtn, flexShrink: 0, cursor: "pointer" }}>
+          Restore from file
+          <input type="file" accept=".html" style={{ display: "none" }} onChange={e => e.target.files[0] && handleFileUpload(e.target.files[0])} />
+        </label>
+      </div>
+
       <SavedLibrary
         styles={savedStyles}
         loading={loadingStyles}
@@ -382,6 +413,45 @@ export default function StyleGuide({ role }) {
         onConfirm={confirmClear}
         onCancel={() => setPendingClear(null)}
       />
+
+      {pendingAnalyzeResult && (
+        <div
+          onClick={() => setPendingAnalyzeResult(null)}
+          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 1200, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ background: "#fff", borderRadius: "12px", width: "100%", maxWidth: "440px", boxShadow: "0 20px 60px rgba(0,0,0,0.3)", fontFamily: "'Be Vietnam Pro', sans-serif", padding: "22px 24px" }}
+          >
+            <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b", marginBottom: "8px" }}>
+              Found {pendingAnalyzeResult.colors.length} colors, {pendingAnalyzeResult.fonts.length} fonts
+            </div>
+            <div style={{ fontSize: "13px", color: "#6b7280", lineHeight: 1.5, marginBottom: "20px" }}>
+              You already have colors or fonts on this page. Add these to what's there, or replace everything with what was just found?
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <button
+                onClick={() => applyAnalyzeResult(pendingAnalyzeResult, "merge")}
+                style={{ padding: "9px 12px", background: "#B45309", color: "#fff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}
+              >
+                Add to what's here
+              </button>
+              <button
+                onClick={() => applyAnalyzeResult(pendingAnalyzeResult, "replace")}
+                style={{ padding: "9px 12px", background: "transparent", color: "#c93939", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}
+              >
+                Replace everything
+              </button>
+              <button
+                onClick={() => setPendingAnalyzeResult(null)}
+                style={{ padding: "9px 12px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
