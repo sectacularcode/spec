@@ -5,6 +5,7 @@ import FontCard from "./components/FontCard.jsx";
 import SavedLibrary from "./components/SavedLibrary.jsx";
 import StyleDocument from "./components/StyleDocument.jsx";
 import { parseStyleGuideHtml } from "./utils/export.js";
+import { ConfirmDialog } from "../components/ConfirmDialog.jsx";
 
 // Spec's 8 template color roles <-> the fixed keys brand_styles actually
 // stores (see api/brand-styles.js's COLOR_KEYS). Custom/"Additional"
@@ -60,6 +61,7 @@ export default function StyleGuide({ role }) {
 
   const [view, setView] = useState("edit"); // "edit" | "document"
   const [documentSource, setDocumentSource] = useState(null); // the style shown when view === "document"
+  const [pendingClear, setPendingClear] = useState(null); // "all" | "colors" | "fonts" | null -- drives the confirm dialog below
 
   const loadSavedStyles = useCallback(async () => {
     setLoadingStyles(true);
@@ -151,6 +153,33 @@ export default function StyleGuide({ role }) {
     setFonts(fs => [...fs, { custom: true, role: "", name: "", confidence: "confirmed" }]);
   }
 
+  // Clearing an analyzed/edited section is real potential data loss --
+  // re-typing 8 colors by hand isn't "trivial" the way removing one row
+  // is (which is why individual swatch/font removal above doesn't
+  // confirm) -- so these three go through the same ConfirmDialog every
+  // other real data-loss action in this app already uses.
+  function requestClearAll() { setPendingClear("all"); }
+  function requestClearColors() { setPendingClear("colors"); }
+  function requestClearFonts() { setPendingClear("fonts"); }
+
+  function confirmClear() {
+    if (pendingClear === "all") {
+      setBrandName(""); setUrl(""); setColors([]); setFonts([]); setSourceUrl("");
+      setAnalyzeStatus(""); setUploadStatus(""); setSaveStatus("");
+    } else if (pendingClear === "colors") {
+      setColors([]);
+    } else if (pendingClear === "fonts") {
+      setFonts([]);
+    }
+    setPendingClear(null);
+  }
+
+  const clearDialogCopy = {
+    all: { title: "Start a new style guide?", message: "This clears the brand name, colors, and fonts on this page. Anything already saved to the library is unaffected.", confirmLabel: "Start new" },
+    colors: { title: "Clear all colors?", message: "Removes every color shown here, including anything found by analyzing a site. This only affects this page -- nothing saved to the library is touched.", confirmLabel: "Clear colors" },
+    fonts: { title: "Clear all fonts?", message: "Removes every font shown here. This only affects this page -- nothing saved to the library is touched.", confirmLabel: "Clear fonts" },
+  };
+
   // Custom ("Additional colors") entries and any font beyond Heading/Body
   // don't have a place to live in brand_styles yet -- COLOR_KEYS there is
   // a fixed 8-slot allowlist by design, and fonts is just {heading, body}.
@@ -223,10 +252,15 @@ export default function StyleGuide({ role }) {
 
   return (
     <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "32px 24px 64px", fontFamily: "'Be Vietnam Pro', sans-serif" }}>
-      <h1 style={{ fontSize: "28px", fontWeight: 700, margin: "0 0 4px" }}>Style guide</h1>
-      <p style={{ fontSize: "13px", color: "#6B7280", margin: "0 0 28px" }}>
-        Pull real colors and fonts from any live site, or build one from scratch. Saved guides are reusable across Brief to Blueprint and Template Studio.
-      </p>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "20px" }}>
+        <div>
+          <h1 style={{ fontSize: "28px", fontWeight: 700, margin: "0 0 4px" }}>Style guide</h1>
+          <p style={{ fontSize: "13px", color: "#6B7280", margin: "0 0 28px" }}>
+            Pull real colors and fonts from any live site, or build one from scratch. Saved guides are reusable across Brief to Blueprint and Template Studio.
+          </p>
+        </div>
+        <button onClick={requestClearAll} style={{ ...secondaryBtn, flexShrink: 0, whiteSpace: "nowrap" }}>+ New style guide</button>
+      </div>
 
       <Card>
         <CardLabel>Brand name</CardLabel>
@@ -264,7 +298,10 @@ export default function StyleGuide({ role }) {
       </Card>
 
       <Card>
-        <CardLabel>Colors {colors.length > 0 ? `(${colors.length})` : ""}</CardLabel>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
+          <CardLabel noMargin>Colors {colors.length > 0 ? `(${colors.length})` : ""}</CardLabel>
+          {colors.length > 0 && <button onClick={requestClearColors} style={clearLink}>Clear colors</button>}
+        </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "14px" }}>
           {colors.map((c, i) => (
             <ColorSwatch key={i} color={c} onChange={updated => updateColor(i, updated)} onRemove={() => removeColor(i)} />
@@ -277,7 +314,10 @@ export default function StyleGuide({ role }) {
       </Card>
 
       <Card>
-        <CardLabel>Fonts {fonts.length > 0 ? `(${fonts.length})` : ""}</CardLabel>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
+          <CardLabel noMargin>Fonts {fonts.length > 0 ? `(${fonts.length})` : ""}</CardLabel>
+          {fonts.length > 0 && <button onClick={requestClearFonts} style={clearLink}>Clear fonts</button>}
+        </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "20px" }}>
           {fonts.map((f, i) => (
             <FontCard key={i} font={f} onChange={updated => updateFont(i, updated)} onRemove={() => removeFont(i)} />
@@ -289,17 +329,27 @@ export default function StyleGuide({ role }) {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <button onClick={saveToLibrary} style={primaryBtn}>Save to library</button>
-          {colors.length + fonts.length > 0 && (
-            <button
-              onClick={() => { setDocumentSource({ brandName, sourceUrl, colors, fonts }); setView("document"); }}
-              style={secondaryBtn}
-            >
-              Preview document
-            </button>
-          )}
           {saveStatus && <span style={{ fontSize: "12px", color: "#6B7280" }}>{saveStatus}</span>}
         </div>
       </Card>
+
+      {colors.length + fonts.length > 0 && (
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px",
+          background: "#FEF3E2", border: "1px solid #FBEBD1", borderRadius: "10px", padding: "16px 20px", marginBottom: "20px",
+        }}>
+          <div>
+            <p style={{ fontSize: "13px", fontWeight: 600, margin: "0 0 2px", color: "#09090B" }}>See it as a real document</p>
+            <p style={{ fontSize: "11px", color: "#6B7280", margin: 0 }}>Brand name, swatches, and full type specimens on one shareable page.</p>
+          </div>
+          <button
+            onClick={() => { setDocumentSource({ brandName, sourceUrl, colors, fonts }); setView("document"); }}
+            style={{ ...primaryBtn, flexShrink: 0 }}
+          >
+            View brand sheet
+          </button>
+        </div>
+      )}
 
       <SavedLibrary
         styles={savedStyles}
@@ -308,6 +358,15 @@ export default function StyleGuide({ role }) {
         onView={viewStyle}
         onDownload={viewStyle}
       />
+
+      <ConfirmDialog
+        open={!!pendingClear}
+        title={pendingClear ? clearDialogCopy[pendingClear].title : ""}
+        message={pendingClear ? clearDialogCopy[pendingClear].message : ""}
+        confirmLabel={pendingClear ? clearDialogCopy[pendingClear].confirmLabel : "Clear"}
+        onConfirm={confirmClear}
+        onCancel={() => setPendingClear(null)}
+      />
     </div>
   );
 }
@@ -315,8 +374,8 @@ export default function StyleGuide({ role }) {
 function Card({ children }) {
   return <div style={{ background: "#fff", border: "1px solid #DDE0E6", borderRadius: "10px", padding: "24px", marginBottom: "20px" }}>{children}</div>;
 }
-function CardLabel({ children }) {
-  return <p style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "#6B7280", margin: "0 0 14px" }}>{children}</p>;
+function CardLabel({ children, noMargin }) {
+  return <p style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "#6B7280", margin: noMargin ? 0 : "0 0 14px" }}>{children}</p>;
 }
 
 const nameInput = { flex: 1, height: "38px", padding: "0 14px", border: "1px solid #DDE0E6", borderRadius: "6px", fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: "14px", fontWeight: 600, color: "#09090B", width: "100%", boxSizing: "border-box" };
@@ -324,3 +383,4 @@ const urlInput = { flex: 1, height: "38px", padding: "0 14px", border: "1px soli
 const primaryBtn = { height: "38px", padding: "0 18px", background: "#B45309", color: "#fff", border: "none", borderRadius: "6px", fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: "13px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" };
 const secondaryBtn = { height: "38px", padding: "0 18px", background: "#fff", color: "#6B635C", border: "1px solid #DDE0E6", borderRadius: "6px", fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: "13px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center" };
 const addTile = { border: "1.5px dashed #DDE0E6", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", minHeight: "120px", cursor: "pointer", color: "#6B7280", fontSize: "13px", fontWeight: 600, flexDirection: "column", gap: "6px", background: "transparent", fontFamily: "'Be Vietnam Pro', sans-serif" };
+const clearLink = { background: "none", border: "none", color: "#B45309", fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: "11px", fontWeight: 600, cursor: "pointer", padding: 0, textDecoration: "underline" };

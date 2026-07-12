@@ -131,7 +131,12 @@ export function printStyleGuide() {
 export async function exportStyleGuideImage(exportElement, format, data) {
   if (!exportElement) return;
   await document.fonts.ready;
-  const canvas = await html2canvas(exportElement, { backgroundColor: "#ffffff", scale: 2 });
+  // scale:2 (retina) made the default PNG/JPEG taller than a typical
+  // laptop screen at 100% zoom -- fine for print, but the first thing
+  // most people do is just open the file to look at it. 1.5x is still
+  // sharp enough to read hex codes clearly, at roughly 3/4 the pixel
+  // dimensions of the old default.
+  const canvas = await html2canvas(exportElement, { backgroundColor: "#ffffff", scale: 1.5 });
   const base = safeFileBase(data.brandName);
   const mime = format === "jpeg" ? "image/jpeg" : "image/png";
   triggerDownload(canvas.toDataURL(mime, 0.95), `${base}-style-guide.${format}`);
