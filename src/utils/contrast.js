@@ -53,11 +53,24 @@ export function pickReadableColor(bgHex, candidates, minContrast = MIN_CONTRAST_
 }
 
 // For text sitting ON a color (a button fill, a dark panel) rather than
-// text placed next to it -- picks whichever of white or a given dark
-// color actually contrasts better against that specific background.
+// text placed next to it -- picks whichever candidate actually contrasts
+// best against that background. darkHex is a preferred on-brand dark
+// candidate (e.g. the "Body text" role), but it's just a candidate, not
+// trusted blindly -- if it turns out not to actually be dark (roles can
+// get reassigned to the wrong color, e.g. after a merge), the hardcoded
+// #1a1a1a fallback still gets weighed and wins if it reads better.
 export function bestTextColor(bgHex, darkHex = "#1a1a1a") {
   if (!bgHex) return "#FFFFFF";
-  const withWhite = contrastRatio("#FFFFFF", bgHex);
-  const withDark = contrastRatio(darkHex, bgHex);
-  return withWhite >= withDark ? "#FFFFFF" : darkHex;
+  const candidates = ["#FFFFFF", darkHex, "#1a1a1a"];
+  let best = "#FFFFFF";
+  let bestScore = -1;
+  for (const c of candidates) {
+    if (!c) continue;
+    const score = contrastRatio(c, bgHex);
+    if (score > bestScore) {
+      bestScore = score;
+      best = c;
+    }
+  }
+  return best;
 }
