@@ -1,10 +1,11 @@
-// Brand style guide API — Postgres-backed. One saved color/font profile
-// per (user, brand name), reusable across every future page for that
-// brand regardless of upload source (Standard Brief or Manifest import).
+// Brand style guide API — Postgres-backed. One saved color/font/button
+// profile per (user, brand name), reusable across every future page for
+// that brand regardless of upload source (Standard Brief or Manifest
+// import).
 //
 // GET    /api/brand-styles              — list the caller's saved brand styles
 // GET    /api/brand-styles?brand_name=X — look up one brand's saved style
-// POST   /api/brand-styles              — { brand_name, colors, fonts } — upsert
+// POST   /api/brand-styles              — { brand_name, colors, fonts, buttons } — upsert
 // DELETE /api/brand-styles?brand_name=X — remove one saved style
 
 import { requireAuth } from "./_lib/auth.js";
@@ -42,6 +43,11 @@ async function ensureTable() {
   // cheap on every request once the column is already there, and doesn't
   // require a separate one-off migration to have actually been run.
   await sql`ALTER TABLE brand_styles ADD COLUMN IF NOT EXISTS source_url TEXT`;
+  // Buttons is a real array (not a fixed-key object like colors/fonts) --
+  // a person picks 1-3 explicit background+text pairs directly, there's
+  // no template-role slot system to key them by. Same self-healing
+  // pattern as source_url above.
+  await sql`ALTER TABLE brand_styles ADD COLUMN IF NOT EXISTS buttons JSONB NOT NULL DEFAULT '[]'::jsonb`;
 }
 
 // Only these keys are meaningful to Spec's color system (see landing.js's
@@ -101,6 +107,27 @@ function sanitizeFonts(input) {
   return { clean, dropped };
 }
 
+const MAX_BUTTONS = 10; // generous ceiling above the realistic "1-3 button styles" use case -- a sanity cap, not a real constraint
+const MAX_BUTTON_NAME_LEN = 60;
+
+// Each entry needs a valid background AND a valid text color to be worth
+// storing at all -- a button with only one real color isn't renderable,
+// so a bad entry is dropped whole rather than saved half-populated.
+function sanitizeButtons(input) {
+  if (!Array.isArray(input)) return { clean: [], droppedCount: 0 };
+  let droppedCount = 0;
+  const clean = [];
+  for (const b of input.slice(0, MAX_BUTTONS)) {
+    if (!b || typeof b !== "object") { droppedCount++; continue; }
+    const background = typeof b.background === "string" && HEX_RE.test(b.background.trim()) ? b.background.trim() : null;
+    const textColor = typeof b.textColor === "string" && HEX_RE.test(b.textColor.trim()) ? b.textColor.trim() : null;
+    if (!background || !textColor) { droppedCount++; continue; }
+    const name = typeof b.name === "string" ? b.name.trim().slice(0, MAX_BUTTON_NAME_LEN) : "";
+    clean.push({ name, background, textColor });
+  }
+  return { clean, droppedCount };
+}
+
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
 
@@ -126,7 +153,7 @@ export default async function handler(req, res) {
         // this fix, this deterministically returns the most recently
         // updated one rather than an arbitrary row.
         const { rows } = await sql`
-          SELECT brand_name, colors, fonts, source_url, updated_at FROM brand_styles
+          SELECT brand_name, colors, fonts, buttons, source_url, updated_at FROM brand_styles
           WHERE user_id = ${userId} AND LOWER(brand_name) = LOWER(${brandName})
           ORDER BY updated_at DESC
           LIMIT 1
@@ -134,7 +161,7 @@ export default async function handler(req, res) {
         return res.status(200).json({ style: rows[0] || null });
       }
       const { rows } = await sql`
-        SELECT brand_name, colors, fonts, source_url, updated_at FROM brand_styles
+        SELECT brand_name, colors, fonts, buttons, source_url, updated_at FROM brand_styles
         WHERE user_id = ${userId}
         ORDER BY updated_at DESC
       `;
@@ -142,14 +169,15 @@ export default async function handler(req, res) {
     }
 
     if (req.method === "POST") {
-      const { brand_name, colors, fonts, source_url } = req.body || {};
+      const { brand_name, colors, fonts, buttons, source_url } = req.body || {};
       if (!validText(brand_name, 200) || brand_name.trim().length === 0) {
         return res.status(400).json({ error: "Invalid brand_name" });
       }
       const { clean: cleanColors, dropped: droppedColorKeys } = sanitizeColors(colors);
       const { clean: cleanFonts, dropped: droppedFontKeys } = sanitizeFonts(fonts);
-      if (!validJsonSize(cleanColors) || !validJsonSize(cleanFonts)) {
-        return res.status(400).json({ error: "Invalid colors/fonts payload" });
+      const { clean: cleanButtons, droppedCount: droppedButtonCount } = sanitizeButtons(buttons);
+      if (!validJsonSize(cleanColors) || !validJsonSize(cleanFonts) || !validJsonSize({ buttons: cleanButtons })) {
+        return res.status(400).json({ error: "Invalid colors/fonts/buttons payload" });
       }
       // Optional -- a manually-entered style guide has no source URL at
       // all, which is fine. When present it's validated the same as any
@@ -203,20 +231,21 @@ export default async function handler(req, res) {
         // handler rather than a special "keep the old casing" carve-out.
         await sql`
           UPDATE brand_styles
-          SET brand_name = ${trimmedName}, colors = ${cleanColors}, fonts = ${cleanFonts},
+          SET brand_name = ${trimmedName}, colors = ${cleanColors}, fonts = ${cleanFonts}, buttons = ${JSON.stringify(cleanButtons)},
               source_url = COALESCE(${cleanSourceUrl}, source_url), updated_at = NOW()
           WHERE user_id = ${userId} AND brand_name = ${existing[0].brand_name}
         `;
       } else {
         await sql`
-          INSERT INTO brand_styles (user_id, brand_name, colors, fonts, source_url, updated_at)
-          VALUES (${userId}, ${trimmedName}, ${cleanColors}, ${cleanFonts}, ${cleanSourceUrl}, NOW())
+          INSERT INTO brand_styles (user_id, brand_name, colors, fonts, buttons, source_url, updated_at)
+          VALUES (${userId}, ${trimmedName}, ${cleanColors}, ${cleanFonts}, ${JSON.stringify(cleanButtons)}, ${cleanSourceUrl}, NOW())
         `;
       }
       return res.status(200).json({
-        ok: true, brand_name: trimmedName, colors: cleanColors, fonts: cleanFonts,
+        ok: true, brand_name: trimmedName, colors: cleanColors, fonts: cleanFonts, buttons: cleanButtons,
         droppedColorKeys: droppedColorKeys.length ? droppedColorKeys : undefined,
         droppedFontKeys: droppedFontKeys.length ? droppedFontKeys : undefined,
+        droppedButtonCount: droppedButtonCount || undefined,
       });
     }
 
