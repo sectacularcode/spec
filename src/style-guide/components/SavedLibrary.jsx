@@ -4,7 +4,7 @@ import { useState } from "react";
 // regardless of source (manual entry, Style Guide URL-scrape, or a
 // previous upload) -- brand_styles doesn't distinguish, and neither does
 // this list; source_url just renders differently per row when present.
-export default function SavedLibrary({ styles, loading, onApply }) {
+export default function SavedLibrary({ styles, loading, onApply, onDelete, statusMessage }) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -24,6 +24,10 @@ export default function SavedLibrary({ styles, loading, onApply }) {
           ▾
         </span>
       </div>
+
+      {statusMessage && (
+        <p style={{ fontSize: "12px", color: "#B45309", margin: "0 0 12px" }}>{statusMessage}</p>
+      )}
 
       {!collapsed && (
         loading ? (
@@ -54,6 +58,7 @@ export default function SavedLibrary({ styles, loading, onApply }) {
                 </p>
               </div>
               <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
+                <button onClick={() => onDelete(style)} style={secondaryBtn}>Delete</button>
                 <button onClick={() => onApply(style)} style={applyBtn}>Apply</button>
               </div>
             </div>
