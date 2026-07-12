@@ -268,10 +268,16 @@ export function buildColorSet(css) {
   if (!accentOk) { const c = nextRanked(); if (c) add("Accent", c, "estimated"); }
   if (!bgOk) {
     // White is a safe structural default even if it collides with
-    // something else already assigned -- an unfilled Background is
-    // worse than a possibly-duplicate white, so this is the one role
-    // that intentionally skips the used-check.
+    // something already assigned via a confirmed signal -- an unfilled
+    // Background is worse than a possibly-duplicate white, so this is
+    // the one role that intentionally skips the used-check on the way
+    // in. It still gets registered in `used` afterward, though -- a real
+    // site (jpmorganchase.com) confirmed the gap: without this, a later
+    // role's ranked-fallback could independently rediscover white too
+    // (a bank site has plenty of it) and produce the exact same
+    // accidental duplicate this whole pass structure was built to catch.
     result.push({ role: "Background", hex: "#FFFFFF", confidence: "derived", custom: false });
+    used.add("#FFFFFF");
   }
   if (!mutedOk) { const c = nextRanked(); if (c) add("Muted", c, "estimated"); }
 
