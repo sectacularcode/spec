@@ -33,3 +33,24 @@ export const buttonOn = (sectionBg, accent) => {
   const btnText = textOn(btnBg);
   return { btnBg, btnText };
 };
+
+// A small, auto-generated button hierarchy -- Primary (solid), Secondary
+// (outline), Ghost (text-only) -- all derived from the brand's own
+// accent/primary colors and contrast-checked against sectionBg, never
+// manually entered. This is the "variations you can apply to a template"
+// set: one deterministic, always-legible option per style, not a picker
+// of arbitrary color combinations someone has to vet themselves.
+export const buttonVariations = (sectionBg, accent) => {
+  const solid = buttonOn(sectionBg, accent);
+  // Outline/Ghost have no fill of their own, so what matters is whether
+  // the accent itself reads directly against sectionBg -- a different
+  // question than buttonOn's "does accent read as a FILL" check, which
+  // also considers what text color would sit ON that fill.
+  const accentReadableDirectly = contrastRatio(accent, sectionBg) >= 3;
+  const lineColor = accentReadableDirectly ? accent : textOn(sectionBg);
+  return {
+    primary: { bg: solid.btnBg, text: solid.btnText },
+    secondary: { border: lineColor, text: lineColor },
+    ghost: { text: lineColor },
+  };
+};

@@ -5,7 +5,7 @@ import { FONT_OPTIONS, PREMIUM_ACCENTS } from "../../constants/ui.jsx";
 import { THEMES } from "../../constants/themes.js";
 import { LAYOUTS } from "../../constants/layouts.js";
 import { WEBSITE_TEMPLATES, applyWebsiteTemplate, applyTheme } from "../../constants/templates.js";
-import { contrastRatio, isLight } from "../../utils/colors.js";
+import { contrastRatio, isLight, buttonVariations } from "../../utils/colors.js";
 
 export default function BrandTab({ ctx }) {
   const { brand, pageIdx, updBrand, showAdvancedColors, setShowAdvancedColors, showAllThemes, setShowAllThemes, setProjects, activeId } = ctx;
@@ -462,6 +462,34 @@ export default function BrandTab({ ctx }) {
                       ))}
                     </div>
                   </div>
+                </div>
+
+                <div style={{ marginTop: "4px", paddingTop: "16px", borderTop: "1px solid #dde0e6" }}>
+                  <label style={I.lbl}>Button Styles</label>
+                  <p style={{ fontSize: "11px", color: "#6b7280", margin: "0 0 12px", lineHeight: 1.5 }}>
+                    Built from your Primary and Accent colors above -- Primary for the main call to action, Secondary and Ghost for lower-emphasis actions elsewhere on the page. Auto-generated and contrast-checked, not something to color individually.
+                  </p>
+                  {(() => {
+                    const pcColor = brand.primaryColor || "#ffffff";
+                    const acColor = brand.accentColor || "#000000";
+                    const radius = { sharp: "0", subtle: "6px", pill: "999px" }[brand.buttonRadius || "subtle"];
+                    const v = buttonVariations(pcColor, acColor);
+                    const items = [
+                      { label: "Primary", style: { background: v.primary.bg, color: v.primary.text, border: "none" } },
+                      { label: "Secondary", style: { background: "transparent", color: v.secondary.text, border: `2px solid ${v.secondary.border}` } },
+                      { label: "Ghost", style: { background: "transparent", color: v.ghost.text, border: "none", textDecoration: "underline", textUnderlineOffset: "3px" } },
+                    ];
+                    return (
+                      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", alignItems: "flex-start", padding: "20px", background: pcColor, borderRadius: "8px", border: "1px solid #dde0e6" }}>
+                        {items.map(({ label, style }) => (
+                          <div key={label} style={{ textAlign: "center" }}>
+                            <button style={{ ...style, borderRadius: radius, padding: "10px 20px", fontSize: "13px", fontWeight: 600, cursor: "default" }} disabled>Call to action</button>
+                            <div style={{ fontSize: "10px", color: isLight(pcColor) ? "#6b7280" : "rgba(255,255,255,0.6)", marginTop: "8px", fontWeight: 600, letterSpacing: "0.03em", textTransform: "uppercase" }}>{label}</div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </div>
               </Section>
 
