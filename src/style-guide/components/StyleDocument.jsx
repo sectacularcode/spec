@@ -49,6 +49,15 @@ export default function StyleDocument({ brandName, sourceUrl, colors, fonts }) {
   // as unreadable as light-on-white was for headings above.
   const accentHex = mainColors.find(c => c.role === "Accent")?.hex || "#333";
   const buttonTextColor = bestTextColor(accentHex, bodyTextHex || "#1a1a1a");
+  // A button fill color alone doesn't show how a button actually reads --
+  // a light accent that's meant to pop against a dark hero section looks
+  // like a washed-out nothing sitting directly on the document's own
+  // white page. Showing it on both a light AND dark surface from the
+  // brand's own palette (falling back to hardcoded white/near-black only
+  // if those roles weren't captured) gives an honest picture either way,
+  // instead of asserting which context is the "real" one.
+  const lightPanelHex = mainColors.find(c => c.role === "Background")?.hex || "#FFFFFF";
+  const darkPanelDemoHex = darkPanelHex || "#1a1a1a";
 
   const exportData = { brandName, sourceUrl, colors, fonts };
 
@@ -123,8 +132,19 @@ export default function StyleDocument({ brandName, sourceUrl, colors, fonts }) {
                 </div>
                 <div style={typeRow}>
                   <div style={typeLabel}>Button</div>
-                  <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: accentHex }}>
-                    <span style={{ fontFamily: `'${bodyFont.name}', sans-serif`, fontWeight: 600, fontSize: "13px", color: buttonTextColor, letterSpacing: "0.02em" }}>Call to action</span>
+                  <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+                    <div style={buttonDemoPanel(lightPanelHex)}>
+                      <p style={buttonDemoLabel(false)}>On light</p>
+                      <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: accentHex }}>
+                        <span style={{ fontFamily: `'${bodyFont.name}', sans-serif`, fontWeight: 600, fontSize: "13px", color: buttonTextColor, letterSpacing: "0.02em" }}>Call to action</span>
+                      </div>
+                    </div>
+                    <div style={buttonDemoPanel(darkPanelDemoHex)}>
+                      <p style={buttonDemoLabel(true)}>On dark</p>
+                      <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: accentHex }}>
+                        <span style={{ fontFamily: `'${bodyFont.name}', sans-serif`, fontWeight: 600, fontSize: "13px", color: buttonTextColor, letterSpacing: "0.02em" }}>Call to action</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -217,6 +237,16 @@ const fontNameLabel = { fontSize: "14px", fontWeight: 600, color: "#1a1a1a" };
 const typeRow = { display: "flex", alignItems: "baseline", gap: "20px", marginBottom: "14px" };
 const typeLabel = { flexShrink: 0, width: "58px", fontSize: "11px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", color: "#8a8a8a" };
 const typeLabelSmall = { display: "block", fontSize: "10px", fontWeight: 400, textTransform: "none", color: "#b0b0b0", marginTop: "2px" };
+function buttonDemoPanel(bg) {
+  return {
+    background: bg, borderRadius: "8px", padding: "14px 18px",
+    display: "inline-flex", flexDirection: "column", alignItems: "flex-start", gap: "10px",
+    border: bg.toLowerCase() === "#ffffff" ? "1px solid #ececec" : "none",
+  };
+}
+function buttonDemoLabel(onDark) {
+  return { fontSize: "10px", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: onDark ? "#b0b0b0" : "#8a8a8a", margin: 0 };
+}
 
 const exportBtn = { fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: "12px", fontWeight: 600, padding: "9px 16px", borderRadius: "6px", cursor: "pointer", border: "1px solid #DDE0E6", background: "#fff", color: "#6B635C" };
 const primaryExportBtn = { ...exportBtn, background: "#09090B", color: "#fff", borderColor: "#09090B" };
