@@ -63,6 +63,8 @@ export default function StyleGuide({ role }) {
   const [view, setView] = useState("edit"); // "edit" | "document"
   const [documentSource, setDocumentSource] = useState(null); // the style shown when view === "document"
   const [pendingClear, setPendingClear] = useState(null); // "all" | "colors" | "fonts" | null -- drives the confirm dialog below
+  const [pendingDeleteStyle, setPendingDeleteStyle] = useState(null); // the saved style object pending delete confirmation, or null
+  const [deleteStatus, setDeleteStatus] = useState("");
   const [pendingAnalyzeResult, setPendingAnalyzeResult] = useState(null); // holds a fetched result when the grid already has colors/fonts, until the person picks merge or replace
   const [draggedColorIndex, setDraggedColorIndex] = useState(null);
   const [dragOverColorIndex, setDragOverColorIndex] = useState(null);
@@ -316,6 +318,32 @@ export default function StyleGuide({ role }) {
     setTimeout(() => setSaveStatus(""), 4000);
   }
 
+  function requestDeleteStyle(style) {
+    setPendingDeleteStyle(style);
+  }
+
+  async function confirmDeleteStyle() {
+    const style = pendingDeleteStyle;
+    if (!style) return;
+    setPendingDeleteStyle(null);
+    try {
+      const res = await fetch(`/api/brand-styles?brand_name=${encodeURIComponent(style.brand_name)}`, {
+        method: "DELETE",
+        headers: await authHeaders(),
+      });
+      if (res.ok) {
+        loadSavedStyles();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setDeleteStatus(formatErrorMessage(role, res.status, data.error, "Couldn't delete — try again."));
+        setTimeout(() => setDeleteStatus(""), 6000);
+      }
+    } catch (e) {
+      setDeleteStatus(formatErrorMessage(role, null, e.message, "Couldn't delete — try again."));
+      setTimeout(() => setDeleteStatus(""), 6000);
+    }
+  }
+
   if (view === "document" && documentSource) {
     return (
       <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "32px 24px 64px" }}>
@@ -451,6 +479,8 @@ export default function StyleGuide({ role }) {
         styles={savedStyles}
         loading={loadingStyles}
         onApply={applyStyle}
+        onDelete={requestDeleteStyle}
+        statusMessage={deleteStatus}
       />
 
       <ConfirmDialog
@@ -460,6 +490,15 @@ export default function StyleGuide({ role }) {
         confirmLabel={pendingClear ? clearDialogCopy[pendingClear].confirmLabel : "Clear"}
         onConfirm={confirmClear}
         onCancel={() => setPendingClear(null)}
+      />
+
+      <ConfirmDialog
+        open={!!pendingDeleteStyle}
+        title={pendingDeleteStyle ? `Delete ${pendingDeleteStyle.brand_name}'s saved style guide?` : ""}
+        message="This permanently removes it from your saved library and can't be undone."
+        confirmLabel="Delete"
+        onConfirm={confirmDeleteStyle}
+        onCancel={() => setPendingDeleteStyle(null)}
       />
 
       {pendingAnalyzeResult && (
