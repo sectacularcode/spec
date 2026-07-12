@@ -662,8 +662,15 @@ Return ONLY the new ${fieldName} value as plain text.`;
     // setBriefText() and hoping this function's closure sees the updated
     // state on the same tick -- React state updates aren't synchronous, so
     // reading briefText here right after a setBriefText() call would still
-    // see the OLD value.
-    const text = (overrideText !== undefined ? overrideText : briefText).trim();
+    // see the OLD value. Checking typeof === "string" rather than
+    // !== undefined is deliberate: a bare onClick={describeMySite} (as
+    // opposed to onClick={() => describeMySite()}) passes the click's
+    // SyntheticEvent as the first argument, which is very much not
+    // undefined -- that broke both call sites below once this param was
+    // added. Every call site is now fixed to call describeMySite() with no
+    // arguments explicitly, but this guard stays so the same mistake can't
+    // silently reintroduce the bug at a future call site.
+    const text = (typeof overrideText === "string" ? overrideText : briefText).trim();
     if (!text && !lockedTemplateId) return;
     const reqId = ++briefRecReqRef.current;
     setBriefLoading(true);
@@ -1728,7 +1735,7 @@ Rules:
           </div>
           <div style={{ display: "flex", gap: "10px", marginTop: "14px", alignItems: "center", flexWrap: "wrap" }}>
             <button
-              onClick={describeMySite}
+              onClick={() => describeMySite()}
               disabled={briefLoading || (!briefText.trim() && !lockedTemplateId)}
               style={{
                 display: "inline-flex", alignItems: "center", gap: "8px",
@@ -1988,7 +1995,7 @@ Rules:
                 <button onClick={applyBriefRecommendation} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px", background: "#3f3f46", color: "#fff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
                   <Icon name="check" size={14} color="#fff" /> Create this project
                 </button>
-                <button onClick={describeMySite} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
+                <button onClick={() => describeMySite()} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
                   <Icon name="refresh" size={14} color="#09090b" /> Regenerate
                 </button>
                 <button onClick={() => setBriefRec(null)} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 14px", background: "transparent", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "13px", fontWeight: 500, cursor: "pointer" }}>
