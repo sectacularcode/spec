@@ -322,13 +322,36 @@ export function buildColorSet(css) {
 
 // ---- Font extraction ----------------------------------------------------
 
+// Icon fonts (rendering icons AS letters via font glyphs -- an arrow, a
+// hamburger menu, a star) are structurally identical to real typography
+// once declared: a font-family name plus a font file, via the exact same
+// @font-face or Google Fonts mechanisms a real heading/body font uses.
+// Nothing in that structure distinguishes "this is meant to be read" from
+// "this is meant to be an icon." Nearly every icon font system puts
+// "icon" directly in its family name -- swiper-icons, elementor's own
+// eicons, WordPress's bundled dashicons and genericons, material-icons /
+// material-symbols, bootstrap-icons, ionicons, glyphicons, octicons,
+// remixicon, themify-icons, simple-line-icons, linearicons, typicons --
+// so a single substring check catches the large majority of real-world
+// cases, including the two most likely to show up on Spec's own client
+// sites: WordPress and Elementor both load their icon fonts by default,
+// not as an opt-in. Font Awesome is the one common exception with no
+// literal "icon" in its name, so it gets an explicit check too.
+function isLikelyIconFont(name) {
+  const n = (name || "").toLowerCase();
+  if (n.includes("icon")) return true;
+  if (n.includes("fontawesome") || n.includes("font awesome")) return true;
+  if (n.includes("material symbol")) return true; // Google's newer icon system -- "Material Symbols Outlined/Rounded/Sharp" has no literal "icon" in the name
+  return false;
+}
+
 function extractGoogleFontLinks(html) {
   const names = [];
   const re = /fonts\.googleapis\.com\/css2?\?family=([^"'&]+)/gi;
   let m;
   while ((m = re.exec(html)) !== null) {
     const family = decodeURIComponent(m[1].split(":")[0]).replace(/\+/g, " ");
-    if (family) names.push(family);
+    if (family && !isLikelyIconFont(family)) names.push(family);
   }
   return [...new Set(names)];
 }
@@ -337,7 +360,10 @@ function extractFontFaceNames(css) {
   const names = [];
   const re = /@font-face\s*\{[^}]*font-family\s*:\s*["']?([^;"'}]+)["']?/gi;
   let m;
-  while ((m = re.exec(css)) !== null) names.push(m[1].trim());
+  while ((m = re.exec(css)) !== null) {
+    const name = m[1].trim();
+    if (name && !isLikelyIconFont(name)) names.push(name);
+  }
   return [...new Set(names)];
 }
 
@@ -350,7 +376,13 @@ function extractSelectorFontFamily(css, selector) {
   const fontMatch = m[1].match(/font-family\s*:\s*([^;]+);/i);
   if (!fontMatch) return null;
   const first = fontMatch[1].split(",")[0].trim().replace(/^["']|["']$/g, "");
-  return GENERIC_FONT_FAMILIES.includes(first.toLowerCase()) ? null : first;
+  if (GENERIC_FONT_FAMILIES.includes(first.toLowerCase())) return null;
+  // Belt-and-suspenders: even if an h1/body selector's own font-family
+  // rule genuinely resolves to an icon font (a misconfigured site, or a
+  // decorative icon-as-heading trick), it's still not something to
+  // report as the brand's real heading/body typeface.
+  if (isLikelyIconFont(first)) return null;
+  return first;
 }
 
 // Mirrors buildColorSet's confidence honesty: "confirmed" when the font
