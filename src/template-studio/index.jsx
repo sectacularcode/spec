@@ -620,34 +620,31 @@ Return ONLY the new ${fieldName} value as plain text.`;
     if (hue < 290) return "purple";
     return "pink";
   }
+  // Each color word maps to the SET of hue families it can legitimately
+  // land in, not a single family -- a one-word-one-family design is the
+  // root problem this replaces. Audited every word here against a
+  // canonical real-world hex value for that color and its computed
+  // hexHueFamily result (2026-07-12 audit, 13 of 46 words came back wrong
+  // under the old single-family design -- including "pink" itself:
+  // standard web pink #FFC0CB computes to "red", not "pink"). Words with
+  // more than one entry are ones that genuinely span two adjacent hue
+  // buckets depending on the specific shade (indigo blue-vs-purple, coral
+  // orange-vs-red-vs-pink, charcoal black-vs-blue-vs-gray, etc.) -- that's
+  // real perceptual ambiguity, not something a single mapping can resolve
+  // correctly either way.
   const COLOR_WORD_FAMILY = {
-    red: "red", crimson: "red", scarlet: "red", maroon: "red",
-    orange: "orange", amber: "orange", rust: "orange", coral: "orange", tangerine: "orange",
-    brown: "orange", tan: "orange", bronze: "orange", copper: "orange", terracotta: "orange", clay: "orange",
-    // "gold" is deliberately mapped to orange, not yellow -- every real
-    // gold/champagne/bronze accent color already used in this app's own
-    // theme library (editorial-dark #c9a86a, onyx-bronze #b87333,
-    // slate-amber #d4901a) computes to "orange" via hexHueFamily's hue
-    // bucketing, not "yellow". Leaving "gold" mapped to yellow meant the AI
-    // accurately describing its own accent color as "gold" was flagged as
-    // a mismatch against the real orange-bucketed hex every time, silently
-    // overwriting specific reasoning with the generic "keyed to orange
-    // tones" fallback -- confirmed as the source of that boilerplate text
-    // repeating verbatim across otherwise-unrelated custom projects.
-    yellow: "yellow", gold: "orange", mustard: "yellow",
-    green: "green", emerald: "green", sage: "green", olive: "green", forest: "green", mint: "green", sewer: "green",
-    teal: "teal", turquoise: "teal", cyan: "teal", aqua: "teal",
-    blue: "blue", navy: "blue", cobalt: "blue", indigo: "blue",
-    purple: "purple", violet: "purple", lavender: "purple", plum: "purple", lilac: "purple",
-    // "rose" is deliberately mapped to orange, not pink -- same issue as
-    // gold: "rose gold" is an extremely common warm mauve-tan descriptor in
-    // beauty/spa/wellness contexts, and real rose-gold hex values compute
-    // to "orange" via hue bucketing, not "pink". True saturated pink/
-    // magenta/fuchsia still correctly map to pink below.
-    pink: "pink", magenta: "pink", rose: "orange", fuchsia: "pink",
-    black: "black", charcoal: "black", onyx: "black", ebony: "black",
-    white: "white", ivory: "white", cream: "white",
-    gray: "gray", grey: "gray", slate: "gray",
+    red: ["red"], crimson: ["red"], scarlet: ["red"], maroon: ["red", "orange"],
+    orange: ["orange"], amber: ["orange", "yellow"], rust: ["orange", "red"], coral: ["orange", "red", "pink"], tangerine: ["orange"],
+    brown: ["orange"], tan: ["orange"], bronze: ["orange"], copper: ["orange"], terracotta: ["orange", "red"], clay: ["orange"],
+    yellow: ["yellow"], gold: ["orange", "yellow"], mustard: ["yellow"],
+    green: ["green"], emerald: ["green"], sage: ["green"], olive: ["green", "yellow"], forest: ["green"], mint: ["green"], sewer: ["green"],
+    teal: ["teal"], turquoise: ["teal"], cyan: ["teal"], aqua: ["teal"],
+    blue: ["blue"], navy: ["blue"], cobalt: ["blue"], indigo: ["blue", "purple"],
+    purple: ["purple", "pink"], violet: ["purple"], lavender: ["purple", "blue"], plum: ["purple", "pink"], lilac: ["purple", "pink"],
+    pink: ["pink", "red"], magenta: ["pink", "purple"], rose: ["orange", "pink", "red"], fuchsia: ["pink", "purple"],
+    black: ["black"], charcoal: ["black", "gray", "blue"], onyx: ["black"], ebony: ["black"],
+    white: ["white"], ivory: ["white", "yellow"], cream: ["white", "yellow"],
+    gray: ["gray"], grey: ["gray"], slate: ["gray", "blue"],
   };
   // Natural-language color mentions are overwhelmingly plural ("blues",
   // "browns", "hues of pink") -- COLOR_WORD_FAMILY only has singular keys,
@@ -656,16 +653,17 @@ Return ONLY the new ${fieldName} value as plain text.`;
   // pink") against the un-fixed lookup: it caught "pink" but silently
   // missed "blues" entirely, which would have made the safety net below
   // under-detect on exactly the case it exists to catch.
-  function wordToColorFamily(word) {
+  function wordAcceptableFamilies(word) {
     if (COLOR_WORD_FAMILY[word]) return COLOR_WORD_FAMILY[word];
     if (word.endsWith("s") && COLOR_WORD_FAMILY[word.slice(0, -1)]) return COLOR_WORD_FAMILY[word.slice(0, -1)];
     return null;
   }
-  // If themeReason names a color family that isn't actually present in any
-  // of the returned hex values, don't trust the freeform claim -- replace
-  // it with a plain description generated from the real colors instead.
-  // Guarantees the displayed reasoning always matches the actual swatches,
-  // regardless of how well the model followed the prompt's new instruction.
+  // If themeReason names a color that isn't actually present in any of the
+  // returned hex values (none of that word's acceptable families match),
+  // don't trust the freeform claim -- replace it with a plain description
+  // generated from the real colors instead. Guarantees the displayed
+  // reasoning always matches the actual swatches, regardless of how well
+  // the model followed the prompt's instructions.
   function verifyCustomColorReasoning(parsed) {
     if (!parsed || !parsed.customColors || !parsed.themeReason) return parsed;
     const bc = parsed.customColors;
@@ -673,8 +671,10 @@ Return ONLY the new ${fieldName} value as plain text.`;
       [bc.background, bc.accent, bc.text, bc.card].filter(Boolean).map(hexHueFamily).filter(Boolean)
     );
     const words = parsed.themeReason.toLowerCase().match(/[a-z]+/g) || [];
-    const claimedFamilies = new Set(words.map(wordToColorFamily).filter(Boolean));
-    const hasMismatch = [...claimedFamilies].some(f => !actualFamilies.has(f));
+    const hasMismatch = words.some(word => {
+      const acceptable = wordAcceptableFamilies(word);
+      return acceptable && !acceptable.some(f => actualFamilies.has(f));
+    });
     if (!hasMismatch) return parsed;
     const namedFamilies = [...actualFamilies].filter(f => !["black", "white", "gray"].includes(f));
     const themeReason = namedFamilies.length
@@ -699,10 +699,17 @@ Return ONLY the new ${fieldName} value as plain text.`;
       [bc.background, bc.accent, bc.text, bc.card].filter(Boolean).map(hexHueFamily).filter(Boolean)
     );
     const words = rawInput.toLowerCase().match(/[a-z]+/g) || [];
-    const requestedFamilies = new Set(words.map(wordToColorFamily).filter(Boolean));
-    const missing = [...requestedFamilies].filter(f => !actualFamilies.has(f));
-    if (missing.length === 0) return parsed;
-    const note = `⚠️ You mentioned ${missing.join(" and ")}, but the generated palette doesn't actually include ${missing.length > 1 ? "them" : "it"} — try Regenerate for a closer match. `;
+    const missingWords = [];
+    const seen = new Set();
+    for (const word of words) {
+      if (seen.has(word)) continue;
+      const acceptable = wordAcceptableFamilies(word);
+      if (!acceptable) continue;
+      seen.add(word);
+      if (!acceptable.some(f => actualFamilies.has(f))) missingWords.push(word);
+    }
+    if (missingWords.length === 0) return parsed;
+    const note = `⚠️ You mentioned ${missingWords.join(" and ")}, but the generated palette doesn't actually include ${missingWords.length > 1 ? "them" : "it"} — try Regenerate for a closer match. `;
     return { ...parsed, themeReason: note + (parsed.themeReason || "") };
   }
 
