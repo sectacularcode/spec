@@ -52,34 +52,53 @@ const COLOR_KEYS = ["ink", "brass", "brass-deep", "bone", "asphalt", "stone", "w
 const FONT_KEYS = ["heading", "body"];
 const HEX_RE = /^#[0-9A-Fa-f]{3}$|^#[0-9A-Fa-f]{4}$|^#[0-9A-Fa-f]{6}$|^#[0-9A-Fa-f]{8}$/;
 
+// Real font names are letters, numbers, spaces, and a handful of
+// punctuation marks (e.g. "Be Vietnam Pro", "DM Sans", "Helvetica Neue",
+// curly-quote contractions like "O'Brien Display"). Restricting to this
+// character class closes off font-family as an injection vector before
+// it's used in any HTML/CSS context downstream -- not currently rendered
+// anywhere in the preview, but this is exactly the kind of stored value
+// that becomes exploitable the moment some future feature does render
+// it, and validating at the point of storage is cheaper than tracking
+// down every future consumer. A comma or a literal quote character is
+// still rejected on purpose -- either one usually means a leftover CSS
+// font-family fallback list slipped through uncleaned (e.g. "Inter,
+// sans-serif" or a still-quoted "\"Instrument Serif\""), which is worth
+// surfacing as a real problem rather than silently accepting it.
+const FONT_NAME_RE = /^[A-Za-z0-9 '’‘.–—&-]{1,100}$/;
+
+// Returns { clean, dropped }. A key is only reported in `dropped` if the
+// caller actually sent a non-empty value for it that failed validation --
+// a key that was never submitted at all isn't a "drop," it's just absent.
+// This distinction is what makes a silent validation failure visible
+// instead of invisible: previously, a font name (or color) that failed
+// its regex just vanished with zero trace anywhere, in the API response
+// or the UI, which is exactly the shape of bug that's nearly impossible
+// to diagnose after the fact.
 function sanitizeColors(input) {
-  if (typeof input !== "object" || input === null || Array.isArray(input)) return {};
-  const out = {};
+  const clean = {};
+  const dropped = [];
+  if (typeof input !== "object" || input === null || Array.isArray(input)) return { clean, dropped };
   for (const key of COLOR_KEYS) {
     const val = input[key];
-    if (typeof val === "string" && HEX_RE.test(val.trim())) out[key] = val.trim();
+    if (val == null || val === "") continue;
+    if (typeof val === "string" && HEX_RE.test(val.trim())) clean[key] = val.trim();
+    else dropped.push(key);
   }
-  return out;
+  return { clean, dropped };
 }
 
-// Real font names are letters, numbers, spaces, and a handful of
-// punctuation marks (e.g. "Be Vietnam Pro", "DM Sans", "Helvetica Neue").
-// Restricting to that character class closes off font-family as an
-// injection vector before it's used in any HTML/CSS context downstream --
-// not currently rendered anywhere in the preview, but this is exactly the
-// kind of stored value that becomes exploitable the moment some future
-// feature does render it, and validating at the point of storage is
-// cheaper than tracking down every future consumer.
-const FONT_NAME_RE = /^[A-Za-z0-9 '.-]{1,100}$/;
-
 function sanitizeFonts(input) {
-  if (typeof input !== "object" || input === null || Array.isArray(input)) return {};
-  const out = {};
+  const clean = {};
+  const dropped = [];
+  if (typeof input !== "object" || input === null || Array.isArray(input)) return { clean, dropped };
   for (const key of FONT_KEYS) {
     const val = input[key];
-    if (typeof val === "string" && FONT_NAME_RE.test(val.trim())) out[key] = val.trim();
+    if (val == null || val === "") continue;
+    if (typeof val === "string" && FONT_NAME_RE.test(val.trim())) clean[key] = val.trim();
+    else dropped.push(key);
   }
-  return out;
+  return { clean, dropped };
 }
 
 export default async function handler(req, res) {
@@ -127,8 +146,8 @@ export default async function handler(req, res) {
       if (!validText(brand_name, 200) || brand_name.trim().length === 0) {
         return res.status(400).json({ error: "Invalid brand_name" });
       }
-      const cleanColors = sanitizeColors(colors);
-      const cleanFonts = sanitizeFonts(fonts);
+      const { clean: cleanColors, dropped: droppedColorKeys } = sanitizeColors(colors);
+      const { clean: cleanFonts, dropped: droppedFontKeys } = sanitizeFonts(fonts);
       if (!validJsonSize(cleanColors) || !validJsonSize(cleanFonts)) {
         return res.status(400).json({ error: "Invalid colors/fonts payload" });
       }
@@ -194,7 +213,11 @@ export default async function handler(req, res) {
           VALUES (${userId}, ${trimmedName}, ${cleanColors}, ${cleanFonts}, ${cleanSourceUrl}, NOW())
         `;
       }
-      return res.status(200).json({ ok: true, brand_name: trimmedName, colors: cleanColors, fonts: cleanFonts });
+      return res.status(200).json({
+        ok: true, brand_name: trimmedName, colors: cleanColors, fonts: cleanFonts,
+        droppedColorKeys: droppedColorKeys.length ? droppedColorKeys : undefined,
+        droppedFontKeys: droppedFontKeys.length ? droppedFontKeys : undefined,
+      });
     }
 
     if (req.method === "DELETE") {
