@@ -238,6 +238,14 @@ export default function StyleGuide({ role }) {
     }
   }
 
+  // From ScreenshotSampler's "Check color roles against this image" --
+  // applies one accepted correction by hex. A person reviews and accepts
+  // each one individually there; this just performs the actual role swap
+  // once they have.
+  function correctColorRole(hex, newRole) {
+    setColors(cs => cs.map(c => c.hex === hex ? { ...c, role: newRole } : c));
+  }
+
   function updateFont(index, updated) {
     setFonts(fs => fs.map((f, i) => i === index ? updated : f));
   }
@@ -389,7 +397,7 @@ export default function StyleGuide({ role }) {
         <input value={brandName} onChange={e => setBrandName(e.target.value)} placeholder="e.g. Glow Society" style={nameInput} />
       </Card>
 
-      <ScreenshotSampler onSample={addSampledColor} existingHexes={colors.map(c => c.hex)} />
+      <ScreenshotSampler onSample={addSampledColor} colors={colors} onRoleCorrect={correctColorRole} />
 
       <Card>
         <CardLabel>Website URL</CardLabel>
