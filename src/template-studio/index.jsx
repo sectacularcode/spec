@@ -638,7 +638,12 @@ Return ONLY the new ${fieldName} value as plain text.`;
     teal: "teal", turquoise: "teal", cyan: "teal", aqua: "teal",
     blue: "blue", navy: "blue", cobalt: "blue", indigo: "blue",
     purple: "purple", violet: "purple", lavender: "purple", plum: "purple", lilac: "purple",
-    pink: "pink", magenta: "pink", rose: "pink", fuchsia: "pink",
+    // "rose" is deliberately mapped to orange, not pink -- same issue as
+    // gold: "rose gold" is an extremely common warm mauve-tan descriptor in
+    // beauty/spa/wellness contexts, and real rose-gold hex values compute
+    // to "orange" via hue bucketing, not "pink". True saturated pink/
+    // magenta/fuchsia still correctly map to pink below.
+    pink: "pink", magenta: "pink", rose: "orange", fuchsia: "pink",
     black: "black", charcoal: "black", onyx: "black", ebony: "black",
     white: "white", ivory: "white", cream: "white",
     gray: "gray", grey: "gray", slate: "gray",
@@ -787,7 +792,7 @@ Rules:
 - ONLY use a templateId if the user's description clearly matches one of the industries above
 - If it does NOT match — beauty salons, nail artists, spas, tattoo studios, barbershops, pet care, florists, bakeries, gaming, esports, comic books, collectors, fan sites, hobby niches, pop culture, entertainment, art studios, dance studios, yoga, pilates, music, podcasts, churches, or ANYTHING else not in the list above — set isCustom: true and templateId: null
 - For isCustom projects: generate AUTHENTIC colors pulled specifically from the actual theme described, never a generic default palette. Base the palette entirely on what the user actually described, not on any example elsewhere in this prompt.
-- Do not default to the same "black + warm gold/tan + cream, boutique-premium" palette for every personal-service or boutique-adjacent niche (salons, stylists, bars, spas, coaches, etc.) just because that's a common real convention for the category -- that convention being common doesn't make it the only authentic answer, and reaching for it by habit defeats the purpose of a custom-generated project. The same niche could genuinely go moody and dark, bright and saturated, playful and graphic, minimalist and stark, warm and rustic, or something else entirely, depending on what the actual description implies. Pick based on real signal in what the user wrote, not on whichever register is most common for that category.
+- STOP DEFAULTING TO THE SAME LOOK: recent custom-generated projects (med spa, actor portfolio, chef, catering, hair salon, fashion stylist, craft mixologist) have all converged on the identical combination -- black/near-black + warm gold-tan + cream, Cormorant Garamond + DM Sans, Boutique Luxury or Editorial Bold layout -- regardless of how different the actual niches were. Do not repeat that specific combination unless the described niche gives a genuinely strong, specific reason to. "It's premium" or "it's boutique" is not a strong enough reason -- most niches described here are premium or boutique in some sense, and defaulting to it every time defeats the entire purpose of a custom-generated project. Before finalizing, actually weigh at least 2 concretely different directions for THIS specific niche rather than confirming the default: (a) saturated and energetic, with a bold geometric sans (Manrope, Space Mono, Oswald) instead of an editorial serif; (b) soft and pastel-toned rather than dark; (c) stark black-and-white minimalism instead of a warm neutral base; (d) a genuinely different accent hue family -- blue, green, pink, red -- not another warm gold/tan/amber/bronze/rose. Pick whichever direction actually fits the niche best, including the default when it's genuinely the best fit -- the requirement is that real alternatives get weighed every time, not that the default is banned outright.
 - themeReason MUST accurately describe the ACTUAL hex values in customColors — never name a color family (e.g. "green", "purple") in themeReason unless that color is genuinely present in background/accent/text/card. Write themeReason by looking at the hex values you actually chose, not from the theme's general vibe.
 - customColors must ALWAYS be provided for isCustom projects — never leave it null when isCustom is true
 - sections should match what that type of site actually needs
