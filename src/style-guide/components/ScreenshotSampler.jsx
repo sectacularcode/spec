@@ -33,7 +33,16 @@ export default function ScreenshotSampler({ onSample }) {
   const [fileName, setFileName] = useState("");
   const [pending, setPending] = useState(null); // { hex, role } | null -- the most recent click, not yet added
   const [error, setError] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
 
+  // The canvas is ALWAYS mounted (visibility toggled via CSS, never
+  // conditionally rendered) so canvasRef.current is guaranteed to exist
+  // by the time an image finishes loading -- see handleFile below.
+  // Previously the canvas only rendered once imageLoaded was true, which
+  // meant the very first image on a fresh mount had nowhere to draw into:
+  // canvasRef.current was null, the draw step bailed out silently, and
+  // imageLoaded never flipped true. Selecting a file looked like it did
+  // nothing.
   const handleFile = useCallback((file) => {
     if (!file) return;
     if (!file.type.startsWith("image/")) {
@@ -46,7 +55,10 @@ export default function ScreenshotSampler({ onSample }) {
       const img = new Image();
       img.onload = () => {
         const canvas = canvasRef.current;
-        if (!canvas) return;
+        if (!canvas) {
+          setError("Couldn't prepare the canvas for that image -- try again.");
+          return;
+        }
         // The canvas's own pixel buffer IS the displayed size here (no
         // separate CSS scale factor to track) -- simplest way to keep
         // click coordinates and pixel data in the same space.
@@ -94,7 +106,28 @@ export default function ScreenshotSampler({ onSample }) {
     setFileName("");
     setPending(null);
     setError("");
+    setIsDragging(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isDragging) setIsDragging(true);
+  }
+
+  function handleDragLeave(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    handleFile(file);
   }
 
   return (
@@ -111,8 +144,16 @@ export default function ScreenshotSampler({ onSample }) {
         Upload a screenshot, a design export, or a photo of a brand guide, then click anywhere on it to pick up the exact color at that spot.
       </p>
 
-      {!imageLoaded ? (
-        <label style={dropZone}>
+      {/* Dropzone: hidden via CSS once an image is loaded, never unmounted
+          mid-flow so drag state and the file input stay stable. */}
+      <div style={{ display: imageLoaded ? "none" : "block" }}>
+        <label
+          style={{ ...dropZone, ...(isDragging ? dropZoneActive : {}) }}
+          onDragOver={handleDragOver}
+          onDragEnter={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
           <input
             ref={fileInputRef}
             type="file"
@@ -121,38 +162,40 @@ export default function ScreenshotSampler({ onSample }) {
             style={{ display: "none" }}
           />
           <span style={{ fontSize: "20px", lineHeight: 1 }}>+</span>
-          <span>Choose an image</span>
+          <span>{isDragging ? "Drop it here" : "Choose an image, or drag one in"}</span>
         </label>
-      ) : (
-        <>
-          <canvas
-            ref={canvasRef}
-            onClick={handleCanvasClick}
-            style={{ maxWidth: "100%", height: "auto", display: "block", borderRadius: "6px", border: "1px solid #DDE0E6", cursor: "crosshair" }}
-          />
-          <p style={{ fontSize: "11px", color: "#B0B0B0", margin: "8px 0 0" }}>{fileName}</p>
+      </div>
 
-          {pending && (
-            <div style={{
-              display: "flex", alignItems: "center", gap: "10px", marginTop: "14px",
-              padding: "12px 14px", background: "#FEF3E2", border: "1px solid #FBEBD1", borderRadius: "8px",
-            }}>
-              <div style={{ width: "32px", height: "32px", borderRadius: "6px", background: pending.hex, border: "1px solid rgba(0,0,0,0.1)", flexShrink: 0 }} />
-              <span style={{ fontFamily: "'Inter', monospace", fontSize: "13px", fontWeight: 600, color: "#09090B" }}>{pending.hex}</span>
-              <select
-                value={pending.role}
-                onChange={e => setPending(p => ({ ...p, role: e.target.value }))}
-                style={{ ...inputStyle, width: "auto", flex: 1, marginBottom: 0 }}
-              >
-                {TEMPLATE_ROLES.map(role => <option key={role} value={role}>{role}</option>)}
-                <option value="Custom">Custom color</option>
-              </select>
-              <button onClick={confirmAdd} style={primaryBtn}>Add</button>
-              <button onClick={() => setPending(null)} style={ghostBtn}>Cancel</button>
-            </div>
-          )}
-        </>
-      )}
+      {/* Canvas is ALWAYS in the DOM -- just hidden until an image is
+          loaded -- so the ref is available the first time handleFile runs. */}
+      <div style={{ display: imageLoaded ? "block" : "none" }}>
+        <canvas
+          ref={canvasRef}
+          onClick={handleCanvasClick}
+          style={{ maxWidth: "100%", height: "auto", display: "block", borderRadius: "6px", border: "1px solid #DDE0E6", cursor: "crosshair" }}
+        />
+        <p style={{ fontSize: "11px", color: "#B0B0B0", margin: "8px 0 0" }}>{fileName}</p>
+
+        {pending && (
+          <div style={{
+            display: "flex", alignItems: "center", gap: "10px", marginTop: "14px",
+            padding: "12px 14px", background: "#FEF3E2", border: "1px solid #FBEBD1", borderRadius: "8px",
+          }}>
+            <div style={{ width: "32px", height: "32px", borderRadius: "6px", background: pending.hex, border: "1px solid rgba(0,0,0,0.1)", flexShrink: 0 }} />
+            <span style={{ fontFamily: "'Inter', monospace", fontSize: "13px", fontWeight: 600, color: "#09090B" }}>{pending.hex}</span>
+            <select
+              value={pending.role}
+              onChange={e => setPending(p => ({ ...p, role: e.target.value }))}
+              style={{ ...inputStyle, width: "auto", flex: 1, marginBottom: 0 }}
+            >
+              {TEMPLATE_ROLES.map(role => <option key={role} value={role}>{role}</option>)}
+              <option value="Custom">Custom color</option>
+            </select>
+            <button onClick={confirmAdd} style={primaryBtn}>Add</button>
+            <button onClick={() => setPending(null)} style={ghostBtn}>Cancel</button>
+          </div>
+        )}
+      </div>
 
       {error && <p style={{ fontSize: "12px", color: "#C93939", margin: "8px 0 0" }}>{error}</p>}
     </div>
@@ -163,7 +206,10 @@ const dropZone = {
   border: "1.5px dashed #DDE0E6", borderRadius: "8px", display: "flex", alignItems: "center",
   justifyContent: "center", minHeight: "120px", cursor: "pointer", color: "#6B7280", fontSize: "13px",
   fontWeight: 600, flexDirection: "column", gap: "6px", background: "transparent",
-  fontFamily: "'Be Vietnam Pro', sans-serif",
+  fontFamily: "'Be Vietnam Pro', sans-serif", transition: "border-color 0.12s, background 0.12s",
+};
+const dropZoneActive = {
+  borderColor: "#B45309", background: "#FEF3E2", color: "#B45309",
 };
 const inputStyle = {
   fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: "12px", color: "#09090B",
