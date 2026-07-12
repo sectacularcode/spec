@@ -695,6 +695,13 @@ ${layoutList}
 Themes (or use customColors if vibe doesn't match):
 ${themeList}
 
+INDUSTRY COLOR & FONT GUIDANCE — real-world convention research, apply unless the user's own description clearly calls for something else:
+- Law Firm: navy is the dominant real-world convention (used by 45%+ of major firms) — prefer "harbor-blue" with a gold accent as the default recommendation. "onyx-bronze" or "slate-amber" fit a more traditional/heritage-firm brief. Serif heading (Playfair Display, Cormorant Garamond).
+- Home Services/Trades, Medical/Dental, Real Estate, Trucking/Logistics: blue reads as trust across all four — prefer "harbor-blue" as the default unless the brief clearly calls for something else (eco-green for solar/insulation trades, boutique-spa "sage-stone" for a concierge medical practice, "pure-minimal" for a luxury real estate brokerage).
+- Automotive/Car Repair: the base should read speed/power or trust — "pure-minimal" (+ red or black accent) or "harbor-blue", never a soft/pastel base like "charcoal-blush".
+- Coaching/Consulting: real range here — "linen-clay" for warm/approachable coaches, "editorial-dark" + gold accent for dark-authority/high-ticket positioning, "bone-ink" for corporate-executive consulting. Don't default to violet/pastel unless the brief is explicitly soft or spiritual.
+- Restaurant/Cafe: warm earth tones ("espresso", "linen-clay") for casual/neighborhood, dark editorial ("onyx-bronze", "editorial-dark") for fine dining, "forest" for farm-to-table. Avoid a blue-dominant palette — blue suppresses appetite — except for a coffee/bar concept built around lingering.
+
 Rules: use customColors for unusual vibes (neon, earthy clay, navy+gold), serifs for editorial/wedding, sans for tech/agency, mono for indie/terminal. For goals, include EVERY goal the site naturally serves (an e-commerce site is usually Direct Sales + Newsletter Growth; a coaching site is Bookings + Lead Generation). Keep all reasons to ONE short sentence.`
       : `You recommend a website template, layout, palette, fonts, and brand brief from a user description.
 
@@ -743,6 +750,13 @@ PORTFOLIO TEMPLATE RULES — read carefully:
 - Use "studio-portfolio" ONLY when: user explicitly wants a cinematic dark studio aesthetic, a full multi-page studio site, or describes a production company with a team — NOT for solo portfolio requests
 - When in doubt between photo-portfolio/video-portfolio and studio-portfolio, always prefer the portfolio templates for solo creator portfolio requests
 - When templateId is "photo-portfolio" or "video-portfolio": ALWAYS set themeId to "pure-minimal", headingFont to "Inter", bodyFont to "Inter". Do not override these — the commercial portfolio look requires pure white background and clean sans-serif. Never use Cormorant Garamond, Fraunces, Playfair Display, or any serif for portfolio templates.
+
+INDUSTRY COLOR & FONT GUIDANCE — real-world convention research, apply unless the user's own description clearly calls for something else:
+- Law Firm: navy is the dominant real-world convention (used by 45%+ of major firms) — prefer "harbor-blue" with a gold accent as the default recommendation. "onyx-bronze" or "slate-amber" fit a more traditional/heritage-firm brief. Serif heading (Playfair Display, Cormorant Garamond).
+- Home Services/Trades, Medical/Dental, Real Estate, Trucking/Logistics: blue reads as trust across all four — prefer "harbor-blue" as the default unless the brief clearly calls for something else (eco-green for solar/insulation trades, boutique-spa "sage-stone" for a concierge medical practice, "pure-minimal" for a luxury real estate brokerage).
+- Automotive/Car Repair: the base should read speed/power or trust — "pure-minimal" (+ red or black accent) or "harbor-blue", never a soft/pastel base like "charcoal-blush".
+- Coaching/Consulting: real range here — "linen-clay" for warm/approachable coaches, "editorial-dark" + gold accent for dark-authority/high-ticket positioning, "bone-ink" for corporate-executive consulting. Don't default to violet/pastel unless the brief is explicitly soft or spiritual.
+- Restaurant/Cafe: warm earth tones ("espresso", "linen-clay") for casual/neighborhood, dark editorial ("onyx-bronze", "editorial-dark") for fine dining, "forest" for farm-to-table. Avoid a blue-dominant palette — blue suppresses appetite — except for a coffee/bar concept built around lingering.
 
 Rules:
 - ONLY use a templateId if the user's description clearly matches one of the industries above
