@@ -16,6 +16,7 @@
 // the image; this just reads pixels out of it.
 
 import { useRef, useState, useCallback } from "react";
+import { authHeaders } from "../../utils/api.js";
 
 const TEMPLATE_ROLES = [
   "Heading", "Body text", "Accent", "Accent — hover",
@@ -29,7 +30,8 @@ const MAX_DISPLAY_WIDTH = 900; // caps the image's BUFFER size on load, not
 
 const ZOOM_LEVELS = [1, 1.5, 2, 3, 4, 6, 8]; // multiples of the fitted buffer size
 
-export default function ScreenshotSampler({ onSample, existingHexes = [] }) {
+export default function ScreenshotSampler({ onSample, colors = [], onRoleCorrect }) {
+  const existingHexes = colors.map(c => c.hex);
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -46,6 +48,13 @@ export default function ScreenshotSampler({ onSample, existingHexes = [] }) {
   // page and back for every single color.
   const [pendingList, setPendingList] = useState([]); // [{ id, hex, role }]
   const [duplicateNotice, setDuplicateNotice] = useState("");
+
+  // Cross-checking currently-assigned roles against this same image --
+  // separate from pendingList above (that's for NEW colors being sampled;
+  // this reviews roles already sitting in the Colors grid).
+  const [checkingRoles, setCheckingRoles] = useState(false);
+  const [roleCorrections, setRoleCorrections] = useState([]); // [{ hex, suggestedRole, reason }]
+  const [roleCheckStatus, setRoleCheckStatus] = useState(""); // "no mismatches" / error text, shown once, not persistent
 
   const zoom = ZOOM_LEVELS[zoomIndex];
 
@@ -150,6 +159,55 @@ export default function ScreenshotSampler({ onSample, existingHexes = [] }) {
     setDuplicateNotice("");
   }
 
+  // Sends the CURRENTLY DISPLAYED canvas image (already resized/zoomed-out
+  // to the fitted buffer, not the original full-resolution upload) plus
+  // the grid's template-role colors to the vision model, and gets back
+  // only mismatches it can point to real evidence for. Nothing gets
+  // changed automatically -- every result is Accept/Dismiss.
+  async function checkRoles() {
+    const canvas = canvasRef.current;
+    if (!canvas || checkingRoles) return;
+    const roleColors = colors.filter(c => !c.custom && c.role && c.hex);
+    if (roleColors.length === 0) {
+      setRoleCheckStatus("No template-role colors in the grid yet to check.");
+      return;
+    }
+    setCheckingRoles(true);
+    setRoleCheckStatus("");
+    setRoleCorrections([]);
+    try {
+      const image = canvas.toDataURL("image/jpeg", 0.85);
+      const res = await fetch("/api/check-color-roles", {
+        method: "POST",
+        headers: await authHeaders(),
+        body: JSON.stringify({
+          colors: roleColors.map(c => ({ hex: c.hex, role: c.role })),
+          image,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        const corrections = data.corrections || [];
+        setRoleCorrections(corrections);
+        if (corrections.length === 0) setRoleCheckStatus("No mismatches found — your roles look right against this image.");
+      } else {
+        setRoleCheckStatus(data.error || "Couldn't check roles — try again.");
+      }
+    } catch (e) {
+      setRoleCheckStatus("Couldn't check roles — try again.");
+    }
+    setCheckingRoles(false);
+  }
+
+  function acceptCorrection(hex, suggestedRole) {
+    onRoleCorrect?.(hex, suggestedRole);
+    setRoleCorrections(list => list.filter(c => c.hex !== hex));
+  }
+
+  function dismissCorrection(hex) {
+    setRoleCorrections(list => list.filter(c => c.hex !== hex));
+  }
+
   function reset() {
     setImageLoaded(false);
     setFileName("");
@@ -159,6 +217,9 @@ export default function ScreenshotSampler({ onSample, existingHexes = [] }) {
     setDuplicateNotice("");
     setError("");
     setIsDragging(false);
+    setRoleCorrections([]);
+    setRoleCheckStatus("");
+    setCheckingRoles(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
@@ -249,6 +310,45 @@ export default function ScreenshotSampler({ onSample, existingHexes = [] }) {
         </div>
         <p style={{ fontSize: "11px", color: "#B0B0B0", margin: "8px 0 0" }}>{fileName}</p>
 
+        {colors.filter(c => !c.custom).length > 0 && (
+          <div style={{ marginTop: "12px" }}>
+            <button onClick={checkRoles} disabled={checkingRoles} style={{ ...secondaryActionBtn, opacity: checkingRoles ? 0.6 : 1 }}>
+              {checkingRoles ? "Checking against this image…" : "Check color roles against this image"}
+            </button>
+
+            {roleCheckStatus && roleCorrections.length === 0 && (
+              <p style={{ fontSize: "12px", color: roleCheckStatus.startsWith("No mismatches") ? "#2F6E3E" : "#C93939", margin: "8px 0 0" }}>
+                {roleCheckStatus}
+              </p>
+            )}
+
+            {roleCorrections.length > 0 && (
+              <div style={{ marginTop: "10px", padding: "12px 14px", background: "#FEF3E2", border: "1px solid #FBEBD1", borderRadius: "8px" }}>
+                <p style={{ fontSize: "12px", fontWeight: 600, color: "#09090B", margin: "0 0 10px" }}>
+                  {roleCorrections.length} possible mismatch{roleCorrections.length === 1 ? "" : "es"} found
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {roleCorrections.map(c => (
+                    <div key={c.hex} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                      <div style={{ width: "24px", height: "24px", borderRadius: "5px", background: c.hex, border: "1px solid rgba(0,0,0,0.1)", flexShrink: 0, marginTop: "1px" }} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontSize: "12px", fontWeight: 600, color: "#09090B", margin: 0 }}>
+                          {c.hex} — currently <em style={{ fontStyle: "normal", color: "#6B7280" }}>{colors.find(col => col.hex === c.hex)?.role || "?"}</em>, suggested <em style={{ fontStyle: "normal", color: "#B45309" }}>{c.suggestedRole}</em>
+                        </p>
+                        {c.reason && <p style={{ fontSize: "11px", color: "#6B7280", margin: "3px 0 0" }}>{c.reason}</p>}
+                      </div>
+                      <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
+                        <button onClick={() => acceptCorrection(c.hex, c.suggestedRole)} style={{ ...primaryBtn, height: "26px", padding: "0 10px", fontSize: "11px" }}>Accept</button>
+                        <button onClick={() => dismissCorrection(c.hex)} style={{ ...ghostBtn, height: "26px", padding: "0 8px", fontSize: "11px" }}>Dismiss</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {duplicateNotice && (
           <p style={{ fontSize: "12px", color: "#B45309", background: "#FEF3E2", border: "1px solid #FBEBD1", borderRadius: "6px", padding: "8px 10px", margin: "8px 0 0" }}>
             {duplicateNotice}
@@ -318,6 +418,11 @@ const ghostBtn = {
 const zoomBtnStyle = {
   border: "1px solid #DDE0E6", borderRadius: "6px", width: "28px", height: "28px", padding: 0,
   display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px",
+};
+const secondaryActionBtn = {
+  width: "100%", height: "34px", padding: "0 14px", background: "#fff", color: "#6B635C",
+  border: "1px solid #DDE0E6", borderRadius: "6px", fontFamily: "'Be Vietnam Pro', sans-serif",
+  fontSize: "12px", fontWeight: 600, cursor: "pointer",
 };
 const clearLink = {
   background: "none", border: "none", color: "#B45309", fontFamily: "'Be Vietnam Pro', sans-serif",
