@@ -98,6 +98,28 @@ export default function StyleGuide({ role }) {
 
   useEffect(() => { loadSavedStyles(); }, [loadSavedStyles]);
 
+  // Turns the API's _fontExtractionDebug into a short, readable note shown
+  // directly in the status pill -- so "why no Computed badge" is answerable
+  // right there in the UI, no DevTools/Network tab needed for the common
+  // cases. The raw reason still gets appended (truncated) after the label
+  // so a real code is always visible, per that being the actual ask.
+  function describeFontExtraction(debug) {
+    if (!debug || !debug.attempted) return "";
+    if (debug.ok) return " Verified fonts by rendering the live page.";
+    const reason = debug.reason || "unknown";
+    const code = reason.split(":")[0];
+    const LABELS = {
+      no_api_key: "live font check isn't configured",
+      fetch_exception: "live font check couldn't connect",
+      bad_status: "Browserless rejected the request",
+      bad_json: "live font check returned an unreadable response",
+      empty_response: "live font check returned nothing",
+      empty_fonts: "page rendered but no font was found",
+    };
+    const label = LABELS[code] || "live font check failed";
+    return ` (${label} — ${reason.slice(0, 150)})`;
+  }
+
   async function analyzeUrl() {
     const trimmed = url.trim();
     if (!trimmed) return;
@@ -111,7 +133,8 @@ export default function StyleGuide({ role }) {
       });
       const data = await res.json();
       if (res.ok) {
-        const result = { colors: data.colors || [], fonts: data.fonts || [], brandNameGuess: data.brandNameGuess, origin: data.origin || trimmed };
+        const fontNote = describeFontExtraction(data._fontExtractionDebug);
+        const result = { colors: data.colors || [], fonts: data.fonts || [], brandNameGuess: data.brandNameGuess, origin: data.origin || trimmed, fontNote };
         // Only interrupt with a choice if there's actually something on
         // the page that a silent overwrite could destroy -- an empty grid
         // has nothing to lose, so apply straight through same as before.
@@ -155,7 +178,7 @@ export default function StyleGuide({ role }) {
     }
     if (result.brandNameGuess && !brandName) setBrandName(result.brandNameGuess);
     setSourceUrl(result.origin);
-    setAnalyzeStatus(`Found ${result.colors.length} colors, ${result.fonts.length} fonts.`);
+    setAnalyzeStatus(`Found ${result.colors.length} colors, ${result.fonts.length} fonts.${result.fontNote || ""}`);
     setPendingAnalyzeResult(null);
   }
 
@@ -589,6 +612,11 @@ export default function StyleGuide({ role }) {
             <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b", marginBottom: "8px" }}>
               Found {pendingAnalyzeResult.colors.length} colors, {pendingAnalyzeResult.fonts.length} fonts
             </div>
+            {pendingAnalyzeResult.fontNote && (
+              <div style={{ fontSize: "12px", color: "#B45309", marginBottom: "8px" }}>
+                {pendingAnalyzeResult.fontNote.trim()}
+              </div>
+            )}
             <div style={{ fontSize: "13px", color: "#6b7280", lineHeight: 1.5, marginBottom: "20px" }}>
               You already have colors or fonts on this page. Add these to what's there, or replace everything with what was just found?
             </div>
