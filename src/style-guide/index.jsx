@@ -316,16 +316,6 @@ export default function StyleGuide({ role }) {
     setTimeout(() => setSaveStatus(""), 4000);
   }
 
-  function viewStyle(style) {
-    setDocumentSource({
-      brandName: style.brand_name,
-      sourceUrl: style.source_url,
-      colors: keyedObjectToColors(style.colors),
-      fonts: keyedObjectToFonts(style.fonts),
-    });
-    setView("document");
-  }
-
   if (view === "document" && documentSource) {
     return (
       <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "32px 24px 64px" }}>
@@ -461,8 +451,6 @@ export default function StyleGuide({ role }) {
         styles={savedStyles}
         loading={loadingStyles}
         onApply={applyStyle}
-        onView={viewStyle}
-        onDownload={viewStyle}
       />
 
       <ConfirmDialog
