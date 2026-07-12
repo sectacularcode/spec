@@ -26,6 +26,17 @@ const TOOLS = [
       </svg>
     ),
   },
+  {
+    id: "style-guide",
+    label: "Style Guide",
+    desc: "Pull real colors and fonts from any live site, or build one from scratch. Saved guides are reusable across your Brief to Blueprint builds.",
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b45309" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="13.5" cy="6.5" r="0.5"/><circle cx="17.5" cy="10.5" r="0.5"/><circle cx="8.5" cy="7.5" r="0.5"/><circle cx="6.5" cy="12.5" r="0.5"/>
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c1.1 0 2-.9 2-2 0-.52-.2-1-.53-1.36-.32-.36-.53-.85-.53-1.39 0-1.1.9-2 2-2h2.36c2.27 0 4.1-1.83 4.1-4.1C21.4 6.02 17.19 2 12 2z"/>
+      </svg>
+    ),
+  },
 ];
 
 const ROLE_COLORS = {
@@ -38,7 +49,15 @@ export default function Dashboard({ onSelectTool, role, tools: allowedTools }) {
   const { user } = useUser();
   const isAdmin   = role === "admin";
   const isManager = role === "manager" || role === "admin";
-  const visibleTools = TOOLS.filter(t => allowedTools.includes(t.id));
+  // Style Guide isn't its own gated permission -- same rule as the top-nav
+  // tab in App.jsx: available whenever either main tool is, since it's a
+  // shared utility for both rather than a tool someone is granted on its
+  // own. allowedTools never actually contains "style-guide" itself.
+  const visibleTools = TOOLS.filter(t =>
+    t.id === "style-guide"
+      ? (allowedTools.includes("template-studio") || allowedTools.includes("brief-to-blueprint"))
+      : allowedTools.includes(t.id)
+  );
   const roleColor = ROLE_COLORS[role] || ROLE_COLORS.staff;
   const [drawerOpen, setDrawerOpen] = useState(false);
 

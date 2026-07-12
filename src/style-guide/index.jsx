@@ -442,7 +442,7 @@ export default function StyleGuide({ role }) {
         <div>
           <h1 style={{ fontSize: "28px", fontWeight: 700, margin: "0 0 4px" }}>Style guide</h1>
           <p style={{ fontSize: "13px", color: "#6B7280", margin: "0 0 28px" }}>
-            Pull real colors and fonts from any live site, or build one from scratch. Saved guides are reusable across Brief to Blueprint and Template Studio.
+            Pull real colors and fonts from any live site, or build one from scratch. Saved guides are reusable across your Brief to Blueprint builds.
           </p>
         </div>
         <button onClick={requestClearAll} style={{ ...secondaryBtn, flexShrink: 0, whiteSpace: "nowrap" }}>+ New style guide</button>

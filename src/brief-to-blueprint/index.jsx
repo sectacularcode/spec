@@ -1131,7 +1131,7 @@ export default function CustomBuild({ userId, role } = {}) {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "32px", gap: "16px", flexWrap: "wrap" }}>
             <div>
               <div style={{ fontSize: "28px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>Blueprint builds</div>
-              <div style={{ fontSize: "14px", color: "#6b7280" }}>Resume a saved build or start a new one.</div>
+              <div style={{ fontSize: "14px", color: "#6b7280" }}>Turn a Customized Brand Brief into a ready-to-import template for your brand.</div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               {isManager && (
