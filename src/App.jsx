@@ -5,6 +5,7 @@ import { authHeaders } from "./utils/api.js";
 
 const ElementorBuilder = lazy(() => import("./template-studio/index.jsx"));
 const CustomBuild      = lazy(() => import("./brief-to-blueprint/index.jsx"));
+const StyleGuide       = lazy(() => import("./style-guide/index.jsx"));
 
 function Spinner() {
   return (
@@ -61,6 +62,11 @@ function ToolNav({ view, setView, tools, user }) {
           {[
             tools.includes("template-studio") && { id: "template-studio", label: "Template Studio" },
             tools.includes("brief-to-blueprint") && { id: "brief-to-blueprint", label: "Brief to Blueprint" },
+            // Shared utility for both tools, not its own gated permission --
+            // available whenever either main tool is, positioned after
+            // Brief to Blueprint since it's an "extra" tool rather than a
+            // step used in between the other two.
+            (tools.includes("template-studio") || tools.includes("brief-to-blueprint")) && { id: "style-guide", label: "Style Guide" },
           ].filter(Boolean).map(tab => (
             <button
               key={tab.id}
@@ -122,13 +128,14 @@ function AppShell() {
 
   if (!roleLoaded) return <Spinner />;
 
-  if (view === "template-studio" || view === "brief-to-blueprint") {
+  if (view === "template-studio" || view === "brief-to-blueprint" || view === "style-guide") {
     return (
       <div style={{ width: "100%", minHeight: "100vh", fontFamily: "Inter, system-ui, sans-serif", boxSizing: "border-box" }}>
         <ToolNav view={view} setView={setView} tools={tools} user={user} />
         <Suspense fallback={<Spinner />}>
           {view === "template-studio"    && <ElementorBuilder userId={user?.id} />}
           {view === "brief-to-blueprint" && <CustomBuild userId={user?.id} role={role} />}
+          {view === "style-guide"        && <StyleGuide role={role} />}
         </Suspense>
       </div>
     );
