@@ -64,6 +64,8 @@ export default function StyleGuide({ role }) {
   const [documentSource, setDocumentSource] = useState(null); // the style shown when view === "document"
   const [pendingClear, setPendingClear] = useState(null); // "all" | "colors" | "fonts" | null -- drives the confirm dialog below
   const [pendingAnalyzeResult, setPendingAnalyzeResult] = useState(null); // holds a fetched result when the grid already has colors/fonts, until the person picks merge or replace
+  const [draggedColorIndex, setDraggedColorIndex] = useState(null);
+  const [dragOverColorIndex, setDragOverColorIndex] = useState(null);
 
   const loadSavedStyles = useCallback(async () => {
     setLoadingStyles(true);
@@ -177,6 +179,41 @@ export default function StyleGuide({ role }) {
   }
   function addColor() {
     setColors(cs => [...cs, { custom: true, hex: "#6B6B6B", name: "", usage: "" }]);
+  }
+  function reorderColors(fromIndex, toIndex) {
+    if (fromIndex === toIndex) return;
+    setColors(cs => {
+      const next = [...cs];
+      const [moved] = next.splice(fromIndex, 1);
+      next.splice(toIndex, 0, moved);
+      return next;
+    });
+  }
+  // Only the small grip handle rendered below has draggable=true -- the
+  // card itself (and everything inside it: name/usage/hex inputs, the
+  // role dropdown) is a plain drop target via onDragOver/onDrop, never
+  // draggable itself. Making the whole card draggable is the tempting
+  // shortcut, but it hijacks normal clicking/text-selection inside its
+  // own inputs on some browsers, which is worse than just adding a handle.
+  function handleColorDragStart(e, index) {
+    setDraggedColorIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", String(index)); // some browsers require setData to actually start the drag
+  }
+  function handleColorDragOver(e, index) {
+    e.preventDefault(); // required for onDrop to fire at all
+    if (draggedColorIndex === null || draggedColorIndex === index) return;
+    if (dragOverColorIndex !== index) setDragOverColorIndex(index);
+  }
+  function handleColorDrop(e, index) {
+    e.preventDefault();
+    if (draggedColorIndex !== null) reorderColors(draggedColorIndex, index);
+    setDraggedColorIndex(null);
+    setDragOverColorIndex(null);
+  }
+  function handleColorDragEnd() {
+    setDraggedColorIndex(null);
+    setDragOverColorIndex(null);
   }
   // From ScreenshotSampler -- a person clicked an actual pixel in an
   // uploaded image and confirmed it, which is why this gets its own
@@ -340,7 +377,30 @@ export default function StyleGuide({ role }) {
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "14px" }}>
           {colors.map((c, i) => (
-            <ColorSwatch key={i} color={c} onChange={updated => updateColor(i, updated)} onRemove={() => removeColor(i)} />
+            <div
+              key={i}
+              onDragOver={e => handleColorDragOver(e, i)}
+              onDrop={e => handleColorDrop(e, i)}
+              style={{
+                position: "relative",
+                borderRadius: "8px",
+                opacity: draggedColorIndex === i ? 0.4 : 1,
+                outline: dragOverColorIndex === i && draggedColorIndex !== i ? "2px dashed #B45309" : "2px solid transparent",
+                outlineOffset: "2px",
+                transition: "opacity 0.12s, outline-color 0.12s",
+              }}
+            >
+              <div
+                draggable
+                onDragStart={e => handleColorDragStart(e, i)}
+                onDragEnd={handleColorDragEnd}
+                title="Drag to reorder"
+                style={dragHandle}
+              >
+                ⋮⋮
+              </div>
+              <ColorSwatch color={c} onChange={updated => updateColor(i, updated)} onRemove={() => removeColor(i)} />
+            </div>
           ))}
           <button onClick={addColor} style={addTile}>
             <span style={{ fontSize: "20px", lineHeight: 1 }}>+</span>
@@ -469,3 +529,9 @@ const primaryBtn = { height: "38px", padding: "0 18px", background: "#B45309", c
 const secondaryBtn = { height: "38px", padding: "0 18px", background: "#fff", color: "#6B635C", border: "1px solid #DDE0E6", borderRadius: "6px", fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: "13px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center" };
 const addTile = { border: "1.5px dashed #DDE0E6", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", minHeight: "120px", cursor: "pointer", color: "#6B7280", fontSize: "13px", fontWeight: 600, flexDirection: "column", gap: "6px", background: "transparent", fontFamily: "'Be Vietnam Pro', sans-serif" };
 const clearLink = { background: "none", border: "none", color: "#B45309", fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: "11px", fontWeight: 600, cursor: "pointer", padding: 0, textDecoration: "underline" };
+const dragHandle = {
+  position: "absolute", top: "8px", left: "8px", width: "20px", height: "20px", zIndex: 2,
+  borderRadius: "50%", background: "rgba(255,255,255,0.9)", border: "1px solid #DDE0E6",
+  color: "#6B635C", fontSize: "11px", lineHeight: 1, cursor: "grab",
+  display: "flex", alignItems: "center", justifyContent: "center",
+};
