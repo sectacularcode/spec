@@ -1,5 +1,6 @@
 import { useRef } from "react";
-import { downloadStyleGuideHtml, printStyleGuide, exportStyleGuideImage } from "../utils/export.js";
+import { downloadStyleGuideHtml, downloadStyleGuidePdf, exportStyleGuideImage } from "../utils/export.js";
+import { pickReadableColor, bestTextColor, MIN_CONTRAST_LARGE_TEXT } from "../../utils/contrast.js";
 
 // The shareable one-pager: brand name, colors (8 template roles plus any
 // custom "Additional colors"), and full typography specimens. Deliberately
@@ -24,15 +25,40 @@ export default function StyleDocument({ brandName, sourceUrl, colors, fonts }) {
   const bodyFont = fonts.find(f => f.role === "Body") || fonts[1];
   const otherFonts = fonts.filter(f => f !== headingFont && f !== bodyFont);
 
+  // The extracted "Heading" color has no memory of what background it sat
+  // on at the source -- a light heading pulled from a dark hero section
+  // renders as invisible text the moment it's placed on this document's
+  // white page. Falling back through "Body text" (Spec's own role for
+  // "copy on light") then "Dark panel"/"Muted" before a hardcoded
+  // near-black means the sheet always uses something dark enough to read,
+  // while still preferring an on-brand color over generic black wherever
+  // one actually works.
+  const rawHeadingHex = mainColors.find(c => c.role === "Heading")?.hex;
+  const bodyTextHex = mainColors.find(c => c.role === "Body text")?.hex;
+  const darkPanelHex = mainColors.find(c => c.role === "Dark panel")?.hex;
+  const mutedHex = mainColors.find(c => c.role === "Muted")?.hex;
+  const readableHeadingColor = pickReadableColor(
+    "#FFFFFF",
+    [rawHeadingHex, bodyTextHex, darkPanelHex, mutedHex],
+    MIN_CONTRAST_LARGE_TEXT
+  );
+
+  // Same problem, different shape: the button always used white text on
+  // top of whatever the extracted Accent color was. If Accent turns out
+  // to be a pale mint or similar light color, white-on-white-ish is just
+  // as unreadable as light-on-white was for headings above.
+  const accentHex = mainColors.find(c => c.role === "Accent")?.hex || "#333";
+  const buttonTextColor = bestTextColor(accentHex, bodyTextHex || "#1a1a1a");
+
   const exportData = { brandName, sourceUrl, colors, fonts };
 
   return (
     <div>
-      <div style={{ maxWidth: "820px", margin: "32px auto 64px", background: "#fff", border: "1px solid #DDE0E6", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }} className="style-doc-page">
+      <div style={{ maxWidth: "820px", margin: "32px auto 64px", background: "#fff", border: "1px solid #DDE0E6", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
         <div style={{ padding: "56px 64px" }}>
           <div id="style-doc-exportable" ref={exportRef} style={{ fontFamily: "'Inter', sans-serif" }}>
             <p style={sectionEyebrow}>Style guide</p>
-            <h1 style={{ fontSize: "44px", margin: "0 0 8px", lineHeight: 1.05, fontFamily: headingFont?.name ? `'${headingFont.name}', serif` : undefined, color: mainColors.find(c => c.role === "Heading")?.hex || "#1a1a1a" }}>
+            <h1 style={{ fontSize: "44px", margin: "0 0 8px", lineHeight: 1.05, fontFamily: headingFont?.name ? `'${headingFont.name}', serif` : undefined, color: readableHeadingColor }}>
               {brandName || "Untitled brand"}
             </h1>
             {sourceUrl && <p style={{ fontSize: "13px", color: "#8a8a8a", margin: "0 0 44px" }}>{safeHostname(sourceUrl)}</p>}
@@ -40,8 +66,8 @@ export default function StyleDocument({ brandName, sourceUrl, colors, fonts }) {
             <p style={sectionLabel(true)}>Colors</p>
             <div style={swatchGrid(compact)}>
               {mainColors.map(c => (
-                <div key={c.role}>
-                  <div style={{ width: "100%", aspectRatio: "1", borderRadius: "4px", marginBottom: compact ? "7px" : "10px", background: c.hex, border: c.hex.toLowerCase() === "#ffffff" ? "1px solid #ececec" : "none" }} />
+                <div key={c.role} style={{ width: swatchItemWidth(compact), flexShrink: 0 }}>
+                  <div style={{ width: "100%", position: "relative", paddingTop: "100%", borderRadius: "4px", marginBottom: compact ? "7px" : "10px", background: c.hex, border: c.hex.toLowerCase() === "#ffffff" ? "1px solid #ececec" : "none" }} />
                   <p style={{ fontFamily: "'Inter', monospace", fontSize: compact ? "11px" : "13px", fontWeight: 600, color: "#1a1a1a", margin: 0 }}>{c.hex}</p>
                   <p style={{ fontSize: compact ? "10px" : "11px", color: "#8a8a8a", margin: "2px 0 0" }}>{c.role}</p>
                 </div>
@@ -53,8 +79,8 @@ export default function StyleDocument({ brandName, sourceUrl, colors, fonts }) {
                 <p style={{ ...sectionLabel(false), fontSize: "10px", paddingTop: "20px", borderTop: "none" }}>Additional colors</p>
                 <div style={swatchGrid(compact)}>
                   {extraColors.map((c, i) => (
-                    <div key={i}>
-                      <div style={{ width: "100%", aspectRatio: "1", borderRadius: "4px", marginBottom: compact ? "7px" : "10px", background: c.hex }} />
+                    <div key={i} style={{ width: swatchItemWidth(compact), flexShrink: 0 }}>
+                      <div style={{ width: "100%", position: "relative", paddingTop: "100%", borderRadius: "4px", marginBottom: compact ? "7px" : "10px", background: c.hex }} />
                       <p style={{ fontFamily: "'Inter', monospace", fontSize: compact ? "11px" : "13px", fontWeight: 600, color: "#1a1a1a", margin: 0 }}>{c.hex}</p>
                       <p style={{ fontSize: compact ? "10px" : "11px", color: "#8a8a8a", margin: "2px 0 0" }}>{c.name || "Untitled"}</p>
                     </div>
@@ -71,10 +97,10 @@ export default function StyleDocument({ brandName, sourceUrl, colors, fonts }) {
                 {[["H1", 40], ["H2", 30], ["H3", 23], ["H4", 18]].map(([label, px]) => (
                   <div key={label} style={typeRow}>
                     <div style={typeLabel}>{label}<small style={typeLabelSmall}>{px}px</small></div>
-                    {label === "H1" ? <h1 style={{ margin: 0, fontFamily: `'${headingFont.name}', serif`, fontWeight: 500, fontSize: px, color: mainColors.find(c => c.role === "Heading")?.hex || "#1a1a1a" }}>Built for the long haul</h1>
-                    : label === "H2" ? <h2 style={{ margin: 0, fontFamily: `'${headingFont.name}', serif`, fontWeight: 500, fontSize: px, color: mainColors.find(c => c.role === "Heading")?.hex || "#1a1a1a" }}>Every piece, field-tested</h2>
-                    : label === "H3" ? <h3 style={{ margin: 0, fontFamily: `'${headingFont.name}', serif`, fontWeight: 500, fontSize: px, color: mainColors.find(c => c.role === "Heading")?.hex || "#1a1a1a" }}>Made to be repaired, not replaced</h3>
-                    : <h4 style={{ margin: 0, fontFamily: `'${headingFont.name}', serif`, fontWeight: 500, fontSize: px, color: mainColors.find(c => c.role === "Heading")?.hex || "#1a1a1a" }}>Care and maintenance</h4>}
+                    {label === "H1" ? <h1 style={{ margin: 0, fontFamily: `'${headingFont.name}', serif`, fontWeight: 500, fontSize: px, color: readableHeadingColor }}>Built for the long haul</h1>
+                    : label === "H2" ? <h2 style={{ margin: 0, fontFamily: `'${headingFont.name}', serif`, fontWeight: 500, fontSize: px, color: readableHeadingColor }}>Every piece, field-tested</h2>
+                    : label === "H3" ? <h3 style={{ margin: 0, fontFamily: `'${headingFont.name}', serif`, fontWeight: 500, fontSize: px, color: readableHeadingColor }}>Made to be repaired, not replaced</h3>
+                    : <h4 style={{ margin: 0, fontFamily: `'${headingFont.name}', serif`, fontWeight: 500, fontSize: px, color: readableHeadingColor }}>Care and maintenance</h4>}
                   </div>
                 ))}
               </div>
@@ -97,8 +123,8 @@ export default function StyleDocument({ brandName, sourceUrl, colors, fonts }) {
                 </div>
                 <div style={typeRow}>
                   <div style={typeLabel}>Button</div>
-                  <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: mainColors.find(c => c.role === "Accent")?.hex || "#333" }}>
-                    <span style={{ fontFamily: `'${bodyFont.name}', sans-serif`, fontWeight: 600, fontSize: "13px", color: "#fff", letterSpacing: "0.02em" }}>Call to action</span>
+                  <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: accentHex }}>
+                    <span style={{ fontFamily: `'${bodyFont.name}', sans-serif`, fontWeight: 600, fontSize: "13px", color: buttonTextColor, letterSpacing: "0.02em" }}>Call to action</span>
                   </div>
                 </div>
               </div>
@@ -126,7 +152,7 @@ export default function StyleDocument({ brandName, sourceUrl, colors, fonts }) {
 
           <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
             <button onClick={() => downloadStyleGuideHtml(exportRef.current, exportData)} style={primaryExportBtn}>Download HTML</button>
-            <button onClick={printStyleGuide} style={exportBtn}>Download PDF</button>
+            <button onClick={() => downloadStyleGuidePdf(exportRef.current, exportData)} style={exportBtn}>Download PDF</button>
             <button onClick={() => exportStyleGuideImage(exportRef.current, "jpeg", exportData)} style={exportBtn}>Download JPEG</button>
             <button onClick={() => exportStyleGuideImage(exportRef.current, "png", exportData)} style={exportBtn}>Download PNG</button>
           </div>
@@ -135,6 +161,9 @@ export default function StyleDocument({ brandName, sourceUrl, colors, fonts }) {
 
       <style>{`
         @media print {
+          /* Download PDF no longer calls window.print() (see export.js) --
+             this block is kept only so a manual Cmd/Ctrl+P still isolates
+             the document correctly instead of printing the whole app UI. */
           * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           @page { size: letter; margin: 0.5in; }
           /* The real app nests this component many layers deep (App shell
@@ -167,8 +196,20 @@ const sectionEyebrow = { fontSize: "11px", letterSpacing: "0.08em", textTransfor
 function sectionLabel(first) {
   return { fontSize: "11px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#8a8a8a", margin: "0 0 18px", paddingTop: first ? 0 : "32px", borderTop: first ? "none" : "1px solid #ececec" };
 }
+// Flexbox + explicit item widths instead of CSS Grid, and paddingTop
+// percent squares instead of aspect-ratio (used at the call sites above) --
+// both aspect-ratio and CSS Grid are known-inconsistent in html2canvas's
+// rendering engine (confirmed against html2canvas 1.4.1, the version this
+// app uses), which is why the live page always looked right while the
+// exported PNG/JPEG/PDF came out with the swatch section collapsed or
+// misplaced and everything after it shifted/cut off as a result.
 function swatchGrid(compact) {
-  return { display: "grid", gridTemplateColumns: compact ? "repeat(6, 1fr)" : "repeat(4, 1fr)", gap: compact ? "14px" : "20px", marginBottom: "8px" };
+  return { display: "flex", flexWrap: "wrap", gap: compact ? "14px" : "20px", marginBottom: "8px" };
+}
+function swatchItemWidth(compact) {
+  const cols = compact ? 6 : 4;
+  const gapPx = compact ? 14 : 20;
+  return `calc((100% - ${gapPx * (cols - 1)}px) / ${cols})`;
 }
 const fontMeta = { display: "flex", alignItems: "baseline", gap: "10px", marginBottom: "16px" };
 const fontRoleLabel = { fontSize: "11px", fontWeight: 600, color: "#8a8a8a", textTransform: "uppercase", letterSpacing: "0.05em" };
