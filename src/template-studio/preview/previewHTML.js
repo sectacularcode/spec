@@ -46,15 +46,20 @@ export function previewHTML(page, brand) {
   const theme = THEMES.find(t => t.id === brand.themeId);
   const isDark = !isLight(pc);
   const headingColor = headingColorOn(pc, theme && theme.headingColor);
+  // Many sections render on cardBgColor instead of primaryColor (About, Process,
+  // Portfolio, FAQ, footer, etc.) -- computed once here, same pattern as headingColor,
+  // so each of those sections uses a color actually contrast-checked against its own
+  // real background instead of silently inheriting the pc-based one.
+  const cardHc = headingColorOn(card, theme && theme.headingColor);
   const ts = body;
   const sl = brand.socialLinks || [];
   const layout = getLayout(brand.layoutId);
 
   // Logo helper — uses WordPress URL when present, falls back to text.
   // Adds onerror handler so broken image URLs gracefully degrade to text.
-  const logoHTML = (size = 28, align = "left") => brand.logoUrl
-    ? `<img src="${brand.logoUrl}" alt="${brand.name}" style="height:${Math.round(size * 1.4)}px;width:auto;display:block;${align === "center" ? "margin:0 auto;" : ""}" onerror="this.outerHTML='<span style=\\'font-family:&quot;${hf}&quot;,serif;font-size:${size}px;color:${headingColor};font-weight:400;display:inline-block;\\'>${(brand.logoText || brand.name).replace(/'/g, "&#39;")}</span>'"/>`
-    : `<span style="font-family:'${hf}',serif;font-size:${size}px;color:${headingColor};font-weight:400;display:inline-block;">${brand.logoText || brand.name}</span>`;
+  const logoHTML = (size = 28, align = "left", color = headingColor) => brand.logoUrl
+    ? `<img src="${brand.logoUrl}" alt="${brand.name}" style="height:${Math.round(size * 1.4)}px;width:auto;display:block;${align === "center" ? "margin:0 auto;" : ""}" onerror="this.outerHTML='<span style=\\'font-family:&quot;${hf}&quot;,serif;font-size:${size}px;color:${color};font-weight:400;display:inline-block;\\'>${(brand.logoText || brand.name).replace(/'/g, "&#39;")}</span>'"/>`
+    : `<span style="font-family:'${hf}',serif;font-size:${size}px;color:${color};font-weight:400;display:inline-block;">${brand.logoText || brand.name}</span>`;
 
   const navSocial = brand.showSocialInNav ? sl.map(s => SVG[s.key] ? `<a href="${s.url}" target="_blank" style="color:${ts};display:inline-flex;align-items:center;margin-left:14px;">${SVG[s.key](ts, 18)}</a>` : "").join("") : "";
 
@@ -182,7 +187,7 @@ export function previewHTML(page, brand) {
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;" class="about-grid">
           <div>
             <p data-edit="page.aboutEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">${page.aboutEyebrow || "About"}</p>
-            <h2 data-edit="page.aboutHeading" style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 32px;font-weight:400;line-height:1.15;">${page.aboutHeading || "Built for brands that need content that performs."}</h2>
+            <h2 data-edit="page.aboutHeading" style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${cardHc};margin:0 0 32px;font-weight:400;line-height:1.15;">${page.aboutHeading || "Built for brands that need content that performs."}</h2>
             <p data-edit="page.aboutBody" style="font-family:'${bf}',sans-serif;font-size:17px;color:${ts};line-height:1.8;margin:0;">${page.aboutBody || brand.description}</p>
           </div>
           <div style="aspect-ratio:4/5;background:url('${aboutImg}') center/cover no-repeat;"></div>
@@ -220,7 +225,7 @@ export function previewHTML(page, brand) {
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;text-align:left;">
             ${items.map((line, i) => { const [t, d] = line.split("|"); return `<div style="background:${card};padding:40px 32px;border-radius:${radius};">
               <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:${ac};margin:0 0 20px;font-weight:600;" data-edit="page.serviceNumber_${i}">${String(i + 1).padStart(2, "0")}</p>
-              <h3 style="font-family:'${hf}',sans-serif;font-size:22px;color:${headingColor};margin:0 0 12px;font-weight:500;">${t || ""}</h3>
+              <h3 style="font-family:'${hf}',sans-serif;font-size:22px;color:${cardHc};margin:0 0 12px;font-weight:500;">${t || ""}</h3>
               <p style="font-family:'${bf}',sans-serif;font-size:14px;color:${ts};line-height:1.6;margin:0;">${d || ""}</p>
             </div>`; }).join("")}
           </div>
@@ -260,11 +265,11 @@ export function previewHTML(page, brand) {
       const items = (page.process || "").split("\n").filter(Boolean);
       return `<section style="background:${card};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
         <p data-edit="page.processEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">${page.processEyebrow || "How We Work"}</p>
-        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 80px;font-weight:400;" data-edit="page.processHeading">${page.processHeading || "The process."}</h2>
+        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${cardHc};margin:0 0 80px;font-weight:400;" data-edit="page.processHeading">${page.processHeading || "The process."}</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:40px;">
           ${items.map((line, i) => { const [t, d] = line.split("|"); return `<div style="border-top:2px solid ${ac};padding-top:24px;">
             <p style="font-family:'${hf}',serif;font-size:14px;color:${ac};margin:0 0 16px;letter-spacing:.05em;">Step ${String(i + 1).padStart(2, "0")}</p>
-            <h3 style="font-family:'${hf}',serif;font-size:22px;color:${headingColor};margin:0 0 12px;font-weight:400;">${t || ""}</h3>
+            <h3 style="font-family:'${hf}',serif;font-size:22px;color:${cardHc};margin:0 0 12px;font-weight:400;">${t || ""}</h3>
             <p style="font-family:'${bf}',sans-serif;font-size:14px;color:${ts};line-height:1.7;margin:0;">${d || ""}</p>
           </div>`; }).join("")}
         </div>
@@ -295,7 +300,7 @@ export function previewHTML(page, brand) {
       return `<section style="background:${card};padding:clamp(60px,10vw,120px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};text-align:center;">
         <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 40px;" data-edit="page.clientsEyebrow">${page.clientsEyebrow || "Trusted By"}</p>
         <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:48px 64px;max-width:1100px;margin:0 auto;">
-          ${items.map(c => `<div style="font-family:'${hf}',serif;font-size:24px;color:${headingColor};opacity:.6;letter-spacing:.02em;">${c}</div>`).join("")}
+          ${items.map(c => `<div style="font-family:'${hf}',serif;font-size:24px;color:${cardHc};opacity:.6;letter-spacing:.02em;">${c}</div>`).join("")}
         </div>
       </section>`;
     }
@@ -325,7 +330,7 @@ export function previewHTML(page, brand) {
       return `<section style="background:${card};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
         <div style="display:flex;justify-content:space-between;align-items:baseline;margin:0 0 60px;flex-wrap:wrap;gap:24px;">
           <div><p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.portfolioEyebrow">${page.portfolioEyebrow || "Selected Work"}</p>
-          <h2 data-edit="page.portfolioHeading" style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0;font-weight:400;">${page.portfolioHeading || "Recent projects."}</h2></div>
+          <h2 data-edit="page.portfolioHeading" style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${cardHc};margin:0;font-weight:400;">${page.portfolioHeading || "Recent projects."}</h2></div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px;">
           ${items.map((line, i) => {
@@ -333,7 +338,7 @@ export function previewHTML(page, brand) {
             const portImg = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, 800, 1000, brand.imageCategory);
             return `<div>
               <div style="aspect-ratio:4/5;background:url('${portImg}') center/cover no-repeat;margin:0 0 20px;"></div>
-              <h3 style="font-family:'${hf}',serif;font-size:22px;color:${headingColor};margin:0 0 6px;font-weight:400;">${t || ""}</h3>
+              <h3 style="font-family:'${hf}',serif;font-size:22px;color:${cardHc};margin:0 0 6px;font-weight:400;">${t || ""}</h3>
               <p style="font-family:'${bf}',sans-serif;font-size:12px;color:${ac};letter-spacing:.1em;text-transform:uppercase;margin:0;">${c || ""}</p>
             </div>`;
           }).join("")}
@@ -357,7 +362,7 @@ export function previewHTML(page, brand) {
       const items = (page.pricing || "").split("\n").filter(Boolean);
       return `<section style="background:${card};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};text-align:center;">
         <p data-edit="page.pricingEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">${page.pricingEyebrow || "Pricing"}</p>
-        <h2 style="font-family:'${hf}',serif;font-size:clamp(36px,5vw,64px);color:${headingColor};margin:0 0 80px;font-weight:400;" data-edit="page.pricingHeading">${page.pricingHeading || "Investment."}</h2>
+        <h2 style="font-family:'${hf}',serif;font-size:clamp(36px,5vw,64px);color:${cardHc};margin:0 0 80px;font-weight:400;" data-edit="page.pricingHeading">${page.pricingHeading || "Investment."}</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;max-width:1100px;margin:0 auto;">
           ${items.map(line => { const [tier, price, desc] = line.split("|"); return `<div style="background:${pc};padding:48px 32px;border:1px solid ${bdr};">
             <h3 style="font-family:'${hf}',serif;font-size:22px;color:${headingColor};margin:0 0 16px;font-weight:400;">${tier || ""}</h3>
@@ -386,8 +391,8 @@ export function previewHTML(page, brand) {
       const items = (page.faq || "").split("\n").filter(Boolean);
       return `<section style="background:${card};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
         <p data-edit="page.faqEyebrow" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;">${page.faqEyebrow || "FAQ"}</p>
-        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 60px;font-weight:400;" data-edit="page.faqHeading">${page.faqHeading || "Questions, answered."}</h2>
-        <div>${items.map(line => { const [q, a] = line.split("|"); return `<details style="border-bottom:1px solid ${bdr};padding:24px 0;"><summary style="font-family:'${hf}',serif;font-size:20px;color:${headingColor};cursor:pointer;font-weight:400;list-style:none;">${q || ""}</summary><p style="font-family:'${bf}',sans-serif;font-size:15px;color:${ts};line-height:1.8;margin:16px 0 0;">${a || ""}</p></details>`; }).join("")}</div>
+        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${cardHc};margin:0 0 60px;font-weight:400;" data-edit="page.faqHeading">${page.faqHeading || "Questions, answered."}</h2>
+        <div>${items.map(line => { const [q, a] = line.split("|"); return `<details style="border-bottom:1px solid ${bdr};padding:24px 0;"><summary style="font-family:'${hf}',serif;font-size:20px;color:${cardHc};cursor:pointer;font-weight:400;list-style:none;">${q || ""}</summary><p style="font-family:'${bf}',sans-serif;font-size:15px;color:${ts};line-height:1.8;margin:16px 0 0;">${a || ""}</p></details>`; }).join("")}</div>
       </section>`;
     }
 
@@ -417,14 +422,15 @@ export function previewHTML(page, brand) {
       return allForms.map(f => {
         const [title, fStr, cta] = f.split("|");
         const fields = (fStr || "Name,Email,Message").split(",").filter(Boolean);
+        const formHc = s === "Form" ? cardHc : headingColor;
         return `<section id="contact" style="background:${s === "Form" ? card : pc};padding:clamp(60px,10vw,140px) clamp(24px,8vw,100px);border-top:1px solid ${bdr};">
           <div style="max-width:640px;">
             <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;" data-edit="page.contactEyebrow">${page.contactEyebrow || "Contact"}</p>
-            <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 40px;font-weight:400;">${title || "Let's talk."}</h2>
+            <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${formHc};margin:0 0 40px;font-weight:400;">${title || "Let's talk."}</h2>
             <form style="display:flex;flex-direction:column;gap:18px;">
               ${fields.map(fl => /message|details|notes/i.test(fl)
-                ? `<textarea placeholder="${fl}" rows="5" style="background:transparent;border:none;border-bottom:1px solid ${bdr};padding:14px 0;color:${headingColor};font-family:'${bf}',sans-serif;font-size:15px;resize:vertical;outline:none;"></textarea>`
-                : `<input placeholder="${fl}" style="background:transparent;border:none;border-bottom:1px solid ${bdr};padding:14px 0;color:${headingColor};font-family:'${bf}',sans-serif;font-size:15px;outline:none;"/>`).join("")}
+                ? `<textarea placeholder="${fl}" rows="5" style="background:transparent;border:none;border-bottom:1px solid ${bdr};padding:14px 0;color:${formHc};font-family:'${bf}',sans-serif;font-size:15px;resize:vertical;outline:none;"></textarea>`
+                : `<input placeholder="${fl}" style="background:transparent;border:none;border-bottom:1px solid ${bdr};padding:14px 0;color:${formHc};font-family:'${bf}',sans-serif;font-size:15px;outline:none;"/>`).join("")}
               <button type="button" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:${textOn(ac)};background:${ac};padding:16px 32px;border:none;cursor:pointer;margin-top:16px;align-self:flex-start;">${cta || "Send"}</button>
             </form>
           </div>
@@ -438,13 +444,14 @@ export function previewHTML(page, brand) {
         const [name, title, leaderImg, quote, bio] = line.split("|");
         const imgSrc = imgOrPlaceholder(leaderImg, `${brand.name}-leader-${name}-${idx}`, 700, 900, "portrait");
         const bg = idx % 2 === 0 ? pc : card;
+        const bgHc = idx % 2 === 0 ? headingColor : cardHc;
         const imageOnLeft = idx % 2 === 0;
         const imgCol = `<div style="flex:0 0 40%;"><img src="${imgSrc}" alt="${name || ""}" style="width:100%;height:auto;display:block;"/></div>`;
         const txtCol = `<div style="flex:1;">
           <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.leadershipEyebrow">${page.leadershipEyebrow || "Leadership"}</p>
-          <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${headingColor};margin:0 0 8px;font-weight:400;line-height:1.15;">${name || "Leader"}</h2>
+          <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,56px);color:${bgHc};margin:0 0 8px;font-weight:400;line-height:1.15;">${name || "Leader"}</h2>
           <p style="font-family:'${bf}',sans-serif;font-size:14px;color:${ac};margin:0 0 32px;">${title || "Title"}</p>
-          ${quote ? `<h4 style="font-family:'${hf}',serif;font-size:clamp(20px,2.5vw,24px);color:${headingColor};margin:0 0 28px;font-weight:400;line-height:1.4;font-style:italic;">"${quote}"</h4>` : ""}
+          ${quote ? `<h4 style="font-family:'${hf}',serif;font-size:clamp(20px,2.5vw,24px);color:${bgHc};margin:0 0 28px;font-weight:400;line-height:1.4;font-style:italic;">"${quote}"</h4>` : ""}
           ${bio ? `<p style="font-family:'${bf}',sans-serif;font-size:16px;color:${ts};margin:0;line-height:1.7;">${bio}</p>` : ""}
         </div>`;
         return `<section style="background:${bg};padding:clamp(60px,10vw,${layout.sectionPadding}px) clamp(24px,8vw,100px);">
@@ -480,13 +487,13 @@ export function previewHTML(page, brand) {
         const src = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, 1000, 750, brand.imageCategory);
         return `<div style="min-width:0;">
           <img src="${src}" alt="${title || ""}" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block;"/>
-          <h3 style="font-family:'${hf}',serif;font-size:20px;color:${headingColor};margin:16px 0 4px;font-weight:500;">${title || ""}</h3>
+          <h3 style="font-family:'${hf}',serif;font-size:20px;color:${cardHc};margin:16px 0 4px;font-weight:500;">${title || ""}</h3>
           <p style="font-family:'${bf}',sans-serif;font-size:12px;color:${ac};margin:0;">${cat || ""}</p>
         </div>`;
       }).join("");
       return `<section style="background:${card};padding:clamp(60px,10vw,${layout.sectionPadding}px) clamp(24px,8vw,100px);">
         <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.portfolioEyebrow">${page.portfolioEyebrow || "Selected Work"}</p>
-        <h2 data-edit="page.portfolioHeading" style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,${layout.sectionHeading}px);color:${headingColor};margin:0 0 48px;font-weight:400;">${page.portfolioHeading || "Recent projects."}</h2>
+        <h2 data-edit="page.portfolioHeading" style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,${layout.sectionHeading}px);color:${cardHc};margin:0 0 48px;font-weight:400;">${page.portfolioHeading || "Recent projects."}</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;">${cards}</div>
       </section>`;
     }
@@ -494,7 +501,7 @@ export function previewHTML(page, brand) {
     if (s === "Logo Carousel") {
       const clientNames = (brand.clientLogos || "").split("\n").filter(Boolean);
       const logos = clientNames.map((name) =>
-        `<div style="flex:0 0 auto;padding:0 32px;font-family:'${hf}',serif;font-size:22px;color:${headingColor};opacity:0.55;white-space:nowrap;">${name}</div>`
+        `<div style="flex:0 0 auto;padding:0 32px;font-family:'${hf}',serif;font-size:22px;color:${cardHc};opacity:0.55;white-space:nowrap;">${name}</div>`
       ).join("");
       return `<section style="background:${card};padding:clamp(40px,6vw,80px) 0;overflow:hidden;">
         <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 24px;text-align:center;" data-edit="page.clientsEyebrow">${page.clientsEyebrow || "Trusted By"}</p>
@@ -539,7 +546,7 @@ export function previewHTML(page, brand) {
       const heading = page.servicesHeading || "Our services.";
       return `<section style="background:${card};padding:clamp(60px,10vw,100px) clamp(24px,8vw,100px);">
         <p style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:${ac};margin:0 0 16px;" data-edit="page.sectionEyebrow">${eyebrow}</p>
-        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,48px);color:${headingColor};margin:0 0 48px;font-weight:400;" data-edit="page.servicesHeading">${heading}</h2>
+        <h2 style="font-family:'${hf}',serif;font-size:clamp(32px,4vw,48px);color:${cardHc};margin:0 0 48px;font-weight:400;" data-edit="page.servicesHeading">${heading}</h2>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;">${cards}</div>
       </section>`;
     }
@@ -632,7 +639,7 @@ export function previewHTML(page, brand) {
     const footerSocial = brand.showSocialInFooter ? sl.map(s => SVG[s.key] ? `<a href="${s.url}" target="_blank" style="color:${ts};display:inline-flex;margin:0 10px;">${SVG[s.key](ts, 20)}</a>` : "").join("") : "";
     if (fs === "Editorial") {
       return `<footer style="background:${card};padding:80px clamp(24px,8vw,100px) 40px;border-top:1px solid ${bdr};text-align:center;">
-        <div style="margin:0 0 12px;">${logoHTML(28, "center")}</div>
+        <div style="margin:0 0 12px;">${logoHTML(28, "center", cardHc)}</div>
         <p style="font-family:'${bf}',sans-serif;font-size:13px;color:${ts};margin:0 0 24px;">${brand.tagline || ""}</p>
         <div style="margin:0 0 24px;">${footerSocial}</div>
         <p style="font-family:'${bf}',sans-serif;font-size:11px;color:${ts};margin:0;">© ${new Date().getFullYear()} ${brand.name}. All rights reserved.</p>
@@ -640,7 +647,7 @@ export function previewHTML(page, brand) {
     }
     if (fs === "Studio") {
       return `<footer style="background:${card};padding:80px clamp(24px,8vw,100px) 40px;border-top:1px solid ${bdr};text-align:center;">
-        <div style="margin:0 0 24px;">${logoHTML(28, "center")}</div>
+        <div style="margin:0 0 24px;">${logoHTML(28, "center", cardHc)}</div>
         <nav style="margin:0 0 24px;">${(brand.primaryMenu || "").split(",").map(m => `<a href="#" style="font-family:'${bf}',sans-serif;font-size:13px;color:${ts};text-decoration:none;margin:0 16px;">${m.trim()}</a>`).join("")}</nav>
         <div style="margin:0 0 24px;">${footerSocial}</div>
         <p style="font-family:'${bf}',sans-serif;font-size:11px;color:${ts};margin:0;">© ${new Date().getFullYear()} ${brand.name}</p>
@@ -650,7 +657,7 @@ export function previewHTML(page, brand) {
       return `<footer style="background:${card};padding:80px clamp(24px,8vw,100px) 40px;border-top:1px solid ${bdr};">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:48px;margin:0 0 48px;">
           <div>
-            <div style="margin:0 0 12px;">${logoHTML(24, "left")}</div>
+            <div style="margin:0 0 12px;">${logoHTML(24, "left", cardHc)}</div>
             <p style="font-family:'${bf}',sans-serif;font-size:13px;color:${ts};margin:0 0 16px;line-height:1.7;">${brand.tagline || ""}</p>
             <div>${footerSocial}</div>
           </div>
@@ -674,7 +681,7 @@ export function previewHTML(page, brand) {
     return `<footer style="background:${card};padding:100px clamp(24px,8vw,100px) 40px;border-top:1px solid ${bdr};">
       <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px;margin:0 0 64px;" class="footer-grid">
         <div>
-          <div style="margin:0 0 16px;">${logoHTML(28, "left")}</div>
+          <div style="margin:0 0 16px;">${logoHTML(28, "left", cardHc)}</div>
           <p style="font-family:'${bf}',sans-serif;font-size:14px;color:${ts};margin:0 0 20px;line-height:1.7;">${brand.tagline || ""}</p>
           <p style="font-family:'${bf}',sans-serif;font-size:13px;color:${ts};margin:0 0 16px;">${brand.contactEmail || ""}</p>
           <div>${footerSocial}</div>
