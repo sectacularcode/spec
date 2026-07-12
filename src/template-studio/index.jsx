@@ -1757,7 +1757,7 @@ Rules:
             <textarea
               value={briefText}
               onChange={e => setBriefText(e.target.value)}
-              placeholder="e.g. A modern fitness coaching site for women over 40. Warm but no-nonsense. Earthy palette."
+              placeholder="e.g. A vintage arcade and pinball bar. Loud, nostalgic, a little chaotic. Neon purple and teal on black."
               style={{ width: "100%", minHeight: "80px", padding: "12px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "8px", fontSize: "14px", fontFamily: "inherit", resize: "vertical", lineHeight: 1.6, outline: "none", boxSizing: "border-box" }}
             />
           </div>
