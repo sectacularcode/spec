@@ -110,10 +110,31 @@ export function parseStyleGuideHtml(htmlText) {
 }
 
 // Shared by both export formats below so the html2canvas call config
-// (background, font-readiness wait) only lives in one place.
+// (background, font-readiness wait) only lives in one place. Also
+// temporarily widens the captured element beyond its 820px in-app editing
+// width -- that width is sized for comfortable on-screen editing, not for
+// a downloaded image/PDF, and at 820px a 6-column "compact" swatch grid
+// comes out visibly cramped. The swatch grid already uses percentage-based
+// flex widths (see StyleDocument.jsx), so widening the element here is
+// enough on its own to make the squares bigger and evenly spaced -- no
+// grid-specific math needed. The width is restored right after capture
+// (try/finally, so a capture error can't leave the live editing view
+// stuck at the wrong width) and the mutation never touches React state,
+// so it doesn't trigger a re-render the person would see flash by.
+const EXPORT_CAPTURE_WIDTH_PX = 1100;
+
 async function captureCanvas(exportElement, scale) {
   await document.fonts.ready;
-  return html2canvas(exportElement, { backgroundColor: "#ffffff", scale });
+  const prevWidth = exportElement.style.width;
+  const prevMaxWidth = exportElement.style.maxWidth;
+  exportElement.style.width = `${EXPORT_CAPTURE_WIDTH_PX}px`;
+  exportElement.style.maxWidth = `${EXPORT_CAPTURE_WIDTH_PX}px`;
+  try {
+    return await html2canvas(exportElement, { backgroundColor: "#ffffff", scale });
+  } finally {
+    exportElement.style.width = prevWidth;
+    exportElement.style.maxWidth = prevMaxWidth;
+  }
 }
 
 // PDF: renders the document to a canvas, then slices that canvas across
