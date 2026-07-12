@@ -94,8 +94,8 @@ export default function StyleGuide({ role }) {
       });
       const data = await res.json();
       if (res.ok) {
-        setColors((data.colors || []).map(c => ({ ...c, custom: false })));
-        setFonts((data.fonts || []).map(f => ({ ...f, custom: false })));
+        setColors((data.colors || []).map(c => ({ ...c, custom: c.custom ?? false })));
+        setFonts((data.fonts || []).map(f => ({ ...f, custom: f.custom ?? false })));
         if (data.brandNameGuess && !brandName) setBrandName(data.brandNameGuess);
         setSourceUrl(data.origin || trimmed);
         setAnalyzeStatus(`Found ${data.colors?.length || 0} colors, ${data.fonts?.length || 0} fonts.`);

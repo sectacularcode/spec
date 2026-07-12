@@ -17,24 +17,38 @@ import { isSafeUrl, fetchPage, fetchCss } from "./_lib/safeFetch.js";
 const MAX_CSS_FETCHES = 10;
 
 // General stylesheet discovery -- every <link rel="stylesheet">, not just
-// Elementor-tagged ones (crawl-inspo.js only needs Elementor's Kit CSS;
-// this route has to work on any site builder, so it can't filter to one
-// vendor's naming convention up front).
+// Elementor-tagged ones (this route has to work on any site builder, not
+// just Elementor). But naive DOM-order-first-N is a real bug on a typical
+// WordPress site: confirmed against a real 39-stylesheet page where the
+// one file that actually carries brand colors (Elementor's per-post Kit
+// CSS, post-N.css) sat at position 15 -- past any reasonable cutoff --
+// while the first 10 were dashicons, admin-bar, cookie-consent, and other
+// plugin CSS that never carries color data. Prioritizing post-N.css
+// first, then other Elementor-tagged files, then everything else (same
+// ordering crawl-inspo.js already uses and already proved out) fixes
+// that without needing to raise the fetch cap for every site.
 function extractStylesheetUrls(html, origin) {
   const linkRe = /<link[^>]+rel=["']stylesheet["'][^>]*>/gi;
   const hrefRe = /href=["']([^"']+)["']/i;
   const links = html.match(linkRe) || [];
-  const urls = [];
+  const postCssUrls = [];
+  const elementorUrls = [];
+  const otherUrls = [];
   for (const tag of links) {
     const m = tag.match(hrefRe);
     if (!m) continue;
+    let resolved;
     try {
-      urls.push(new URL(m[1], origin).href);
+      resolved = new URL(m[1], origin).href;
     } catch {
-      // malformed href -- skip, don't fail the whole extraction over it
+      continue; // malformed href -- skip, don't fail the whole extraction over it
     }
+    if (/post-\d+\.css/i.test(resolved)) postCssUrls.push(resolved);
+    else if (/elementor/i.test(resolved)) elementorUrls.push(resolved);
+    else otherUrls.push(resolved);
   }
-  return [...new Set(urls)].slice(0, MAX_CSS_FETCHES);
+  const ordered = [...new Set([...postCssUrls, ...elementorUrls, ...otherUrls])];
+  return ordered.slice(0, MAX_CSS_FETCHES);
 }
 
 async function fetchAllCss(html, origin) {
@@ -49,16 +63,25 @@ async function fetchAllCss(html, origin) {
 // Elementor sites expose Global Colors as CSS custom properties directly
 // (confirmed convention, see api/crawl-inspo.js). Checked first since it's
 // the single most reliable signal available on any site that has it.
+// Elementor's 4 stock slots use readable ids (primary/secondary/text/
+// accent); anything a site owner adds beyond those gets an opaque
+// hash-style id instead, returned separately as "custom" rather than
+// discarded -- confirmed against a real site (AFS) that keeps 5 named
+// brand colors, including its actual yellow accent, entirely in custom
+// slots the stock 4 never surface.
 const ELEMENTOR_STOCK_SLOTS = ["primary", "secondary", "text", "accent"];
 function extractElementorGlobalColors(css) {
-  const found = {};
+  const stock = {};
+  const custom = {};
   const re = /--e-global-color-([a-z0-9]+)\s*:\s*(#[0-9a-fA-F]{3,8})/g;
   let m;
   while ((m = re.exec(css)) !== null) {
     const id = m[1].toLowerCase();
-    if (ELEMENTOR_STOCK_SLOTS.includes(id)) found[id] = m[2].toUpperCase();
+    const hex = m[2].toUpperCase();
+    if (ELEMENTOR_STOCK_SLOTS.includes(id)) stock[id] = hex;
+    else custom[id] = hex;
   }
-  return found;
+  return { stock, custom };
 }
 
 // General fallback: CSS custom properties declared at :root/html/body.
@@ -159,6 +182,7 @@ function findRootProp(rootProps, keywords) {
 
 export function buildColorSet(css) {
   const elementor = extractElementorGlobalColors(css);
+  const stock = elementor.stock;
   const rootProps = extractRootCustomProperties(css);
   const ranked = extractHighSignalColors(css);
 
@@ -168,32 +192,44 @@ export function buildColorSet(css) {
                            // and Accent just because it topped two lists
   function add(role, hex, confidence) {
     if (!hex) return;
-    result.push({ role, hex, confidence });
+    result.push({ role, hex, confidence, custom: false });
     used.add(hex);
   }
   function nextRanked() {
     return ranked.find(hex => !used.has(hex)) || null;
   }
 
+  // Elementor's own 4 stock slots: "Primary" is the dominant/heading color
+  // in real-world use (confirmed against a real site, see crawl-inspo.js's
+  // note on this), "Text" is specifically body copy -- the previous
+  // version of this function had these backwards, mapping "Text" to
+  // Heading and never producing a Body text role at all.
   const headingProp = findRootProp(rootProps, ["heading", "headline", "title", "text-dark", "-dark"]);
-  if (elementor.text) add("Heading", elementor.text, "confirmed");
+  if (stock.primary) add("Heading", stock.primary, "confirmed");
+  else if (stock.text) add("Heading", stock.text, "confirmed");
   else if (headingProp) add("Heading", headingProp, "confirmed");
   else { const c = nextRanked(); if (c) add("Heading", c, "estimated"); }
 
-  // "primary" is deliberately in the accent list, not the heading list --
-  // in real-world CSS convention (Bootstrap, Material, Tailwind, and most
-  // hand-rolled design-token setups) "--primary" almost always names the
-  // brand/accent color, not body or heading text.
+  const bodyTextProp = findRootProp(rootProps, ["body-text", "text-body", "body-color", "paragraph"]);
+  if (stock.text) add("Body text", stock.text, "confirmed");
+  else if (bodyTextProp) add("Body text", bodyTextProp, "confirmed");
+  else { const c = nextRanked(); if (c) add("Body text", c, "estimated"); }
+
+  // "primary" is deliberately also checked here as a fallback for accent
+  // (not just heading above) -- in general CSS convention (Bootstrap,
+  // Material, Tailwind) "--primary" more often names the brand/accent
+  // color than heading text, so a non-Elementor site's :root variable
+  // named "primary" is checked against the accent list too.
   const accentProp = findRootProp(rootProps, ["accent", "brand", "primary", "cta", "action"]);
   let accentHex = null;
-  if (elementor.accent) { accentHex = elementor.accent; add("Accent", accentHex, "confirmed"); }
+  if (stock.accent) { accentHex = stock.accent; add("Accent", accentHex, "confirmed"); }
   else if (accentProp) { accentHex = accentProp; add("Accent", accentHex, "confirmed"); }
   else { const c = nextRanked(); if (c) { accentHex = c; add("Accent", c, "estimated"); } }
 
   if (accentHex) add("Accent — hover", darkenHex(accentHex, 0.15), "derived");
 
   const bgProp = findRootProp(rootProps, ["background", "bg", "surface", "canvas"]);
-  if (elementor.secondary) add("Background", elementor.secondary, "confirmed");
+  if (stock.secondary) add("Background", stock.secondary, "confirmed");
   else if (bgProp) add("Background", bgProp, "confirmed");
   else add("Background", "#FFFFFF", "derived");
 
@@ -202,11 +238,32 @@ export function buildColorSet(css) {
   else add("Dark panel", "#1A1A1A", "derived");
 
   const mutedProp = findRootProp(rootProps, ["muted", "stone", "secondary-text", "gray", "grey"]);
-  if (elementor.primary && elementor.primary !== accentHex) add("Muted", elementor.primary, "estimated");
-  else if (mutedProp) add("Muted", mutedProp, "estimated");
+  if (mutedProp) add("Muted", mutedProp, "estimated");
   else { const c = nextRanked(); if (c) add("Muted", c, "estimated"); }
 
   add("Text on dark", "#FAFAF8", "derived");
+
+  // Elementor global colors beyond the 4 stock slots are real, deliberate,
+  // site-owner-named brand colors -- confirmed against a real site (AFS)
+  // that keeps its actual yellow accent entirely in one of these. Previously
+  // discarded outright; now surfaced as "Additional colors" (the same
+  // free-form custom-color shape the UI already supports for manually
+  // added colors), skipping anything that duplicates a hex already used
+  // for one of the 8 template roles above. Capped at 6 so a site with a
+  // large custom palette doesn't flood the results.
+  // Filtering once up front against `used` and THEN looping isn't enough --
+  // two custom-color ids can share the same hex (confirmed in the real AFS
+  // data: two differently-named custom slots both resolve to #2B2826), so
+  // the used-check has to happen per-iteration, not just before the loop,
+  // or duplicates among the custom entries themselves slip through.
+  let addedCustom = 0;
+  for (const [id, hex] of Object.entries(elementor.custom)) {
+    if (addedCustom >= 6) break;
+    if (used.has(hex)) continue;
+    result.push({ custom: true, hex, name: "", usage: "", confidence: "confirmed" });
+    used.add(hex);
+    addedCustom++;
+  }
 
   return result;
 }
