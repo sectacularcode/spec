@@ -7,7 +7,7 @@ import { he } from "../utils/htmlEscape.js";
 import { getLayout, eyebrowText } from "../constants/layouts.js";
 import { SVG } from "../utils/svg.js";
 import { imgOrPlaceholder } from "../utils/images.js";
-import { luminance, textOn } from "../utils/colors.js";
+import { luminance, textOn, mutedTextOn, buttonOn } from "../utils/colors.js";
 
 export function previewHTML(page, brand) {
   // Sanitize all brand string fields before any HTML insertion
@@ -395,11 +395,11 @@ export function previewHTML(page, brand) {
       </section>`;
     }
 
-    if (s === "CTA") return `<section style="background:${ac};padding:clamp(80px,12vw,160px) clamp(24px,8vw,100px);text-align:center;">
-      <h2 style="font-family:'${hf}',serif;font-size:clamp(36px,6vw,80px);color:#fff;margin:0 0 24px;font-weight:400;max-width:900px;margin-left:auto;margin-right:auto;line-height:1.1;">${page.ctaHeading || "Ready to make something worth seeing?"}</h2>
-      <p style="font-family:'${bf}',sans-serif;font-size:17px;color:rgba(255,255,255,.85);margin:0 0 40px;">${brand.tagline || ""}</p>
-      <a href="#contact" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:${ac};background:#fff;padding:18px 40px;text-decoration:none;display:inline-block;">${brand.cta1}</a>
-    </section>`;
+    if (s === "CTA") { const ctaBtn = buttonOn(ac, pc); return `<section style="background:${ac};padding:clamp(80px,12vw,160px) clamp(24px,8vw,100px);text-align:center;">
+      <h2 style="font-family:'${hf}',serif;font-size:clamp(36px,6vw,80px);color:${textOn(ac)};margin:0 0 24px;font-weight:400;max-width:900px;margin-left:auto;margin-right:auto;line-height:1.1;">${page.ctaHeading || "Ready to make something worth seeing?"}</h2>
+      <p style="font-family:'${bf}',sans-serif;font-size:17px;color:${mutedTextOn(ac)};margin:0 0 40px;">${brand.tagline || ""}</p>
+      <a href="#contact" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:${ctaBtn.btnText};background:${ctaBtn.btnBg};padding:18px 40px;text-decoration:none;display:inline-block;">${brand.cta1}</a>
+    </section>`; }
 
     if (s === "Contact" || s === "Form") {
       const allForms = (page.forms || "").split("\n").filter(Boolean);
@@ -414,7 +414,7 @@ export function previewHTML(page, brand) {
               ${fields.map(fl => /message|details|notes/i.test(fl)
                 ? `<textarea placeholder="${fl}" rows="5" style="background:transparent;border:none;border-bottom:1px solid ${bdr};padding:14px 0;color:${headingColor};font-family:'${bf}',sans-serif;font-size:15px;resize:vertical;outline:none;"></textarea>`
                 : `<input placeholder="${fl}" style="background:transparent;border:none;border-bottom:1px solid ${bdr};padding:14px 0;color:${headingColor};font-family:'${bf}',sans-serif;font-size:15px;outline:none;"/>`).join("")}
-              <button type="button" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#fff;background:${ac};padding:16px 32px;border:none;cursor:pointer;margin-top:16px;align-self:flex-start;">${cta || "Send"}</button>
+              <button type="button" style="font-family:'${bf}',sans-serif;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:${textOn(ac)};background:${ac};padding:16px 32px;border:none;cursor:pointer;margin-top:16px;align-self:flex-start;">${cta || "Send"}</button>
             </form>
           </div>
         </section>`;

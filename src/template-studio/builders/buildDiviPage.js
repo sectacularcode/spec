@@ -1,6 +1,7 @@
 import { THEMES } from "../constants/themes.js";
 import { imgOrPlaceholder } from "../utils/images.js";
 import { he } from "../utils/htmlEscape.js";
+import { textOn, mutedTextOn, buttonOn } from "../utils/colors.js";
 // Builds Divi shortcode format for a page (secondary export format)
 // Returns a plain string of Divi [et_pb_*] shortcodes.
 export function buildDiviPage(page, brand) {
@@ -38,7 +39,7 @@ export function buildDiviPage(page, brand) {
   };
   const dTxt = (html, color = ts, font = bf, size = 16, align = "left") =>
     `[et_pb_text text_font="${font}||||" text_text_color="${color}" ${dFontAttr("text_font_size", size, 0.95, 0.85, 13)} text_orientation="${align}"]<p>${he(html)}</p>[/et_pb_text]`;
-  const dBtn = (text, link = "#", bg = ac, color = "#fff", align = "left") =>
+  const dBtn = (text, link = "#", bg = ac, color = textOn(bg), align = "left") =>
     `[et_pb_button button_text="${he(text)}" button_url="${link}" button_alignment="${align}" custom_button="on" button_text_color="${color}" button_bg_color="${bg}" button_font="${bf}|700|on|on|||||" button_letter_spacing="2px" button_text_size="11px" custom_padding="16px|36px|16px|36px|true|true" custom_padding_tablet="14px|28px|14px|28px|true|true" custom_padding_phone="12px|24px|12px|24px|true|true" custom_padding_last_edited="on|desktop"][/et_pb_button]`;
   const dImg = (url, alt = "") =>
     `[et_pb_image src="${url}" alt="${he(alt)}" align="center"][/et_pb_image]`;
@@ -61,7 +62,7 @@ export function buildDiviPage(page, brand) {
       const ft = /message|details|notes/i.test(fl) ? "text" : (/email/i.test(fl) ? "email" : "input");
       return `[et_pb_contact_field field_id="${fl.toLowerCase().replace(/[^a-z0-9]+/g, "_")}" field_title="${he(fl)}" field_type="${ft}" fullwidth_field="on"][/et_pb_contact_field]`;
     }).join("");
-    return `[et_pb_contact_form title="${he(title)}" submit_button_text="${he(btn)}" custom_button="on" button_bg_color="${ac}" button_text_color="#ffffff" form_field_text_color="${hc}" form_field_background_color="transparent"]${f}[/et_pb_contact_form]`;
+    return `[et_pb_contact_form title="${he(title)}" submit_button_text="${he(btn)}" custom_button="on" button_bg_color="${ac}" button_text_color="${textOn(ac)}" form_field_text_color="${hc}" form_field_background_color="transparent"]${f}[/et_pb_contact_form]`;
   };
 
   const sections = [];
@@ -73,7 +74,7 @@ export function buildDiviPage(page, brand) {
         dTxt(`●  STUDIO`, ac, bf, 11, "left") + dDiv(24) +
         dHead(page.heroHeading || brand.tagline, "h1", hc, hf, 84, "left") + dDiv(28) +
         dTxt(page.heroSubhead || (brand.keyMessages || "").split(".")[0], ts, bf, 18, "left") + dDiv(48) +
-        dBtn(brand.cta1, "#contact", ac, "#fff", "left")
+        dBtn(brand.cta1, "#contact", ac, textOn(ac), "left")
       ));
       sections.push(`[et_pb_section fb_built="1" background_color="${pc}" background_image="${img}" background_blend="overlay" ${dPad(160, 20, 160, 20)}]${inner}[/et_pb_section]`);
     }
@@ -141,7 +142,7 @@ export function buildDiviPage(page, brand) {
     if (s === "Pricing") {
       const items = (page.pricing || "").split("\n").filter(Boolean);
       const headRow = dRow("4_4", dCol("4_4", dTxt("PRICING", ac, bf, 11, "center") + dDiv(16) + dHead("Investment.", "h2", hc, hf, 52, "center") + dDiv(40)));
-      const cards = items.slice(0, 3).map(line => { const [tier, price, desc] = line.split("|"); return dCol("1_3", dHead(tier || "", "h4", hc, hf, 22, "center") + dHead(price || "", "h3", ac, hf, 40, "center") + dTxt(desc || "", ts, bf, 14, "center") + dDiv(24) + dBtn(brand.cta1, "#contact", ac, "#fff", "center")); }).join("");
+      const cards = items.slice(0, 3).map(line => { const [tier, price, desc] = line.split("|"); return dCol("1_3", dHead(tier || "", "h4", hc, hf, 22, "center") + dHead(price || "", "h3", ac, hf, 40, "center") + dTxt(desc || "", ts, bf, 14, "center") + dDiv(24) + dBtn(brand.cta1, "#contact", ac, textOn(ac), "center")); }).join("");
       sections.push(dSec(card, 140, headRow + dRow("1_3,1_3,1_3", cards)));
     }
 
@@ -175,10 +176,11 @@ export function buildDiviPage(page, brand) {
     }
 
     if (s === "CTA") {
+      const ctaBtn = buttonOn(ac, pc);
       const inner = dRow("4_4", dCol("4_4",
-        dHead(page.ctaHeading || "Ready to make something worth seeing?", "h2", "#ffffff", hf, 64, "center") + dDiv(28) +
-        dTxt(brand.tagline || "", "rgba(255,255,255,0.85)", bf, 17, "center") + dDiv(40) +
-        dBtn(brand.cta1, "#contact", "#ffffff", ac, "center")
+        dHead(page.ctaHeading || "Ready to make something worth seeing?", "h2", textOn(ac), hf, 64, "center") + dDiv(28) +
+        dTxt(brand.tagline || "", mutedTextOn(ac), bf, 17, "center") + dDiv(40) +
+        dBtn(brand.cta1, "#contact", ctaBtn.btnBg, ctaBtn.btnText, "center")
       ));
       sections.push(dSec(ac, 160, inner));
     }
