@@ -335,11 +335,31 @@ function manifestPageDocumentToBrief(raw) {
     faqItems: [],
     _unmappedBlocks: [],
     // Surfaces Manifest's own audit trail -- flagged claims needing a real
-    // receipt, unverified technical claims pending expert review, buttons
-    // still pointing at placeholders -- so a human sees exactly what needs
-    // attention before this ships, instead of it silently disappearing.
+    // receipt, unverified technical claims pending expert review -- so a
+    // human sees exactly what needs attention before this ships, instead
+    // of it silently disappearing. Distinct from _placeholderButtons below:
+    // this is Manifest's own freeform prose passed through as-is, genuinely
+    // secondary (each item already has its own correction path -- a
+    // write-back mechanism, a CFR citation to verify against). Nothing in
+    // here is an action Kalei needs to take before publishing.
     _manifestWarnings: [],
+    // Structural check Spec does itself, not dependent on parsing
+    // Manifest's prose -- every button whose real URL came back empty
+    // (pageDocumentButtonUrl returning "") but which has a real label,
+    // meaning it's a genuine button that's missing its destination, not an
+    // unused slot. Unlike _manifestWarnings, every item here is a real
+    // "you must supply this before publishing" requirement -- a placeholder
+    // button ships as a dead link if nobody fills it in.
+    _placeholderButtons: [],
   };
+
+  // Tracks a button in _placeholderButtons only when it's a genuine labeled
+  // button with no resolvable URL -- an empty button slot (no label at all)
+  // isn't a placeholder, it's just absent, and shouldn't show up as
+  // something to fix.
+  function trackPlaceholderButton(label, url, section) {
+    if (label && !url) brief._placeholderButtons.push({ label: label, section: section });
+  }
 
   if (provenance.clean === false && provenance.clean_reason) {
     brief._manifestWarnings.push(provenance.clean_reason);
@@ -377,8 +397,10 @@ function manifestPageDocumentToBrief(raw) {
       brief.heroSubhead = flattenRichText(section.subheading);
       brief.phoneCta = heroButtons[0] ? heroButtons[0].label || "" : "";
       brief.heroPrimaryUrl = pageDocumentButtonUrl(heroButtons[0]);
+      trackPlaceholderButton(brief.phoneCta, brief.heroPrimaryUrl, "Hero");
       brief.contactCta = heroButtons[1] ? heroButtons[1].label || "" : "";
       brief.heroSecondaryUrl = pageDocumentButtonUrl(heroButtons[1]);
+      trackPlaceholderButton(brief.contactCta, brief.heroSecondaryUrl, "Hero");
       return;
     }
 
@@ -446,6 +468,11 @@ function manifestPageDocumentToBrief(raw) {
         var directionsUrl = section.directions_url || btnUrl;
         var viewUrl = section.maps_url || btnUrl;
         brief.mapUrl = mode === "service_area" ? (viewUrl || directionsUrl) : (directionsUrl || viewUrl);
+        // directions_url/maps_url (both computed from the governed address,
+        // not the button itself) can genuinely fill in even when the
+        // button's own destination is a placeholder -- only flag this one
+        // if brief.mapUrl itself came back empty, meaning nothing resolved.
+        trackPlaceholderButton(section.button && section.button.label, brief.mapUrl, "Map");
         if (noteText) brief._manifestMapNote = noteText;
       } else if (noteText) {
         // No structured address to build the real map widget from -- the
