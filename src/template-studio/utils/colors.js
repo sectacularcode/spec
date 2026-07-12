@@ -54,3 +54,17 @@ export const buttonVariations = (sectionBg, accent) => {
     ghost: { text: lineColor },
   };
 };
+
+// Resolves the safe heading color for a given background. Prefers an explicit
+// theme-provided heading color (themes can deliberately pick a warm off-white
+// or off-black for aesthetic reasons, not just pure #fff/#000) but only if it
+// still reads legibly against the CURRENT background -- otherwise falls back
+// to the guaranteed-safe textOn(bg). Same "trust it if it's safe, otherwise
+// fall back" pattern as buttonOn(), applied to heading text. Exists because a
+// stored theme.headingColor can go stale the moment a background color is
+// overridden without also changing the associated theme (e.g. a manual
+// Primary BG color-picker edit after a preset theme was applied).
+export const headingColorOn = (bg, themeHeadingColor) => {
+  if (themeHeadingColor && contrastRatio(themeHeadingColor, bg) >= 4.5) return themeHeadingColor;
+  return textOn(bg);
+};

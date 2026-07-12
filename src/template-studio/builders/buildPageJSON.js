@@ -11,7 +11,12 @@ import { he } from "../utils/htmlEscape.js";
 export function buildPageJSON(page, brand) {
   const { primaryColor: pc, accentColor: ac, cardBgColor: card, headingFont: hf, bodyFont: bf } = brand;
   const theme = THEMES.find(t => t.id === brand.themeId);
-  const isDark = (brand.themeMode || (theme && theme.mode)) === "dark" || pc.toLowerCase() === "#0a0a0a" || pc.toLowerCase() === "#000000" || pc === "#111111";
+  // Computed fresh from the actual background color every time, not from a stored
+  // theme.mode/themeMode label -- those can go stale the moment primaryColor is
+  // changed without also updating them (e.g. the "Primary BG" color picker doesn't
+  // touch themeId/themeMode), which previously left dark/light section treatment
+  // silently wrong. isLight() already does the real WCAG luminance math.
+  const isDark = !isLight(pc);
   const sections = [];
   const push = (parent, ...els) => els.forEach(e => parent.elements.push(e));
 

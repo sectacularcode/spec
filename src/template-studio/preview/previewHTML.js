@@ -7,7 +7,7 @@ import { he } from "../utils/htmlEscape.js";
 import { getLayout, eyebrowText } from "../constants/layouts.js";
 import { SVG } from "../utils/svg.js";
 import { imgOrPlaceholder } from "../utils/images.js";
-import { luminance, textOn, mutedTextOn, buttonOn, buttonVariations } from "../utils/colors.js";
+import { luminance, textOn, mutedTextOn, buttonOn, buttonVariations, isLight, headingColorOn } from "../utils/colors.js";
 
 export function previewHTML(page, brand) {
   // Sanitize all brand string fields before any HTML insertion
@@ -44,8 +44,8 @@ export function previewHTML(page, brand) {
 
   const { primaryColor: pc, accentColor: ac, cardBgColor: card, bodyTextColor: body, borderColor: bdr, headingFont: hf, bodyFont: bf } = brand;
   const theme = THEMES.find(t => t.id === brand.themeId);
-  const isDark = (brand.themeMode || (theme && theme.mode)) === "dark";
-  const headingColor = (theme && theme.headingColor) || (isDark ? "#ffffff" : "#0a0a0a");
+  const isDark = !isLight(pc);
+  const headingColor = headingColorOn(pc, theme && theme.headingColor);
   const ts = body;
   const sl = brand.socialLinks || [];
   const layout = getLayout(brand.layoutId);

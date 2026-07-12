@@ -1,13 +1,12 @@
 import { THEMES } from "../constants/themes.js";
-import { textOn } from "../utils/colors.js";
+import { textOn, headingColorOn } from "../utils/colors.js";
 import { uid, eContainer, eSection, eHead, eBtn, eNavMenu, eSocial } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
 // Builds Elementor JSON for the site header (Theme Builder global template)
 export function buildHeaderJSON(brand) {
   const { primaryColor: pc, accentColor: ac, headingFont: hf, bodyFont: bf, headerStyle = "Editorial" } = brand;
   const theme = THEMES.find(t => t.id === brand.themeId);
-  const isDark = (brand.themeMode || (theme && theme.mode)) === "dark";
-  const hColor = (theme && theme.headingColor) || (isDark ? "#ffffff" : "#0a0a0a");
+  const hColor = headingColorOn(pc, theme && theme.headingColor);
 
   // Header is a sticky bar with reduced vertical padding
   const sec = eSection(pc, 20, 20);

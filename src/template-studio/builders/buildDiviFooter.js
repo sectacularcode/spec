@@ -1,11 +1,15 @@
 import { THEMES } from "../constants/themes.js";
+import { isLight, headingColorOn } from "../utils/colors.js";
 import { he } from "../utils/htmlEscape.js";
 // Builds Divi shortcode format for the site footer
 export function buildDiviFooter(brand) {
   const { accentColor: ac, cardBgColor: card, headingFont: hf, bodyFont: bf, footerStyle } = brand;
   const theme = THEMES.find(t => t.id === brand.themeId);
-  const isDark = (brand.themeMode || (theme && theme.mode)) === "dark";
-  const hc = (theme && theme.headingColor) || (isDark ? "#ffffff" : "#0a0a0a");
+  // Footer's own background is cardBgColor, not primaryColor -- computed from the
+  // footer's actual background rather than a global site-mode flag that can go
+  // stale relative to it. Same fix as buildFooterJSON.js (Elementor equivalent).
+  const isDark = !isLight(card);
+  const hc = headingColorOn(card, theme && theme.headingColor);
   const body = isDark ? "#888" : "#666";
   const logoText = brand.logoText || brand.name;
 

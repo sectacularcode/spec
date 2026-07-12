@@ -1,12 +1,16 @@
 import { THEMES } from "../constants/themes.js";
+import { isLight, headingColorOn } from "../utils/colors.js";
 import { eSection, eHead, eTxt, eSpacer, eSocial, eNavMenu } from "./helpers.js";
 import { he } from "../utils/htmlEscape.js";
 // Builds Elementor JSON for the site footer (Theme Builder global template)
 export function buildFooterJSON(brand) {
   const { accentColor: ac, cardBgColor: card, headingFont: hf, bodyFont: bf, footerStyle } = brand;
   const theme = THEMES.find(t => t.id === brand.themeId);
-  const isDark = (brand.themeMode || (theme && theme.mode)) === "dark";
-  const headingColor = (theme && theme.headingColor) || (isDark ? "#ffffff" : "#0a0a0a");
+  // Footer's own background is cardBgColor, not primaryColor -- a theme's overall
+  // "mode" can be dark while its card color is light (or vice versa), so this is
+  // computed from the footer's actual background, not a global site-mode flag.
+  const isDark = !isLight(card);
+  const headingColor = headingColorOn(card, theme && theme.headingColor);
   const body = isDark ? "#888" : "#666";
   const sec = eSection(card, 80, 60);
   const push = (...els) => els.forEach(e => sec.elements.push(e));

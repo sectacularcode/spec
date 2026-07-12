@@ -1,15 +1,15 @@
 import { THEMES } from "../constants/themes.js";
 import { imgOrPlaceholder } from "../utils/images.js";
 import { he } from "../utils/htmlEscape.js";
-import { textOn, mutedTextOn, buttonOn, buttonVariations } from "../utils/colors.js";
+import { textOn, mutedTextOn, buttonOn, buttonVariations, isLight, headingColorOn } from "../utils/colors.js";
 // Builds Divi shortcode format for a page (secondary export format)
 // Returns a plain string of Divi [et_pb_*] shortcodes.
 export function buildDiviPage(page, brand) {
   const { primaryColor: pc, accentColor: ac, cardBgColor: card, bodyTextColor: body, headingFont: hf, bodyFont: bf } = brand;
   const ts = body;
   const theme = THEMES.find(t => t.id === brand.themeId);
-  const isDark = (brand.themeMode || (theme && theme.mode)) === "dark";
-  const hc = (theme && theme.headingColor) || (isDark ? "#ffffff" : "#0a0a0a");
+  const isDark = !isLight(pc);
+  const hc = headingColorOn(pc, theme && theme.headingColor);
 
   // Responsive padding string: desktop "T|R|B|L" plus tablet/phone scaled-down variants.
   // Divi decodes HTML entities in shortcode attribute values the same way it decodes
@@ -50,24 +50,24 @@ export function buildDiviPage(page, brand) {
     `[et_pb_image src="${url}" alt="${he(alt)}" align="center"][/et_pb_image]`;
   const dDiv = (h = 40) =>
     `[et_pb_divider color="transparent" divider_position="top" height="${h}px" hide_on_mobile="off"][/et_pb_divider]`;
-  const dBlurb = (title, content) =>
-    `[et_pb_blurb title="${he(title)}" header_font="${hf}|500|||||||" header_text_color="${hc}" header_font_size="22px" body_font="${bf}||||" body_text_color="${ts}" body_font_size="14px"]${he(content)}[/et_pb_blurb]`;
-  const dTest = (text, name, role) =>
-    `[et_pb_testimonial author="${he(name)}" job_title="${he(role)}" body_font="${hf}||||" body_text_color="${hc}" body_font_size="22px" author_font="${bf}|600||on|||||" author_text_color="${ac}"]${he(text)}[/et_pb_testimonial]`;
-  const dCount = (num, suffix, label) =>
-    `[et_pb_number_counter title="${he(label)}" number="${parseInt(num) || 0}" percent_sign="off" counter_color="${ac}" title_font="${bf}|500||on|||||" title_text_color="${hc}" number_font="${hf}||||" number_font_size="56px"][/et_pb_number_counter]`;
-  const dAcc = (items) =>
-    `[et_pb_accordion toggle_font="${hf}|400||||||" toggle_text_color="${hc}" icon_color="${ac}"]${items.map(([q, a]) => `[et_pb_accordion_item title="${he(q)}"]${he(a)}[/et_pb_accordion_item]`).join("")}[/et_pb_accordion]`;
-  const dSocial = (links) =>
-    `[et_pb_social_media_follow url_new_window="on" follow_button="off" icon_color="${hc}"]${links.map(l => `[et_pb_social_media_follow_network social_network="${l.key}" url="${l.url}" bg_color="transparent"]${he(l.label)}[/et_pb_social_media_follow_network]`).join("")}[/et_pb_social_media_follow]`;
+  const dBlurb = (title, content, color = hc) =>
+    `[et_pb_blurb title="${he(title)}" header_font="${hf}|500|||||||" header_text_color="${color}" header_font_size="22px" body_font="${bf}||||" body_text_color="${ts}" body_font_size="14px"]${he(content)}[/et_pb_blurb]`;
+  const dTest = (text, name, role, color = hc) =>
+    `[et_pb_testimonial author="${he(name)}" job_title="${he(role)}" body_font="${hf}||||" body_text_color="${color}" body_font_size="22px" author_font="${bf}|600||on|||||" author_text_color="${ac}"]${he(text)}[/et_pb_testimonial]`;
+  const dCount = (num, suffix, label, color = hc) =>
+    `[et_pb_number_counter title="${he(label)}" number="${parseInt(num) || 0}" percent_sign="off" counter_color="${ac}" title_font="${bf}|500||on|||||" title_text_color="${color}" number_font="${hf}||||" number_font_size="56px"][/et_pb_number_counter]`;
+  const dAcc = (items, color = hc) =>
+    `[et_pb_accordion toggle_font="${hf}|400||||||" toggle_text_color="${color}" icon_color="${ac}"]${items.map(([q, a]) => `[et_pb_accordion_item title="${he(q)}"]${he(a)}[/et_pb_accordion_item]`).join("")}[/et_pb_accordion]`;
+  const dSocial = (links, color = hc) =>
+    `[et_pb_social_media_follow url_new_window="on" follow_button="off" icon_color="${color}"]${links.map(l => `[et_pb_social_media_follow_network social_network="${l.key}" url="${l.url}" bg_color="transparent"]${he(l.label)}[/et_pb_social_media_follow_network]`).join("")}[/et_pb_social_media_follow]`;
   const dVid = (url) =>
     `[et_pb_video src="${url}"][/et_pb_video]`;
-  const dForm = (title, fields, btn) => {
+  const dForm = (title, fields, btn, color = hc) => {
     const f = fields.map(fl => {
       const ft = /message|details|notes/i.test(fl) ? "text" : (/email/i.test(fl) ? "email" : "input");
       return `[et_pb_contact_field field_id="${fl.toLowerCase().replace(/[^a-z0-9]+/g, "_")}" field_title="${he(fl)}" field_type="${ft}" fullwidth_field="on"][/et_pb_contact_field]`;
     }).join("");
-    return `[et_pb_contact_form title="${he(title)}" submit_button_text="${he(btn)}" custom_button="on" button_bg_color="${ac}" button_text_color="${textOn(ac)}" form_field_text_color="${hc}" form_field_background_color="transparent"]${f}[/et_pb_contact_form]`;
+    return `[et_pb_contact_form title="${he(title)}" submit_button_text="${he(btn)}" custom_button="on" button_bg_color="${ac}" button_text_color="${textOn(ac)}" form_field_text_color="${color}" form_field_background_color="transparent"]${f}[/et_pb_contact_form]`;
   };
 
   const sections = [];
@@ -96,8 +96,9 @@ export function buildDiviPage(page, brand) {
 
     if (s === "About") {
       const img = imgOrPlaceholder(page.aboutImage, `${brand.name}-about`, 800, 1000, brand.imageCategory);
+      const cardHc = headingColorOn(card, theme && theme.headingColor);
       const inner = dRow("1_2,1_2",
-        dCol("1_2", dTxt("ABOUT", ac, bf, 11, "left") + dDiv(16) + dHead(page.aboutHeading || "About", "h2", hc, hf, 48, "left") + dDiv(28) + dTxt(page.aboutBody || brand.description, ts, bf, 17, "left")) +
+        dCol("1_2", dTxt("ABOUT", ac, bf, 11, "left") + dDiv(16) + dHead(page.aboutHeading || "About", "h2", cardHc, hf, 48, "left") + dDiv(28) + dTxt(page.aboutBody || brand.description, ts, bf, 17, "left")) +
         dCol("1_2", dImg(img, "About"))
       );
       sections.push(dSec(card, 140, inner));
@@ -113,19 +114,21 @@ export function buildDiviPage(page, brand) {
 
     if (s === "Process") {
       const items = (page.process || "").split("\n").filter(Boolean);
-      const headRow = dRow("4_4", dCol("4_4", dTxt("HOW WE WORK", ac, bf, 11, "left") + dDiv(16) + dHead("The process.", "h2", hc, hf, 48, "left") + dDiv(40)));
-      const cols = items.slice(0, 4).map((line, i) => { const [t, d] = line.split("|"); return dCol("1_4", dBlurb(`Step ${String(i + 1).padStart(2, "0")} — ${t || ""}`, d || "")); }).join("");
+      const cardHc = headingColorOn(card, theme && theme.headingColor);
+      const headRow = dRow("4_4", dCol("4_4", dTxt("HOW WE WORK", ac, bf, 11, "left") + dDiv(16) + dHead("The process.", "h2", cardHc, hf, 48, "left") + dDiv(40)));
+      const cols = items.slice(0, 4).map((line, i) => { const [t, d] = line.split("|"); return dCol("1_4", dBlurb(`Step ${String(i + 1).padStart(2, "0")} — ${t || ""}`, d || "", cardHc)); }).join("");
       const itemsRow = dRow("1_4,1_4,1_4,1_4", cols);
       sections.push(dSec(card, 140, headRow + itemsRow));
     }
 
     if (s === "Portfolio") {
       const items = (page.portfolio || "").split("\n").filter(Boolean);
-      const headRow = dRow("4_4", dCol("4_4", dTxt("SELECTED WORK", ac, bf, 11, "left") + dDiv(16) + dHead("Recent projects.", "h2", hc, hf, 52, "left") + dDiv(40)));
+      const cardHc = headingColorOn(card, theme && theme.headingColor);
+      const headRow = dRow("4_4", dCol("4_4", dTxt("SELECTED WORK", ac, bf, 11, "left") + dDiv(16) + dHead("Recent projects.", "h2", cardHc, hf, 52, "left") + dDiv(40)));
       const cards = items.slice(0, 3).map((line, i) => {
         const [t, c, img] = line.split("|");
         const portImg = imgOrPlaceholder(img, `${brand.name}-portfolio-${i}`, 800, 1000, brand.imageCategory);
-        return dCol("1_3", dImg(portImg, t || "") + dHead(t || "", "h3", hc, hf, 22, "left") + dTxt(c || "", ac, bf, 12, "left"));
+        return dCol("1_3", dImg(portImg, t || "") + dHead(t || "", "h3", cardHc, hf, 22, "left") + dTxt(c || "", ac, bf, 12, "left"));
       }).join("");
       const cardRow = dRow("1_3,1_3,1_3", cards);
       sections.push(dSec(card, 140, headRow + cardRow));
@@ -144,7 +147,8 @@ export function buildDiviPage(page, brand) {
 
     if (s === "Clients") {
       const list = (brand.clientLogos || "").split("\n").filter(Boolean).join(" · ");
-      const inner = dRow("4_4", dCol("4_4", dTxt("TRUSTED BY", ac, bf, 11, "center") + dDiv(24) + dHead(list, "h3", hc, hf, 20, "center")));
+      const cardHc = headingColorOn(card, theme && theme.headingColor);
+      const inner = dRow("4_4", dCol("4_4", dTxt("TRUSTED BY", ac, bf, 11, "center") + dDiv(24) + dHead(list, "h3", cardHc, hf, 20, "center")));
       sections.push(dSec(card, 100, inner));
     }
 
@@ -156,8 +160,9 @@ export function buildDiviPage(page, brand) {
 
     if (s === "Pricing") {
       const items = (page.pricing || "").split("\n").filter(Boolean);
-      const headRow = dRow("4_4", dCol("4_4", dTxt("PRICING", ac, bf, 11, "center") + dDiv(16) + dHead("Investment.", "h2", hc, hf, 52, "center") + dDiv(40)));
-      const cards = items.slice(0, 3).map(line => { const [tier, price, desc] = line.split("|"); return dCol("1_3", dHead(tier || "", "h4", hc, hf, 22, "center") + dHead(price || "", "h3", ac, hf, 40, "center") + dTxt(desc || "", ts, bf, 14, "center") + dDiv(24) + dBtn(brand.cta1, "#contact", ac, textOn(ac), "center")); }).join("");
+      const cardHc = headingColorOn(card, theme && theme.headingColor);
+      const headRow = dRow("4_4", dCol("4_4", dTxt("PRICING", ac, bf, 11, "center") + dDiv(16) + dHead("Investment.", "h2", cardHc, hf, 52, "center") + dDiv(40)));
+      const cards = items.slice(0, 3).map(line => { const [tier, price, desc] = line.split("|"); return dCol("1_3", dHead(tier || "", "h4", cardHc, hf, 22, "center") + dHead(price || "", "h3", ac, hf, 40, "center") + dTxt(desc || "", ts, bf, 14, "center") + dDiv(24) + dBtn(brand.cta1, "#contact", ac, textOn(ac), "center")); }).join("");
       sections.push(dSec(card, 140, headRow + dRow("1_3,1_3,1_3", cards)));
     }
 
@@ -177,7 +182,8 @@ export function buildDiviPage(page, brand) {
 
     if (s === "FAQ") {
       const items = (page.faq || "").split("\n").filter(Boolean).map(l => l.split("|"));
-      const inner = dRow("4_4", dCol("4_4", dTxt("FAQ", ac, bf, 11, "left") + dDiv(16) + dHead("Questions, answered.", "h2", hc, hf, 48, "left") + dDiv(40) + dAcc(items)));
+      const cardHc = headingColorOn(card, theme && theme.headingColor);
+      const inner = dRow("4_4", dCol("4_4", dTxt("FAQ", ac, bf, 11, "left") + dDiv(16) + dHead("Questions, answered.", "h2", cardHc, hf, 48, "left") + dDiv(40) + dAcc(items, cardHc)));
       sections.push(dSec(card, 140, inner));
     }
 
@@ -204,12 +210,14 @@ export function buildDiviPage(page, brand) {
       (page.forms || "").split("\n").filter(Boolean).forEach(f => {
         const [title, fieldStr, cta] = f.split("|");
         const fields = (fieldStr || "Name,Email,Message").split(",").filter(Boolean);
+        const bg = s === "Form" ? card : pc;
+        const bgHc = headingColorOn(bg, theme && theme.headingColor);
         const inner = dRow("4_4", dCol("4_4",
           dTxt("CONTACT", ac, bf, 11, "left") + dDiv(16) +
-          dHead(title || "Let's talk.", "h2", hc, hf, 52, "left") + dDiv(40) +
-          dForm(title || "Contact", fields, cta || "Send")
+          dHead(title || "Let's talk.", "h2", bgHc, hf, 52, "left") + dDiv(40) +
+          dForm(title || "Contact", fields, cta || "Send", bgHc)
         ));
-        sections.push(dSec(s === "Form" ? card : pc, 140, inner));
+        sections.push(dSec(bg, 140, inner));
       });
     }
   });
