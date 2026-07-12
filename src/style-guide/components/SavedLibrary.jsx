@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { bestTextColor } from "../../utils/contrast.js";
 
 // Collapsible list of every saved brand style for this user. Reused as-is
 // regardless of source (manual entry, Style Guide URL-scrape, or a
@@ -37,7 +38,10 @@ export default function SavedLibrary({ styles, loading, onApply, onDelete, statu
             No saved style guides yet. Analyze a site or add colors above, then save one.
           </p>
         ) : (
-          styles.map((style, i) => (
+          styles.map((style, i) => {
+            const accentHex = style.colors?.brass;
+            const buttonTextColor = accentHex ? bestTextColor(accentHex, style.colors?.text || "#1a1a1a") : null;
+            return (
             <div
               key={style.brand_name}
               style={{
@@ -50,6 +54,11 @@ export default function SavedLibrary({ styles, loading, onApply, onDelete, statu
                   <div key={j} style={{ width: "18px", height: "18px", borderRadius: "4px", background: hex }} />
                 ))}
               </div>
+              {accentHex && (
+                <div style={{ flexShrink: 0, padding: "5px 10px", borderRadius: "4px", background: accentHex }}>
+                  <span style={{ fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: "10px", fontWeight: 600, color: buttonTextColor, whiteSpace: "nowrap" }}>Button</span>
+                </div>
+              )}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{style.brand_name}</p>
                 <p style={{ fontSize: "11px", color: "#6B7280", margin: "2px 0 0" }}>
@@ -62,7 +71,7 @@ export default function SavedLibrary({ styles, loading, onApply, onDelete, statu
                 <button onClick={() => onApply(style)} style={applyBtn}>Apply</button>
               </div>
             </div>
-          ))
+          );})
         )
       )}
     </div>
