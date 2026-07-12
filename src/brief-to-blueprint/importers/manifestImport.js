@@ -506,6 +506,23 @@ function manifestPageDocumentToBrief(raw) {
     brief._unmappedBlocks.push({ elementType: section.type, reason: "no matching Spec widget yet", heading: headingText });
   });
 
+  // Second pass, deliberately separate from the type-dispatch loop above:
+  // catches placeholder buttons on every OTHER section type. hero and
+  // map_location are excluded here since they're already tracked above
+  // with their own fallback-aware logic (map's directions_url/maps_url can
+  // resolve even when the raw button is a placeholder -- this generic pass
+  // doesn't know that nuance, so it must not re-check map). Confirmed via
+  // a real file (AFS Saginaw round 3) that text_section inline/secondary
+  // buttons -- including the page's actual closing CTA button -- were
+  // being silently missed entirely without this: the original hero+map-only
+  // check caught 1 of 4 real placeholder buttons in that file.
+  sections.forEach(function (section) {
+    if (section.type === "hero" || section.type === "map_location") return;
+    (section.buttons || []).forEach(function (btn) {
+      trackPlaceholderButton(btn && btn.label, pageDocumentButtonUrl(btn), section.type === "text_section" ? "Body" : section.type);
+    });
+  });
+
   if (featurePairs.length) brief.features = featurePairs;
   if (faqPairs.length) brief.faqItems = faqPairs;
 
