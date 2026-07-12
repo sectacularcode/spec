@@ -137,8 +137,22 @@ export default function StyleDocument({ brandName, sourceUrl, colors, fonts }) {
         @media print {
           * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           @page { size: letter; margin: 0.5in; }
-          body > *:not(.style-doc-print-root) { display: none !important; }
-          .style-doc-page { border: none !important; box-shadow: none !important; max-width: none !important; margin: 0 !important; }
+          /* The real app nests this component many layers deep (App shell
+             -> tab router -> Suspense -> this tree), unlike the flat
+             single-page mockup this was first designed against -- a rule
+             like "hide every direct child of body except X" only ever
+             matches body's IMMEDIATE children, which in this app is just
+             the React root div, not anything of ours. That silently hid
+             the entire app, including the content it was supposed to
+             print, which is why the print preview came back blank.
+             visibility (not display) is the fix: hiding everything and
+             then re-showing #style-doc-exportable and its descendants
+             works regardless of how deeply nested it is, because a
+             visible child can override a hidden ancestor's visibility --
+             display:none can't be overridden that way. */
+          body * { visibility: hidden; }
+          #style-doc-exportable, #style-doc-exportable * { visibility: visible; }
+          #style-doc-exportable { position: absolute; left: 0; top: 0; width: 100%; }
         }
       `}</style>
     </div>
