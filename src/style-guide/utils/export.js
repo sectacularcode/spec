@@ -111,29 +111,51 @@ export function parseStyleGuideHtml(htmlText) {
 
 // Shared by both export formats below so the html2canvas call config
 // (background, font-readiness wait) only lives in one place. Also
-// temporarily widens the captured element beyond its 820px in-app editing
-// width -- that width is sized for comfortable on-screen editing, not for
-// a downloaded image/PDF, and at 820px a 6-column "compact" swatch grid
-// comes out visibly cramped. The swatch grid already uses percentage-based
-// flex widths (see StyleDocument.jsx), so widening the element here is
-// enough on its own to make the squares bigger and evenly spaced -- no
-// grid-specific math needed. The width is restored right after capture
-// (try/finally, so a capture error can't leave the live editing view
-// stuck at the wrong width) and the mutation never touches React state,
-// so it doesn't trigger a re-render the person would see flash by.
+// temporarily widens the captured element and gives it real page margins
+// for the capture window:
+// - Width: 1100px instead of the 820px in-app editing width -- that width
+//   is sized for comfortable on-screen editing, not for a downloaded
+//   image/PDF, and at 820px a 6-column "compact" swatch grid comes out
+//   visibly cramped. The swatch grid already uses percentage-based flex
+//   widths (see StyleDocument.jsx), so widening the element here is
+//   enough on its own to make the squares bigger and evenly spaced -- no
+//   grid-specific math needed.
+// - Padding: exportElement (#style-doc-exportable) is the INNER content
+//   node -- the 56px/64px page margin visible in the live app lives on
+//   its PARENT wrapper, which is never part of what html2canvas captures.
+//   That's the actual reason PNG/JPEG/PDF exports kept coming out with
+//   content flush against the edges no matter what else got tuned --
+//   there was never any margin in the captured element at all. Applying
+//   the same padding directly here, just for the capture, fixes it at
+//   the actual boundary instead of hoping an ancestor's styling carries
+//   through (it doesn't, for exactly the reason #style-doc-exportable's
+//   own comment already documents about html2canvas/print scoping).
+// Both mutations are restored after capture (try/finally, so a capture
+// error can't leave the live editing view visibly altered) and never
+// touch React state, so there's no re-render for the person to see.
 const EXPORT_CAPTURE_WIDTH_PX = 1100;
+const EXPORT_CAPTURE_PADDING = "64px 72px";
 
 async function captureCanvas(exportElement, scale) {
   await document.fonts.ready;
   const prevWidth = exportElement.style.width;
   const prevMaxWidth = exportElement.style.maxWidth;
+  const prevPadding = exportElement.style.padding;
+  const prevBoxSizing = exportElement.style.boxSizing;
   exportElement.style.width = `${EXPORT_CAPTURE_WIDTH_PX}px`;
   exportElement.style.maxWidth = `${EXPORT_CAPTURE_WIDTH_PX}px`;
+  exportElement.style.padding = EXPORT_CAPTURE_PADDING;
+  // border-box so the 1100px width above is the OUTER edge (matching what
+  // "1100px wide" should mean for layout/pagination math below) with the
+  // padding eating into it, rather than padding adding on top of 1100px.
+  exportElement.style.boxSizing = "border-box";
   try {
     return await html2canvas(exportElement, { backgroundColor: "#ffffff", scale });
   } finally {
     exportElement.style.width = prevWidth;
     exportElement.style.maxWidth = prevMaxWidth;
+    exportElement.style.padding = prevPadding;
+    exportElement.style.boxSizing = prevBoxSizing;
   }
 }
 
