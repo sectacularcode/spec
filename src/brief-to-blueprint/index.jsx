@@ -55,6 +55,14 @@ export default function CustomBuild({ userId, role } = {}) {
   const [pickerError, setPickerError]         = useState(""); // set when the picker's fetch fails, distinct from "no styles saved yet"
   const [briefName, setBriefName]       = useState("");
   const [briefError, setBriefError]     = useState("");
+  // Manifest's non-blocking review notices (unverified claims, placeholder
+  // buttons, unmapped blocks) -- kept separate from briefError on purpose.
+  // Both used to share briefError's red #dc2626 styling, which made a
+  // benign "review before you ship this" checklist look like a genuine
+  // failure. Structured here instead of a pre-joined string so the trigger
+  // can show just a count, with the full detail behind a click.
+  const [manifestReview, setManifestReview]         = useState(null); // { unmappedBlocks: [], warnings: [] } | null
+  const [manifestReviewOpen, setManifestReviewOpen] = useState(false);
   const [draftMsg, setDraftMsg]         = useState(""); // transient message for saved-drafts list actions
   const [clientName, setClientName]     = useState("");
   const [showIntake, setShowIntake]     = useState(false);
@@ -339,27 +347,21 @@ export default function CustomBuild({ userId, role } = {}) {
             // empty-looking page. "Other" routes to the same builder that
             // actually reads brief.features/faqItems/testimonials.
             setPages(["other"]);
-            // Surfaced before generation, not buried — this is Manifest's
+            // Surfaced before generation, not buried -- this is Manifest's
             // own audit trail (unverified claims, buttons still pointing at
             // placeholders) plus anything that had no matching Spec widget.
             // Nothing here blocks generation; it's a "review before you
             // ship this" notice, same spirit as the AI-drafted-fields
-            // approval step already gates the standard upload path.
-            const noticeLines = [];
-            if (parsed._unmappedBlocks && parsed._unmappedBlocks.length > 0) {
-              noticeLines.push(
-                parsed._unmappedBlocks.length + " block" + (parsed._unmappedBlocks.length !== 1 ? "s" : "") +
-                " from this import didn't map to a Spec widget yet: " +
-                parsed._unmappedBlocks.map(b => b.elementType).join(", ")
-              );
+            // approval step already gates the standard upload path. Stored
+            // structured (not pre-joined into one string) so the compact
+            // trigger can show just a count, full detail behind a click.
+            const unmappedBlocks = parsed._unmappedBlocks || [];
+            const warnings = parsed._manifestWarnings || [];
+            if (unmappedBlocks.length > 0 || warnings.length > 0) {
+              setManifestReview({ unmappedBlocks, warnings });
+            } else {
+              setManifestReview(null);
             }
-            if (parsed._manifestWarnings && parsed._manifestWarnings.length > 0) {
-              noticeLines.push(
-                "Review before generating (" + parsed._manifestWarnings.length + "):\n" +
-                parsed._manifestWarnings.map(w => "• " + w).join("\n")
-              );
-            }
-            if (noticeLines.length > 0) setBriefError(noticeLines.join("\n\n"));
             return;
           }
 
@@ -1144,7 +1146,7 @@ export default function CustomBuild({ userId, role } = {}) {
                 ↓ Intake Form
               </button>
               <button
-                onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setDraftsView(false); }}
+                onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setDraftsView(false); setManifestReview(null); }}
                 style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
                 + New build
               </button>
@@ -1161,7 +1163,7 @@ export default function CustomBuild({ userId, role } = {}) {
               <div style={{ fontSize: "15px", fontWeight: 600, color: "#09090b", marginBottom: "8px" }}>No saved builds yet</div>
               <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "24px" }}>Upload a brief or fill out the intake form to get started.</div>
               <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
-                <button onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setDraftsView(false); }} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>Start a build</button>
+                <button onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setDraftsView(false); setManifestReview(null); }} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>Start a build</button>
                 <button onClick={() => { setShowIntake(true); setDraftsView(false); }} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#ffffff", border: "none", borderRadius: "6px", cursor: "pointer" }}>Fill out intake form</button>
               </div>
             </div>
@@ -1169,7 +1171,7 @@ export default function CustomBuild({ userId, role } = {}) {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px" }}>
               {/* New build card */}
               <div
-                onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setDraftsView(false); }}
+                onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setDraftsView(false); setManifestReview(null); }}
                 style={{ border: "2px dashed #dde0e6", borderRadius: "10px", padding: "24px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "180px", gap: "8px" }}
                 onMouseOver={e => e.currentTarget.style.borderColor = "#b45309"}
                 onMouseOut={e => e.currentTarget.style.borderColor = "#dde0e6"}>
@@ -1263,7 +1265,7 @@ export default function CustomBuild({ userId, role } = {}) {
                   // back in. clearSessionDraft() also sets keepalive:true as
                   // a second layer of protection against exactly that.
                   await clearSessionDraft();
-                  setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]);
+                  setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setManifestReview(null);
                   setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({});
                   setPreviewPage("home"); setPageOverrides({}); setCustomPages([]);
                   setClearingDraft(false);
@@ -1490,6 +1492,37 @@ export default function CustomBuild({ userId, role } = {}) {
                   </div>
                   {parsing && <div style={{ marginTop: "12px", padding: "12px", background: "#ffffff", borderRadius: "6px", fontSize: "13px", color: "#09090b" }}>Reading brief — this takes a few seconds...</div>}
                   {briefError && <div style={{ fontSize: "12px", color: "#dc2626", marginTop: "8px", whiteSpace: "pre-wrap" }}>{briefError}</div>}
+                  {manifestReview && (() => {
+                    const count = (manifestReview.unmappedBlocks?.length || 0) + (manifestReview.warnings?.length || 0);
+                    return (
+                      <div style={{ position: "relative", marginTop: "8px" }}>
+                        <button
+                          onClick={() => setManifestReviewOpen(o => !o)}
+                          style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "5px 10px", fontSize: "12px", fontWeight: 600, color: "#B45309", background: "#fffaf3", border: "1px solid #f0dcc0", borderRadius: "20px", cursor: "pointer" }}>
+                          ⚠ Review before generating ({count})
+                        </button>
+                        {manifestReviewOpen && (
+                          <>
+                            {/* Click-outside-to-close layer -- transparent, sits under the popover, above everything else */}
+                            <div onClick={() => setManifestReviewOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 40 }} />
+                            <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, zIndex: 41, width: "360px", maxHeight: "320px", overflowY: "auto", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "8px", boxShadow: "0 8px 24px rgba(0,0,0,0.12)", padding: "14px 16px", fontSize: "12px", color: "#3f3f46", lineHeight: 1.5 }}>
+                              <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", marginBottom: "8px" }}>
+                                Nothing here blocks generation -- worth a look before you ship it.
+                              </div>
+                              {manifestReview.unmappedBlocks.length > 0 && (
+                                <div style={{ marginBottom: manifestReview.warnings.length > 0 ? "10px" : 0 }}>
+                                  {manifestReview.unmappedBlocks.length} block{manifestReview.unmappedBlocks.length !== 1 ? "s" : ""} from this import didn't map to a Spec widget yet: {manifestReview.unmappedBlocks.map(b => b.elementType).join(", ")}
+                                </div>
+                              )}
+                              {manifestReview.warnings.map((w, i) => (
+                                <div key={i} style={{ marginBottom: i < manifestReview.warnings.length - 1 ? "6px" : 0 }}>• {w}</div>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </>
               ) : (
                 <div style={{ width: "100%", boxSizing: "border-box", overflow: "hidden" }}>
@@ -1588,7 +1621,7 @@ export default function CustomBuild({ userId, role } = {}) {
                   <div style={{ fontSize: "11px", color: "#9ca3af", marginBottom: "12px" }}>
                     Files will download as: <span style={{ color: "#09090b", fontWeight: 600 }}>{slugify(clientName || brief?.brandName)}-home.json</span>
                   </div>
-                  <button style={T.btnGhost} onClick={() => { setBrief(null); setBriefName(""); setClientName(""); }}>Replace brief</button>
+                  <button style={T.btnGhost} onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setManifestReview(null); }}>Replace brief</button>
                 </div>
               )}
             </div>
