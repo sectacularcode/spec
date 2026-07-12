@@ -580,6 +580,81 @@ Return ONLY the new ${fieldName} value as plain text.`;
     setTab("positioning"); // Advance to Positioning — next step after copy is drafted
   };
 
+  // Maps a hex color to a broad hue family (red/orange/green/etc.) or an
+  // achromatic bucket (black/white/gray). Used to verify the AI's freeform
+  // themeReason text actually describes the colors it returned, rather than
+  // trusting the prose on its own -- confirmed root cause of a real mismatch
+  // (reasoning said "sewer-green... purple and orange", actual customColors
+  // were black/orange/white): the prompt's own few-shot example primes the
+  // model's reasoning text more strongly than it constrains the actual hex
+  // values, so the two can drift apart within one response.
+  function hexHueFamily(hex) {
+    if (!hex || typeof hex !== "string") return null;
+    const h = hex.replace("#", "");
+    if (h.length < 6) return null;
+    const r = parseInt(h.slice(0, 2), 16) / 255;
+    const g = parseInt(h.slice(2, 4), 16) / 255;
+    const b = parseInt(h.slice(4, 6), 16) / 255;
+    if ([r, g, b].some(Number.isNaN)) return null;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    const l = (max + min) / 2;
+    const delta = max - min;
+    if (delta < 0.04) {
+      if (l < 0.15) return "black";
+      if (l > 0.9) return "white";
+      return "gray";
+    }
+    let hue;
+    if (max === r) hue = ((g - b) / delta) % 6;
+    else if (max === g) hue = (b - r) / delta + 2;
+    else hue = (r - g) / delta + 4;
+    hue = Math.round(hue * 60);
+    if (hue < 0) hue += 360;
+    if (hue < 15 || hue >= 345) return "red";
+    if (hue < 45) return "orange";
+    if (hue < 65) return "yellow";
+    if (hue < 170) return "green";
+    if (hue < 200) return "teal";
+    if (hue < 255) return "blue";
+    if (hue < 290) return "purple";
+    return "pink";
+  }
+  const COLOR_WORD_FAMILY = {
+    red: "red", crimson: "red", scarlet: "red", maroon: "red",
+    orange: "orange", amber: "orange", rust: "orange", coral: "orange", tangerine: "orange",
+    brown: "orange", tan: "orange", bronze: "orange", copper: "orange", terracotta: "orange", clay: "orange",
+    yellow: "yellow", gold: "yellow", mustard: "yellow",
+    green: "green", emerald: "green", sage: "green", olive: "green", forest: "green", mint: "green", sewer: "green",
+    teal: "teal", turquoise: "teal", cyan: "teal", aqua: "teal",
+    blue: "blue", navy: "blue", cobalt: "blue", indigo: "blue",
+    purple: "purple", violet: "purple", lavender: "purple", plum: "purple", lilac: "purple",
+    pink: "pink", magenta: "pink", rose: "pink", fuchsia: "pink",
+    black: "black", charcoal: "black", onyx: "black", ebony: "black",
+    white: "white", ivory: "white", cream: "white",
+    gray: "gray", grey: "gray", slate: "gray",
+  };
+  // If themeReason names a color family that isn't actually present in any
+  // of the returned hex values, don't trust the freeform claim -- replace
+  // it with a plain description generated from the real colors instead.
+  // Guarantees the displayed reasoning always matches the actual swatches,
+  // regardless of how well the model followed the prompt's new instruction.
+  function verifyCustomColorReasoning(parsed) {
+    if (!parsed || !parsed.customColors || !parsed.themeReason) return parsed;
+    const bc = parsed.customColors;
+    const actualFamilies = new Set(
+      [bc.background, bc.accent, bc.text, bc.card].filter(Boolean).map(hexHueFamily).filter(Boolean)
+    );
+    const words = parsed.themeReason.toLowerCase().match(/[a-z]+/g) || [];
+    const claimedFamilies = new Set(words.map(w => COLOR_WORD_FAMILY[w]).filter(Boolean));
+    const hasMismatch = [...claimedFamilies].some(f => !actualFamilies.has(f));
+    if (!hasMismatch) return parsed;
+    const namedFamilies = [...actualFamilies].filter(f => !["black", "white", "gray"].includes(f));
+    const themeReason = namedFamilies.length
+      ? `Colors keyed to ${namedFamilies.join(" and ")} tones, generated for this theme.`
+      : "A custom neutral palette generated for this theme.";
+    return { ...parsed, themeReason };
+  }
+
   // AI Site Brief — describe your site, get template/layout/theme/colors/fonts/brief recommendations
   const describeMySite = async () => {
     if (!briefText.trim() && !lockedTemplateId) return;
@@ -673,6 +748,7 @@ Rules:
 - ONLY use a templateId if the user's description clearly matches one of the industries above
 - If it does NOT match — beauty salons, nail artists, spas, tattoo studios, barbershops, pet care, florists, bakeries, gaming, esports, comic books, collectors, fan sites, hobby niches, pop culture, entertainment, art studios, dance studios, yoga, pilates, music, podcasts, churches, or ANYTHING else not in the list above — set isCustom: true and templateId: null
 - For isCustom projects: generate AUTHENTIC colors from the actual theme (nail art = pastels/metallics/bold brights, not generic blue; Ninja Turtles = green/purple/orange)
+- themeReason MUST accurately describe the ACTUAL hex values in customColors — never name a color family (e.g. "green", "purple") in themeReason unless that color is genuinely present in background/accent/text/card. Write themeReason by looking at the hex values you actually chose, not from the theme's general vibe.
 - customColors must ALWAYS be provided for isCustom projects — never leave it null when isCustom is true
 - sections should match what that type of site actually needs
 - For goals, include EVERY goal the site naturally serves
@@ -730,7 +806,7 @@ Rules:
       // user clicked "Regenerate" again before this one finished) — otherwise
       // a slow first response can overwrite a fresher second one.
       if (briefRecReqRef.current !== reqId) return;
-      setBriefRec(JSON.parse(clean));
+      setBriefRec(verifyCustomColorReasoning(JSON.parse(clean)));
     } catch (e) {
       if (briefRecReqRef.current !== reqId) return;
       const msg = e.name === "AbortError"

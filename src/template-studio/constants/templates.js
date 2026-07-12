@@ -13,6 +13,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Lead Generation", "Awareness & Brand Building"],
     desc: "Bold ad-creative agency. Marquee tickers, work grids, service cards. Like Superside, VaynerMedia, Cohley.",
     layoutId: "editorial-bold", themeId: "midnight", accentColor: "#c8ff00",
+    themeAlternates: [{ themeId: "neon-mono", accentColor: "#39ff14" }, { themeId: "slate-amber", accentColor: "#d4901a" }],
     headingFont: "Manrope", bodyFont: "Inter", imageCategory: "marketing",
     homepageSections: ["Hero", "Marquee", "Logo Carousel", "Service Cards", "Process", "Portfolio Carousel", "Stats", "Testimonials", "Blog", "CTA"],
     defaults: {
@@ -49,6 +50,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Lead Generation", "Awareness & Brand Building"],
     desc: "Premium content production studio. Bold sans-serif, .01-.04 process cards, service category grid. Like Pola Marketing.",
     layoutId: "editorial-bold", themeId: "pure-minimal", accentColor: "#3b82f6",
+    themeAlternates: [{ themeId: "ash-copper", accentColor: "#b05e2a" }, { themeId: "ivory-violet", accentColor: "#6b4fa0" }],
     headingFont: "Inter", bodyFont: "Inter", imageCategory: "production",
     homepageSections: ["Hero", "Logo Carousel", "Service Cards", "Process", "Portfolio Carousel", "Stats", "Testimonials", "Form"],
     defaults: {
@@ -83,6 +85,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Direct Sales / E-commerce", "Community & Newsletter Growth"],
     desc: "Product-led brand. Top promo banner, full-bleed image hero, category grids. Built for fashion and consumer goods.",
     layoutId: "studio-modern", themeId: "pure-minimal", accentColor: "#0a0a0a",
+    themeAlternates: [{ themeId: "charcoal-blush", accentColor: "#3a2828" }, { themeId: "hot-pink-mono", accentColor: "#ff2d87" }],
     headingFont: "Inter", bodyFont: "Inter", imageCategory: "product",
     homepageSections: ["Promo Banner", "Hero", "Logo Carousel", "Service Cards", "Portfolio Carousel", "Testimonials", "Form"],
     defaults: {
@@ -116,6 +119,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Awareness & Brand Building", "Community & Newsletter Growth"],
     desc: "Magazine-style personal brand or lifestyle blog. Centered hero, featured articles, author bio. Like Poosh, Goop.",
     layoutId: "magazine", themeId: "linen-clay", accentColor: "#a64f30",
+    themeAlternates: [{ themeId: "sage-stone", accentColor: "#4a5d44" }, { themeId: "ash-copper", accentColor: "#b05e2a" }],
     headingFont: "Playfair Display", bodyFont: "Inter", imageCategory: "lifestyle",
     homepageSections: ["Hero", "About", "Blog", "Leadership", "Portfolio Carousel", "Stats", "Form"],
     defaults: {
@@ -148,6 +152,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Lead Generation", "Awareness & Brand Building"],
     desc: "Cinematic black studio. Bold sans-serif, numbered service rows, work-first. Like Lumen Frame, Stink, Smuggler.",
     layoutId: "editorial-bold", themeId: "editorial-dark", accentColor: "#c8791a",
+    themeAlternates: [{ themeId: "midnight", accentColor: "#ed7464" }, { themeId: "onyx-bronze", accentColor: "#b87333" }],
     headingFont: "Manrope", bodyFont: "Inter", imageCategory: "production",
     homepageSections: ["Hero", "Logo Carousel", "About", "Services", "Process", "Portfolio Carousel", "Stats", "Testimonials", "CTA"],
     defaults: {
@@ -180,6 +185,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Lead Generation", "Awareness & Brand Building"],
     desc: "Solo expert positioning. Personal hero, services, work samples, FAQ. For writers, designers, devs, consultants flying solo.",
     layoutId: "studio-modern", themeId: "bone-ink", accentColor: "#3b3b58",
+    themeAlternates: [{ themeId: "ivory-violet", accentColor: "#6b4fa0" }, { themeId: "ash-copper", accentColor: "#b05e2a" }],
     headingFont: "Inter", bodyFont: "Inter", imageCategory: "marketing",
     homepageSections: ["Hero", "About", "Services", "Process", "Portfolio Carousel", "Testimonials", "FAQ", "Form"],
     defaults: {
@@ -214,6 +220,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Lead Generation", "Bookings & Reservations"],
     desc: "Local trade business. Phone-prominent hero, service grid, trust signals, service areas. Built for getting found and booked.",
     layoutId: "modern-tech", themeId: "pure-minimal", accentColor: "#f97316",
+    themeAlternates: [{ themeId: "charcoal-blush", accentColor: "#3a2828" }, { themeId: "ash-copper", accentColor: "#b05e2a" }],
     headingFont: "Manrope", bodyFont: "Inter", imageCategory: "trades",
     homepageSections: ["Promo Banner", "Hero", "Service Cards", "Process", "Stats", "Logo Carousel", "Testimonials", "FAQ", "Form"],
     defaults: {
@@ -247,6 +254,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Lead Generation", "Bookings & Reservations"],
     desc: "Vehicle-led brand. Sleek hero, service categories, inventory or work showcase, stats. Built for moving wheels.",
     layoutId: "modern-tech", themeId: "charcoal-blush", accentColor: "#dc2626",
+    themeAlternates: [{ themeId: "pure-minimal", accentColor: "#0a0a0a" }, { themeId: "ash-copper", accentColor: "#b05e2a" }],
     headingFont: "Manrope", bodyFont: "Inter", imageCategory: "automotive",
     homepageSections: ["Hero", "Service Cards", "Process", "Portfolio Carousel", "Stats", "Testimonials", "FAQ", "Form"],
     defaults: {
@@ -280,6 +288,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Lead Generation", "Bookings & Reservations"],
     desc: "Personal authority brand. Founder-led hero, programs, transformations, testimonials. For coaches and experts.",
     layoutId: "apple-minimal", themeId: "linen-clay", accentColor: "#a64f30",
+    themeAlternates: [{ themeId: "bone-ink", accentColor: "#1f2940" }, { themeId: "ivory-violet", accentColor: "#6b4fa0" }],
     headingFont: "Playfair Display", bodyFont: "Inter", imageCategory: "lifestyle",
     homepageSections: ["Hero", "Leadership", "Service Cards", "Process", "Portfolio Carousel", "Stats", "Testimonials", "Pricing", "FAQ", "Form"],
     defaults: {
@@ -315,6 +324,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Lead Generation", "Bookings & Reservations"],
     desc: "Hyper-local personal brand. Photo hero, recent listings, neighborhood expertise, big stats. Built for getting buyers and sellers.",
     layoutId: "apple-minimal", themeId: "bone-ink", accentColor: "#1f2940",
+    themeAlternates: [{ themeId: "sage-stone", accentColor: "#4a5d44" }, { themeId: "ash-copper", accentColor: "#b05e2a" }],
     headingFont: "Playfair Display", bodyFont: "Inter", imageCategory: "lifestyle",
     homepageSections: ["Hero", "Service Cards", "Process", "Portfolio Carousel", "Stats", "Leadership", "Testimonials", "FAQ", "Form"],
     defaults: {
@@ -349,6 +359,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Bookings & Reservations", "Awareness & Brand Building"],
     desc: "Atmosphere-led food brand. Hero with food, menu categories, story, photos, reservations. Built for foot traffic and bookings.",
     layoutId: "magazine", themeId: "espresso", accentColor: "#d4a574",
+    themeAlternates: [{ themeId: "forest", accentColor: "#d4b896" }, { themeId: "onyx-bronze", accentColor: "#b87333" }],
     headingFont: "Playfair Display", bodyFont: "Inter", imageCategory: "lifestyle",
     homepageSections: ["Hero", "About", "Service Cards", "Portfolio Carousel", "Testimonials", "Stats", "FAQ", "Form"],
     defaults: {
@@ -381,6 +392,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Bookings & Reservations", "Lead Generation"],
     desc: "Trust-led healthcare brand. Insurance banner, calm hero, services, doctor bios, FAQ. Built for patient bookings.",
     layoutId: "swiss-grid", themeId: "sage-stone", accentColor: "#4a5d44",
+    themeAlternates: [{ themeId: "bone-ink", accentColor: "#1f2940" }, { themeId: "ivory-violet", accentColor: "#6b4fa0" }],
     headingFont: "Inter", bodyFont: "Inter", imageCategory: "default",
     homepageSections: ["Promo Banner", "Hero", "Service Cards", "Process", "Leadership", "Stats", "Testimonials", "FAQ", "Form"],
     defaults: {
@@ -415,6 +427,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Lead Generation", "Bookings & Reservations"],
     desc: "Authority-led firm. Calm hero, practice areas, attorney bios, case results. Built for credibility and consultations.",
     layoutId: "swiss-grid", themeId: "onyx-bronze", accentColor: "#b87333",
+    themeAlternates: [{ themeId: "editorial-dark", accentColor: "#c9a86a" }, { themeId: "slate-amber", accentColor: "#d4901a" }],
     headingFont: "Playfair Display", bodyFont: "Inter", imageCategory: "default",
     homepageSections: ["Hero", "Service Cards", "Process", "Leadership", "Stats", "Testimonials", "FAQ", "Form"],
     defaults: {
@@ -448,6 +461,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Bookings & Reservations", "Lead Generation"],
     desc: "Single-photographer portfolio. Image-led hero, packages, galleries, process. Built for booking inquiries.",
     layoutId: "boutique-luxury", themeId: "pure-minimal", accentColor: "#2d2d2d",
+    themeAlternates: [{ themeId: "charcoal-blush", accentColor: "#3a2828" }, { themeId: "bone-ink", accentColor: "#1f2940" }],
     headingFont: "Cormorant Garamond", bodyFont: "Inter", imageCategory: "editorial",
     homepageSections: ["Hero", "Portfolio Carousel", "About", "Service Cards", "Process", "Pricing", "Testimonials", "FAQ", "Form"],
     defaults: {
@@ -482,6 +496,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Bookings & Reservations", "Lead Generation"],
     desc: "High-energy fitness brand. Transformation hero, programs, results, testimonials. Built for getting clients signed up.",
     layoutId: "modern-tech", themeId: "charcoal-blush", accentColor: "#c8ff00",
+    themeAlternates: [{ themeId: "hot-pink-mono", accentColor: "#ff2d87" }, { themeId: "pure-minimal", accentColor: "#0a0a0a" }],
     headingFont: "Manrope", bodyFont: "Inter", imageCategory: "lifestyle",
     homepageSections: ["Hero", "Service Cards", "Process", "Portfolio Carousel", "Stats", "Testimonials", "Pricing", "FAQ", "Form"],
     defaults: {
@@ -516,6 +531,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Donations & Fundraising", "Awareness & Brand Building", "Community & Newsletter Growth"],
     desc: "Mission-led organization. Impact hero, programs, leadership, stories, donation form. Built for engagement and giving.",
     layoutId: "editorial-minimal", themeId: "sage-stone", accentColor: "#4a5d44",
+    themeAlternates: [{ themeId: "linen-clay", accentColor: "#a64f30" }, { themeId: "bone-ink", accentColor: "#1f2940" }],
     headingFont: "Playfair Display", bodyFont: "Inter", imageCategory: "lifestyle",
     homepageSections: ["Hero", "About", "Service Cards", "Stats", "Leadership", "Portfolio Carousel", "Testimonials", "Form"],
     defaults: {
@@ -548,6 +564,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Applications & Sign-ups", "Lead Generation"],
     desc: "Student-outcome focused. Big curriculum, testimonials, results, instructor bio, pricing. Built for course enrollment.",
     layoutId: "modern-tech", themeId: "midnight", accentColor: "#7c3aed",
+    themeAlternates: [{ themeId: "neon-mono", accentColor: "#39ff14" }, { themeId: "slate-amber", accentColor: "#d4901a" }],
     headingFont: "Manrope", bodyFont: "Inter", imageCategory: "marketing",
     homepageSections: ["Hero", "Service Cards", "Process", "Portfolio Carousel", "Stats", "Leadership", "Testimonials", "Pricing", "FAQ", "Form"],
     defaults: {
@@ -583,6 +600,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Lead Generation", "Applications & Sign-ups"],
     desc: "24/7 fleet operation. Bold yellow CTAs, urgent hero, coast-to-coast service map. Like TopTech Fleet, Epika Fleet.",
     layoutId: "modern-tech", themeId: "midnight", accentColor: "#fbbf24",
+    themeAlternates: [{ themeId: "slate-amber", accentColor: "#d4901a" }, { themeId: "espresso", accentColor: "#e8c8a0" }],
     headingFont: "Manrope", bodyFont: "Inter", imageCategory: "trades",
     homepageSections: ["Promo Banner", "Hero", "Service Cards", "Process", "Stats", "Portfolio Carousel", "Logo Carousel", "Testimonials", "FAQ", "Form"],
     defaults: {
@@ -617,6 +635,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Bookings & Reservations", "Lead Generation"],
     desc: "Romantic event planner. Fullbleed hero, serif type, booking-led. Soft palette, couple-focused storytelling.",
     layoutId: "wedding-editorial", themeId: "linen-clay", accentColor: "#9c6b56",
+    themeAlternates: [{ themeId: "ivory-violet", accentColor: "#6b4fa0" }, { themeId: "sage-stone", accentColor: "#4a5d44" }],
     headingFont: "Cormorant Garamond", bodyFont: "Inter", imageCategory: "lifestyle",
     homepageSections: ["Hero", "About", "Service Cards", "Process", "Portfolio Carousel", "Pricing", "Testimonials", "Leadership", "FAQ", "Form"],
     defaults: {
@@ -652,6 +671,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Lead Generation", "Awareness & Brand Building"],
     desc: "Full-service video studio. Work-first portfolio grid, stats bar, categorized services, process steps. Like Lemonlight, Levitate, Black Propeller.",
     layoutId: "editorial-minimal", themeId: "editorial-dark", accentColor: "#c9a86a",
+    themeAlternates: [{ themeId: "onyx-bronze", accentColor: "#b87333" }, { themeId: "forest", accentColor: "#d4b896" }],
     headingFont: "Cormorant Garamond", bodyFont: "DM Sans", imageCategory: "editorial",
     homepageSections: ["Hero", "Logo Carousel", "Stats", "Services", "Portfolio", "Process", "Testimonials", "CTA"],
     defaults: {
@@ -761,14 +781,27 @@ export const layoutFooterStyle = (layoutId) => {
 
 // Apply a website template — sets layout, theme, fonts, accent, sections, and copy
 export const applyWebsiteTemplate = (template, brand, page, themes = []) => {
-  const theme = themes.find(t => t.id === template.themeId);
+  // Every prior generation of a given template always produced the exact
+  // same theme/accent pairing -- confirmed with certainty, not a guess: no
+  // randomization existed anywhere in this function. Picking from the
+  // template's default plus its curated themeAlternates (each hand-chosen
+  // to stay in the same dark/light mode and industry mood, never a
+  // mismatched aesthetic) gives real variety across repeat generations of
+  // the same template while keeping every option a deliberate, good-fit
+  // choice rather than a random pick across all 16 themes.
+  const pool = [
+    { themeId: template.themeId, accentColor: template.accentColor },
+    ...(template.themeAlternates || []),
+  ];
+  const picked = pool[Math.floor(Math.random() * pool.length)];
+  const theme = themes.find(t => t.id === picked.themeId);
   const d = template.defaults || {};
   const newBrand = {
     ...brand,
     templateId: template.id,
     layoutId: template.layoutId,
-    themeId: template.themeId,
-    accentColor: template.accentColor,
+    themeId: picked.themeId,
+    accentColor: picked.accentColor,
     headingFont: template.headingFont || brand.headingFont,
     bodyFont: template.bodyFont || brand.bodyFont,
     imageCategory: template.imageCategory || "editorial",
