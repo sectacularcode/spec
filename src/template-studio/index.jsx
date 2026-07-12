@@ -649,6 +649,18 @@ Return ONLY the new ${fieldName} value as plain text.`;
     white: "white", ivory: "white", cream: "white",
     gray: "gray", grey: "gray", slate: "gray",
   };
+  // Natural-language color mentions are overwhelmingly plural ("blues",
+  // "browns", "hues of pink") -- COLOR_WORD_FAMILY only has singular keys,
+  // so a bare dictionary lookup silently misses every plural form. Confirmed
+  // this by testing the exact reported input ("browns, blues and hues of
+  // pink") against the un-fixed lookup: it caught "pink" but silently
+  // missed "blues" entirely, which would have made the safety net below
+  // under-detect on exactly the case it exists to catch.
+  function wordToColorFamily(word) {
+    if (COLOR_WORD_FAMILY[word]) return COLOR_WORD_FAMILY[word];
+    if (word.endsWith("s") && COLOR_WORD_FAMILY[word.slice(0, -1)]) return COLOR_WORD_FAMILY[word.slice(0, -1)];
+    return null;
+  }
   // If themeReason names a color family that isn't actually present in any
   // of the returned hex values, don't trust the freeform claim -- replace
   // it with a plain description generated from the real colors instead.
@@ -661,7 +673,7 @@ Return ONLY the new ${fieldName} value as plain text.`;
       [bc.background, bc.accent, bc.text, bc.card].filter(Boolean).map(hexHueFamily).filter(Boolean)
     );
     const words = parsed.themeReason.toLowerCase().match(/[a-z]+/g) || [];
-    const claimedFamilies = new Set(words.map(w => COLOR_WORD_FAMILY[w]).filter(Boolean));
+    const claimedFamilies = new Set(words.map(wordToColorFamily).filter(Boolean));
     const hasMismatch = [...claimedFamilies].some(f => !actualFamilies.has(f));
     if (!hasMismatch) return parsed;
     const namedFamilies = [...actualFamilies].filter(f => !["black", "white", "gray"].includes(f));
@@ -669,6 +681,29 @@ Return ONLY the new ${fieldName} value as plain text.`;
       ? `Colors keyed to ${namedFamilies.join(" and ")} tones, generated for this theme.`
       : "A custom neutral palette generated for this theme.";
     return { ...parsed, themeReason };
+  }
+
+  // Checks the ACTUAL palette against what the person themselves explicitly
+  // asked for -- a different and stronger signal than verifyCustomColorReasoning
+  // above, which only checks the AI's own reasoning against its own colors.
+  // This checks the person's original request against the real output. If
+  // someone names specific colors ("browns, blues, and hues of pink") and
+  // the model quietly drops one, that's a genuine instruction-following
+  // miss, not a phrasing/hue-boundary quirk -- surfaced directly in the
+  // reasoning text rather than left silent, so it's visible instead of
+  // looking like the request was honored when it wasn't.
+  function checkRequestedColorsHonored(rawInput, parsed) {
+    if (!parsed || !parsed.customColors || !rawInput) return parsed;
+    const bc = parsed.customColors;
+    const actualFamilies = new Set(
+      [bc.background, bc.accent, bc.text, bc.card].filter(Boolean).map(hexHueFamily).filter(Boolean)
+    );
+    const words = rawInput.toLowerCase().match(/[a-z]+/g) || [];
+    const requestedFamilies = new Set(words.map(wordToColorFamily).filter(Boolean));
+    const missing = [...requestedFamilies].filter(f => !actualFamilies.has(f));
+    if (missing.length === 0) return parsed;
+    const note = `⚠️ You mentioned ${missing.join(" and ")}, but the generated palette doesn't actually include ${missing.length > 1 ? "them" : "it"} — try Regenerate for a closer match. `;
+    return { ...parsed, themeReason: note + (parsed.themeReason || "") };
   }
 
   // AI Site Brief — describe your site, get template/layout/theme/colors/fonts/brief recommendations
@@ -793,6 +828,7 @@ Rules:
 - ONLY use a templateId if the user's description clearly matches one of the industries above
 - If it does NOT match — beauty salons, nail artists, spas, tattoo studios, barbershops, pet care, florists, bakeries, gaming, esports, comic books, collectors, fan sites, hobby niches, pop culture, entertainment, art studios, dance studios, yoga, pilates, music, podcasts, churches, or ANYTHING else not in the list above — set isCustom: true and templateId: null
 - For isCustom projects: generate AUTHENTIC colors pulled specifically from the actual theme described, never a generic default palette. Base the palette entirely on what the user actually described, not on any example elsewhere in this prompt.
+- HARD REQUIREMENT, HIGHEST PRIORITY: if the user's own description explicitly names specific colors or color families (e.g. "blues", "browns", "hues of pink", a hex code, "no pastels"), every one of those families MUST actually appear somewhere in customColors (background, accent, text, or card). This overrides every other instruction in this prompt, including the anti-default-look rule below -- if honoring the request means using a color you would otherwise avoid by habit, use it anyway. Do not substitute a similar-but-different family (brown instead of an explicitly requested blue is not honoring the request) and do not quietly drop a requested color because it doesn't fit your first instinct for the palette. If the user names 3 colors, the palette should genuinely reflect roughly 3 colors, not converge back to 2.
 - STOP DEFAULTING TO THE SAME LOOK: recent custom-generated projects (med spa, actor portfolio, chef, catering, hair salon, fashion stylist, craft mixologist) have all converged on the identical combination -- black/near-black + warm gold-tan + cream, Cormorant Garamond + DM Sans, Boutique Luxury or Editorial Bold layout -- regardless of how different the actual niches were. Do not repeat that specific combination unless the described niche gives a genuinely strong, specific reason to. "It's premium" or "it's boutique" is not a strong enough reason -- most niches described here are premium or boutique in some sense, and defaulting to it every time defeats the entire purpose of a custom-generated project. Before finalizing, actually weigh at least 2 concretely different directions for THIS specific niche rather than confirming the default: (a) saturated and energetic, with a bold geometric sans (Manrope, Space Mono, Oswald) instead of an editorial serif; (b) soft and pastel-toned rather than dark; (c) stark black-and-white minimalism instead of a warm neutral base; (d) a genuinely different accent hue family -- blue, green, pink, red -- not another warm gold/tan/amber/bronze/rose. Pick whichever direction actually fits the niche best, including the default when it's genuinely the best fit -- the requirement is that real alternatives get weighed every time, not that the default is banned outright.
 - themeReason MUST accurately describe the ACTUAL hex values in customColors — never name a color family (e.g. "green", "purple") in themeReason unless that color is genuinely present in background/accent/text/card. Write themeReason by looking at the hex values you actually chose, not from the theme's general vibe.
 - customColors must ALWAYS be provided for isCustom projects — never leave it null when isCustom is true
@@ -875,7 +911,7 @@ Rules:
       // user clicked "Regenerate" again before this one finished) — otherwise
       // a slow first response can overwrite a fresher second one.
       if (briefRecReqRef.current !== reqId) return;
-      setBriefRec(verifyCustomColorReasoning(parsedResult));
+      setBriefRec(checkRequestedColorsHonored(text, verifyCustomColorReasoning(parsedResult)));
     } catch (e) {
       if (briefRecReqRef.current !== reqId) return;
       const msg = e.name === "AbortError"
