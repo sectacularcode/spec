@@ -310,7 +310,7 @@ export default function StyleGuide({ role }) {
         </label>
       </Card>
 
-      <ScreenshotSampler onSample={addSampledColor} />
+      <ScreenshotSampler onSample={addSampledColor} existingHexes={colors.map(c => c.hex)} />
 
       <Card>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
