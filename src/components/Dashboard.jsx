@@ -29,7 +29,7 @@ const TOOLS = [
   {
     id: "style-guide",
     label: "Style Guide",
-    desc: "Pull real colors and fonts from any live site, or build one from scratch. Saved guides are reusable across your Brief to Blueprint builds.",
+    desc: "Pull real colors and fonts from any live site, or build one from scratch — then apply it directly in your Brief to Blueprint builds.",
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b45309" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="13.5" cy="6.5" r="0.5"/><circle cx="17.5" cy="10.5" r="0.5"/><circle cx="8.5" cy="7.5" r="0.5"/><circle cx="6.5" cy="12.5" r="0.5"/>

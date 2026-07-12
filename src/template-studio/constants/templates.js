@@ -219,8 +219,8 @@ export const WEBSITE_TEMPLATES = [
     industry: "Electrician, Plumber, Contractor, Landscaper, HVAC, Handyman",
     goals: ["Lead Generation", "Bookings & Reservations"],
     desc: "Local trade business. Phone-prominent hero, service grid, trust signals, service areas. Built for getting found and booked.",
-    layoutId: "modern-tech", themeId: "pure-minimal", accentColor: "#f97316",
-    themeAlternates: [{ themeId: "charcoal-blush", accentColor: "#3a2828" }, { themeId: "ash-copper", accentColor: "#b05e2a" }],
+    layoutId: "modern-tech", themeId: "harbor-blue", accentColor: "#3b82c4",
+    themeAlternates: [{ themeId: "pure-minimal", accentColor: "#f97316" }, { themeId: "forest", accentColor: "#d4b896" }],
     headingFont: "Manrope", bodyFont: "Inter", imageCategory: "trades",
     homepageSections: ["Promo Banner", "Hero", "Service Cards", "Process", "Stats", "Logo Carousel", "Testimonials", "FAQ", "Form"],
     defaults: {
@@ -253,8 +253,8 @@ export const WEBSITE_TEMPLATES = [
     industry: "Consumer/passenger vehicles only — car dealerships, used car lots, auto repair shops, car mechanics, auto detailing, tire shops, car wash, oil change shops, body shops, exotic car rentals, classic car restoration, auto parts retailers, mobile car mechanics. Personal vehicle market only. NOT for semis, fleet trucks, or commercial vehicles (use Trucking/Fleet Services instead).",
     goals: ["Lead Generation", "Bookings & Reservations"],
     desc: "Vehicle-led brand. Sleek hero, service categories, inventory or work showcase, stats. Built for moving wheels.",
-    layoutId: "modern-tech", themeId: "charcoal-blush", accentColor: "#dc2626",
-    themeAlternates: [{ themeId: "pure-minimal", accentColor: "#0a0a0a" }, { themeId: "ash-copper", accentColor: "#b05e2a" }],
+    layoutId: "modern-tech", themeId: "pure-minimal", accentColor: "#dc2626",
+    themeAlternates: [{ themeId: "harbor-blue", accentColor: "#3b82c4" }, { themeId: "onyx-bronze", accentColor: "#b87333" }],
     headingFont: "Manrope", bodyFont: "Inter", imageCategory: "automotive",
     homepageSections: ["Hero", "Service Cards", "Process", "Portfolio Carousel", "Stats", "Testimonials", "FAQ", "Form"],
     defaults: {
@@ -288,7 +288,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Lead Generation", "Bookings & Reservations"],
     desc: "Personal authority brand. Founder-led hero, programs, transformations, testimonials. For coaches and experts.",
     layoutId: "apple-minimal", themeId: "linen-clay", accentColor: "#a64f30",
-    themeAlternates: [{ themeId: "bone-ink", accentColor: "#1f2940" }, { themeId: "ivory-violet", accentColor: "#6b4fa0" }],
+    themeAlternates: [{ themeId: "bone-ink", accentColor: "#1f2940" }, { themeId: "editorial-dark", accentColor: "#c9a86a" }],
     headingFont: "Playfair Display", bodyFont: "Inter", imageCategory: "lifestyle",
     homepageSections: ["Hero", "Leadership", "Service Cards", "Process", "Portfolio Carousel", "Stats", "Testimonials", "Pricing", "FAQ", "Form"],
     defaults: {
@@ -392,7 +392,7 @@ export const WEBSITE_TEMPLATES = [
     goals: ["Bookings & Reservations", "Lead Generation"],
     desc: "Trust-led healthcare brand. Insurance banner, calm hero, services, doctor bios, FAQ. Built for patient bookings.",
     layoutId: "swiss-grid", themeId: "sage-stone", accentColor: "#4a5d44",
-    themeAlternates: [{ themeId: "bone-ink", accentColor: "#1f2940" }, { themeId: "ivory-violet", accentColor: "#6b4fa0" }],
+    themeAlternates: [{ themeId: "bone-ink", accentColor: "#1f2940" }, { themeId: "harbor-blue", accentColor: "#3b82c4" }],
     headingFont: "Inter", bodyFont: "Inter", imageCategory: "default",
     homepageSections: ["Promo Banner", "Hero", "Service Cards", "Process", "Leadership", "Stats", "Testimonials", "FAQ", "Form"],
     defaults: {
@@ -426,8 +426,8 @@ export const WEBSITE_TEMPLATES = [
     industry: "Attorneys, Law Firms, Legal Services",
     goals: ["Lead Generation", "Bookings & Reservations"],
     desc: "Authority-led firm. Calm hero, practice areas, attorney bios, case results. Built for credibility and consultations.",
-    layoutId: "swiss-grid", themeId: "onyx-bronze", accentColor: "#b87333",
-    themeAlternates: [{ themeId: "editorial-dark", accentColor: "#c9a86a" }, { themeId: "slate-amber", accentColor: "#d4901a" }],
+    layoutId: "swiss-grid", themeId: "harbor-blue", accentColor: "#c9a86a",
+    themeAlternates: [{ themeId: "onyx-bronze", accentColor: "#b87333" }, { themeId: "slate-amber", accentColor: "#d4901a" }],
     headingFont: "Playfair Display", bodyFont: "Inter", imageCategory: "default",
     homepageSections: ["Hero", "Service Cards", "Process", "Leadership", "Stats", "Testimonials", "FAQ", "Form"],
     defaults: {

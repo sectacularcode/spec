@@ -183,6 +183,18 @@ export const THEMES = [
     headingColor: "#1a1c20",
   },
   {
+    id: "harbor-blue",
+    name: "Harbor Blue",
+    desc: "Deep trust navy + clean sky-blue accent. The proven pairing for law, medical, home services, and real estate — anywhere the sale depends on trust.",
+    mode: "dark",
+    primaryColor: "#0f1e33",
+    cardBgColor: "#16283f",
+    accentColor: "#3b82c4",
+    bodyTextColor: "#a9b8cc",
+    borderColor: "#1f3350",
+    headingColor: "#f5f8fb",
+  },
+  {
     id: "portfolio-clean",
     name: "Portfolio Clean",
     desc: "Pure white canvas, near-black text, neutral borders. Built for commercial portfolios where the work is the color.",
