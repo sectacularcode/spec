@@ -51,6 +51,7 @@ Return ONLY valid JSON — no preamble, no markdown fences:
 
 Rules:
 - Colors must come from the actual theme described, never a generic default palette -- base every choice entirely on what the user typed, not on any example elsewhere in this prompt
+- Do not default to the same "black + warm gold/tan + cream, boutique-premium" palette for every personal-service or boutique-adjacent niche just because that's a common real convention -- the same niche could genuinely go moody and dark, bright and saturated, playful and graphic, minimalist and stark, warm and rustic, or something else entirely, depending on what was actually typed. Pick based on real signal in the input, not on whichever register is most common for that category.
 - Copy must sound authentically niche — a comic collector site sounds different from a fleet maintenance site
 - Sections should make sense for the page type and theme
 - If the theme is pop culture, entertainment, collector, hobby, or creative — lean into it fully
