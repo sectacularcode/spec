@@ -77,7 +77,7 @@ function extractElementorGlobalColors(css) {
   let m;
   while ((m = re.exec(css)) !== null) {
     const id = m[1].toLowerCase();
-    const hex = m[2].toUpperCase();
+    const hex = expandHex(m[2]);
     if (ELEMENTOR_STOCK_SLOTS.includes(id)) stock[id] = hex;
     else custom[id] = hex;
   }
@@ -96,7 +96,7 @@ function extractRootCustomProperties(css) {
     const propRe = /--([a-zA-Z0-9-]+)\s*:\s*(#[0-9a-fA-F]{3,8})/g;
     let m;
     while ((m = propRe.exec(blockMatch[1])) !== null) {
-      found[m[1].toLowerCase()] = m[2].toUpperCase();
+      found[m[1].toLowerCase()] = expandHex(m[2]);
     }
   }
   return found;
@@ -127,12 +127,25 @@ function extractHighSignalColors(css) {
       const colorRe = /#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b/g;
       let c;
       while ((c = colorRe.exec(m[1])) !== null) {
-        const hex = c[0].toUpperCase();
+        const hex = expandHex(c[0]);
         counts[hex] = (counts[hex] || 0) + 1;
       }
     }
   }
   return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([hex]) => hex);
+}
+
+// "#000" is valid CSS but reads as broken sitting next to seven 6-digit
+// hex codes in an exported document -- confirmed against a real site
+// (jpmorganchase.com) where the frequency heuristic picked up shorthand
+// hex used directly in the site's own CSS. Normalizing at the point of
+// extraction means every downstream consumer (buildColorSet, darkenHex,
+// the UI, the exported document) sees only 6-digit values, rather than
+// needing the same fix repeated at every display site.
+function expandHex(hex) {
+  const h = hex.replace("#", "");
+  if (h.length === 3) return "#" + h.split("").map(c => c + c).join("").toUpperCase();
+  return hex.toUpperCase();
 }
 
 function darkenHex(hex, amount) {
@@ -187,33 +200,52 @@ export function buildColorSet(css) {
   const ranked = extractHighSignalColors(css);
 
   const result = [];
-  const used = new Set(); // hex values already assigned to a role, so the
-                           // same color doesn't get reused as both Heading
-                           // and Accent just because it topped two lists
+  const used = new Set(); // Every hex assigned to any role, from any
+                           // signal source, goes in here -- confirmed
+                           // against a real site (jpmorganchase.com) that
+                           // the previous version only deduped WITHIN the
+                           // ranked-list fallback, so two independent
+                           // "confirmed" matches (e.g. a :root property
+                           // that happens to match both the heading and
+                           // background keyword lists) could still claim
+                           // the same hex for two different roles with no
+                           // cross-check between them at all.
   function add(role, hex, confidence) {
-    if (!hex) return;
+    if (!hex || used.has(hex)) return false;
     result.push({ role, hex, confidence, custom: false });
     used.add(hex);
+    return true;
   }
   function nextRanked() {
     return ranked.find(hex => !used.has(hex)) || null;
   }
+  // Tries each CONFIRMED candidate for a role, in priority order.
+  // Deliberately does not fall through to the ranked/estimated guess
+  // here -- that happens in a second pass below, only after every role
+  // has had a chance to claim its own real signal first. Without that
+  // split, whichever role happens to run first (Heading, in source
+  // order) could grab a value through the weak fallback before a later
+  // role's much stronger confirmed match ever got a turn -- confirmed
+  // against a real site (jpmorganchase.com) where exactly that happened:
+  // Heading's fallback guess claimed the one color Accent's real :root
+  // property was about to confirm, leaving Accent with nothing at all.
+  function tryConfirmed(role, candidates) {
+    for (const hex of candidates) {
+      if (hex && add(role, hex, "confirmed")) return true;
+    }
+    return false;
+  }
 
   // Elementor's own 4 stock slots: "Primary" is the dominant/heading color
   // in real-world use (confirmed against a real site, see crawl-inspo.js's
-  // note on this), "Text" is specifically body copy -- the previous
-  // version of this function had these backwards, mapping "Text" to
-  // Heading and never producing a Body text role at all.
+  // note on this), "Text" is specifically body copy -- an earlier version
+  // of this function had these backwards, mapping "Text" to Heading and
+  // never producing a Body text role at all.
   const headingProp = findRootProp(rootProps, ["heading", "headline", "title", "text-dark", "-dark"]);
-  if (stock.primary) add("Heading", stock.primary, "confirmed");
-  else if (stock.text) add("Heading", stock.text, "confirmed");
-  else if (headingProp) add("Heading", headingProp, "confirmed");
-  else { const c = nextRanked(); if (c) add("Heading", c, "estimated"); }
+  const headingOk = tryConfirmed("Heading", [stock.primary, stock.text, headingProp]);
 
   const bodyTextProp = findRootProp(rootProps, ["body-text", "text-body", "body-color", "paragraph"]);
-  if (stock.text) add("Body text", stock.text, "confirmed");
-  else if (bodyTextProp) add("Body text", bodyTextProp, "confirmed");
-  else { const c = nextRanked(); if (c) add("Body text", c, "estimated"); }
+  const bodyOk = tryConfirmed("Body text", [stock.text, bodyTextProp]);
 
   // "primary" is deliberately also checked here as a fallback for accent
   // (not just heading above) -- in general CSS convention (Bootstrap,
@@ -221,27 +253,41 @@ export function buildColorSet(css) {
   // color than heading text, so a non-Elementor site's :root variable
   // named "primary" is checked against the accent list too.
   const accentProp = findRootProp(rootProps, ["accent", "brand", "primary", "cta", "action"]);
-  let accentHex = null;
-  if (stock.accent) { accentHex = stock.accent; add("Accent", accentHex, "confirmed"); }
-  else if (accentProp) { accentHex = accentProp; add("Accent", accentHex, "confirmed"); }
-  else { const c = nextRanked(); if (c) { accentHex = c; add("Accent", c, "estimated"); } }
-
-  if (accentHex) add("Accent — hover", darkenHex(accentHex, 0.15), "derived");
+  const accentOk = tryConfirmed("Accent", [stock.accent, accentProp]);
 
   const bgProp = findRootProp(rootProps, ["background", "bg", "surface", "canvas"]);
-  if (stock.secondary) add("Background", stock.secondary, "confirmed");
-  else if (bgProp) add("Background", bgProp, "confirmed");
-  else add("Background", "#FFFFFF", "derived");
-
-  const headingEntry = result.find(r => r.role === "Heading");
-  if (headingEntry && luminance(headingEntry.hex) < 0.3) add("Dark panel", headingEntry.hex, "derived");
-  else add("Dark panel", "#1A1A1A", "derived");
+  const bgOk = tryConfirmed("Background", [stock.secondary, bgProp]);
 
   const mutedProp = findRootProp(rootProps, ["muted", "stone", "secondary-text", "gray", "grey"]);
-  if (mutedProp) add("Muted", mutedProp, "estimated");
-  else { const c = nextRanked(); if (c) add("Muted", c, "estimated"); }
+  const mutedOk = tryConfirmed("Muted", [mutedProp]);
 
-  add("Text on dark", "#FAFAF8", "derived");
+  // Second pass -- only now does anything reach for the frequency-ranked
+  // guess, and only for roles that came up empty above.
+  if (!headingOk) { const c = nextRanked(); if (c) add("Heading", c, "estimated"); }
+  if (!bodyOk) { const c = nextRanked(); if (c) add("Body text", c, "estimated"); }
+  if (!accentOk) { const c = nextRanked(); if (c) add("Accent", c, "estimated"); }
+  if (!bgOk) {
+    // White is a safe structural default even if it collides with
+    // something else already assigned -- an unfilled Background is
+    // worse than a possibly-duplicate white, so this is the one role
+    // that intentionally skips the used-check.
+    result.push({ role: "Background", hex: "#FFFFFF", confidence: "derived", custom: false });
+  }
+  if (!mutedOk) { const c = nextRanked(); if (c) add("Muted", c, "estimated"); }
+
+  // Derived roles, computed only after Accent and Heading have their
+  // final values from both passes above.
+  const accentEntry = result.find(r => r.role === "Accent");
+  if (accentEntry) add("Accent — hover", darkenHex(accentEntry.hex, 0.15), "derived");
+
+  const headingEntry = result.find(r => r.role === "Heading");
+  if (headingEntry && luminance(headingEntry.hex) < 0.3) {
+    result.push({ role: "Dark panel", hex: headingEntry.hex, confidence: "derived", custom: false });
+  } else {
+    result.push({ role: "Dark panel", hex: "#1A1A1A", confidence: "derived", custom: false });
+  }
+
+  result.push({ role: "Text on dark", hex: "#FAFAF8", confidence: "derived", custom: false });
 
   // Elementor global colors beyond the 4 stock slots are real, deliberate,
   // site-owner-named brand colors -- confirmed against a real site (AFS)
