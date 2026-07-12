@@ -33,8 +33,16 @@ function keyedObjectToColors(obj) {
 }
 
 function fontsToKeyedObject(fonts) {
-  const heading = fonts.find(f => f.role === "Heading");
-  const body = fonts.find(f => f.role === "Body");
+  // Same fallback StyleDocument.jsx already uses for display: extraction
+  // only tags a font "Heading"/"Body" when it finds a literal h1{}/body{}
+  // CSS selector, which modern utility-class-styled sites (Tailwind,
+  // shadcn-style component CSS) essentially never have -- everything
+  // real still gets found by name, just tagged generic "Other" instead.
+  // Falling back to array position keeps Save honest with what's already
+  // shown as "the heading font" / "the body font" on the brand sheet,
+  // rather than silently saving nothing because the exact tag was missing.
+  const heading = fonts.find(f => f.role === "Heading") || fonts[0];
+  const body = fonts.find(f => f.role === "Body") || fonts[1];
   return { heading: heading?.name || "", body: body?.name || "" };
 }
 
