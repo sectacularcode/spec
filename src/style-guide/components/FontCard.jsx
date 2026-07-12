@@ -3,6 +3,7 @@
 // name only -- a font doesn't have a "usage" note the way a color does).
 
 const CONFIDENCE_STYLES = {
+  computed: { background: "#E3F2FA", color: "#1D6FA5" }, // real getComputedStyle() read via headless browser -- strongest signal available, same blue language as ColorSwatch's "Sampled" tier
   confirmed: { background: "#E8F3E9", color: "#2F6E3E" },
   estimated: { background: "#FEF3E2", color: "#B45309" },
 };

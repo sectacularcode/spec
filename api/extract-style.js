@@ -13,6 +13,7 @@ import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { logError } from "./_lib/errorLog.js";
 import { isSafeUrl, fetchPage, fetchCss } from "./_lib/safeFetch.js";
+import { extractComputedFonts } from "./_lib/computedFontStyle.js";
 
 const MAX_CSS_FETCHES = 10;
 
@@ -467,6 +468,40 @@ export default async function handler(req, res) {
     // so the color pass reads html + css together, not css alone.
     const colors = buildColorSet(html + "\n" + css);
     const fonts = buildFontSet(html, css);
+
+    // Regex extraction hits a real structural ceiling on sites where fonts
+    // never appear as a literal "font-family: X" string in source CSS (Wix's
+    // proprietary rendering, Tailwind utility classes, CSS-variable font
+    // stacks) -- confirmed against real sites, not theoretical. Only spend a
+    // Browserless call when the cheap path didn't already confidently
+    // resolve both roles; a "confirmed" regex match (an explicit @font-face
+    // or Google Fonts declaration) is already trustworthy on its own.
+    const headingConfirmed = fonts.some(f => f.role === "Heading" && f.confidence === "confirmed");
+    const bodyConfirmed = fonts.some(f => f.role === "Body" && f.confidence === "confirmed");
+    if (!headingConfirmed || !bodyConfirmed) {
+      const computed = await extractComputedFonts(base.href);
+      if (computed) {
+        // Once the Browserless call has already fired (because at least one
+        // role wasn't confirmed), upgrading the OTHER role too costs
+        // nothing extra and "computed" is strictly more trustworthy than
+        // "confirmed" anyway -- a regex match assumes the declared rule is
+        // what's actually applied, computed style is what the browser
+        // actually resolved. Not gated per-field on purpose.
+        if (computed.heading) {
+          const idx = fonts.findIndex(f => f.role === "Heading");
+          const entry = { role: "Heading", name: computed.heading, confidence: "computed" };
+          if (idx >= 0) fonts[idx] = entry; else fonts.unshift(entry);
+        }
+        if (computed.body && computed.body.toLowerCase() !== (computed.heading || "").toLowerCase()) {
+          const idx = fonts.findIndex(f => f.role === "Body");
+          const entry = { role: "Body", name: computed.body, confidence: "computed" };
+          if (idx >= 0) fonts[idx] = entry; else fonts.splice(1, 0, entry);
+        }
+      }
+      // computed === null (missing key, navigation failure, timeout) means
+      // the regex result stands as-is -- degrade gracefully, never throw.
+    }
+
     const brandNameGuess = guessBrandName(html);
 
     return res.status(200).json({ origin, brandNameGuess, colors, fonts });
