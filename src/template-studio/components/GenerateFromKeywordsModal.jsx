@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { authHeaders } from "../../utils/api.js";
 import { logTemplateQuery } from "../../utils/templateQueries.js";
+import {
+  verifyThemeReasonAgainstColors,
+  detectMissingRequestedColors,
+  prefixMissingColorsWarning,
+  retryColorPalette,
+  mergeCorrectedColors,
+} from "../../utils/colorRequestCheck.js";
 
 // GenerateFromKeywordsModal
 // Opened from the "Generate from keywords" option in the Add Page dropdown.
@@ -89,15 +96,65 @@ Research what this theme looks, sounds, and feels like. Use authentic colors fro
       const text = data.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
       const clean = text.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
       const parsed = JSON.parse(clean);
+      const rawInput = keywords.trim();
+
+      // Same color-request check + one-shot correction retry as the
+      // "describe your site" flow (colorRequestCheck.js) -- this tool had
+      // only the prompt-level rule before, which was already proven live
+      // not to be reliable enough on its own for the sibling entry point.
+      // ai.colors uses { primary, accent, text, card }; the shared module
+      // expects { background, accent, text, card } -- mapped at this
+      // boundary rather than teaching the shared module about this file's
+      // specific schema.
+      let normalizedColors = parsed.colors ? {
+        background: parsed.colors.primary,
+        accent: parsed.colors.accent,
+        text: parsed.colors.text,
+        card: parsed.colors.card,
+      } : null;
+      let themeReason = parsed.theme || "";
+      if (normalizedColors) {
+        themeReason = verifyThemeReasonAgainstColors(normalizedColors, themeReason);
+      }
+      let colorRetryFired = false;
+      let colorRetrySucceeded = false;
+      const missingColors = (rawInput && normalizedColors)
+        ? detectMissingRequestedColors(rawInput, normalizedColors)
+        : [];
+      if (missingColors.length > 0) {
+        colorRetryFired = true;
+        const corrected = await retryColorPalette(authHeaders, rawInput, normalizedColors, missingColors);
+        if (corrected && corrected.colors) {
+          normalizedColors = mergeCorrectedColors(normalizedColors, corrected.colors);
+          themeReason = corrected.themeReason || themeReason;
+          colorRetrySucceeded = detectMissingRequestedColors(rawInput, normalizedColors).length === 0;
+        }
+      }
+      if (normalizedColors) {
+        themeReason = prefixMissingColorsWarning(rawInput, normalizedColors, themeReason);
+      }
+      // Map back to this file's own { primary, accent, text, card } shape
+      // before it flows into buildPageFromAI, which already expects that
+      // schema and is left untouched.
+      const finalParsed = {
+        ...parsed,
+        colors: normalizedColors ? {
+          primary: normalizedColors.background,
+          accent: normalizedColors.accent,
+          text: normalizedColors.text,
+          card: normalizedColors.card,
+        } : (parsed.colors || {}),
+        theme: themeReason,
+      };
 
       // Build a Template Studio-compatible page object from the AI result
-      const newPage = buildPageFromAI(parsed, keywords.trim());
+      const newPage = buildPageFromAI(finalParsed, rawInput);
       setResults(prev => [newPage, ...prev]);
       setSelected(0);
       // This tool never matches against WEBSITE_TEMPLATES -- every result
       // here is effectively isCustom by design, so logged as such with no
       // matched template. Fire-and-forget, never blocks the UI.
-      logTemplateQuery("keywords_modal", keywords.trim(), true, null);
+      logTemplateQuery("keywords_modal", rawInput, true, null, colorRetryFired, colorRetrySucceeded);
     } catch(e) {
       const msg = e.name === "AbortError"
         ? "Request timed out — try again."

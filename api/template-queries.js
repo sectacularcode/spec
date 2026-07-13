@@ -28,7 +28,7 @@ export default async function handler(req, res) {
   if (req.method === "POST") {
     if (!(await rateLimit(userId, "template-queries-write", 60))) return tooMany(res);
 
-    const { source, queryText, isCustom, matchedTemplateId } = req.body || {};
+    const { source, queryText, isCustom, matchedTemplateId, colorRetryFired, colorRetrySucceeded } = req.body || {};
     if (!VALID_SOURCES.includes(source)) return res.status(400).json({ error: "Invalid source" });
     if (!validText(queryText, 500)) return res.status(400).json({ error: "Invalid queryText" });
     if (matchedTemplateId != null && !validId(matchedTemplateId, 64)) {
@@ -42,7 +42,9 @@ export default async function handler(req, res) {
     await logTemplateQuery(
       userId, source, queryText,
       typeof isCustom === "boolean" ? isCustom : null,
-      matchedTemplateId || null
+      matchedTemplateId || null,
+      colorRetryFired === true,
+      colorRetrySucceeded === true
     );
     return res.status(200).json({ ok: true });
   }
@@ -61,6 +63,8 @@ export default async function handler(req, res) {
           COUNT(*) FILTER (WHERE is_custom = true) AS custom_count,
           COUNT(*) FILTER (WHERE is_custom = false) AS matched_count,
           MODE() WITHIN GROUP (ORDER BY matched_template_id) AS top_matched_template_id,
+          COUNT(*) FILTER (WHERE color_retry_fired = true) AS color_retry_fired_count,
+          COUNT(*) FILTER (WHERE color_retry_fired = true AND color_retry_succeeded = true) AS color_retry_succeeded_count,
           MAX(occurred_at) AS last_seen
         FROM template_queries
         GROUP BY LOWER(TRIM(query_text))

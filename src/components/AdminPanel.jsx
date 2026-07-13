@@ -660,6 +660,8 @@ export default function AdminPanel({ isAdmin }) {
                   <th style={S.th}>Custom</th>
                   <th style={S.th}>Matched</th>
                   <th style={S.th}>Top Matched Template</th>
+                  <th style={S.th}>Color Retry Fired</th>
+                  <th style={S.th}>Color Retry Fixed It</th>
                   <th style={S.th}>Last Seen</th>
                 </tr>
               </thead>
@@ -671,6 +673,12 @@ export default function AdminPanel({ isAdmin }) {
                     <td style={S.td}>{q.custom_count > 0 ? q.custom_count : "—"}</td>
                     <td style={S.td}>{q.matched_count > 0 ? q.matched_count : "—"}</td>
                     <td style={S.td}><code style={{ fontSize: "12px" }}>{q.top_matched_template_id || "—"}</code></td>
+                    <td style={S.td}>{q.color_retry_fired_count > 0 ? q.color_retry_fired_count : "—"}</td>
+                    <td style={S.td}>
+                      {q.color_retry_fired_count > 0
+                        ? `${q.color_retry_succeeded_count} / ${q.color_retry_fired_count}`
+                        : "—"}
+                    </td>
                     <td style={S.td}>{new Date(q.last_seen).toLocaleString()}</td>
                   </tr>
                 ))}
@@ -679,7 +687,7 @@ export default function AdminPanel({ isAdmin }) {
           )}
 
           <div style={{ padding: "10px 20px 16px", fontSize: "11px", color: "#9ca3af" }}>
-            Top 200 queries by frequency, grouped by normalized text. A high "Custom" count with no matched template is a real candidate for a new Template Studio template.
+            Top 200 queries by frequency, grouped by normalized text. A high "Custom" count with no matched template is a real candidate for a new Template Studio template. "Color Retry Fixed It" shows successes/attempts for the automatic color-request correction -- a low ratio here means the retry mechanism itself needs work, not just individual prompts.
           </div>
         </div>
       )}

@@ -12,7 +12,11 @@
 //
 // Table is self-healing (CREATE TABLE IF NOT EXISTS on every write),
 // matching every other table in this codebase -- see api/brand-styles.js's
-// history for why that's not a safe assumption to skip.
+// history for why that's not a safe assumption to skip. The two retry
+// columns were added after the table already existed in production, so
+// they go through ALTER TABLE ADD COLUMN IF NOT EXISTS rather than only
+// living in the CREATE TABLE statement -- same pattern brand-styles.js
+// used for its own after-the-fact column (source_url).
 
 import { sql } from "@vercel/postgres";
 
@@ -30,19 +34,21 @@ export async function ensureTemplateQueryLogTable() {
       matched_template_id TEXT
     )
   `;
+  await sql`ALTER TABLE template_queries ADD COLUMN IF NOT EXISTS color_retry_fired BOOLEAN NOT NULL DEFAULT false`;
+  await sql`ALTER TABLE template_queries ADD COLUMN IF NOT EXISTS color_retry_succeeded BOOLEAN NOT NULL DEFAULT false`;
 }
 
 // Best-effort and non-throwing by design, same contract as logError() in
 // errorLog.js -- a logging failure must never break the actual
 // recommendation flow the person is in the middle of.
-export async function logTemplateQuery(userId, source, queryText, isCustom, matchedTemplateId) {
+export async function logTemplateQuery(userId, source, queryText, isCustom, matchedTemplateId, colorRetryFired, colorRetrySucceeded) {
   try {
     await ensureTemplateQueryLogTable();
     const safeText = String(queryText == null ? "" : queryText).trim().slice(0, MAX_QUERY_LEN);
     if (!safeText) return; // nothing meaningful to log
     await sql`
-      INSERT INTO template_queries (user_id, source, query_text, is_custom, matched_template_id)
-      VALUES (${userId || null}, ${source}, ${safeText}, ${isCustom == null ? null : isCustom}, ${matchedTemplateId || null})
+      INSERT INTO template_queries (user_id, source, query_text, is_custom, matched_template_id, color_retry_fired, color_retry_succeeded)
+      VALUES (${userId || null}, ${source}, ${safeText}, ${isCustom == null ? null : isCustom}, ${matchedTemplateId || null}, ${!!colorRetryFired}, ${!!colorRetrySucceeded})
     `;
   } catch (e) {
     console.error("logTemplateQuery itself failed:", e.message);

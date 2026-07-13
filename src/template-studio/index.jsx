@@ -42,6 +42,13 @@ import { listProjects, saveProjectsBatch } from "../utils/projects.js";
 import { listTemplateLibrary, deleteTemplateLibraryEntry } from "../utils/templateLibrary.js";
 import { listKeywordBuilds, saveKeywordBuildEntry, deleteKeywordBuildEntry } from "../utils/keywordBuilds.js";
 import { logTemplateQuery } from "../utils/templateQueries.js";
+import {
+  verifyThemeReasonAgainstColors,
+  detectMissingRequestedColors,
+  prefixMissingColorsWarning,
+  retryColorPalette,
+  mergeCorrectedColors,
+} from "../utils/colorRequestCheck.js";
 
 // Styles
 
@@ -581,233 +588,6 @@ Return ONLY the new ${fieldName} value as plain text.`;
     setTab("positioning"); // Advance to Positioning — next step after copy is drafted
   };
 
-  // Maps a hex color to a broad hue family (red/orange/green/etc.) or an
-  // achromatic bucket (black/white/gray). Used to verify the AI's freeform
-  // themeReason text actually describes the colors it returned, rather than
-  // trusting the prose on its own -- confirmed root cause of a real mismatch
-  // (reasoning said "sewer-green... purple and orange", actual customColors
-  // were black/orange/white): the prompt's own few-shot example primes the
-  // model's reasoning text more strongly than it constrains the actual hex
-  // values, so the two can drift apart within one response.
-  // Used to validate individual customColors fields returned by
-  // retryColorPalette before trusting them -- a malformed or missing field
-  // in that response must never silently overwrite a good original value.
-  function isValidHex(s) {
-    return typeof s === "string" && /^#[0-9a-f]{6}$/i.test(s);
-  }
-  function hexHueFamily(hex) {
-    if (!hex || typeof hex !== "string") return null;
-    const h = hex.replace("#", "");
-    if (h.length < 6) return null;
-    const r = parseInt(h.slice(0, 2), 16) / 255;
-    const g = parseInt(h.slice(2, 4), 16) / 255;
-    const b = parseInt(h.slice(4, 6), 16) / 255;
-    if ([r, g, b].some(Number.isNaN)) return null;
-    const max = Math.max(r, g, b), min = Math.min(r, g, b);
-    const l = (max + min) / 2;
-    const delta = max - min;
-    if (delta < 0.04) {
-      if (l < 0.15) return "black";
-      if (l > 0.9) return "white";
-      return "gray";
-    }
-    let hue;
-    if (max === r) hue = ((g - b) / delta) % 6;
-    else if (max === g) hue = (b - r) / delta + 2;
-    else hue = (r - g) / delta + 4;
-    hue = Math.round(hue * 60);
-    if (hue < 0) hue += 360;
-    if (hue < 15 || hue >= 345) return "red";
-    if (hue < 45) return "orange";
-    if (hue < 65) return "yellow";
-    if (hue < 170) return "green";
-    if (hue < 200) return "teal";
-    if (hue < 255) return "blue";
-    if (hue < 290) return "purple";
-    return "pink";
-  }
-  // Each color word maps to the SET of hue families it can legitimately
-  // land in, not a single family -- a one-word-one-family design is the
-  // root problem this replaces. Audited every word here against a
-  // canonical real-world hex value for that color and its computed
-  // hexHueFamily result (2026-07-12 audit, 13 of 46 words came back wrong
-  // under the old single-family design -- including "pink" itself:
-  // standard web pink #FFC0CB computes to "red", not "pink"). Words with
-  // more than one entry are ones that genuinely span two adjacent hue
-  // buckets depending on the specific shade (indigo blue-vs-purple, coral
-  // orange-vs-red-vs-pink, charcoal black-vs-blue-vs-gray, etc.) -- that's
-  // real perceptual ambiguity, not something a single mapping can resolve
-  // correctly either way.
-  const COLOR_WORD_FAMILY = {
-    red: ["red"], crimson: ["red"], scarlet: ["red"], maroon: ["red", "orange"],
-    orange: ["orange"], amber: ["orange", "yellow"], rust: ["orange", "red"], coral: ["orange", "red", "pink"], tangerine: ["orange"],
-    brown: ["orange"], tan: ["orange"], bronze: ["orange"], copper: ["orange"], terracotta: ["orange", "red"], clay: ["orange"],
-    yellow: ["yellow"], gold: ["orange", "yellow"], mustard: ["yellow"],
-    green: ["green"], emerald: ["green"], sage: ["green"], olive: ["green", "yellow"], forest: ["green"], mint: ["green"], sewer: ["green"],
-    teal: ["teal"], turquoise: ["teal"], cyan: ["teal"], aqua: ["teal"],
-    blue: ["blue"], navy: ["blue"], cobalt: ["blue"], indigo: ["blue", "purple"],
-    purple: ["purple", "pink"], violet: ["purple"], lavender: ["purple", "blue"], plum: ["purple", "pink"], lilac: ["purple", "pink"],
-    pink: ["pink", "red"], magenta: ["pink", "purple"], rose: ["orange", "pink", "red"], fuchsia: ["pink", "purple"],
-    black: ["black"], charcoal: ["black", "gray", "blue"], onyx: ["black"], ebony: ["black"],
-    white: ["white"], ivory: ["white", "yellow"], cream: ["white", "yellow"],
-    gray: ["gray"], grey: ["gray"], slate: ["gray", "blue"],
-  };
-  // Natural-language color mentions are overwhelmingly plural ("blues",
-  // "browns", "hues of pink") -- COLOR_WORD_FAMILY only has singular keys,
-  // so a bare dictionary lookup silently misses every plural form. Confirmed
-  // this by testing the exact reported input ("browns, blues and hues of
-  // pink") against the un-fixed lookup: it caught "pink" but silently
-  // missed "blues" entirely, which would have made the safety net below
-  // under-detect on exactly the case it exists to catch.
-  function wordAcceptableFamilies(word) {
-    if (COLOR_WORD_FAMILY[word]) return COLOR_WORD_FAMILY[word];
-    if (word.endsWith("s") && COLOR_WORD_FAMILY[word.slice(0, -1)]) return COLOR_WORD_FAMILY[word.slice(0, -1)];
-    return null;
-  }
-  // If themeReason names a color that isn't actually present in any of the
-  // returned hex values (none of that word's acceptable families match),
-  // don't trust the freeform claim -- replace it with a plain description
-  // generated from the real colors instead. Guarantees the displayed
-  // reasoning always matches the actual swatches, regardless of how well
-  // the model followed the prompt's instructions.
-  function verifyCustomColorReasoning(parsed) {
-    if (!parsed || !parsed.customColors || !parsed.themeReason) return parsed;
-    const bc = parsed.customColors;
-    const actualFamilies = new Set(
-      [bc.background, bc.accent, bc.text, bc.card].filter(Boolean).map(hexHueFamily).filter(Boolean)
-    );
-    const words = parsed.themeReason.toLowerCase().match(/[a-z]+/g) || [];
-    const hasMismatch = words.some(word => {
-      const acceptable = wordAcceptableFamilies(word);
-      return acceptable && !acceptable.some(f => actualFamilies.has(f));
-    });
-    if (!hasMismatch) return parsed;
-    const namedFamilies = [...actualFamilies].filter(f => !["black", "white", "gray"].includes(f));
-    const themeReason = namedFamilies.length
-      ? `Colors keyed to ${namedFamilies.join(" and ")} tones, generated for this theme.`
-      : "A custom neutral palette generated for this theme.";
-    return { ...parsed, themeReason };
-  }
-
-  // Returns the list of color words the person explicitly used that aren't
-  // actually represented in the returned palette -- pure, no side effects,
-  // used both by the visible-warning check below AND by the automatic
-  // retry in describeMySite (which needs the raw list to build a targeted
-  // correction request, not a pre-formatted warning string).
-  //
-  // Requires at least 2 DISTINCT color words in the raw input before
-  // treating ANY of them as a genuine palette request. Found this gap
-  // auditing the mechanism after it shipped: ordinary business
-  // descriptions are full of single incidental color words that aren't
-  // color requests at all -- "we help companies go green", "get clients
-  // out of the red financially" -- and with only 1 match required, both of
-  // those triggered a false "missing color" detection, which now costs a
-  // real wasted API call (the automatic retry) and shows a confusing
-  // warning for something that was never actually broken. Two or more
-  // distinct color words together is a much stronger, more specific signal
-  // that someone is actually describing a palette -- matches how people
-  // naturally phrase color requests anyway ("browns, blues, and hues of
-  // pink"), and the accepted tradeoff is that a genuine single-color ask
-  // ("make it red") won't trigger the check -- that's reverting to the
-  // pre-existing behavior for that narrower case, not a regression.
-  function detectMissingRequestedColors(rawInput, parsed) {
-    if (!parsed || !parsed.customColors || !rawInput) return [];
-    const bc = parsed.customColors;
-    const actualFamilies = new Set(
-      [bc.background, bc.accent, bc.text, bc.card].filter(Boolean).map(hexHueFamily).filter(Boolean)
-    );
-    const words = rawInput.toLowerCase().match(/[a-z]+/g) || [];
-    const allColorWords = [];
-    const seen = new Set();
-    for (const word of words) {
-      if (seen.has(word)) continue;
-      const acceptable = wordAcceptableFamilies(word);
-      if (!acceptable) continue;
-      seen.add(word);
-      allColorWords.push(word);
-    }
-    if (allColorWords.length < 2) return [];
-    return allColorWords.filter(word => {
-      const acceptable = wordAcceptableFamilies(word);
-      return !acceptable.some(f => actualFamilies.has(f));
-    });
-  }
-
-  // Checks the ACTUAL palette against what the person themselves explicitly
-  // asked for -- a different and stronger signal than verifyCustomColorReasoning
-  // above, which only checks the AI's own reasoning against its own colors.
-  // This checks the person's original request against the real output. If
-  // someone names specific colors ("browns, blues, and hues of pink") and
-  // the model quietly drops one, that's a genuine instruction-following
-  // miss, not a phrasing/hue-boundary quirk -- surfaced directly in the
-  // reasoning text rather than left silent, so it's visible instead of
-  // looking like the request was honored when it wasn't. describeMySite
-  // runs one automatic correction attempt (retryColorPalette) before this
-  // ever gets shown -- reaching the visible warning means the retry was
-  // attempted and still didn't fully succeed, not that no attempt was made.
-  function checkRequestedColorsHonored(rawInput, parsed) {
-    const missingWords = detectMissingRequestedColors(rawInput, parsed);
-    if (missingWords.length === 0) return parsed;
-    const note = `⚠️ You mentioned ${missingWords.join(" and ")}, but the generated palette doesn't actually include ${missingWords.length > 1 ? "them" : "it"} — try Regenerate for a closer match. `;
-    return { ...parsed, themeReason: note + (parsed.themeReason || "") };
-  }
-
-  // One automatic, targeted correction attempt when the first response
-  // misses an explicitly-requested color -- the prompt-level "HARD
-  // REQUIREMENT" rule alone wasn't enough (confirmed live: same furniture-
-  // shop input, same missing blue/pink, even with that rule in place).
-  // Reacting to a specific, named failure ("you used X, that's missing Y")
-  // is a materially different and often more effective prompt than a
-  // general rule stated in advance -- this is the next real attempt at
-  // fixing the underlying problem, not a second copy of the same nudge.
-  //
-  // Deliberately narrow: asks for ONLY a corrected customColors +
-  // themeReason, not a full regenerate. Keeps whatever the first response
-  // already got right (template, layout, fonts, goals, copy) untouched,
-  // and costs far less than re-running the whole recommendation. Best-
-  // effort and non-throwing, matching every other fire-and-forget/
-  // degrade-gracefully helper in this codebase -- if the retry itself
-  // fails for any reason, returns null and the caller falls back to the
-  // visible warning instead of the person seeing nothing happen.
-  async function retryColorPalette(originalText, firstResult, missingWords) {
-    try {
-      const bc = firstResult.customColors || {};
-      const retrySystemPrompt = `You are correcting a color palette that failed to include colors the user explicitly requested. Return ONLY a valid JSON object -- no preamble, no markdown fences:
-{
-  "customColors": { "background": "#hex", "accent": "#hex", "text": "#hex", "card": "#hex" },
-  "themeReason": "1 short sentence explaining the corrected palette"
-}
-The new palette MUST include every one of the missing colors listed below as one of the 4 hex values, while staying true to the overall theme/mood already established. Keep whichever of the original 4 colors still make sense; only change what's necessary to actually include the missing colors.`;
-      const retryUserPrompt = `Original site description: ${originalText}
-Original palette: background=${bc.background || "?"}, accent=${bc.accent || "?"}, text=${bc.text || "?"}, card=${bc.card || "?"}
-Missing colors that MUST be included: ${missingWords.join(", ")}
-Return the corrected JSON now.`;
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000);
-      const res = await fetch("/api/generate-copy", {
-        method: "POST",
-        headers: await authHeaders(),
-        body: JSON.stringify({
-          model: "claude-sonnet-4-6",
-          max_tokens: 300,
-          system: retrySystemPrompt,
-          messages: [{ role: "user", content: retryUserPrompt }],
-        }),
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-      if (!res.ok) return null;
-      const data = await res.json();
-      const responseText = data.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
-      const clean = responseText.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
-      const corrected = JSON.parse(clean);
-      if (!corrected || !corrected.customColors) return null;
-      return corrected;
-    } catch {
-      return null;
-    }
-  }
-
   // AI Site Brief — describe your site, get template/layout/theme/colors/fonts/brief recommendations
   const describeMySite = async (overrideText) => {
     // overrideText lets a caller (e.g. "Regenerate" on a saved Keyword
@@ -996,63 +776,75 @@ Rules:
       const responseText = data.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
       const clean = responseText.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
       const parsedResult = JSON.parse(clean);
-      // Log every resolved attempt regardless of outcome -- someone typing
-      // "hair salon" and clicking Discard should still count toward "how
-      // many times has this been typed", same as if they'd created the
-      // project. Fire-and-forget: not awaited, and logTemplateQuery never
-      // throws, so this can never affect the actual recommendation flow.
-      if (text) {
-        logTemplateQuery(
-          lockedTpl ? "describe_site_locked" : "describe_site",
-          text,
-          lockedTpl ? false : !!parsedResult.isCustom,
-          lockedTpl ? lockedTpl.id : (parsedResult.templateId || null)
-        );
-      }
       // Drop this result if a newer request has been issued since (e.g. the
       // user clicked "Regenerate" again before this one finished) — otherwise
-      // a slow first response can overwrite a fresher second one.
+      // a slow first response can overwrite a fresher second one. Query
+      // logging now happens further down, after any retry completes, so a
+      // stale response (superseded before reaching that point) won't be
+      // logged -- a deliberate, minor behavior change from before, traded
+      // for having retry-fired/retry-succeeded in the same log row instead
+      // of a second write.
       if (briefRecReqRef.current !== reqId) return;
-      let verifiedResult = verifyCustomColorReasoning(parsedResult);
-      // One automatic correction attempt when an explicitly-requested
-      // color is missing -- see retryColorPalette's own comment for why
-      // this exists (the prompt-level rule alone wasn't enough, confirmed
-      // live). Only fires when there's actually something to fix.
-      const missingColors = text ? detectMissingRequestedColors(text, verifiedResult) : [];
+      let verifiedResult = parsedResult;
+      if (verifiedResult.customColors) {
+        verifiedResult = {
+          ...verifiedResult,
+          themeReason: verifyThemeReasonAgainstColors(verifiedResult.customColors, verifiedResult.themeReason),
+        };
+      }
+      // One automatic correction attempt when an explicitly-requested color
+      // is missing -- see retryColorPalette's own comment (colorRequestCheck.js)
+      // for why this exists (the prompt-level rule alone wasn't enough,
+      // confirmed live). Only fires when there's actually something to fix.
+      let colorRetryFired = false;
+      let colorRetrySucceeded = false;
+      const missingColors = (text && verifiedResult.customColors)
+        ? detectMissingRequestedColors(text, verifiedResult.customColors)
+        : [];
       if (missingColors.length > 0) {
-        const corrected = await retryColorPalette(text, verifiedResult, missingColors);
+        colorRetryFired = true;
+        const corrected = await retryColorPalette(authHeaders, text, verifiedResult.customColors, missingColors);
         // Re-check staleness -- the retry itself awaits a second network
-        // call, so a newer request could have been issued while it was
-        // in flight.
+        // call, so a newer request could have been issued while it was in
+        // flight.
         if (briefRecReqRef.current !== reqId) return;
-        if (corrected && corrected.customColors) {
-          // Field-by-field merge, not a wholesale replace -- if the retry's
-          // response is missing a field or returns a malformed value for
-          // one, that must fall back to the original good value, not
-          // silently disappear. Found this while auditing the mechanism:
-          // a wholesale `customColors: corrected.customColors` would lose
-          // text/card entirely if the retry's response happened to only
-          // include background/accent, even though those were already
-          // fine and didn't need correcting.
-          const cc = corrected.customColors;
-          const origCc = verifiedResult.customColors || {};
+        if (corrected && corrected.colors) {
+          const mergedColors = mergeCorrectedColors(verifiedResult.customColors, corrected.colors);
           verifiedResult = {
             ...verifiedResult,
-            customColors: {
-              background: isValidHex(cc.background) ? cc.background : origCc.background,
-              accent: isValidHex(cc.accent) ? cc.accent : origCc.accent,
-              text: isValidHex(cc.text) ? cc.text : origCc.text,
-              card: isValidHex(cc.card) ? cc.card : origCc.card,
-            },
+            customColors: mergedColors,
             themeReason: corrected.themeReason || verifiedResult.themeReason,
           };
+          colorRetrySucceeded = detectMissingRequestedColors(text, mergedColors).length === 0;
         }
       }
       // Runs again regardless of whether a retry happened -- silently
       // passes through unchanged if the (possibly corrected) palette now
       // honors the request, or shows the visible warning with whatever's
       // still actually missing if the retry didn't fully resolve it.
-      setBriefRec(checkRequestedColorsHonored(text, verifiedResult));
+      if (verifiedResult.customColors) {
+        verifiedResult = {
+          ...verifiedResult,
+          themeReason: prefixMissingColorsWarning(text, verifiedResult.customColors, verifiedResult.themeReason),
+        };
+      }
+      // Log every resolved (non-stale) attempt regardless of outcome --
+      // someone typing "hair salon" and clicking Discard should still
+      // count toward "how many times has this been typed", same as if
+      // they'd created the project. Fire-and-forget: not awaited, and
+      // logTemplateQuery never throws, so this can never affect the actual
+      // recommendation flow.
+      if (text) {
+        logTemplateQuery(
+          lockedTpl ? "describe_site_locked" : "describe_site",
+          text,
+          lockedTpl ? false : !!verifiedResult.isCustom,
+          lockedTpl ? lockedTpl.id : (verifiedResult.templateId || null),
+          colorRetryFired,
+          colorRetrySucceeded
+        );
+      }
+      setBriefRec(verifiedResult);
     } catch (e) {
       if (briefRecReqRef.current !== reqId) return;
       const msg = e.name === "AbortError"
