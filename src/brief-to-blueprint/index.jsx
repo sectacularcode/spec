@@ -1387,7 +1387,13 @@ export default function CustomBuild({ userId, role } = {}) {
                           <select
                             value={row.style}
                             onChange={e => setSectionRowStyle(rows, rowIdx, e.target.value)}
-                            style={{ padding: "6px 8px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", color: "#09090b", background: "#fff", width: "100%" }}>
+                            // Same custom SVG chevron pattern already
+                            // proven throughout Template Studio -- this
+                            // was relying on the browser's own native
+                            // select arrow with no room reserved for it,
+                            // which is exactly what looked disproportionate
+                            // and cramped against the border.
+                            style={{ padding: "6px 26px 6px 8px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", color: "#09090b", background: "#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%236b635c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\") no-repeat right 9px center", width: "100%", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none", boxSizing: "border-box" }}>
                             {Object.entries(SECTION_STYLE_LABELS).map(([val, label]) => (
                               (val === "video" && !brief.videoUrl) ? null :
                               <option key={val} value={val}>{label}</option>

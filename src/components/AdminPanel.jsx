@@ -320,7 +320,17 @@ export default function AdminPanel({ isAdmin }) {
     addRow: { display: "grid", gridTemplateColumns: "1fr 120px 200px auto", gap: "8px", alignItems: "end" },
     fieldLabel: { fontSize: "11px", color: "#6b7280", fontWeight: 600, marginBottom: "4px" },
     input: { padding: "8px 10px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", width: "100%", boxSizing: "border-box", fontFamily: "Inter, system-ui, sans-serif" },
-    select: { padding: "8px 10px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", background: "#fff", width: "100%", fontFamily: "Inter, system-ui, sans-serif" },
+    // Custom SVG chevron, same proven pattern already used throughout
+    // Template Studio (index.jsx's Blueprint Library filters and locked-
+    // template picker) -- this file was relying on each browser's own
+    // native select arrow instead, with no appearance:none and no right-
+    // padding reserved for it, which is exactly why it looked cramped
+    // against the border and inconsistent in size. Generous 34px right
+    // padding gives the chevron real breathing room; appearance:none +
+    // WebkitAppearance:none suppresses the native arrow everywhere so
+    // this SVG is the only one that renders, instead of the browser
+    // drawing its own on top of or next to it.
+    select: { padding: "8px 34px 8px 10px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", background: "#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%236b635c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\") no-repeat right 12px center", width: "100%", fontFamily: "Inter, system-ui, sans-serif", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none", boxSizing: "border-box" },
     btnPrimary: { padding: "8px 18px", background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" },
     btnSecondary: { padding: "6px 12px", background: "#fff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer" },
     btnDanger: { padding: "6px 12px", background: "none", color: "#dc2626", border: "none", fontSize: "12px", fontWeight: 600, cursor: "pointer" },
@@ -751,6 +761,17 @@ export default function AdminPanel({ isAdmin }) {
           ) : allStyleGuides.length === 0 ? (
             <div style={S.empty}>No saved style guides yet.</div>
           ) : (
+            // Wrapped in its own horizontally-scrollable container --
+            // brand names can run long ("Superside: Your creative team's
+            // creative team™", a real saved entry) and a full Clerk
+            // user_id is a long opaque string on its own; without this,
+            // total row width can exceed the panel's fixed width and the
+            // panel's own overflow clips whatever doesn't fit -- which is
+            // exactly what was silently cutting off the Source column's
+            // URLs. This guarantees every column stays reachable (via
+            // scroll) instead of some of them being invisibly cropped,
+            // regardless of how long any individual value gets.
+            <div style={{ overflowX: "auto" }}>
             <table style={S.table}>
               <thead>
                 <tr>
@@ -766,7 +787,7 @@ export default function AdminPanel({ isAdmin }) {
               <tbody>
                 {allStyleGuides.map(sg => (
                   <tr key={sg.user_id + "::" + sg.brand_name}>
-                    <td style={S.td}>{sg.brand_name}</td>
+                    <td style={{ ...S.td, maxWidth: "220px" }}>{sg.brand_name}</td>
                     <td style={S.td}>
                       <div style={{ display: "flex", gap: "4px" }}>
                         {Object.entries(sg.colors || {}).map(([key, hex]) => (
@@ -776,17 +797,26 @@ export default function AdminPanel({ isAdmin }) {
                     </td>
                     <td style={S.td}>{sg.fonts?.heading || "—"}</td>
                     <td style={S.td}>{sg.fonts?.body || "—"}</td>
-                    <td style={S.td}>
+                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>
                       {sg.source_url
                         ? <a href={sg.source_url} target="_blank" rel="noreferrer" style={{ color: "#b45309" }}>{safeHostname(sg.source_url)}</a>
                         : <span style={{ color: "#9ca3af" }}>manual</span>}
                     </td>
-                    <td style={S.td}><code style={{ fontSize: "11px" }}>{sg.user_id}</code></td>
-                    <td style={S.td}>{new Date(sg.updated_at).toLocaleDateString()}</td>
+                    <td style={S.td}>
+                      {/* Truncated with a title tooltip for the full value
+                          -- a full Clerk user_id (user_2AbCdEfGh...) isn't
+                          meaningfully readable at-a-glance in full anyway,
+                          and this frees up real width for Source, the
+                          column that's actually clickable and useful in
+                          full. */}
+                      <code style={{ fontSize: "11px" }} title={sg.user_id}>{sg.user_id.length > 16 ? sg.user_id.slice(0, 16) + "…" : sg.user_id}</code>
+                    </td>
+                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>{new Date(sg.updated_at).toLocaleDateString()}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            </div>
           )}
 
           <div style={{ padding: "10px 20px 16px", fontSize: "11px", color: "#9ca3af" }}>

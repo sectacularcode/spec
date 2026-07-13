@@ -57,8 +57,8 @@ export default function SavedLibrary({ styles, loading, onApply, onDelete, statu
                 ))}
               </div>
               {buttonBg && (
-                <div style={{ flexShrink: 0, padding: "5px 10px", borderRadius: "4px", background: buttonBg }}>
-                  <span style={{ fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: "10px", fontWeight: 600, color: buttonTextColor, whiteSpace: "nowrap" }}>
+                <div style={{ flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", padding: "5px 10px", borderRadius: "4px", background: buttonBg }}>
+                  <span style={{ fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: "10px", fontWeight: 600, lineHeight: 1, color: buttonTextColor, whiteSpace: "nowrap" }}>
                     {realButton?.name || "Button"}
                   </span>
                 </div>
