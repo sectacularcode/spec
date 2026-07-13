@@ -26,7 +26,40 @@ import { sql } from "@vercel/postgres";
 
 const COMMIT = process.argv.includes("--commit");
 
+// Self-healing, matching api/brands.js's ensureTable() exactly. The
+// migration script is the one place in this codebase that assumed the
+// destination table already existed instead of creating it itself --
+// every API route follows the self-healing pattern (see the brand_styles
+// lesson in project memory: a table "confirmed created" in a past session
+// never actually existed in production). Applying that same pattern here
+// so this script works standalone regardless of whether anyone has hit
+// /api/brands yet.
+async function ensureBrandsTable() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS brands (
+      id                       TEXT PRIMARY KEY,
+      created_by               TEXT NOT NULL,
+      name                     TEXT NOT NULL,
+      manifest_brand_id        TEXT,
+      colors                   JSONB NOT NULL DEFAULT '{}'::jsonb,
+      fonts                    JSONB NOT NULL DEFAULT '{}'::jsonb,
+      buttons                  JSONB NOT NULL DEFAULT '[]'::jsonb,
+      feature_layout           JSONB NOT NULL DEFAULT '[]'::jsonb,
+      post_closing_layout      JSONB NOT NULL DEFAULT '[]'::jsonb,
+      skip_services_checklist  BOOLEAN NOT NULL DEFAULT false,
+      source_url               TEXT,
+      notes                    TEXT,
+      created_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at               TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+  await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_brands_manifest_brand_id ON brands(manifest_brand_id) WHERE manifest_brand_id IS NOT NULL`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_brands_name_lower ON brands(LOWER(name))`;
+}
+
 async function main() {
+  await ensureBrandsTable();
+
   const { rows: brandStyles } = await sql`
     SELECT user_id, brand_name, colors, fonts, buttons, source_url, updated_at
     FROM brand_styles
