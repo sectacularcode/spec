@@ -288,7 +288,7 @@ export default function AdminPanel({ isAdmin }) {
     // an ancestor the way divs/spans do -- wrap's fontFamily above covers
     // most of this file's text, but these need it set explicitly or
     // they'd silently fall back to the browser default UI font.
-    input: { padding: "8px 10px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "13px", width: "100%", boxSizing: "border-box", fontFamily: "'Be Vietnam Pro', sans-serif" },
+    input: { padding: "8px 10px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", width: "100%", boxSizing: "border-box", fontFamily: "'Be Vietnam Pro', sans-serif" },
     // Custom SVG chevron, same proven pattern already used throughout
     // Template Studio (index.jsx's Blueprint Library filters and locked-
     // template picker) -- this file was relying on each browser's own
@@ -299,14 +299,16 @@ export default function AdminPanel({ isAdmin }) {
     // WebkitAppearance:none suppresses the native arrow everywhere so
     // this SVG is the only one that renders, instead of the browser
     // drawing its own on top of or next to it.
-    select: { padding: "8px 34px 8px 10px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "13px", color: "#09090b", background: "#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%236b635c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\") no-repeat right 12px center", width: "100%", fontFamily: "'Be Vietnam Pro', sans-serif", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none", boxSizing: "border-box" },
-    // 4px radius everywhere below, matching the standing convention (non-
-    // pill buttons) -- this file had drifted to 6px, one of several small
-    // things that added up to feeling off-brand.
-    btnPrimary: { padding: "8px 18px", background: "#b45309", color: "#fff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "'Be Vietnam Pro', sans-serif" },
-    btnSecondary: { padding: "6px 12px", background: "#fff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Be Vietnam Pro', sans-serif" },
+    select: { padding: "8px 34px 8px 10px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", background: "#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%236b635c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\") no-repeat right 12px center", width: "100%", fontFamily: "'Be Vietnam Pro', sans-serif", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none", boxSizing: "border-box" },
+    // 6px radius on every control below -- verified against the real,
+    // dominant live convention (ConfirmDialog.jsx and 5 other established
+    // files, 14 button instances) rather than trusted from a stale memory
+    // note that claimed 4px. 4px turned out to be a one-file outlier
+    // (Template Studio's ExportTab.jsx only), not the standard.
+    btnPrimary: { padding: "8px 18px", background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "'Be Vietnam Pro', sans-serif" },
+    btnSecondary: { padding: "6px 12px", background: "#fff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Be Vietnam Pro', sans-serif" },
     btnDanger: { padding: "6px 12px", background: "none", color: "#dc2626", border: "none", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Be Vietnam Pro', sans-serif" },
-    btnSave: { padding: "6px 12px", background: "#09090b", color: "#fff", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Be Vietnam Pro', sans-serif" },
+    btnSave: { padding: "6px 12px", background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Be Vietnam Pro', sans-serif" },
     // Row layout replaces table/th/td entirely -- every remaining section
     // (Users, Usage x2, Error Log, Template Queries) shares this one
     // pattern instead of near-duplicate wide tables, none of which ever
@@ -315,7 +317,7 @@ export default function AdminPanel({ isAdmin }) {
     rowTop: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" },
     rowTitle: { fontSize: "13px", fontWeight: 600, color: "#09090b" },
     rowMeta: { fontSize: "11px", color: "#9ca3af" },
-    badge: { fontSize: "10px", fontWeight: 600, padding: "3px 8px", borderRadius: "4px", background: "#fef3e2", color: "#b45309", whiteSpace: "nowrap", flexShrink: 0 },
+    badge: { fontSize: "10px", fontWeight: 600, padding: "3px 9px", borderRadius: "20px", background: "#fef3e2", color: "#b45309", whiteSpace: "nowrap", flexShrink: 0 },
     editRow: { display: "flex", gap: "8px", alignItems: "center", flexShrink: 0 },
     msg: { fontSize: "12px", marginTop: "8px" },
     empty: { padding: "24px 16px", textAlign: "center", color: "#6b7280", fontSize: "13px" },

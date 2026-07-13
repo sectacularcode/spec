@@ -165,7 +165,7 @@ export default function Brands() {
     title: { fontSize: "22px", fontWeight: 700, color: "#09090b" },
     sub: { fontSize: "13px", color: "#6b7280", marginTop: "4px" },
     search: { flex: 1, maxWidth: "320px", padding: "9px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", fontFamily: "'Be Vietnam Pro', sans-serif" },
-    newBtn: { padding: "9px 16px", background: "#b45309", color: "#fff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 600, cursor: "pointer" },
+    newBtn: { padding: "9px 16px", background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 600, cursor: "pointer" },
     grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "14px" },
     card: { background: "#fff", border: "1px solid #dde0e6", borderRadius: "10px", padding: "18px", cursor: "pointer", display: "flex", flexDirection: "column", gap: "10px" },
     cardName: { fontSize: "14px", fontWeight: 700, color: "#09090b" },
@@ -182,8 +182,8 @@ export default function Brands() {
     addBtn: { padding: "8px 14px", background: "#fff", border: "1px dashed #dde0e6", borderRadius: "6px", fontSize: "12px", fontWeight: 500, color: "#6b7280", cursor: "pointer", alignSelf: "flex-start" },
     structureNote: { fontSize: "12px", color: "#6b7280", background: "#f9f9fa", border: "1px solid #dde0e6", borderRadius: "6px", padding: "12px 14px", lineHeight: 1.5 },
     footer: { display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px", paddingTop: "20px", borderTop: "1px solid #dde0e6" },
-    saveBtn: { padding: "10px 20px", background: "#b45309", color: "#fff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 600, cursor: "pointer" },
-    deleteBtn: { padding: "10px 16px", background: "#fff", color: "#c93939", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer" },
+    saveBtn: { padding: "10px 20px", background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 600, cursor: "pointer" },
+    deleteBtn: { padding: "10px 16px", background: "#fff", color: "#c93939", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer" },
     errorMsg: { fontSize: "12px", color: "#c93939", marginBottom: "12px" },
   };
 

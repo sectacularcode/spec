@@ -10,7 +10,7 @@ const Brands           = lazy(() => import("./brands/index.jsx"));
 
 function Spinner() {
   return (
-    <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Inter, system-ui, sans-serif" }}>
+    <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Be Vietnam Pro', sans-serif" }}>
       <div style={{ fontSize: "13px", color: "#6b7280" }}>Loading…</div>
     </div>
   );
@@ -18,8 +18,8 @@ function Spinner() {
 
 function LoginScreen() {
   return (
-    <div style={{ minHeight: "100vh", background: "#eeedf1", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "Inter, system-ui, sans-serif" }}>
-      <div style={{ fontSize: "32px", fontWeight: 800, letterSpacing: "-0.04em", color: "#09090b", marginBottom: "24px" }}>
+    <div style={{ minHeight: "100vh", background: "#eeedf1", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "'Be Vietnam Pro', sans-serif" }}>
+      <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: "32px", fontWeight: 800, letterSpacing: "-0.04em", color: "#09090b", marginBottom: "24px" }}>
         spec<span style={{ color: "#b45309" }}>.</span>
       </div>
       <SignIn
@@ -52,7 +52,7 @@ function ToolNav({ view, setView, tools, role, user }) {
             title="Back to dashboard">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
-          <div style={{ fontSize: "22px", fontWeight: 800, letterSpacing: "-0.04em", color: "#09090b", lineHeight: 1 }}>
+          <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: "22px", fontWeight: 800, letterSpacing: "-0.04em", color: "#09090b", lineHeight: 1 }}>
             spec<span style={{ color: "#b45309" }}>.</span>
           </div>
           <div style={{ fontSize: "9px", color: "#ffffff", padding: "2px 6px", background: "#b45309", borderRadius: "6px", letterSpacing: "0.04em", fontWeight: 500 }}>beta</div>

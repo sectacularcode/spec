@@ -75,9 +75,9 @@ export default function Dashboard({ onSelectTool, role, tools: allowedTools }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const S = {
-    wrap: { minHeight: "100vh", background: "#eeedf1", fontFamily: "Inter, system-ui, sans-serif" },
+    wrap: { minHeight: "100vh", background: "#eeedf1", fontFamily: "'Be Vietnam Pro', sans-serif" },
     nav: { background: "#fff", borderBottom: "1px solid #dde0e6", height: "48px", display: "flex", alignItems: "center", padding: "0 32px", justifyContent: "space-between" },
-    logo: { fontSize: "24px", fontWeight: 800, letterSpacing: "-0.04em", color: "#09090b" },
+    logo: { fontFamily: "'Outfit', sans-serif", fontSize: "24px", fontWeight: 800, letterSpacing: "-0.04em", color: "#09090b" },
     logoDot: { color: "#b45309" },
     beta: { fontSize: "9px", color: "#fff", padding: "2px 6px", background: "#b45309", borderRadius: "6px", fontWeight: 500, marginLeft: "6px", verticalAlign: "middle" },
     navRight: { display: "flex", alignItems: "center", gap: "16px" },
