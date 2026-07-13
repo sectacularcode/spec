@@ -452,7 +452,8 @@ export default function StyleGuide({ role }) {
   }
 
   return (
-    <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "32px 24px 64px", fontFamily: "'Be Vietnam Pro', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#eeedf1", fontFamily: "'Be Vietnam Pro', sans-serif" }}>
+    <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "32px 24px 64px" }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "20px" }}>
         <div>
           <h1 style={{ fontSize: "28px", fontWeight: 700, margin: "0 0 4px" }}>Style guide</h1>
@@ -662,6 +663,7 @@ export default function StyleGuide({ role }) {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }

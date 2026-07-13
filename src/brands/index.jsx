@@ -167,7 +167,15 @@ export default function Brands() {
   const filtered = brands.filter(b => !search.trim() || b.name.toLowerCase().includes(search.trim().toLowerCase()));
 
   const S = {
-    wrap: { maxWidth: "1100px", margin: "0 auto", padding: "40px 24px", fontFamily: "'Be Vietnam Pro', sans-serif" },
+    // Two layers, matching Template Studio's and Brief to Blueprint's
+    // actual structure -- page is full-bleed (fills the viewport, gray
+    // canvas edge to edge), inner is the centered max-width content
+    // column. Backgrounding the maxWidth column directly (what this used
+    // to have no background at all, then briefly one draft of this fix)
+    // would leave white margins on either side on any screen wider than
+    // 1100px instead of a true full-bleed canvas.
+    page: { minHeight: "100vh", background: "#eeedf1", fontFamily: "'Be Vietnam Pro', sans-serif" },
+    wrap: { maxWidth: "1100px", margin: "0 auto", padding: "40px 24px" },
     header: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px", gap: "16px", flexWrap: "wrap" },
     title: { fontSize: "22px", fontWeight: 700, color: "#09090b" },
     sub: { fontSize: "13px", color: "#6b7280", marginTop: "4px" },
@@ -204,6 +212,7 @@ export default function Brands() {
     const shortId = id => id ? id.slice(0, 12) + "…" : "—";
     const displayName = (name, id) => name || (id ? shortId(id) : "—");
     return (
+      <div style={S.page}>
       <div style={S.wrap}>
         <button style={S.backBtn} onClick={backToGrid}>← Back to Component Library</button>
         <div style={S.formWrap}>
@@ -288,10 +297,12 @@ export default function Brands() {
           onCancel={() => setDeleteTarget(null)}
         />
       </div>
+      </div>
     );
   }
 
   return (
+    <div style={S.page}>
     <div style={S.wrap}>
       <div style={S.header}>
         <div>
@@ -321,6 +332,7 @@ export default function Brands() {
           ))}
         </div>
       )}
+    </div>
     </div>
   );
 }
