@@ -3,19 +3,26 @@ import { authHeaders } from "../utils/api.js";
 import ButtonEditor from "../style-guide/components/ButtonEditor.jsx";
 import { ConfirmDialog } from "../components/ConfirmDialog.jsx";
 
-// Matches COLOR_KEYS in api/_lib/brandValidation.js exactly -- kept as a
-// separate frontend constant rather than importing across the api/src
-// boundary, same as every other tool in this app already does for its own
-// color-key lists.
+// The keys (ink, brass, brass-deep, etc.) match COLOR_KEYS in
+// api/_lib/brandValidation.js exactly and must stay as-is -- they're
+// Manifest's fixed export schema ("field names must match exactly", per
+// the integration requirements), not meant to be read by a person. The
+// labels are a different story: these are literally one early example
+// client's (Mile Marker Films) own evocative color names, generalized
+// into a universal schema -- "Brass" means nothing on a coffee roaster's
+// or a law firm's brand. Reusing Style Guide's exact ROLE_TO_KEY label
+// text here (same file, different vocabulary would just be a second
+// inconsistency) so both tools describe the same underlying key the same
+// way.
 const COLOR_FIELDS = [
-  { key: "ink", label: "Ink" },
-  { key: "brass", label: "Brass" },
-  { key: "brass-deep", label: "Brass — deep" },
-  { key: "bone", label: "Bone" },
-  { key: "asphalt", label: "Asphalt" },
-  { key: "stone", label: "Stone" },
-  { key: "warm-white", label: "Warm white" },
-  { key: "text", label: "Text" },
+  { key: "ink", label: "Heading" },
+  { key: "brass", label: "Accent" },
+  { key: "brass-deep", label: "Accent — hover" },
+  { key: "bone", label: "Background" },
+  { key: "asphalt", label: "Dark panel" },
+  { key: "stone", label: "Muted" },
+  { key: "warm-white", label: "Text on dark" },
+  { key: "text", label: "Body text" },
 ];
 
 function emptyBrand() {
@@ -190,9 +197,12 @@ export default function Brands() {
   if (view === "form" && editing) {
     const isNew = !brands.find(b => b.id === editing.id);
     const structureRows = (editing.feature_layout || []).length + (editing.post_closing_layout || []).length;
-    // Same truncation convention as the Saved Style Guides admin panel —
-    // a full Clerk user_id isn't meaningfully readable in full anyway.
+    // created_by_name/updated_by_name come resolved from the API (Clerk
+    // lookup, same mechanism AdminPanel's Users list already uses) --
+    // shortId is only the last-resort fallback for the rare case Clerk
+    // lookup misses (e.g. a deleted account), not the normal path anymore.
     const shortId = id => id ? id.slice(0, 12) + "…" : "—";
+    const displayName = (name, id) => name || (id ? shortId(id) : "—");
     return (
       <div style={S.wrap}>
         <button style={S.backBtn} onClick={backToGrid}>← Back to Component Library</button>
@@ -202,7 +212,7 @@ export default function Brands() {
             <input style={S.input} value={editing.name} onChange={e => setEditing({ ...editing, name: e.target.value })} placeholder="e.g. Northfield Coffee Roasters" />
             {!isNew && (
               <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "6px" }}>
-                Added by {shortId(editing.created_by)} · Last updated by {shortId(editing.updated_by)}
+                Added by {displayName(editing.created_by_name, editing.created_by)} · Last updated by {displayName(editing.updated_by_name, editing.updated_by)}
               </div>
             )}
           </div>

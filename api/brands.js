@@ -34,7 +34,24 @@ import { logError } from "./_lib/errorLog.js";
 import {
   sanitizeColors, sanitizeFonts, sanitizeButtons, sanitizeSectionLayout,
 } from "./_lib/brandValidation.js";
+import { clerkGetUsers } from "./_lib/clerkUsers.js";
 import { sql } from "@vercel/postgres";
+
+// Resolves created_by/updated_by on a batch of rows to real display names
+// in one shot -- a single batched Clerk call regardless of how many rows
+// or how many distinct users are involved, same pattern user-role.js
+// already uses for the Users list. Falls back to null (not the raw id --
+// that's the frontend's call, same as AdminPanel's own name-or-email-or-id
+// fallback) when a lookup misses, e.g. a deleted Clerk account.
+async function attachUserNames(rows) {
+  const ids = [...new Set(rows.flatMap(r => [r.created_by, r.updated_by]).filter(Boolean))];
+  const users = await clerkGetUsers(ids);
+  return rows.map(r => ({
+    ...r,
+    created_by_name: users[r.created_by]?.name || users[r.created_by]?.email || null,
+    updated_by_name: r.updated_by ? (users[r.updated_by]?.name || users[r.updated_by]?.email || null) : null,
+  }));
+}
 
 // Browsing the full list (and, for now, single-id lookup -- only reachable
 // from that same admin-only grid today) stays the admin management
@@ -124,25 +141,28 @@ export default async function handler(req, res) {
       if (manifestBrandId) {
         if (!validText(manifestBrandId, 200)) return res.status(400).json({ error: "Invalid manifest_brand_id" });
         const { rows } = await sql`SELECT * FROM brands WHERE manifest_brand_id = ${manifestBrandId} LIMIT 1`;
-        return res.status(200).json({ brand: rows[0] || null });
+        const [resolved] = rows[0] ? await attachUserNames(rows) : [null];
+        return res.status(200).json({ brand: resolved });
       }
 
       const name = req.query.name;
       if (name) {
         if (!validText(name, 200)) return res.status(400).json({ error: "Invalid name" });
         const { rows } = await sql`SELECT * FROM brands WHERE LOWER(name) = LOWER(${name}) LIMIT 1`;
-        return res.status(200).json({ brand: rows[0] || null });
+        const [resolved] = rows[0] ? await attachUserNames(rows) : [null];
+        return res.status(200).json({ brand: resolved });
       }
 
       const id = req.query.id;
       if (id) {
         if (!validId(id)) return res.status(400).json({ error: "Invalid id" });
         const { rows } = await sql`SELECT * FROM brands WHERE id = ${id} LIMIT 1`;
-        return res.status(200).json({ brand: rows[0] || null });
+        const [resolved] = rows[0] ? await attachUserNames(rows) : [null];
+        return res.status(200).json({ brand: resolved });
       }
 
       const { rows } = await sql`SELECT * FROM brands ORDER BY updated_at DESC`;
-      return res.status(200).json({ brands: rows });
+      return res.status(200).json({ brands: await attachUserNames(rows) });
     }
 
     if (req.method === "POST") {
@@ -278,9 +298,10 @@ export default async function handler(req, res) {
       }
 
       const { rows: saved } = await sql`SELECT * FROM brands WHERE id = ${id}`;
+      const [savedResolved] = await attachUserNames(saved);
       return res.status(200).json({
         ok: true,
-        brand: saved[0],
+        brand: savedResolved,
         droppedColorKeys: droppedColorKeys.length ? droppedColorKeys : undefined,
         droppedFontKeys: droppedFontKeys.length ? droppedFontKeys : undefined,
         droppedButtonCount: droppedButtonCount || undefined,

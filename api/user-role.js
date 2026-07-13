@@ -10,31 +10,9 @@
 import { requireAuth, getProfile, ensureProfilesTable } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { logError } from "./_lib/errorLog.js";
+import { clerkGetUsers } from "./_lib/clerkUsers.js";
 import { sql } from "@vercel/postgres";
 
-const CLERK_SECRET = process.env.CLERK_SECRET_KEY;
-
-// Fetch user details (name, email) from Clerk for a list of user IDs
-async function clerkGetUsers(userIds) {
-  if (!CLERK_SECRET || !userIds.length) return {};
-  try {
-    const params = userIds.map(id => `user_id[]=${encodeURIComponent(id)}`).join("&");
-    const res = await fetch(`https://api.clerk.com/v1/users?${params}&limit=100`, {
-      headers: { Authorization: `Bearer ${CLERK_SECRET}` },
-    });
-    if (!res.ok) return {};
-    const data = await res.json();
-    const map = {};
-    for (const u of data) {
-      const primaryEmail = u.email_addresses?.find(e => e.id === u.primary_email_address_id);
-      const name = [u.first_name, u.last_name].filter(Boolean).join(" ") || null;
-      map[u.id] = { name, email: primaryEmail?.email_address || null };
-    }
-    return map;
-  } catch {
-    return {};
-  }
-}
 
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
