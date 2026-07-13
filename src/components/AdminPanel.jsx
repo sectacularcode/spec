@@ -277,7 +277,8 @@ export default function AdminPanel({ isAdmin }) {
   }
 
   const S = {
-    wrap: { background: "#fff", border: "1px solid #dde0e6", borderRadius: "10px", overflow: "hidden", marginTop: "32px", fontFamily: "'Be Vietnam Pro', sans-serif" },
+    page: { background: "#eeedf1", padding: "20px", display: "flex", flexDirection: "column", gap: "16px", fontFamily: "'Be Vietnam Pro', sans-serif" },
+    card: { background: "#fff", border: "1px solid #dde0e6", borderRadius: "10px", overflow: "hidden" },
     header: { padding: "16px 20px", borderBottom: "1px solid #dde0e6", display: "flex", justifyContent: "space-between", alignItems: "center" },
     headerTitle: { fontSize: "13px", fontWeight: 700, color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em" },
     addBlock: { padding: "20px", borderBottom: "1px solid #dde0e6", background: "#fafafa" },
@@ -324,7 +325,8 @@ export default function AdminPanel({ isAdmin }) {
   };
 
   return (
-    <div style={S.wrap}>
+    <div style={S.page}>
+      <div style={S.card}>
       <div style={S.header}>
         <div style={S.headerTitle}>User Management</div>
         <button style={S.btnSecondary} onClick={loadUsers}>Refresh</button>
@@ -420,11 +422,12 @@ export default function AdminPanel({ isAdmin }) {
           ))}
         </div>
       )}
+      </div>
 
       {/* Usage & Limits — admin only, per explicit instruction; managers see
           the user table above but not spend/limit data. */}
       {isAdmin && (
-        <div style={{ borderTop: "1px solid #dde0e6" }}>
+        <div style={S.card}>
           <div style={S.header}>
             <div style={S.headerTitle}>Usage &amp; Limits — This Month</div>
             <div style={{ display: "flex", gap: "8px" }}>
@@ -552,7 +555,7 @@ export default function AdminPanel({ isAdmin }) {
           not routine 400/401 rejections) written by api/_lib/errorLog.js.
           Read-only; no delete/clear yet. */}
       {isAdmin && (
-        <div style={{ borderTop: "1px solid #dde0e6" }}>
+        <div style={S.card}>
           <div style={S.header}>
             <div style={S.headerTitle}>Error Log</div>
             <button style={S.btnSecondary} onClick={loadErrorLogs} disabled={errorLogsLoading}>
@@ -601,7 +604,7 @@ export default function AdminPanel({ isAdmin }) {
           grouped by normalized query text -- captures every resolved
           attempt, not just ones the person explicitly saved. Read-only. */}
       {isAdmin && (
-        <div style={{ borderTop: "1px solid #dde0e6" }}>
+        <div style={S.card}>
           <div style={S.header}>
             <div style={S.headerTitle}>Template Queries</div>
             <button style={S.btnSecondary} onClick={loadTemplateQueries} disabled={templateQueriesLoading}>
