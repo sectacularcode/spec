@@ -1,4 +1,4 @@
-import { selectPatterns, parseInspoPatterns } from "../utils/patterns.js";
+import { selectPatterns } from "../utils/patterns.js";
 import { he } from "../utils/htmlEscape.js";
 import { buildLandingPreview } from "./pages/landingPreview.js";
 
@@ -48,9 +48,20 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
   if (baseActivePage === "services") {
     patterns.services = (variant === "B") ? "alternating-rows" : "card-grid";
   }
-  if (baseActivePage === "home") {
-    patterns.hero = (variant === "B") ? "split-left" : "centered-bold";
-  }
+  // NOTE: no generic "home" entry here (removed) -- the special-case block
+  // above already fully handles home's A/B/C hero+services combination.
+  // This block used to ALSO set patterns.hero for home via a plain A/B
+  // ternary, which ran unconditionally right after the special-case block
+  // and silently overwrote its correct C-variant "minimal" value back to
+  // "centered-bold" every time (variant "C" !== "B", so the ternary's
+  // false branch always fired) -- home page variant C's hero rendered
+  // identically to variant A while its services section correctly stayed
+  // on the C layout, a real, confirmed, live inconsistency. Verified
+  // patterns.hero is genuinely read downstream (used to build the hero
+  // section HTML) before removing this, and confirmed no other page type
+  // has this same double-block collision -- home is the only page with a
+  // preceding special-case override, everything else is handled by this
+  // generic block alone.
   if (baseActivePage === "about") {
     patterns.about = (variant === "B") ? "team-grid" : "split-image";
   }
@@ -62,9 +73,6 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
   }
   if (baseActivePage === "work") {
     patterns.portfolio = (variant === "B") ? "case-study-cards" : "masonry-grid";
-  }
-  if (baseActivePage === "landing") {
-    patterns.landing = (variant === "B") ? "split-light" : "centered-dark";
   }
   if (baseActivePage === "team") {
     patterns.team = (variant === "B") ? "featured-founder" : "photo-grid";
@@ -93,27 +101,16 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
   if (baseActivePage === "portfolio") {
     patterns.portfolio = (variant === "B") ? "editorial" : "dark-grid";
   }
-  if (baseActivePage === "location") {
-    patterns.location = (variant === "B") ? "centered" : "map-split";
-  }
-  if (baseActivePage === "press") {
-    patterns.press = (variant === "B") ? "featured-hero" : "list";
-  }
-  if (baseActivePage === "partners") {
-    patterns.partners = (variant === "B") ? "description-list" : "logo-grid";
-  }
-  if (baseActivePage === "resources") {
-    patterns.resources = (variant === "B") ? "category-list" : "card-grid";
-  }
-  if (baseActivePage === "downloads") {
-    patterns.downloads = (variant === "B") ? "card-grid" : "simple-list";
-  }
-  if (baseActivePage === "blog-post") {
-    patterns["blog-post"] = (variant === "B") ? "wide-editorial" : "narrow-centered";
-  }
-  if (baseActivePage === "event-single") {
-    patterns["event-single"] = (variant === "B") ? "light-centered" : "dark-hero";
-  }
+  // No override entries here for landing, location, press, partners,
+  // resources, downloads, blog-post, or event-single -- their sections
+  // (below) branch on `variant` directly rather than reading a
+  // patterns.X value, so a patterns.X entry for them would be computed
+  // and never consumed. Confirmed this by tracing each one individually
+  // before removing 8 exactly such dead assignments that were here.
+  // landing's rendering lives entirely in ./pages/landingPreview.js and
+  // takes variant as its own direct parameter; the other 7 check
+  // `variant === "B"` inline within their own section function.
+
   // Per-key fallbacks for every color, not a single object-level check —
   // brief.colors can be a present-but-empty object (confirmed: every
   // Manifest import has brief.colors === {}, since Manifest's export

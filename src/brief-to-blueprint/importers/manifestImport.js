@@ -22,12 +22,6 @@
 const REQUIRED_BRAND_FIELDS = ["id", "name"];
 const REQUIRED_PAGE_FIELDS = ["id", "status", "blocks"];
 
-// Element types Spec currently has a widget for. Anything outside this list
-// still gets carried through (into brief._unmappedBlocks) instead of silently
-// dropped, so the caller can surface "N blocks from this import weren't
-// placed" instead of copy quietly going missing.
-const MAPPED_TYPES = ["hero", "trust_stats", "feature", "faq", "testimonial", "map", "closing_cta"];
-
 // Restricts a URL to safe schemes (http/https/tel/mailto/relative/anchor).
 // Manifest export data is external, untrusted input — a URL field could
 // carry a javascript: URI or similar. Duplicated here (rather than imported
@@ -177,6 +171,21 @@ function legacyManifestToBrief(raw) {
         brief.closingBody = block.body || "";
         break;
 
+      // Element types Spec currently has a widget for are exactly the case
+      // labels above (hero, trust_stats, feature, faq, testimonial, map,
+      // closing_cta). Anything outside that list falls through to here and
+      // still gets carried through (into brief._unmappedBlocks) instead of
+      // silently dropped, so the caller can surface "N blocks from this
+      // import weren't placed" instead of copy quietly going missing.
+      //
+      // This used to be tracked separately as a MAPPED_TYPES array, defined
+      // but never actually referenced anywhere -- this switch's own case
+      // list was already the real, active source of truth, and the array
+      // was dead weight duplicating it. Removed the array; if a genuine
+      // need for a standalone list of known types comes up later (e.g. for
+      // validation before this switch runs), derive it from these case
+      // labels rather than maintaining a second hardcoded copy that can
+      // drift out of sync with what's actually handled below.
       default:
         brief._unmappedBlocks.push({
           elementType: block.elementType,
