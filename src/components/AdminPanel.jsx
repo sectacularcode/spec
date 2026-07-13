@@ -697,7 +697,19 @@ export default function AdminPanel({ isAdmin }) {
           ) : templateQueries.length === 0 ? (
             <div style={S.empty}>Nothing logged yet.</div>
           ) : (
-            <table style={S.table}>
+            // Same overflow-x wrapper as Saved Style Guides below, for the
+            // same reason -- an 8-column table with a free-text Query
+            // column (people type full sentences into "Describe your
+            // site") is routinely wider than the panel. Also overrides
+            // S.table's width:100% with width:auto + minWidth:100%: at
+            // 100% fixed, the table can never actually exceed its
+            // container, so it was squeezing/wrapping every column
+            // instead of the wrapper ever getting a chance to scroll --
+            // width:auto lets it grow to its real content width when
+            // that's wider than the panel, which is what makes the scroll
+            // wrapper meaningful in the first place.
+            <div style={{ overflowX: "auto" }}>
+            <table style={{ ...S.table, width: "auto", minWidth: "100%" }}>
               <thead>
                 <tr>
                   <th style={S.th}>Query</th>
@@ -713,7 +725,7 @@ export default function AdminPanel({ isAdmin }) {
               <tbody>
                 {templateQueries.map(q => (
                   <tr key={q.normalized_query}>
-                    <td style={S.td}>{q.normalized_query}</td>
+                    <td style={{ ...S.td, maxWidth: "280px" }}>{q.normalized_query}</td>
                     <td style={S.td}>{q.total_count}</td>
                     <td style={S.td}>{q.custom_count > 0 ? q.custom_count : "—"}</td>
                     <td style={S.td}>{q.matched_count > 0 ? q.matched_count : "—"}</td>
@@ -724,11 +736,12 @@ export default function AdminPanel({ isAdmin }) {
                         ? `${q.color_retry_succeeded_count} / ${q.color_retry_fired_count}`
                         : "—"}
                     </td>
-                    <td style={S.td}>{new Date(q.last_seen).toLocaleString()}</td>
+                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>{new Date(q.last_seen).toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            </div>
           )}
 
           <div style={{ padding: "10px 20px 16px", fontSize: "11px", color: "#9ca3af" }}>
@@ -771,8 +784,16 @@ export default function AdminPanel({ isAdmin }) {
             // URLs. This guarantees every column stays reachable (via
             // scroll) instead of some of them being invisibly cropped,
             // regardless of how long any individual value gets.
+            //
+            // The wrapper alone wasn't actually enough, though -- S.table
+            // sets width:100%, which means the table could never exceed
+            // its container in the first place, so it was squeezing/
+            // wrapping columns instead of the scroll wrapper ever
+            // engaging. width:auto + minWidth:100% below lets it grow
+            // past 100% when the real content needs it, which is what
+            // actually makes overflow-x meaningful here.
             <div style={{ overflowX: "auto" }}>
-            <table style={S.table}>
+            <table style={{ ...S.table, width: "auto", minWidth: "100%" }}>
               <thead>
                 <tr>
                   <th style={S.th}>Brand</th>
