@@ -54,6 +54,7 @@ import {
   retryFontChoice,
 } from "../utils/fontRequestCheck.js";
 import { sanitizeImageCategory } from "./utils/images.js";
+import { mapExternalBrandToTemplateStudio } from "../utils/externalBrandMapping.js";
 import { scanForLegacyContent, regenerateHeadings, applyLegacyContentFixes } from "../utils/legacyContentRepair.js";
 
 // Styles
@@ -130,6 +131,12 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
   const [savedBuilds, setSavedBuilds] = useState([]); // Blueprint builds saved to library
   const [keywordBuilds, setKeywordBuilds] = useState([]); // Keyword-generated custom builds
   const [libraryFilter, setLibraryFilter] = useState({ visual: "", industry: "" }); // browser filters
+  // Guards the "Use as New Template" button against a rapid double-click
+  // creating two projects -- tracks which specific build (by id) currently
+  // has a conversion in flight, so the button disables itself immediately
+  // on click and re-enables once done, without needing a global loading flag
+  // that would disable every card's button for one card's action.
+  const [usingBuildId, setUsingBuildId] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -2026,6 +2033,42 @@ Rules:
                             }}
                             style={{ flex: 1, padding: "9px 0", fontSize: "12px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
                             Download Pages
+                          </button>
+                          <button
+                            disabled={usingBuildId === build.id}
+                            onClick={() => {
+                              if (usingBuildId) return; // already converting some card -- ignore extra clicks anywhere
+                              setUsingBuildId(build.id);
+                              // Colors/fonts only, by design -- B2B's Elementor-block page
+                              // content has no equivalent in Template Studio's Hero/About/
+                              // Services field model, so this deliberately doesn't attempt
+                              // to migrate content, only the brand's visual identity. The
+                              // new project starts on Template Studio's own blank-page
+                              // defaults, ready to build out normally.
+                              const mapped = mapExternalBrandToTemplateStudio(build.colors, build.fonts);
+                              const newBrand = {
+                                ...BLANK_BRAND,
+                                ...mapped,
+                                name: build.client || "New Project",
+                                description: build.description || "",
+                                industry: (build.industryFit || [])[0] || "",
+                                themeId: "custom-brand",
+                                themeMode: mapped.primaryColor && (function(hex) {
+                                  const h = hex.replace("#", "");
+                                  const rr = parseInt(h.slice(0, 2), 16), gg = parseInt(h.slice(2, 4), 16), bb = parseInt(h.slice(4, 6), 16);
+                                  return (0.299 * rr + 0.587 * gg + 0.114 * bb) / 255 < 0.5;
+                                })(mapped.primaryColor) ? "dark" : "light",
+                              };
+                              const newPageObj = newPage("Homepage", "Homepage");
+                              const newId = `proj-${Date.now()}`;
+                              setProjects(ps => [...ps, { id: newId, name: newBrand.name, brand: newBrand, pages: [newPageObj] }]);
+                              setActiveId(newId);
+                              setPageIdx(0);
+                              setView("editor");
+                              setUsingBuildId(null);
+                            }}
+                            style={{ padding: "9px 12px", fontSize: "12px", fontWeight: 600, background: usingBuildId === build.id ? "#dde0e6" : "#fff", color: usingBuildId === build.id ? "#9ca3af" : "#b45309", border: "1px solid " + (usingBuildId === build.id ? "#dde0e6" : "#b45309"), borderRadius: "6px", cursor: usingBuildId === build.id ? "default" : "pointer", whiteSpace: "nowrap" }}>
+                            {usingBuildId === build.id ? "Creating…" : "Use as New Template"}
                           </button>
                           <button
                             onClick={async () => {
