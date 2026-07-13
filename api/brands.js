@@ -2,32 +2,29 @@
 //
 // Unlike every other table in this app, rows here are NOT scoped by
 // user_id — a client isn't "owned" by whoever created it, it's a team
-// resource. Permission is per-operation, not one blanket role check:
-//   - Browsing the full list is the admin management surface.
-//   - Saving a brand's style (from Brief to Blueprint's or Style Guide's
-//     Save button) is open to any authenticated user with tool access --
-//     that's the actual day-to-day work, not an admin-only action.
-//   - Delete is its own, stricter tier (admin/manager), since it's
-//     destructive and writes aren't.
-// created_by/updated_by are audit/display only ("added by X" / "last
-// touched by Y"), never used as an access check themselves.
+// resource. Reads and writes are open to any authenticated user with tool
+// access (this is the actual day-to-day work: saving a brand's style from
+// Brief to Blueprint or Style Guide, and browsing/reusing what's already
+// saved). Delete is the one stricter tier (admin/manager), since it's
+// destructive and reads/writes aren't. created_by/updated_by are
+// audit/display only ("added by X" / "last touched by Y"), never used as
+// an access check themselves.
 //
-// GET    /api/brands                          — list every brand (admin only)
-// GET    /api/brands?id=X                      — one brand's full profile (admin only)
-// GET    /api/brands?name=X                    — case-insensitive lookup by name (any
-//                                                authenticated user -- lets Brief to
-//                                                Blueprint/Style Guide's Save button find
-//                                                an existing brand to update instead of
-//                                                minting a colliding duplicate)
+// GET    /api/brands                          — list every brand
+// GET    /api/brands?id=X                      — one brand's full profile
+// GET    /api/brands?name=X                    — case-insensitive lookup by name --
+//                                                lets Brief to Blueprint/Style Guide's
+//                                                Save button find an existing brand to
+//                                                update instead of minting a colliding
+//                                                duplicate
 // GET    /api/brands?manifest_brand_id=X       — lookup by Manifest's stable brand id
-//                                                (any authenticated user, same reasoning
-//                                                as the name lookup -- for the future
-//                                                auto-link step, not wired yet)
+//                                                (for the future auto-link step, not
+//                                                wired yet)
 // POST   /api/brands                          — { id, name, manifest_brand_id?, colors?,
 //                                                fonts?, buttons?, feature_layout?,
 //                                                post_closing_layout?,
 //                                                skip_services_checklist?, source_url? }
-//                                                — upsert by id (any authenticated user)
+//                                                — upsert by id
 // DELETE /api/brands?id=X                     — remove one brand (admin/manager only)
 
 import { requireAuth, getProfile } from "./_lib/auth.js";
@@ -46,7 +43,11 @@ import { sql } from "@vercel/postgres";
 // anyone with tool access, since those are the people actually doing
 // client work day to day. Delete is its own tier: destructive, so it
 // stays above staff even though writes don't.
-const BROWSE_ROLES = ["admin"];
+// Browsing is now open to anyone authenticated -- colors/fonts aren't
+// sensitive, and restricting reads broke the exact people this table is
+// meant to help (Style Guide's Saved Library needs to show the whole
+// team's saved styles, not just the caller's own). Delete stays its own,
+// stricter tier below.
 const DELETE_ROLES = ["admin", "manager"];
 
 const MAX_NAME_LEN = 200;
@@ -135,13 +136,11 @@ export default async function handler(req, res) {
 
       const id = req.query.id;
       if (id) {
-        if (!BROWSE_ROLES.includes(profile.role)) return res.status(403).json({ error: "Forbidden" });
         if (!validId(id)) return res.status(400).json({ error: "Invalid id" });
         const { rows } = await sql`SELECT * FROM brands WHERE id = ${id} LIMIT 1`;
         return res.status(200).json({ brand: rows[0] || null });
       }
 
-      if (!BROWSE_ROLES.includes(profile.role)) return res.status(403).json({ error: "Forbidden" });
       const { rows } = await sql`SELECT * FROM brands ORDER BY updated_at DESC`;
       return res.status(200).json({ brands: rows });
     }

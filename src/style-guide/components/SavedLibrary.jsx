@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { bestTextColor } from "../../utils/contrast.js";
 
-// Collapsible list of every saved brand style for this user. Reused as-is
-// regardless of source (manual entry, Style Guide URL-scrape, or a
-// previous upload) -- brand_styles doesn't distinguish, and neither does
-// this list; source_url just renders differently per row when present.
-export default function SavedLibrary({ styles, loading, onApply, onDelete, statusMessage }) {
+// Collapsible list of every saved brand style, shared across the whole
+// team now that this reads from brands instead of the old per-user
+// brand_styles table. Reused as-is regardless of source (manual entry,
+// Style Guide URL-scrape, or a previous upload) -- brands doesn't
+// distinguish, and neither does this list; source_url just renders
+// differently per row when present.
+export default function SavedLibrary({ styles, loading, onApply, onDelete, statusMessage, canDelete }) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -45,7 +47,7 @@ export default function SavedLibrary({ styles, loading, onApply, onDelete, statu
             const buttonTextColor = realButton?.textColor || (accentHex ? bestTextColor(accentHex, style.colors?.text || "#1a1a1a") : null);
             return (
             <div
-              key={style.brand_name}
+              key={style.id}
               style={{
                 display: "flex", alignItems: "center", gap: "16px", padding: "14px 0",
                 borderBottom: i === styles.length - 1 ? "none" : "1px solid #DDE0E6",
@@ -64,14 +66,14 @@ export default function SavedLibrary({ styles, loading, onApply, onDelete, statu
                 </div>
               )}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{style.brand_name}</p>
+                <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{style.name}</p>
                 <p style={{ fontSize: "11px", color: "#6B7280", margin: "2px 0 0" }}>
                   {style.source_url ? new URL(style.source_url).hostname : "entered manually"}
                   {" · updated "}{formatRelativeDate(style.updated_at)}
                 </p>
               </div>
               <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
-                <button onClick={() => onDelete(style)} style={secondaryBtn}>Delete</button>
+                {canDelete && <button onClick={() => onDelete(style)} style={secondaryBtn}>Delete</button>}
                 <button onClick={() => onApply(style)} style={applyBtn}>Apply</button>
               </div>
             </div>

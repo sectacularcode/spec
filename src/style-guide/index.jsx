@@ -10,8 +10,8 @@ import { parseStyleGuideHtml } from "./utils/export.js";
 import { ConfirmDialog } from "../components/ConfirmDialog.jsx";
 import { bestTextColor } from "../utils/contrast.js";
 
-// Spec's 8 template color roles <-> the fixed keys brand_styles actually
-// stores (see api/brand-styles.js's COLOR_KEYS). Custom/"Additional"
+// Spec's 8 template color roles <-> the fixed keys brands actually
+// stores (see api/_lib/brandValidation.js's COLOR_KEYS). Custom/"Additional"
 // colors are NOT part of this map on purpose -- see the note above
 // saveToLibrary() below for why they don't persist to the library yet.
 const ROLE_TO_KEY = {
@@ -83,10 +83,10 @@ export default function StyleGuide({ role }) {
   const loadSavedStyles = useCallback(async () => {
     setLoadingStyles(true);
     try {
-      const res = await fetch("/api/brand-styles", { headers: await authHeaders() });
+      const res = await fetch("/api/brands", { headers: await authHeaders() });
       if (res.ok) {
         const data = await res.json();
-        setSavedStyles(data.styles || []);
+        setSavedStyles(data.brands || []);
       }
     } catch {
       // Saved-styles list is a convenience view, not required for the
@@ -335,8 +335,8 @@ export default function StyleGuide({ role }) {
   };
 
   // Custom ("Additional colors") entries and any font beyond Heading/Body
-  // don't have a place to live in brand_styles yet -- COLOR_KEYS there is
-  // a fixed 8-slot allowlist by design, and fonts is just {heading, body}.
+  // don't have a place to live in brands yet -- COLOR_KEYS there is a
+  // fixed 8-slot allowlist by design, and fonts is just {heading, body}.
   // They still work for the document/exports generated from THIS session,
   // they just don't round-trip through the saved library until that
   // schema grows to support them. Flagged in the save status rather than
@@ -350,11 +350,19 @@ export default function StyleGuide({ role }) {
     const droppedCustomColors = colors.filter(c => c.custom).length;
     const droppedExtraFonts = Math.max(0, fonts.filter(f => !f.custom).length - 2) + fonts.filter(f => f.custom).length;
     try {
-      const res = await fetch("/api/brand-styles", {
+      // brands is shared and keyed by id, not by name the way brand_styles
+      // was -- look up whether this client already has a profile first, so
+      // re-saving updates their existing row instead of colliding on the
+      // name-uniqueness check or minting a duplicate.
+      const lookupRes = await fetch("/api/brands?name=" + encodeURIComponent(brandName.trim()), { headers: await authHeaders() });
+      const existing = lookupRes.ok ? (await lookupRes.json()).brand : null;
+      const id = existing ? existing.id : "brand-" + Date.now();
+      const res = await fetch("/api/brands", {
         method: "POST",
         headers: await authHeaders(),
         body: JSON.stringify({
-          brand_name: brandName.trim(),
+          id,
+          name: brandName.trim(),
           colors: colorsToKeyedObject(colors),
           fonts: fontsToKeyedObject(fonts),
           buttons,
@@ -380,7 +388,7 @@ export default function StyleGuide({ role }) {
           notes.push(`⚠ ${data.droppedButtonCount} button${data.droppedButtonCount > 1 ? "s" : ""} had an invalid color and didn't save`);
         }
         const noteText = notes.length ? ` (${notes.join("; ")}.)` : "";
-        setSaveStatus(`Saved as ${data.brand_name}'s style guide.${noteText}`);
+        setSaveStatus(`Saved as ${data.brand?.name}'s style guide.${noteText}`);
         loadSavedStyles();
       } else {
         setSaveStatus(formatErrorMessage(role, res.status, data.error, "Couldn't save — try again."));
@@ -392,12 +400,12 @@ export default function StyleGuide({ role }) {
   }
 
   function applyStyle(style) {
-    setBrandName(style.brand_name);
+    setBrandName(style.name);
     setColors(keyedObjectToColors(style.colors));
     setFonts(keyedObjectToFonts(style.fonts));
     setButtons(Array.isArray(style.buttons) ? style.buttons : []);
     setSourceUrl(style.source_url || "");
-    setSaveStatus(`Loaded ${style.brand_name}'s style guide for editing.`);
+    setSaveStatus(`Loaded ${style.name}'s style guide for editing.`);
     setTimeout(() => setSaveStatus(""), 4000);
   }
 
@@ -410,7 +418,7 @@ export default function StyleGuide({ role }) {
     if (!style) return;
     setPendingDeleteStyle(null);
     try {
-      const res = await fetch(`/api/brand-styles?brand_name=${encodeURIComponent(style.brand_name)}`, {
+      const res = await fetch(`/api/brands?id=${encodeURIComponent(style.id)}`, {
         method: "DELETE",
         headers: await authHeaders(),
       });
@@ -418,7 +426,14 @@ export default function StyleGuide({ role }) {
         loadSavedStyles();
       } else {
         const data = await res.json().catch(() => ({}));
-        setDeleteStatus(formatErrorMessage(role, res.status, data.error, "Couldn't delete — try again."));
+        // 403 here specifically means "you don't have delete permission"
+        // (staff can save/browse but not delete, see api/brands.js) --
+        // worth a clearer message than the generic fallback, since
+        // "try again" would be actively misleading for this one.
+        const fallback = res.status === 403
+          ? "Only managers and admins can delete a saved style guide."
+          : "Couldn't delete — try again.";
+        setDeleteStatus(formatErrorMessage(role, res.status, data.error, fallback));
         setTimeout(() => setDeleteStatus(""), 6000);
       }
     } catch (e) {
@@ -583,6 +598,7 @@ export default function StyleGuide({ role }) {
         onApply={applyStyle}
         onDelete={requestDeleteStyle}
         statusMessage={deleteStatus}
+        canDelete={role === "admin" || role === "manager"}
       />
 
       <ConfirmDialog
@@ -596,8 +612,8 @@ export default function StyleGuide({ role }) {
 
       <ConfirmDialog
         open={!!pendingDeleteStyle}
-        title={pendingDeleteStyle ? `Delete ${pendingDeleteStyle.brand_name}'s saved style guide?` : ""}
-        message="This permanently removes it from your saved library and can't be undone."
+        title={pendingDeleteStyle ? `Delete ${pendingDeleteStyle.name}'s saved style guide?` : ""}
+        message="This removes it from the shared saved library for the whole team, not just you, and can't be undone."
         confirmLabel="Delete"
         onConfirm={confirmDeleteStyle}
         onCancel={() => setPendingDeleteStyle(null)}

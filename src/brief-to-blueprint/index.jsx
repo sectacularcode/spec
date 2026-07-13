@@ -30,7 +30,7 @@ import { estimateGenerationCost } from "./utils/estimateCost.js";
 import { manifestToBrief, ManifestImportError } from "./importers/manifestImport.js";
 
 // Fixed 8-slot color model used everywhere else in Brief to Blueprint (see
-// COLOR_KEYS in api/brand-styles.js and colorNames in IntakeForm.jsx) --
+// COLOR_KEYS in api/_lib/brandValidation.js and colorNames in IntakeForm.jsx) --
 // keys are canonical and not user-renameable, only the hex values are
 // editable here.
 const COLOR_FIELDS = [
@@ -529,12 +529,12 @@ export default function CustomBuild({ userId, role } = {}) {
   async function fetchSavedStyle(brandName) {
     if (!brandName || !brandName.trim()) return null;
     try {
-      const res = await fetch("/api/brand-styles?brand_name=" + encodeURIComponent(brandName.trim()), {
+      const res = await fetch("/api/brands?name=" + encodeURIComponent(brandName.trim()), {
         headers: await authHeaders(),
       });
       if (!res.ok) return null;
       const data = await res.json();
-      return data.style || null;
+      return data.brand || null;
     } catch (e) {
       console.warn("fetchSavedStyle failed:", e.message);
       return null;
@@ -682,10 +682,16 @@ export default function CustomBuild({ userId, role } = {}) {
     if (!brief || !brief.brandName || !brief.colors) return;
     setStylePanelStatus("Saving...");
     try {
-      const res = await fetch("/api/brand-styles", {
+      // brands is shared and keyed by id, not by name the way brand_styles
+      // was -- look up whether this client already has a profile first, so
+      // a re-save updates their existing row instead of either colliding
+      // on the name-uniqueness check or silently minting a duplicate.
+      const existing = await fetchSavedStyle(brief.brandName);
+      const id = existing ? existing.id : "brand-" + Date.now();
+      const res = await fetch("/api/brands", {
         method: "POST",
         headers: await authHeaders(),
-        body: JSON.stringify({ brand_name: brief.brandName, colors: brief.colors, fonts: brief.fonts ? { heading: brief.fonts[0], body: brief.fonts[1] } : {}, buttons: brief.buttons || [] }),
+        body: JSON.stringify({ id, name: brief.brandName, colors: brief.colors, fonts: brief.fonts ? { heading: brief.fonts[0], body: brief.fonts[1] } : {}, buttons: brief.buttons || [] }),
       });
       if (res.ok) {
         setStylePanelStatus("Saved as " + brief.brandName + "'s style guide.");
@@ -713,10 +719,10 @@ export default function CustomBuild({ userId, role } = {}) {
     setLoadingStyles(true);
     setPickerError("");
     try {
-      const res = await fetch("/api/brand-styles", { headers: await authHeaders() });
+      const res = await fetch("/api/brands", { headers: await authHeaders() });
       if (res.ok) {
         const data = await res.json();
-        setSavedStylesList(data.styles || []);
+        setSavedStylesList(data.brands || []);
       } else {
         let serverMsg = "";
         try { serverMsg = (await res.json()).error || ""; } catch { /* body wasn't JSON */ }
@@ -745,7 +751,7 @@ export default function CustomBuild({ userId, role } = {}) {
       buttons: (Array.isArray(style.buttons) && style.buttons.length > 0) ? style.buttons : b.buttons,
     }));
     setShowStylePicker(false);
-    setStylePanelStatus("Applied " + style.brand_name + "'s style guide.");
+    setStylePanelStatus("Applied " + style.name + "'s style guide.");
     setTimeout(() => setStylePanelStatus(""), 3000);
   }
 
@@ -1582,12 +1588,12 @@ export default function CustomBuild({ userId, role } = {}) {
                           )}
                           {!loadingStyles && savedStylesList.map(style => (
                             <div
-                              key={style.brand_name}
+                              key={style.id}
                               onClick={() => applySavedStyle(style)}
                               style={{ padding: "8px", borderRadius: "6px", cursor: "pointer", display: "flex", flexDirection: "column", gap: "6px" }}
                               onMouseEnter={e => e.currentTarget.style.background = "#f9fafb"}
                               onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                              <span style={{ fontSize: "12px", fontWeight: 600, color: "#09090b" }}>{style.brand_name}</span>
+                              <span style={{ fontSize: "12px", fontWeight: 600, color: "#09090b" }}>{style.name}</span>
                               <div style={{ display: "flex", gap: "4px" }}>
                                 {Object.entries(style.colors || {}).slice(0, 8).map(([id, hex]) => (
                                   <div key={id} title={id + ": " + hex} style={{ width: "16px", height: "16px", borderRadius: "3px", background: hex, border: "1px solid rgba(0,0,0,.1)" }} />
