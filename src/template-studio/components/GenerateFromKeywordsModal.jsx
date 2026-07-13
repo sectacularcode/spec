@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { authHeaders } from "../../utils/api.js";
+import { sanitizeImageCategory } from "../utils/images.js";
 import { logTemplateQuery } from "../../utils/templateQueries.js";
 import {
   verifyThemeReasonAgainstColors,
@@ -205,7 +206,14 @@ Research what this theme looks, sounds, and feels like. Use authentic colors fro
       // imgOrPlaceholder(), which would just silently fall back to ITS
       // OWN default ("editorial" = beauty/skincare/fashion) if it doesn't
       // recognize the category -- same failure mode this is meant to fix.
-      _aiImageCategory: VALID_IMAGE_CATEGORIES.includes(ai.imageCategory) ? ai.imageCategory : "default",
+      // sanitizeImageCategory adds a second layer: "editorial" is a VALID
+      // category, so it passes the check above even when the AI's choice
+      // was wrong -- see its own comment (images.js) for the confirmed
+      // live case this was built for.
+      _aiImageCategory: sanitizeImageCategory(
+        VALID_IMAGE_CATEGORIES.includes(ai.imageCategory) ? ai.imageCategory : "default",
+        keywords
+      ),
       _aiTheme: ai.theme || "",
       _aiTagline: ai.copy?.tagline || "",
       _aiCta: ai.copy?.cta || "",

@@ -100,3 +100,30 @@ export const imgOrPlaceholder = (url, seed, w = 800, h = 1000, category = "defau
 };
 
 // Line-art social icons
+// "editorial" is a valid entry in the AI's imageCategory enum, which means
+// the validation step ({r.imageCategory} in the allowed list) passes it
+// straight through even when the AI's choice was wrong. Confirmed live: a
+// "candy bar for kids" project ended up with a fashion jacket and an
+// actual skincare brand's product photo, both from the editorial pool
+// (beauty/skincare/fashion), despite the prompt explicitly instructing
+// "editorial is beauty/skincare/fashion photography specifically -- do
+// NOT use it as a generic catch-all". That's the AI's own judgment being
+// unreliable for one narrow, high-risk category, not a case of ignoring
+// an explicit user request the way colors or fonts are -- nobody ever
+// types "use editorial images". A lightweight sanity check is enough:
+// only downgrade "editorial" specifically, and only when the raw
+// description has zero textual signal of actually being beauty/skincare/
+// fashion related.
+const BEAUTY_SIGNAL_WORDS = [
+  "beauty", "skincare", "skin care", "makeup", "cosmetic", "cosmetics",
+  "salon", "spa", "esthetician", "aesthetician", "facial", "fashion",
+  "apparel", "boutique clothing", "stylist", "hair", "nail", "lash",
+  "brow", "waxing", "dermatology",
+];
+
+export function sanitizeImageCategory(category, rawInput) {
+  if (category !== "editorial") return category;
+  const lower = String(rawInput || "").toLowerCase();
+  const hasBeautySignal = BEAUTY_SIGNAL_WORDS.some(w => lower.includes(w));
+  return hasBeautySignal ? "editorial" : "default";
+}

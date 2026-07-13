@@ -53,6 +53,7 @@ import {
   prefixMissingFontWarning,
   retryFontChoice,
 } from "../utils/fontRequestCheck.js";
+import { sanitizeImageCategory } from "./utils/images.js";
 
 // Styles
 
@@ -930,7 +931,26 @@ Rules:
         // string outright -- an unrecognized value falls through to
         // "default" (generic office/workspace) instead of leaking through
         // to something equally wrong.
-        imageCategory: VALID_IMAGE_CATEGORIES.includes(r.imageCategory) ? r.imageCategory : "default",
+        //
+        // sanitizeImageCategory adds a second layer on top of that
+        // validation: "editorial" is a VALID category, so an AI choice of
+        // "editorial" sails straight through the check above even when
+        // it's wrong -- confirmed live, a "candy bar for kids" project
+        // showed a fashion jacket and an actual skincare brand's product
+        // photo, both from the editorial pool, despite the prompt
+        // explicitly warning "do NOT use it as a generic catch-all". This
+        // is the AI's own judgment being unreliable for one specific
+        // narrow, high-risk category -- not a case of ignoring an
+        // explicit user request the way colors/fonts are, since nobody
+        // ever asks for a specific image category by name. A lightweight
+        // sanity check is enough: if "editorial" was chosen but the raw
+        // description has zero textual signal of actually being beauty/
+        // skincare/fashion related, downgrade to "default" rather than
+        // trust the choice outright.
+        imageCategory: sanitizeImageCategory(
+          VALID_IMAGE_CATEGORIES.includes(r.imageCategory) ? r.imageCategory : "default",
+          briefText
+        ),
         goals: Array.isArray(r.goals) && r.goals.length ? r.goals : (brand.goals || []),
         goal: Array.isArray(r.goals) && r.goals.length ? r.goals[0] : brand.goal,
         outcome: r.outcome || brand.outcome,
