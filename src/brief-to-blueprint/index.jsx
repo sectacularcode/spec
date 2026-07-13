@@ -46,7 +46,6 @@ const COLOR_FIELDS = [
 
 export default function CustomBuild({ userId, role } = {}) {
   const [brief, setBrief]               = useState(null);
-  const [savedBrandStyle, setSavedBrandStyle] = useState(null); // fetched style for the current brief's brand, if any
   const [styleConflict, setStyleConflict]     = useState(null); // { savedStyle, briefColors, brandName } when both exist and differ -- pauses generate() until resolved
   const [stylePanelStatus, setStylePanelStatus] = useState(""); // brief save/load feedback text
   const [showStylePicker, setShowStylePicker] = useState(false); // "Load a saved style guide" dropdown open/closed
@@ -695,8 +694,6 @@ export default function CustomBuild({ userId, role } = {}) {
       });
       if (res.ok) {
         setStylePanelStatus("Saved as " + brief.brandName + "'s style guide.");
-        const saved = await fetchSavedStyle(brief.brandName);
-        setSavedBrandStyle(saved);
       } else {
         let serverMsg = "";
         try { serverMsg = (await res.json()).error || ""; } catch { /* body wasn't JSON */ }
@@ -878,7 +875,6 @@ export default function CustomBuild({ userId, role } = {}) {
     // same conflict and re-prompt in a loop.
     if (!skipStyleCheck) {
       const savedStyle = await fetchSavedStyle(brief.brandName);
-      setSavedBrandStyle(savedStyle);
       if (savedStyle && savedStyle.colors && colorsConflict(brief.colors, savedStyle.colors)) {
         setStyleConflict({ savedStyle, briefColors: brief.colors, brandName: brief.brandName });
         return;

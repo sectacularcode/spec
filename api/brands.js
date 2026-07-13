@@ -161,17 +161,53 @@ export default async function handler(req, res) {
       if (notes != null && !validText(notes, MAX_NOTES_LEN)) {
         return res.status(400).json({ error: "Invalid notes" });
       }
-      const cleanNotes = typeof notes === "string" ? notes.trim() : null;
 
       const trimmedName = name.trim();
-      const { clean: cleanColors, dropped: droppedColorKeys } = sanitizeColors(colors);
-      const { clean: cleanFonts, dropped: droppedFontKeys } = sanitizeFonts(fonts);
-      const { clean: cleanButtons, droppedCount: droppedButtonCount } = sanitizeButtons(buttons);
-      const { clean: cleanFeatureLayout, droppedCount: droppedFeatureRowCount } = sanitizeSectionLayout(feature_layout);
-      const { clean: cleanPostClosingLayout, droppedCount: droppedPostClosingRowCount } = sanitizeSectionLayout(post_closing_layout);
-      const cleanSkipChecklist = !!skip_services_checklist;
-      const urlCheck = validSourceUrl(source_url);
+      const { rows: existingRows } = await sql`SELECT * FROM brands WHERE id = ${id}`;
+      const existingRow = existingRows[0] || null;
+      const isUpdate = !!existingRow;
+
+      // Partial-update semantics: a field entirely ABSENT from the request
+      // body (undefined, checked with !==, not just falsy) means the
+      // caller has no opinion on it -- fall back to whatever's already
+      // there instead of clearing it. Brief to Blueprint's and Style
+      // Guide's Save buttons only ever send colors/fonts/buttons(/
+      // source_url) -- never feature_layout, post_closing_layout,
+      // skip_services_checklist, notes, or manifest_brand_id -- so
+      // treating "not sent" the same as "clear it" meant every save from
+      // either tool silently wiped out anything set through Component
+      // Library's own form (notes, most concretely, since that's the one
+      // actively editable today). A caller that DOES want to explicitly
+      // clear a field still can: send it as null/[]/false, a real
+      // provided value, not an absent one.
+      const colorsProvided = colors !== undefined;
+      const fontsProvided = fonts !== undefined;
+      const buttonsProvided = buttons !== undefined;
+      const featureLayoutProvided = feature_layout !== undefined;
+      const postClosingLayoutProvided = post_closing_layout !== undefined;
+      const skipChecklistProvided = skip_services_checklist !== undefined;
+      const sourceUrlProvided = source_url !== undefined;
+      const notesProvided = notes !== undefined;
+      const manifestBrandIdProvided = manifest_brand_id !== undefined;
+
+      const { clean: cleanColors, dropped: droppedColorKeys } = colorsProvided
+        ? sanitizeColors(colors) : { clean: existingRow?.colors || {}, dropped: [] };
+      const { clean: cleanFonts, dropped: droppedFontKeys } = fontsProvided
+        ? sanitizeFonts(fonts) : { clean: existingRow?.fonts || {}, dropped: [] };
+      const { clean: cleanButtons, droppedCount: droppedButtonCount } = buttonsProvided
+        ? sanitizeButtons(buttons) : { clean: existingRow?.buttons || [], droppedCount: 0 };
+      const { clean: cleanFeatureLayout, droppedCount: droppedFeatureRowCount } = featureLayoutProvided
+        ? sanitizeSectionLayout(feature_layout) : { clean: existingRow?.feature_layout || [], droppedCount: 0 };
+      const { clean: cleanPostClosingLayout, droppedCount: droppedPostClosingRowCount } = postClosingLayoutProvided
+        ? sanitizeSectionLayout(post_closing_layout) : { clean: existingRow?.post_closing_layout || [], droppedCount: 0 };
+      const cleanSkipChecklist = skipChecklistProvided ? !!skip_services_checklist : !!existingRow?.skip_services_checklist;
+      const urlCheck = sourceUrlProvided ? validSourceUrl(source_url) : { ok: true, value: existingRow?.source_url ?? null };
       if (!urlCheck.ok) return res.status(400).json({ error: "Invalid source_url" });
+      const cleanNotes = notesProvided
+        ? (typeof notes === "string" ? notes.trim() : null)
+        : (existingRow?.notes ?? null);
+      const resolvedManifestBrandId = manifestBrandIdProvided ? (manifest_brand_id || null) : (existingRow?.manifest_brand_id ?? null);
+
       if (
         !validJsonSize(cleanColors) || !validJsonSize(cleanFonts)
         || !validJsonSize({ b: cleanButtons }) || !validJsonSize({ f: cleanFeatureLayout })
@@ -179,9 +215,6 @@ export default async function handler(req, res) {
       ) {
         return res.status(400).json({ error: "Payload too large" });
       }
-
-      const { rows: existingById } = await sql`SELECT id FROM brands WHERE id = ${id}`;
-      const isUpdate = existingById.length > 0;
 
       // Name collision check — excludes this row's own id so renaming a
       // brand to its own current name (a no-op save) doesn't false-positive.
@@ -196,7 +229,7 @@ export default async function handler(req, res) {
         });
       }
 
-      if (manifest_brand_id) {
+      if (manifestBrandIdProvided && manifest_brand_id) {
         const { rows: manifestCollisions } = await sql`
           SELECT id FROM brands WHERE manifest_brand_id = ${manifest_brand_id} AND id != ${id}
         `;
@@ -213,7 +246,7 @@ export default async function handler(req, res) {
         await sql`
           UPDATE brands SET
             name = ${trimmedName},
-            manifest_brand_id = ${manifest_brand_id || null},
+            manifest_brand_id = ${resolvedManifestBrandId},
             colors = ${cleanColors},
             fonts = ${cleanFonts},
             buttons = ${JSON.stringify(cleanButtons)},
@@ -236,7 +269,7 @@ export default async function handler(req, res) {
             id, created_by, name, manifest_brand_id, colors, fonts, buttons,
             feature_layout, post_closing_layout, skip_services_checklist, source_url, notes, updated_by
           ) VALUES (
-            ${id}, ${userId}, ${trimmedName}, ${manifest_brand_id || null},
+            ${id}, ${userId}, ${trimmedName}, ${resolvedManifestBrandId},
             ${cleanColors}, ${cleanFonts}, ${JSON.stringify(cleanButtons)},
             ${JSON.stringify(cleanFeatureLayout)}, ${JSON.stringify(cleanPostClosingLayout)},
             ${cleanSkipChecklist}, ${urlCheck.value}, ${cleanNotes}, ${userId}
