@@ -37,6 +37,16 @@ const TOOLS = [
       </svg>
     ),
   },
+  {
+    id: "brands",
+    label: "Brands",
+    desc: "Saved client profiles — colors, fonts, buttons, structure, and notes. Reusable across every future build for that client.",
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b45309" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18"/><circle cx="7" cy="6.5" r="0.6" fill="#b45309" stroke="none"/><circle cx="10" cy="6.5" r="0.6" fill="#b45309" stroke="none"/>
+      </svg>
+    ),
+  },
 ];
 
 const ROLE_COLORS = {
@@ -53,11 +63,14 @@ export default function Dashboard({ onSelectTool, role, tools: allowedTools }) {
   // tab in App.jsx: available whenever either main tool is, since it's a
   // shared utility for both rather than a tool someone is granted on its
   // own. allowedTools never actually contains "style-guide" itself.
-  const visibleTools = TOOLS.filter(t =>
-    t.id === "style-guide"
-      ? (allowedTools.includes("template-studio") || allowedTools.includes("brief-to-blueprint"))
-      : allowedTools.includes(t.id)
-  );
+  const visibleTools = TOOLS.filter(t => {
+    if (t.id === "style-guide") return allowedTools.includes("template-studio") || allowedTools.includes("brief-to-blueprint");
+    // Same reasoning as the top-nav tab in App.jsx -- Brands is a shared
+    // team resource gated by role, not a per-user tool grant, so it never
+    // actually appears in allowedTools.
+    if (t.id === "brands") return role === "admin";
+    return allowedTools.includes(t.id);
+  });
   const roleColor = ROLE_COLORS[role] || ROLE_COLORS.staff;
   const [drawerOpen, setDrawerOpen] = useState(false);
 

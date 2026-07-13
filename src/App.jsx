@@ -6,6 +6,7 @@ import { authHeaders } from "./utils/api.js";
 const ElementorBuilder = lazy(() => import("./template-studio/index.jsx"));
 const CustomBuild      = lazy(() => import("./brief-to-blueprint/index.jsx"));
 const StyleGuide       = lazy(() => import("./style-guide/index.jsx"));
+const Brands           = lazy(() => import("./brands/index.jsx"));
 
 function Spinner() {
   return (
@@ -38,7 +39,7 @@ function LoginScreen() {
   );
 }
 
-function ToolNav({ view, setView, tools, user }) {
+function ToolNav({ view, setView, tools, role, user }) {
   return (
     <div style={{ position: "sticky", top: 0, zIndex: 100, background: "#ffffff", borderBottom: "1px solid #e5e7eb", width: "100%", boxSizing: "border-box" }}>
       <div style={{ width: "100%", display: "flex", alignItems: "center", padding: "0 24px", boxSizing: "border-box", position: "relative", height: "48px" }}>
@@ -67,6 +68,11 @@ function ToolNav({ view, setView, tools, user }) {
             // Brief to Blueprint since it's an "extra" tool rather than a
             // step used in between the other two.
             (tools.includes("template-studio") || tools.includes("brief-to-blueprint")) && { id: "style-guide", label: "Style Guide" },
+            // Admin only for now, same role check pattern api/brands.js
+            // itself uses -- not gated by the `tools` array since it isn't
+            // a per-user permission like the other three, it's a shared
+            // team resource.
+            role === "admin" && { id: "brands", label: "Brands" },
           ].filter(Boolean).map(tab => (
             <button
               key={tab.id}
@@ -128,14 +134,15 @@ function AppShell() {
 
   if (!roleLoaded) return <Spinner />;
 
-  if (view === "template-studio" || view === "brief-to-blueprint" || view === "style-guide") {
+  if (view === "template-studio" || view === "brief-to-blueprint" || view === "style-guide" || view === "brands") {
     return (
       <div style={{ width: "100%", minHeight: "100vh", fontFamily: "Inter, system-ui, sans-serif", boxSizing: "border-box" }}>
-        <ToolNav view={view} setView={setView} tools={tools} user={user} />
+        <ToolNav view={view} setView={setView} tools={tools} role={role} user={user} />
         <Suspense fallback={<Spinner />}>
           {view === "template-studio"    && <ElementorBuilder userId={user?.id} />}
           {view === "brief-to-blueprint" && <CustomBuild userId={user?.id} role={role} />}
           {view === "style-guide"        && <StyleGuide role={role} />}
+          {view === "brands"             && <Brands />}
         </Suspense>
       </div>
     );
