@@ -54,6 +54,7 @@ import {
   retryFontChoice,
 } from "../utils/fontRequestCheck.js";
 import { sanitizeImageCategory } from "./utils/images.js";
+import { scanForLegacyContent, regenerateHeadings, applyLegacyContentFixes } from "../utils/legacyContentRepair.js";
 
 // Styles
 
@@ -117,6 +118,15 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
   const [confirmDeleteId, setConfirmDeleteId] = useState(null); // project id pending delete confirmation
   const [confirmResetId, setConfirmResetId] = useState(null); // project id pending reset-to-blank confirmation
   const [confirmKeywordDeleteId, setConfirmKeywordDeleteId] = useState(null); // keyword build id pending delete confirmation
+
+  // Legacy Content Repair — one-time scan for projects created before the
+  // aboutHeading/ctaHeading/imageCategory fixes existed (see
+  // src/utils/legacyContentRepair.js). Scoped to the current user's own
+  // projects only, via the same auto-save effect every other project
+  // edit already goes through -- no separate save call needed here.
+  const [legacyScanResults, setLegacyScanResults] = useState(null); // null = not scanned yet, [] = scanned clean
+  const [legacyFixing, setLegacyFixing] = useState(false);
+  const [legacyFixMsg, setLegacyFixMsg] = useState("");
   const [savedBuilds, setSavedBuilds] = useState([]); // Blueprint builds saved to library
   const [keywordBuilds, setKeywordBuilds] = useState([]); // Keyword-generated custom builds
   const [libraryFilter, setLibraryFilter] = useState({ visual: "", industry: "" }); // browser filters
@@ -592,6 +602,46 @@ Return ONLY the new ${fieldName} value as plain text.`;
     setAiDraft(null);
     setTab("positioning"); // Advance to Positioning — next step after copy is drafted
   };
+
+  // Legacy Content Repair — scan the current user's own projects for the
+  // two confirmed pre-fix bugs and, on confirmation, correct them. Pure
+  // scan (no side effects) is separated from the fix step so results are
+  // always shown before anything is written -- same "preview before
+  // committing" shape as the rest of this app's AI-assisted flows.
+  function runLegacyScan() {
+    setLegacyFixMsg("");
+    setLegacyScanResults(scanForLegacyContent(projects));
+  }
+
+  async function applyLegacyFixes() {
+    if (!legacyScanResults || legacyScanResults.length === 0) return;
+    setLegacyFixing(true);
+    setLegacyFixMsg("");
+    const headingFixes = {};
+    const needsHeadingFix = legacyScanResults.filter(r =>
+      r.issues.some(i => i.type === "aboutHeading" || i.type === "ctaHeading")
+    );
+    for (const r of needsHeadingFix) {
+      const project = projects.find(p => p.id === r.projectId);
+      const page = project?.pages.find(pg => pg.id === r.pageId);
+      if (!project || !page) continue;
+      const fix = await regenerateHeadings(authHeaders, project.brand, page);
+      if (fix) headingFixes[r.pageId] = fix;
+    }
+    const fixedProjects = applyLegacyContentFixes(projects, legacyScanResults, headingFixes);
+    // setProjects here is enough -- the existing auto-save effect diffs
+    // and persists project changes on its own; no separate save call
+    // needed.
+    setProjects(fixedProjects);
+    const failedHeadingCount = needsHeadingFix.filter(r => !headingFixes[r.pageId]).length;
+    setLegacyFixMsg(
+      failedHeadingCount > 0
+        ? `Fixed ${legacyScanResults.length - failedHeadingCount} of ${legacyScanResults.length} page(s). ${failedHeadingCount} heading regeneration${failedHeadingCount > 1 ? "s" : ""} failed -- try scanning again.`
+        : `Fixed ${legacyScanResults.length} page(s) across ${new Set(legacyScanResults.map(r => r.projectId)).size} project(s).`
+    );
+    setLegacyScanResults(null);
+    setLegacyFixing(false);
+  }
 
   // AI Site Brief — describe your site, get template/layout/theme/colors/fonts/brief recommendations
   const describeMySite = async (overrideText) => {
@@ -1772,6 +1822,55 @@ Rules:
         />
         <h1 style={{ fontSize: "36px", margin: "0 0 6px", fontWeight: 200, letterSpacing: "0", color: "#09090b" }}>Projects</h1>
         <p style={{ color: "#09090b", fontSize: "14px", margin: "0 0 32px", lineHeight: 1.6 }}>Plan, spec, and export Elementor or Divi templates.</p>
+
+        {/* Legacy Content Repair — one-time maintenance tool for projects
+            created before the aboutHeading/ctaHeading/imageCategory fixes
+            existed. Deliberately understated (small text button, not a
+            card) since this is an occasional cleanup action, not a
+            primary feature. */}
+        <div style={{ marginBottom: "24px" }}>
+          <button
+            onClick={runLegacyScan}
+            style={{ background: "none", border: "none", padding: 0, fontSize: "12px", color: "#6b7280", cursor: "pointer", textDecoration: "underline", textUnderlineOffset: "2px" }}>
+            Scan for outdated content
+          </button>
+
+          {legacyScanResults !== null && (
+            <div style={{ marginTop: "12px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "10px", padding: "16px 20px" }}>
+              {legacyScanResults.length === 0 ? (
+                <div style={{ fontSize: "13px", color: "#6b7280" }}>No outdated content found.</div>
+              ) : (
+                <>
+                  <div style={{ fontSize: "13px", fontWeight: 600, color: "#09090b", marginBottom: "10px" }}>
+                    Found {legacyScanResults.length} page{legacyScanResults.length > 1 ? "s" : ""} with outdated content:
+                  </div>
+                  <ul style={{ margin: "0 0 14px", paddingLeft: "18px", fontSize: "12px", color: "#3f3f46", lineHeight: 1.8 }}>
+                    {legacyScanResults.map(r => (
+                      <li key={r.pageId}>
+                        <strong>{r.projectName}</strong> — {r.pageName}: {r.issues.map(i => {
+                          if (i.type === "aboutHeading") return "generic About heading";
+                          if (i.type === "ctaHeading") return "generic CTA heading";
+                          if (i.type === "imageCategory") return "wrong image category (editorial)";
+                          return i.type;
+                        }).join(", ")}
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={applyLegacyFixes}
+                    disabled={legacyFixing}
+                    style={{ padding: "8px 16px", fontSize: "12px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", cursor: legacyFixing ? "default" : "pointer", opacity: legacyFixing ? 0.6 : 1 }}>
+                    {legacyFixing ? "Fixing…" : `Fix all ${legacyScanResults.length} page${legacyScanResults.length > 1 ? "s" : ""}`}
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+
+          {legacyFixMsg && (
+            <div style={{ marginTop: "10px", fontSize: "12px", color: "#3f3f46" }}>{legacyFixMsg}</div>
+          )}
+        </div>
 
         {/* AI Describe Your Site — optional guided start */}
         <div style={{ background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "12px", padding: "24px", marginBottom: "28px" }}>
