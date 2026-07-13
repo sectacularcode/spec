@@ -7,6 +7,7 @@ const ElementorBuilder = lazy(() => import("./template-studio/index.jsx"));
 const CustomBuild      = lazy(() => import("./brief-to-blueprint/index.jsx"));
 const StyleGuide       = lazy(() => import("./style-guide/index.jsx"));
 const Brands           = lazy(() => import("./brands/index.jsx"));
+const DesignSystem     = lazy(() => import("./design-system/index.jsx"));
 
 function Spinner() {
   return (
@@ -73,6 +74,7 @@ function ToolNav({ view, setView, tools, role, user }) {
             // a per-user permission like the other three, it's a shared
             // team resource.
             role === "admin" && { id: "brands", label: "Component Library" },
+            role === "admin" && { id: "design-system", label: "Design System" },
           ].filter(Boolean).map(tab => (
             <button
               key={tab.id}
@@ -134,7 +136,7 @@ function AppShell() {
 
   if (!roleLoaded) return <Spinner />;
 
-  if (view === "template-studio" || view === "brief-to-blueprint" || view === "style-guide" || view === "brands") {
+  if (view === "template-studio" || view === "brief-to-blueprint" || view === "style-guide" || view === "brands" || view === "design-system") {
     return (
       <div style={{ width: "100%", minHeight: "100vh", fontFamily: "Inter, system-ui, sans-serif", boxSizing: "border-box" }}>
         <ToolNav view={view} setView={setView} tools={tools} role={role} user={user} />
@@ -143,6 +145,7 @@ function AppShell() {
           {view === "brief-to-blueprint" && <CustomBuild userId={user?.id} role={role} />}
           {view === "style-guide"        && <StyleGuide role={role} />}
           {view === "brands"             && <Brands />}
+          {view === "design-system"      && <DesignSystem />}
         </Suspense>
       </div>
     );

@@ -47,6 +47,16 @@ const TOOLS = [
       </svg>
     ),
   },
+  {
+    id: "design-system",
+    label: "Design System",
+    desc: "Colors, fonts, and component patterns for Spec's own UI — verified against real code, not assumed. The answer when a font or radius question comes up again.",
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b45309" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="13.5" cy="6.5" r="2.5"/><rect x="4" y="14" width="7" height="7" rx="1.5"/><path d="M17 13.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7z"/>
+      </svg>
+    ),
+  },
 ];
 
 const ROLE_COLORS = {
@@ -69,6 +79,7 @@ export default function Dashboard({ onSelectTool, role, tools: allowedTools }) {
     // team resource gated by role, not a per-user tool grant, so it never
     // actually appears in allowedTools.
     if (t.id === "brands") return role === "admin";
+    if (t.id === "design-system") return role === "admin";
     return allowedTools.includes(t.id);
   });
   const roleColor = ROLE_COLORS[role] || ROLE_COLORS.staff;
