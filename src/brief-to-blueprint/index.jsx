@@ -1526,6 +1526,13 @@ export default function CustomBuild({ userId, role } = {}) {
               ) : (
                 <div style={{ width: "100%", boxSizing: "border-box", overflow: "hidden" }}>
                   <div style={{ fontSize: "13px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>{brief.brandName || "Brand loaded"}</div>
+                  {(brief._manifestTitleTag || brief._manifestMetaDescription) && (
+                    <div style={{ marginBottom: "14px", padding: "10px 12px", background: "#eeedf1", borderRadius: "6px", fontSize: "11px", color: "#6b7280" }}>
+                      <div style={{ fontWeight: 600, color: "#09090b", marginBottom: "4px", fontSize: "11px" }}>For WordPress / Yoast — copy over after import</div>
+                      {brief._manifestTitleTag && <div style={{ marginBottom: "2px" }}><span style={{ fontWeight: 600 }}>Title:</span> {brief._manifestTitleTag}</div>}
+                      {brief._manifestMetaDescription && <div><span style={{ fontWeight: 600 }}>Meta:</span> {brief._manifestMetaDescription}</div>}
+                    </div>
+                  )}
                   <div style={{ marginBottom: "14px" }}>
                     <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                       {COLOR_FIELDS.map(f => (
