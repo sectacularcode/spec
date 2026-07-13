@@ -725,7 +725,7 @@ export default function AdminPanel({ isAdmin }) {
               <tbody>
                 {templateQueries.map(q => (
                   <tr key={q.normalized_query}>
-                    <td style={{ ...S.td, maxWidth: "280px" }}>{q.normalized_query}</td>
+                    <td style={{ ...S.td, maxWidth: "240px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} title={q.normalized_query}>{q.normalized_query}</td>
                     <td style={S.td}>{q.total_count}</td>
                     <td style={S.td}>{q.custom_count > 0 ? q.custom_count : "—"}</td>
                     <td style={S.td}>{q.matched_count > 0 ? q.matched_count : "—"}</td>
