@@ -723,7 +723,7 @@ Return ONLY a valid JSON object — no preamble, no markdown fences:
   "headingFont": "Manrope|Inter|Playfair Display|Cormorant Garamond|Yeseva One|Italiana|Oswald|Space Mono|Fraunces",
   "bodyFont": "Inter|DM Sans|Lato|Manrope|Space Mono",
   "fontReason": "1 short sentence",
-  "imageCategory": "ONLY used when isCustom is true (ignored otherwise) — one of: marketing|production|product|lifestyle|editorial|portrait|trades|automotive|default. Pick whichever real category is the closest visual match to the theme. \"editorial\" is beauty/skincare/fashion photography specifically — do NOT use it as a generic catch-all. If nothing genuinely fits (hobby, fandom, collector, pop-culture, or any theme with no real visual overlap to these categories), use \"default\" rather than forcing a mismatch.",
+  "imageCategory": "ONLY used when isCustom is true (ignored otherwise) — one of: marketing|production|product|lifestyle|editorial|portrait|trades|automotive|food|default. Pick whichever real category is the closest visual match to the theme. \"editorial\" is beauty/skincare/fashion photography specifically — do NOT use it as a generic catch-all. \"food\" is candy/bakery/confectionery/dessert/cafe/restaurant photography — use it for any theme actually about food or sweets. If nothing genuinely fits (hobby, fandom, collector, pop-culture, or any theme with no real visual overlap to these categories), use \"default\" rather than forcing a mismatch.",
   "goals": ["array of 1-3 goals from this list — Lead Generation, Direct Sales / E-commerce, Bookings & Reservations, Awareness & Brand Building, Community & Newsletter Growth, Applications & Sign-ups, Donations & Fundraising"],
   "outcome": "1 specific sentence",
   "primaryKeywords": "5 comma-separated keywords",
@@ -967,7 +967,7 @@ Rules:
         sections: r.sections && r.sections.length ? r.sections : page.sections,
       };
       // Layer AI brand settings
-      const VALID_IMAGE_CATEGORIES = ["marketing", "production", "product", "lifestyle", "editorial", "portrait", "trades", "automotive", "default"];
+      const VALID_IMAGE_CATEGORIES = ["marketing", "production", "product", "lifestyle", "editorial", "portrait", "trades", "automotive", "food", "default"];
       brand = {
         ...brand,
         layoutId: r.layoutId || brand.layoutId,

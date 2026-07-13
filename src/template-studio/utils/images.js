@@ -59,6 +59,16 @@ const IMAGE_LIBRARY = {
     "1542362567-b07e54358753", "1485291571150-772bcfc10da5", "1503376780353-7e6692767b70",
     "1552519507-da3b142c6e3d", "1492144534655-ae79c964c9d7", "1583121274602-3e2820c69888",
   ],
+  // Food/candy/bakery/confectionery -- added specifically because no
+  // existing category covers this. Each ID individually verified by
+  // fetching the actual Unsplash photo page (not guessed): candy-coated
+  // chocolates, candy jars, candy eggs, lollipops, gummy bears, and a
+  // macaron display case. Covers candy shops, bakeries, confectioners,
+  // and similar food/dessert-forward businesses.
+  food: [
+    "1756092790115-5dbcf8f2d2e2", "1675789378281-f3280da92abe", "1744368643361-5c0f715ed751",
+    "1532117364815-720cd35ff6e3", "1635342219731-4ae2bf39e1e9", "1760124056928-a9960b1b1dd2",
+  ],
   // Default — generic office/workspace fallback
   default: [
     "1497366216548-37526070297c", "1497366754035-f200968a6e72", "1497366811353-6870744d04b2",
@@ -99,7 +109,6 @@ export const imgOrPlaceholder = (url, seed, w = 800, h = 1000, category = "defau
   return pickImage(category, seed, w, h);
 };
 
-// Line-art social icons
 // "editorial" is a valid entry in the AI's imageCategory enum, which means
 // the validation step ({r.imageCategory} in the allowed list) passes it
 // straight through even when the AI's choice was wrong. Confirmed live: a
@@ -111,9 +120,9 @@ export const imgOrPlaceholder = (url, seed, w = 800, h = 1000, category = "defau
 // unreliable for one narrow, high-risk category, not a case of ignoring
 // an explicit user request the way colors or fonts are -- nobody ever
 // types "use editorial images". A lightweight sanity check is enough:
-// only downgrade "editorial" specifically, and only when the raw
-// description has zero textual signal of actually being beauty/skincare/
-// fashion related.
+// only act on "editorial" specifically, and only when the raw description
+// has zero textual signal of actually being beauty/skincare/fashion
+// related.
 const BEAUTY_SIGNAL_WORDS = [
   "beauty", "skincare", "skin care", "makeup", "cosmetic", "cosmetics",
   "salon", "spa", "esthetician", "aesthetician", "facial", "fashion",
@@ -121,9 +130,29 @@ const BEAUTY_SIGNAL_WORDS = [
   "brow", "waxing", "dermatology",
 ];
 
+// Signal words for the "food" category -- used to redirect a wrongly-
+// chosen "editorial" toward something actually relevant rather than just
+// the generic "default" office/workspace fallback. Downgrading to
+// "default" stops the WRONG (embarrassing, off-brand) images from
+// showing, but a candy shop showing generic office stock photos is still
+// not the actual candy imagery the theme calls for -- confirmed live,
+// reported directly: "there's no images of candy eventhough i
+// regenerated it". "default" is the correct fallback when nothing fits;
+// "food" should be preferred over it whenever there's real signal the
+// theme actually is food/dessert/confectionery related.
+const FOOD_SIGNAL_WORDS = [
+  "candy", "candies", "sweet", "sweets", "confection", "confectionery",
+  "chocolate", "bakery", "bake shop", "dessert", "pastry", "pastries",
+  "cake", "cookie", "cookies", "donut", "doughnut", "ice cream",
+  "gelato", "lollipop", "gummy", "gummies", "snack", "snacks", "treat",
+  "treats", "food", "cafe", "café", "coffee shop", "restaurant",
+  "diner", "eatery", "kitchen", "culinary", "cuisine",
+];
+
 export function sanitizeImageCategory(category, rawInput) {
   if (category !== "editorial") return category;
   const lower = String(rawInput || "").toLowerCase();
-  const hasBeautySignal = BEAUTY_SIGNAL_WORDS.some(w => lower.includes(w));
-  return hasBeautySignal ? "editorial" : "default";
+  if (BEAUTY_SIGNAL_WORDS.some(w => lower.includes(w))) return "editorial";
+  if (FOOD_SIGNAL_WORDS.some(w => lower.includes(w))) return "food";
+  return "default";
 }

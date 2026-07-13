@@ -48,7 +48,7 @@ Return ONLY valid JSON — no preamble, no markdown fences:
     "card": "#hex — card/surface background color"
   },
   "headingFont": "One of: Manrope, Inter, Playfair Display, Oswald, Fraunces, Space Mono, Cormorant Garamond",
-  "imageCategory": "One of: marketing, production, product, lifestyle, editorial, portrait, trades, automotive, default",
+  "imageCategory": "One of: marketing, production, product, lifestyle, editorial, portrait, trades, automotive, food, default. \"editorial\" is beauty/skincare/fashion specifically. \"food\" is candy/bakery/confectionery/dessert/cafe/restaurant.",
   "sections": ["array of 4-7 section types from: Hero, About, Service Cards, Portfolio Carousel, Stats, Testimonials, Blog, FAQ, Form, CTA, Marquee, Pricing, Leadership, Process, Team, Logo Carousel, Video"],
   "copy": {
     "heroEyebrow": "2-4 word eyebrow label",
@@ -183,7 +183,7 @@ Research what this theme looks, sounds, and feels like. Use authentic colors fro
     }
   }
 
-  const VALID_IMAGE_CATEGORIES = ["marketing", "production", "product", "lifestyle", "editorial", "portrait", "trades", "automotive", "default"];
+  const VALID_IMAGE_CATEGORIES = ["marketing", "production", "product", "lifestyle", "editorial", "portrait", "trades", "automotive", "food", "default"];
 
   function buildPageFromAI(ai, keywords) {
     const id = "custom-" + Date.now();
