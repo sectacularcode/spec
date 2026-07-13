@@ -25,6 +25,7 @@ import { requireAuth, getProfile } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { validText, validJsonSize } from "./_lib/validate.js";
 import { logError } from "./_lib/errorLog.js";
+import { sanitizeColors, sanitizeFonts, sanitizeButtons } from "./_lib/brandValidation.js";
 import { sql } from "@vercel/postgres";
 
 // The table was supposed to already exist in production (created in a
@@ -63,83 +64,11 @@ async function ensureTable() {
   await sql`ALTER TABLE brand_styles ADD COLUMN IF NOT EXISTS buttons JSONB NOT NULL DEFAULT '[]'::jsonb`;
 }
 
-// Only these keys are meaningful to Spec's color system (see landing.js's
-// color fallback chain) — anything else in the submitted object is
-// silently dropped rather than stored, so this table can't accumulate
-// arbitrary junk keys over time.
-const COLOR_KEYS = ["ink", "brass", "brass-deep", "bone", "asphalt", "stone", "warm-white", "text"];
-const FONT_KEYS = ["heading", "body"];
-const HEX_RE = /^#[0-9A-Fa-f]{3}$|^#[0-9A-Fa-f]{4}$|^#[0-9A-Fa-f]{6}$|^#[0-9A-Fa-f]{8}$/;
-
-// Real font names are letters, numbers, spaces, and a handful of
-// punctuation marks (e.g. "Be Vietnam Pro", "DM Sans", "Helvetica Neue",
-// curly-quote contractions like "O'Brien Display"). Restricting to this
-// character class closes off font-family as an injection vector before
-// it's used in any HTML/CSS context downstream -- not currently rendered
-// anywhere in the preview, but this is exactly the kind of stored value
-// that becomes exploitable the moment some future feature does render
-// it, and validating at the point of storage is cheaper than tracking
-// down every future consumer. A comma or a literal quote character is
-// still rejected on purpose -- either one usually means a leftover CSS
-// font-family fallback list slipped through uncleaned (e.g. "Inter,
-// sans-serif" or a still-quoted "\"Instrument Serif\""), which is worth
-// surfacing as a real problem rather than silently accepting it.
-const FONT_NAME_RE = /^[A-Za-z0-9 '’‘.–—&-]{1,100}$/;
-
-// Returns { clean, dropped }. A key is only reported in `dropped` if the
-// caller actually sent a non-empty value for it that failed validation --
-// a key that was never submitted at all isn't a "drop," it's just absent.
-// This distinction is what makes a silent validation failure visible
-// instead of invisible: previously, a font name (or color) that failed
-// its regex just vanished with zero trace anywhere, in the API response
-// or the UI, which is exactly the shape of bug that's nearly impossible
-// to diagnose after the fact.
-function sanitizeColors(input) {
-  const clean = {};
-  const dropped = [];
-  if (typeof input !== "object" || input === null || Array.isArray(input)) return { clean, dropped };
-  for (const key of COLOR_KEYS) {
-    const val = input[key];
-    if (val == null || val === "") continue;
-    if (typeof val === "string" && HEX_RE.test(val.trim())) clean[key] = val.trim();
-    else dropped.push(key);
-  }
-  return { clean, dropped };
-}
-
-function sanitizeFonts(input) {
-  const clean = {};
-  const dropped = [];
-  if (typeof input !== "object" || input === null || Array.isArray(input)) return { clean, dropped };
-  for (const key of FONT_KEYS) {
-    const val = input[key];
-    if (val == null || val === "") continue;
-    if (typeof val === "string" && FONT_NAME_RE.test(val.trim())) clean[key] = val.trim();
-    else dropped.push(key);
-  }
-  return { clean, dropped };
-}
-
-const MAX_BUTTONS = 10; // generous ceiling above the realistic "1-3 button styles" use case -- a sanity cap, not a real constraint
-const MAX_BUTTON_NAME_LEN = 60;
-
-// Each entry needs a valid background AND a valid text color to be worth
-// storing at all -- a button with only one real color isn't renderable,
-// so a bad entry is dropped whole rather than saved half-populated.
-function sanitizeButtons(input) {
-  if (!Array.isArray(input)) return { clean: [], droppedCount: 0 };
-  let droppedCount = 0;
-  const clean = [];
-  for (const b of input.slice(0, MAX_BUTTONS)) {
-    if (!b || typeof b !== "object") { droppedCount++; continue; }
-    const background = typeof b.background === "string" && HEX_RE.test(b.background.trim()) ? b.background.trim() : null;
-    const textColor = typeof b.textColor === "string" && HEX_RE.test(b.textColor.trim()) ? b.textColor.trim() : null;
-    if (!background || !textColor) { droppedCount++; continue; }
-    const name = typeof b.name === "string" ? b.name.trim().slice(0, MAX_BUTTON_NAME_LEN) : "";
-    clean.push({ name, background, textColor });
-  }
-  return { clean, droppedCount };
-}
+// Colors/fonts/buttons validation (COLOR_KEYS/FONT_KEYS/HEX_RE/
+// FONT_NAME_RE, sanitizeColors/sanitizeFonts/sanitizeButtons) now lives in
+// ./_lib/brandValidation.js -- moved there so api/brands.js can reuse the
+// exact same rules instead of a second copy that could drift out of sync.
+// No behavior change here, just where the code lives.
 
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();

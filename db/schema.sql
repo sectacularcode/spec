@@ -151,3 +151,49 @@ CREATE TABLE brand_styles (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (user_id, brand_name)
 );
+
+-- brands: one row per client/brand. Deliberately NOT scoped by user_id like
+-- every table above -- a client isn't "owned" by whoever created it, it's a
+-- shared team resource. Access is gated by role in api/brands.js instead
+-- (admin only for now, manager planned next). created_by is kept for
+-- audit/display only ("added by X"), never used as an access check.
+--
+-- Absorbs what brand_styles used to do alone (colors/fonts/buttons/
+-- source_url), plus the structure/layout defaults from Brief to
+-- Blueprint's per-section style picker (feature_layout/post_closing_layout/
+-- skip_services_checklist) -- so a repeat client's look AND structure
+-- carry forward automatically instead of being re-picked on every new
+-- brief. brand_styles' existing rows migrate in via
+-- db/migrate-brand-styles-to-brands.mjs; brand_styles itself is left in
+-- place (not dropped) until that migration is confirmed clean.
+--
+-- manifest_brand_id matches Manifest's own stable brand.id when a build
+-- came in through Manifest import (see _manifestBrandId in
+-- manifestImport.js) -- preferred over name matching when present, since a
+-- human-typed brand name and Manifest's own casing of the same brand won't
+-- always match exactly. Name matching (case-insensitive, at the
+-- application layer, same convention brand_styles.js already used) is the
+-- fallback for brands that never came through Manifest.
+CREATE TABLE brands (
+  id                       TEXT PRIMARY KEY,
+  created_by               TEXT NOT NULL,
+  name                     TEXT NOT NULL,
+  manifest_brand_id        TEXT,
+  colors                   JSONB NOT NULL DEFAULT '{}'::jsonb,
+  fonts                    JSONB NOT NULL DEFAULT '{}'::jsonb,
+  buttons                  JSONB NOT NULL DEFAULT '[]'::jsonb,
+  feature_layout           JSONB NOT NULL DEFAULT '[]'::jsonb,
+  post_closing_layout      JSONB NOT NULL DEFAULT '[]'::jsonb,
+  skip_services_checklist  BOOLEAN NOT NULL DEFAULT false,
+  source_url               TEXT,
+  notes                    TEXT,
+  created_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at               TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+-- Partial unique index (only enforced when a Manifest link actually
+-- exists) -- this is the one uniqueness rule that stays a real DB
+-- constraint rather than an app-layer check, since a broken 1:1 link here
+-- would silently misattribute a future Manifest re-import to the wrong
+-- client.
+CREATE UNIQUE INDEX idx_brands_manifest_brand_id ON brands(manifest_brand_id) WHERE manifest_brand_id IS NOT NULL;
+CREATE INDEX idx_brands_name_lower ON brands(LOWER(name));
