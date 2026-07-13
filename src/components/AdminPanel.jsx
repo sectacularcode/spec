@@ -23,17 +23,6 @@ function RolePill({ role }) {
   );
 }
 
-// Server-side save already validates source_url is a real, parseable
-// http/https URL (see api/brand-styles.js) -- but that validation was
-// added after the table went live, so rows saved before it exists don't
-// retroactively become clean. Defensive here rather than trusting every
-// existing row predates that fix: falls back to showing the raw string
-// if it isn't parseable, instead of letting a bad legacy value throw and
-// crash this whole panel's render.
-function safeHostname(url) {
-  try { return new URL(url).hostname; } catch { return url; }
-}
-
 export default function AdminPanel({ isAdmin }) {
   const { user } = useUser();
   const [users, setUsers]           = useState([]);
@@ -152,30 +141,6 @@ export default function AdminPanel({ isAdmin }) {
     setTemplateQueriesLoading(false);
   }
   useEffect(() => { if (isAdmin && user?.id) loadTemplateQueries(); }, [isAdmin, user?.id]);
-
-  // Saved Style Guides (admin only) — every user's saved Style Guide brand
-  // entries, real colors/fonts, cross-user. Purely a reference list for
-  // picking real brand data when building a new Template Studio template
-  // -- not a live connection between the two tools, just a faster way to
-  // see what's actually available than asking in chat each time.
-  const [allStyleGuides, setAllStyleGuides] = useState([]);
-  const [styleGuidesLoading, setStyleGuidesLoading] = useState(false);
-  const [styleGuidesMsg, setStyleGuidesMsg] = useState({ text: "", type: "ok" });
-  async function loadAllStyleGuides() {
-    setStyleGuidesLoading(true);
-    try {
-      const res = await fetch("/api/brand-styles?all=true", { headers: await authHeaders() });
-      const data = await res.json();
-      if (res.ok) {
-        setAllStyleGuides(data.styles || []);
-        setStyleGuidesMsg({ text: "", type: "ok" });
-      } else {
-        setStyleGuidesMsg({ text: data.error || "Failed to load saved style guides.", type: "err" });
-      }
-    } catch { setStyleGuidesMsg({ text: "Error loading saved style guides.", type: "err" }); }
-    setStyleGuidesLoading(false);
-  }
-  useEffect(() => { if (isAdmin && user?.id) loadAllStyleGuides(); }, [isAdmin, user?.id]);
 
   function startEditLimit(scope, scopeId, currentCents) {
     setEditingLimit({ scope, scopeId });
@@ -342,11 +307,10 @@ export default function AdminPanel({ isAdmin }) {
     btnSecondary: { padding: "6px 12px", background: "#fff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Be Vietnam Pro', sans-serif" },
     btnDanger: { padding: "6px 12px", background: "none", color: "#dc2626", border: "none", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Be Vietnam Pro', sans-serif" },
     btnSave: { padding: "6px 12px", background: "#09090b", color: "#fff", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Be Vietnam Pro', sans-serif" },
-    // Row layout replaces table/th/td entirely -- every section (Users,
-    // Usage x2, Error Log, Template Queries, Saved Style Guides) now uses
-    // this same shared pattern instead of five near-duplicate wide
-    // tables, none of which ever fit this panel's fixed width without
-    // either scrolling or squeezing.
+    // Row layout replaces table/th/td entirely -- every remaining section
+    // (Users, Usage x2, Error Log, Template Queries) shares this one
+    // pattern instead of near-duplicate wide tables, none of which ever
+    // fit this panel's fixed width without either scrolling or squeezing.
     row: { padding: "14px 20px", borderBottom: "1px solid #eeedf1", display: "flex", flexDirection: "column", gap: "6px" },
     rowTop: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" },
     rowTitle: { fontSize: "13px", fontWeight: 600, color: "#09090b" },
@@ -614,9 +578,8 @@ export default function AdminPanel({ isAdmin }) {
                     <span style={{ ...S.badge, background: "#fee2e2", color: "#dc2626" }}>{log.status_code || "—"}</span>
                   </div>
                   <div style={{ fontSize: "13px", color: "#09090b", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{log.message}</div>
-                  {/* Truncated with a title tooltip, same convention as
-                      Owner in Saved Style Guides -- a full Clerk user_id
-                      isn't meaningfully readable in full anyway. */}
+                  {/* Truncated with a title tooltip -- a full Clerk
+                      user_id isn't meaningfully readable in full anyway. */}
                   <div style={S.rowMeta}>
                     user <code title={log.user_id || ""}>{log.user_id ? (log.user_id.length > 16 ? log.user_id.slice(0, 16) + "…" : log.user_id) : "—"}</code>
                   </div>
@@ -676,75 +639,6 @@ export default function AdminPanel({ isAdmin }) {
 
           <div style={{ padding: "10px 20px 16px", fontSize: "11px", color: "#9ca3af" }}>
             Top 200 queries by frequency, grouped by normalized text. A high "Custom" count with no matched template is a real candidate for a new Template Studio template. "Color Retry Fixed It" shows successes/attempts for the automatic color-request correction -- a low ratio here means the retry mechanism itself needs work, not just individual prompts.
-          </div>
-        </div>
-      )}
-
-      {/* Saved Style Guides — admin only. Every user's saved Style Guide
-          brand entries (real colors/fonts extracted or entered by hand),
-          cross-user. Read-only reference list for picking real brand data
-          when building a new Template Studio template -- not a live
-          connection to Template Studio, just a faster way to see what's
-          actually saved than asking in chat each time. */}
-      {isAdmin && (
-        <div style={{ borderTop: "1px solid #dde0e6" }}>
-          <div style={S.header}>
-            <div style={S.headerTitle}>Saved Style Guides</div>
-            <button style={S.btnSecondary} onClick={loadAllStyleGuides} disabled={styleGuidesLoading}>
-              {styleGuidesLoading ? "Loading…" : "Refresh"}
-            </button>
-          </div>
-
-          {styleGuidesMsg.text && (
-            <div style={{ ...S.msg, padding: "8px 20px 0", color: styleGuidesMsg.type === "err" ? "#dc2626" : "#b45309" }}>{styleGuidesMsg.text}</div>
-          )}
-
-          {styleGuidesLoading ? (
-            <div style={S.empty}>Loading saved style guides…</div>
-          ) : allStyleGuides.length === 0 ? (
-            <div style={S.empty}>No saved style guides yet.</div>
-          ) : (
-            // Row layout instead of a wide table -- same pattern Style
-            // Guide's own SavedLibrary.jsx already uses for its saved-
-            // styles list. A 7-column table (2 of them visual swatches)
-            // never fit comfortably in this panel's fixed width even once
-            // horizontal scroll was working correctly; this content is
-            // fundamentally something to browse/scan, not compare
-            // column-by-column, so a table was the wrong shape for it to
-            // begin with. Long brand names ("Superside: Your creative
-            // team's creative team™", a real saved entry) just wrap
-            // instead of forcing scroll.
-            <div>
-              {allStyleGuides.map(sg => (
-                <div key={sg.user_id + "::" + sg.brand_name} style={S.row}>
-                  <div style={S.rowTop}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
-                      <div style={{ display: "flex", gap: "3px", flexShrink: 0 }}>
-                        {Object.entries(sg.colors || {}).map(([key, hex]) => (
-                          <div key={key} title={key + ": " + hex} style={{ width: "14px", height: "14px", borderRadius: "3px", background: hex, border: "1px solid #dde0e6", flexShrink: 0 }} />
-                        ))}
-                      </div>
-                      <span style={S.rowTitle}>{sg.brand_name}</span>
-                    </div>
-                    {sg.source_url
-                      ? <a href={sg.source_url} target="_blank" rel="noreferrer" style={{ fontSize: "12px", color: "#b45309", flexShrink: 0, whiteSpace: "nowrap" }}>{safeHostname(sg.source_url)}</a>
-                      : <span style={{ fontSize: "12px", color: "#9ca3af", flexShrink: 0 }}>manual</span>}
-                  </div>
-                  <div style={S.rowMeta}>
-                    Heading {sg.fonts?.heading || "—"} · Body {sg.fonts?.body || "—"} ·{" "}
-                    {/* Truncated with a title tooltip for the full value --
-                        a full Clerk user_id (user_2AbCdEfGh...) isn't
-                        meaningfully readable at-a-glance in full anyway. */}
-                    owner <span title={sg.user_id}>{sg.user_id.length > 16 ? sg.user_id.slice(0, 16) + "…" : sg.user_id}</span>
-                    {" "}· updated {new Date(sg.updated_at).toLocaleDateString()}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div style={{ padding: "10px 20px 16px", fontSize: "11px", color: "#9ca3af" }}>
-            Every saved Style Guide brand, across all users. When a template gets built using one of these as reference, note the brand name in a comment at that template's definition in constants/templates.js -- durable, visible in the file itself, no separate system to keep in sync.
           </div>
         </div>
       )}
