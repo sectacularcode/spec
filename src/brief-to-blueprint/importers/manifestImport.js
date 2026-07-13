@@ -488,6 +488,18 @@ function manifestPageDocumentToBrief(raw) {
         // content is still real, so it becomes a feature row instead of
         // silently disappearing. Never invents an address to fill the gap.
         featurePairs.push({ heading: headingText, body: noteText });
+        // The section's own button (e.g. "Get Directions") has nowhere to
+        // render without a real map, but it must still be tracked --
+        // confirmed real bug, July 2026: this was the one place on the page
+        // where a button could silently disappear entirely (not rendered,
+        // not flagged, just gone), because the primary branch above is the
+        // only place trackPlaceholderButton() normally runs for map_location,
+        // and map_location is deliberately excluded from the generic
+        // catch-all pass below (it has its own directions_url/maps_url-aware
+        // logic that pass doesn't know about). This fallback needs its own
+        // check so a button here gets the same "needs a real destination"
+        // visibility as every other button on the page.
+        trackPlaceholderButton(section.button && section.button.label, pageDocumentButtonUrl(section.button), "Map");
       }
       return;
     }
