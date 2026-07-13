@@ -774,69 +774,42 @@ export default function AdminPanel({ isAdmin }) {
           ) : allStyleGuides.length === 0 ? (
             <div style={S.empty}>No saved style guides yet.</div>
           ) : (
-            // Wrapped in its own horizontally-scrollable container --
-            // brand names can run long ("Superside: Your creative team's
-            // creative team™", a real saved entry) and a full Clerk
-            // user_id is a long opaque string on its own; without this,
-            // total row width can exceed the panel's fixed width and the
-            // panel's own overflow clips whatever doesn't fit -- which is
-            // exactly what was silently cutting off the Source column's
-            // URLs. This guarantees every column stays reachable (via
-            // scroll) instead of some of them being invisibly cropped,
-            // regardless of how long any individual value gets.
-            //
-            // The wrapper alone wasn't actually enough, though -- S.table
-            // sets width:100%, which means the table could never exceed
-            // its container in the first place, so it was squeezing/
-            // wrapping columns instead of the scroll wrapper ever
-            // engaging. width:auto + minWidth:100% below lets it grow
-            // past 100% when the real content needs it, which is what
-            // actually makes overflow-x meaningful here.
-            <div style={{ overflowX: "auto" }}>
-            <table style={{ ...S.table, width: "auto", minWidth: "100%" }}>
-              <thead>
-                <tr>
-                  <th style={S.th}>Brand</th>
-                  <th style={S.th}>Colors</th>
-                  <th style={S.th}>Heading Font</th>
-                  <th style={S.th}>Body Font</th>
-                  <th style={S.th}>Source</th>
-                  <th style={S.th}>Owner</th>
-                  <th style={S.th}>Updated</th>
-                </tr>
-              </thead>
-              <tbody>
-                {allStyleGuides.map(sg => (
-                  <tr key={sg.user_id + "::" + sg.brand_name}>
-                    <td style={{ ...S.td, maxWidth: "220px" }}>{sg.brand_name}</td>
-                    <td style={S.td}>
-                      <div style={{ display: "flex", gap: "4px" }}>
+            // Row layout instead of a wide table -- same pattern Style
+            // Guide's own SavedLibrary.jsx already uses for its saved-
+            // styles list. A 7-column table (2 of them visual swatches)
+            // never fit comfortably in this panel's fixed width even once
+            // horizontal scroll was working correctly; this content is
+            // fundamentally something to browse/scan, not compare
+            // column-by-column, so a table was the wrong shape for it to
+            // begin with. Long brand names ("Superside: Your creative
+            // team's creative team™", a real saved entry) just wrap
+            // instead of forcing scroll.
+            <div>
+              {allStyleGuides.map(sg => (
+                <div key={sg.user_id + "::" + sg.brand_name} style={{ padding: "14px 20px", borderBottom: "1px solid #eeedf1", display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
+                      <div style={{ display: "flex", gap: "3px", flexShrink: 0 }}>
                         {Object.entries(sg.colors || {}).map(([key, hex]) => (
-                          <div key={key} title={key + ": " + hex} style={{ width: "16px", height: "16px", borderRadius: "3px", background: hex, border: "1px solid #dde0e6", flexShrink: 0 }} />
+                          <div key={key} title={key + ": " + hex} style={{ width: "14px", height: "14px", borderRadius: "3px", background: hex, border: "1px solid #dde0e6", flexShrink: 0 }} />
                         ))}
                       </div>
-                    </td>
-                    <td style={S.td}>{sg.fonts?.heading || "—"}</td>
-                    <td style={S.td}>{sg.fonts?.body || "—"}</td>
-                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>
-                      {sg.source_url
-                        ? <a href={sg.source_url} target="_blank" rel="noreferrer" style={{ color: "#b45309" }}>{safeHostname(sg.source_url)}</a>
-                        : <span style={{ color: "#9ca3af" }}>manual</span>}
-                    </td>
-                    <td style={S.td}>
-                      {/* Truncated with a title tooltip for the full value
-                          -- a full Clerk user_id (user_2AbCdEfGh...) isn't
-                          meaningfully readable at-a-glance in full anyway,
-                          and this frees up real width for Source, the
-                          column that's actually clickable and useful in
-                          full. */}
-                      <code style={{ fontSize: "11px" }} title={sg.user_id}>{sg.user_id.length > 16 ? sg.user_id.slice(0, 16) + "…" : sg.user_id}</code>
-                    </td>
-                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>{new Date(sg.updated_at).toLocaleDateString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      <span style={{ fontSize: "13px", fontWeight: 600, color: "#09090b" }}>{sg.brand_name}</span>
+                    </div>
+                    {sg.source_url
+                      ? <a href={sg.source_url} target="_blank" rel="noreferrer" style={{ fontSize: "12px", color: "#b45309", flexShrink: 0, whiteSpace: "nowrap" }}>{safeHostname(sg.source_url)}</a>
+                      : <span style={{ fontSize: "12px", color: "#9ca3af", flexShrink: 0 }}>manual</span>}
+                  </div>
+                  <div style={{ fontSize: "11px", color: "#9ca3af" }}>
+                    Heading {sg.fonts?.heading || "—"} · Body {sg.fonts?.body || "—"} ·{" "}
+                    {/* Truncated with a title tooltip for the full value --
+                        a full Clerk user_id (user_2AbCdEfGh...) isn't
+                        meaningfully readable at-a-glance in full anyway. */}
+                    owner <span title={sg.user_id}>{sg.user_id.length > 16 ? sg.user_id.slice(0, 16) + "…" : sg.user_id}</span>
+                    {" "}· updated {new Date(sg.updated_at).toLocaleDateString()}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
