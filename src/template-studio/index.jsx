@@ -683,17 +683,13 @@ Return ONLY the new ${fieldName} value as plain text.`;
     return { ...parsed, themeReason };
   }
 
-  // Checks the ACTUAL palette against what the person themselves explicitly
-  // asked for -- a different and stronger signal than verifyCustomColorReasoning
-  // above, which only checks the AI's own reasoning against its own colors.
-  // This checks the person's original request against the real output. If
-  // someone names specific colors ("browns, blues, and hues of pink") and
-  // the model quietly drops one, that's a genuine instruction-following
-  // miss, not a phrasing/hue-boundary quirk -- surfaced directly in the
-  // reasoning text rather than left silent, so it's visible instead of
-  // looking like the request was honored when it wasn't.
-  function checkRequestedColorsHonored(rawInput, parsed) {
-    if (!parsed || !parsed.customColors || !rawInput) return parsed;
+  // Returns the list of color words the person explicitly used that aren't
+  // actually represented in the returned palette -- pure, no side effects,
+  // used both by the visible-warning check below AND by the automatic
+  // retry in describeMySite (which needs the raw list to build a targeted
+  // correction request, not a pre-formatted warning string).
+  function detectMissingRequestedColors(rawInput, parsed) {
+    if (!parsed || !parsed.customColors || !rawInput) return [];
     const bc = parsed.customColors;
     const actualFamilies = new Set(
       [bc.background, bc.accent, bc.text, bc.card].filter(Boolean).map(hexHueFamily).filter(Boolean)
@@ -708,9 +704,82 @@ Return ONLY the new ${fieldName} value as plain text.`;
       seen.add(word);
       if (!acceptable.some(f => actualFamilies.has(f))) missingWords.push(word);
     }
+    return missingWords;
+  }
+
+  // Checks the ACTUAL palette against what the person themselves explicitly
+  // asked for -- a different and stronger signal than verifyCustomColorReasoning
+  // above, which only checks the AI's own reasoning against its own colors.
+  // This checks the person's original request against the real output. If
+  // someone names specific colors ("browns, blues, and hues of pink") and
+  // the model quietly drops one, that's a genuine instruction-following
+  // miss, not a phrasing/hue-boundary quirk -- surfaced directly in the
+  // reasoning text rather than left silent, so it's visible instead of
+  // looking like the request was honored when it wasn't. describeMySite
+  // runs one automatic correction attempt (retryColorPalette) before this
+  // ever gets shown -- reaching the visible warning means the retry was
+  // attempted and still didn't fully succeed, not that no attempt was made.
+  function checkRequestedColorsHonored(rawInput, parsed) {
+    const missingWords = detectMissingRequestedColors(rawInput, parsed);
     if (missingWords.length === 0) return parsed;
     const note = `⚠️ You mentioned ${missingWords.join(" and ")}, but the generated palette doesn't actually include ${missingWords.length > 1 ? "them" : "it"} — try Regenerate for a closer match. `;
     return { ...parsed, themeReason: note + (parsed.themeReason || "") };
+  }
+
+  // One automatic, targeted correction attempt when the first response
+  // misses an explicitly-requested color -- the prompt-level "HARD
+  // REQUIREMENT" rule alone wasn't enough (confirmed live: same furniture-
+  // shop input, same missing blue/pink, even with that rule in place).
+  // Reacting to a specific, named failure ("you used X, that's missing Y")
+  // is a materially different and often more effective prompt than a
+  // general rule stated in advance -- this is the next real attempt at
+  // fixing the underlying problem, not a second copy of the same nudge.
+  //
+  // Deliberately narrow: asks for ONLY a corrected customColors +
+  // themeReason, not a full regenerate. Keeps whatever the first response
+  // already got right (template, layout, fonts, goals, copy) untouched,
+  // and costs far less than re-running the whole recommendation. Best-
+  // effort and non-throwing, matching every other fire-and-forget/
+  // degrade-gracefully helper in this codebase -- if the retry itself
+  // fails for any reason, returns null and the caller falls back to the
+  // visible warning instead of the person seeing nothing happen.
+  async function retryColorPalette(originalText, firstResult, missingWords) {
+    try {
+      const bc = firstResult.customColors || {};
+      const retrySystemPrompt = `You are correcting a color palette that failed to include colors the user explicitly requested. Return ONLY a valid JSON object -- no preamble, no markdown fences:
+{
+  "customColors": { "background": "#hex", "accent": "#hex", "text": "#hex", "card": "#hex" },
+  "themeReason": "1 short sentence explaining the corrected palette"
+}
+The new palette MUST include every one of the missing colors listed below as one of the 4 hex values, while staying true to the overall theme/mood already established. Keep whichever of the original 4 colors still make sense; only change what's necessary to actually include the missing colors.`;
+      const retryUserPrompt = `Original site description: ${originalText}
+Original palette: background=${bc.background || "?"}, accent=${bc.accent || "?"}, text=${bc.text || "?"}, card=${bc.card || "?"}
+Missing colors that MUST be included: ${missingWords.join(", ")}
+Return the corrected JSON now.`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
+      const res = await fetch("/api/generate-copy", {
+        method: "POST",
+        headers: await authHeaders(),
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 300,
+          system: retrySystemPrompt,
+          messages: [{ role: "user", content: retryUserPrompt }],
+        }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!res.ok) return null;
+      const data = await res.json();
+      const responseText = data.content.filter(b => b.type === "text").map(b => b.text).join("").trim();
+      const clean = responseText.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+      const corrected = JSON.parse(clean);
+      if (!corrected || !corrected.customColors) return null;
+      return corrected;
+    } catch {
+      return null;
+    }
   }
 
   // AI Site Brief — describe your site, get template/layout/theme/colors/fonts/brief recommendations
@@ -918,7 +987,31 @@ Rules:
       // user clicked "Regenerate" again before this one finished) — otherwise
       // a slow first response can overwrite a fresher second one.
       if (briefRecReqRef.current !== reqId) return;
-      setBriefRec(checkRequestedColorsHonored(text, verifyCustomColorReasoning(parsedResult)));
+      let verifiedResult = verifyCustomColorReasoning(parsedResult);
+      // One automatic correction attempt when an explicitly-requested
+      // color is missing -- see retryColorPalette's own comment for why
+      // this exists (the prompt-level rule alone wasn't enough, confirmed
+      // live). Only fires when there's actually something to fix.
+      const missingColors = text ? detectMissingRequestedColors(text, verifiedResult) : [];
+      if (missingColors.length > 0) {
+        const corrected = await retryColorPalette(text, verifiedResult, missingColors);
+        // Re-check staleness -- the retry itself awaits a second network
+        // call, so a newer request could have been issued while it was
+        // in flight.
+        if (briefRecReqRef.current !== reqId) return;
+        if (corrected) {
+          verifiedResult = {
+            ...verifiedResult,
+            customColors: corrected.customColors,
+            themeReason: corrected.themeReason || verifiedResult.themeReason,
+          };
+        }
+      }
+      // Runs again regardless of whether a retry happened -- silently
+      // passes through unchanged if the (possibly corrected) palette now
+      // honors the request, or shows the visible warning with whatever's
+      // still actually missing if the retry didn't fully resolve it.
+      setBriefRec(checkRequestedColorsHonored(text, verifiedResult));
     } catch (e) {
       if (briefRecReqRef.current !== reqId) return;
       const msg = e.name === "AbortError"
