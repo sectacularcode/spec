@@ -195,7 +195,7 @@ export default function Brands() {
     const shortId = id => id ? id.slice(0, 12) + "…" : "—";
     return (
       <div style={S.wrap}>
-        <button style={S.backBtn} onClick={backToGrid}>← Back to Brands</button>
+        <button style={S.backBtn} onClick={backToGrid}>← Back to Component Library</button>
         <div style={S.formWrap}>
           <div style={S.section}>
             <p style={S.label}>Brand / client name</p>
@@ -285,8 +285,8 @@ export default function Brands() {
     <div style={S.wrap}>
       <div style={S.header}>
         <div>
-          <div style={S.title}>Brands</div>
-          <div style={S.sub}>Saved client profiles — look, structure, and notes, reusable across every future build.</div>
+          <div style={S.title}>Component Library</div>
+          <div style={S.sub}>Saved brand profiles — colors, fonts, buttons, structure, and notes, reusable across every future build for that client.</div>
         </div>
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <input style={S.search} value={search} onChange={e => setSearch(e.target.value)} placeholder="Search brands…" />

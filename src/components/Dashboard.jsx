@@ -39,8 +39,8 @@ const TOOLS = [
   },
   {
     id: "brands",
-    label: "Brands",
-    desc: "Saved client profiles — colors, fonts, buttons, structure, and notes. Reusable across every future build for that client.",
+    label: "Component Library",
+    desc: "A component library of saved brand profiles — colors, fonts, buttons, structure, and notes. Reusable across every future build for that client.",
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b45309" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18"/><circle cx="7" cy="6.5" r="0.6" fill="#b45309" stroke="none"/><circle cx="10" cy="6.5" r="0.6" fill="#b45309" stroke="none"/>

@@ -72,7 +72,7 @@ function ToolNav({ view, setView, tools, role, user }) {
             // itself uses -- not gated by the `tools` array since it isn't
             // a per-user permission like the other three, it's a shared
             // team resource.
-            role === "admin" && { id: "brands", label: "Brands" },
+            role === "admin" && { id: "brands", label: "Component Library" },
           ].filter(Boolean).map(tab => (
             <button
               key={tab.id}
