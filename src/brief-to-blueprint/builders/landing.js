@@ -699,8 +699,8 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkHeading(brief.servicesHeading || "What We Do", text, "h2", { weight: 700, px: 36 }),
       mkSpacer(24), mkDivider(accent), mkSpacer(32),
       mkContainer([
-        mkIconList(checklistItemsE.slice(0, halfE), accent, text, { width: 50 }),
-        mkIconList(checklistItemsE.slice(halfE), accent, text, { width: 50 }),
+        mkContainer([mkIconList(checklistItemsE.slice(0, halfE), accent, text, {})], null, { isInner: true, width: 50, padY: "0", padX: "0" }),
+        mkContainer([mkIconList(checklistItemsE.slice(halfE), accent, text, {})], null, { isInner: true, width: 50, padY: "0", padX: "0" }),
       ], null, { direction: "row", gap: "48", padY: "0", isInner: true, full: true }),
     ], warmWhite, { padY: "80" });
 
@@ -733,8 +733,8 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkHeading(brief.servicesHeading || "What We Do", text, "h2", { weight: 700, px: 36 }),
       mkSpacer(24), mkDivider(accent), mkSpacer(32),
       mkContainer([
-        mkIconList(checklistItems.slice(0, half), accent, text, { width: 50 }),
-        mkIconList(checklistItems.slice(half), accent, text, { width: 50 }),
+        mkContainer([mkIconList(checklistItems.slice(0, half), accent, text, {})], null, { isInner: true, width: 50, padY: "0", padX: "0" }),
+        mkContainer([mkIconList(checklistItems.slice(half), accent, text, {})], null, { isInner: true, width: 50, padY: "0", padX: "0" }),
       ], null, { direction: "row", gap: "48", padY: "0", isInner: true, full: true }),
     ], warmWhite, { padY: "80" });
 

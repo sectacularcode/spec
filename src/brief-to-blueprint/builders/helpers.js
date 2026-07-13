@@ -89,6 +89,14 @@ export function mkContainer(children, bg, opts) {
   if (opts.center) {
     s.flex_align_items = "center"; s.flex_align_items_tablet = "center"; s.flex_align_items_mobile = "center";
     s.text_align = "center"; s.text_align_tablet = "center"; s.text_align_mobile = "center";
+    // flex_align_items is the cross-axis; for a row-direction container the
+    // cross-axis is vertical, so it never centered a button row horizontally.
+    // Confirmed real bug, July 2026: every button row needed manual
+    // re-centering after import. flex_justify_content (main axis) is what
+    // actually centers row children horizontally.
+    if (direction === "row") {
+      s.flex_justify_content = "center"; s.flex_justify_content_tablet = "center"; s.flex_justify_content_mobile = "center";
+    }
   }
   if (opts.grow) {
     s._flex_grow = opts.grow;
@@ -173,10 +181,10 @@ export function mkButton(label, bgColor, textColor, url) {
 // uses plain "cover" and gets its tight look purely from photo choice, but
 // this zooms in further by default regardless of the uploaded photo's own
 // composition, since not every photo will be a tight close-up.
-// `opts.width` (0-100) sets a fixed column width instead of flex-grow, for
-// side-by-side split layouts. `opts.minHeight` sets an explicit height in
-// px for standalone cards/grids where there's no sibling content to stretch
-// against. `caption` is plain text — safe to escape unconditionally.
+// `caption` is accepted for backward compatibility with existing call
+// sites but no longer rendered — confirmed real complaint, July 2026: the
+// placeholder box alone is enough signal for where a photo goes; the
+// caption text badge was getting manually deleted after every import.
 export function mkImageBg(caption, opts) {
   opts = opts || {};
   var width = opts.width;
@@ -184,33 +192,12 @@ export function mkImageBg(caption, opts) {
   var passThrough = Object.assign({}, opts);
   delete passThrough.width;
   delete passThrough.minHeight;
-  var captionBadge = {
-    id: nid(), elType: "widget", widgetType: "text-editor",
-    settings: {
-      editor: "<p>" + he(caption || "") + "</p>",
-      text_color: "#6B635C",
-      typography_typography: "custom",
-      typography_font_size: { unit: "px", size: 13 },
-      typography_font_style: "italic",
-      text_align: "center",
-      background_background: "classic",
-      background_color: "#FFFFFFDD",
-      padding: { unit: "px", top: "6", right: "14", bottom: "6", left: "14", isLinked: false },
-      border_radius: { unit: "px", top: "4", right: "4", bottom: "4", left: "4", isLinked: true },
-    },
-    elements: [],
-  };
-  var box = mkContainer([captionBadge], "#DDE0E6", Object.assign({
+  var box = mkContainer([], "#DDE0E6", Object.assign({
     isInner: true, full: true, padY: "0", padX: "0",
   }, passThrough));
   box.settings.background_image = { url: "", id: "" };
   box.settings.background_position = "center center";
   box.settings.background_size = "150%";
-  // Badge sits bottom-center: flex_justify_content is the main axis (vertical,
-  // since this box is column-direction) and flex_align_items is the cross
-  // axis (horizontal).
-  box.settings.flex_justify_content = "flex-end";
-  box.settings.flex_align_items = "center";
   if (width) {
     box.settings.width = { unit: "%", size: width };
     box.settings.width_tablet = { unit: "%", size: 100 };
@@ -246,11 +233,12 @@ export function mkDivider(color) {
 }
 
 // Native Elementor icon-list widget (check-mark bullet list). Shared across
-// page builders — pass `opts.width` (0-100) when the list needs a fixed
-// column width for a side-by-side split (icon-list is a widget, not built
-// via mkContainer, so it never gets mkContainer's width handling
-// automatically). Leave width unset for a list that just sits full-width
-// inside whatever column it's placed in.
+// page builders. For a side-by-side split, wrap this in an isInner
+// mkContainer with `width` set rather than sizing the widget itself —
+// icon-list's own width setting wasn't reliably respected inside a flex
+// row (confirmed real bug, July 2026: items shrank to their natural
+// content width, leaving dead space beside them instead of filling the
+// intended column).
 export function mkIconList(items, accent, textColor, opts) {
   opts = opts || {};
   var fontSize = opts.fontSize || 15;
@@ -271,10 +259,6 @@ export function mkIconList(items, accent, textColor, opts) {
     typography_font_size_tablet: { unit: "px", size: fontSize },
     typography_font_size_mobile: { unit: "px", size: Math.max(13, fontSize - 1) },
   };
-  if (opts.width) {
-    s.width = { unit: "%", size: opts.width };
-    s.width_tablet = { unit: "%", size: 100 };
-  }
   return { id: nid(), elType: "widget", widgetType: "icon-list", settings: s, elements: [] };
 }
 

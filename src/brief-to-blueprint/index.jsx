@@ -34,14 +34,14 @@ import { manifestToBrief, ManifestImportError } from "./importers/manifestImport
 // keys are canonical and not user-renameable, only the hex values are
 // editable here.
 const COLOR_FIELDS = [
-  { key: "ink",        label: "Ink" },
+  { key: "ink",        label: "Heading" },
   { key: "brass",      label: "Accent" },
-  { key: "brass-deep", label: "Accent Deep" },
+  { key: "brass-deep", label: "Accent — hover" },
   { key: "bone",       label: "Background" },
-  { key: "asphalt",    label: "Dark Panel" },
+  { key: "asphalt",    label: "Dark panel" },
   { key: "stone",      label: "Muted" },
-  { key: "warm-white", label: "Warm White" },
-  { key: "text",       label: "Text" },
+  { key: "warm-white", label: "Text on dark" },
+  { key: "text",       label: "Body text" },
 ];
 
 export default function CustomBuild({ userId, role } = {}) {
