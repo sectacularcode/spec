@@ -74,7 +74,6 @@ function ToolNav({ view, setView, tools, role, user }) {
             // a per-user permission like the other three, it's a shared
             // team resource.
             role === "admin" && { id: "brands", label: "Component Library" },
-            role === "admin" && { id: "design-system", label: "Design System" },
           ].filter(Boolean).map(tab => (
             <button
               key={tab.id}
