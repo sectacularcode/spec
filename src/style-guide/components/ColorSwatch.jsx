@@ -94,7 +94,7 @@ export default function ColorSwatch({ color, onChange, onRemove }) {
             <select
               value={color.role}
               onChange={e => onChange({ ...color, role: e.target.value })}
-              style={{ ...inputStyle, color: "#6B635C" }}
+              style={{ ...inputStyle, color: "#6B635C", padding: "4px 22px 4px 6px", background: "#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%236b635c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\") no-repeat right 6px center", cursor: "pointer", appearance: "none", WebkitAppearance: "none" }}
             >
               {TEMPLATE_ROLES.map(role => <option key={role} value={role}>{role}</option>)}
             </select>

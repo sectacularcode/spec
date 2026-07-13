@@ -2123,8 +2123,6 @@ Rules:
                 const colorValues = Object.values(colors).filter(Boolean);
                 return (
                   <div key={build.id} style={{ background: "#fff", border: "1px solid #dde0e6", borderRadius: "10px", overflow: "hidden" }}>
-                    {/* Color bar */}
-                    <div style={{ height: "6px", background: colorValues.length >= 2 ? `linear-gradient(to right, ${colorValues[0]} 0%, ${colorValues[0]} 50%, ${colorValues[1]} 50%)` : colorValues[0] || "#dde0e6" }} />
                     <div style={{ padding: "16px" }}>
                       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "8px", marginBottom: "8px" }}>
                         <div>

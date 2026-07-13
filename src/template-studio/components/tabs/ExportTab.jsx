@@ -7,19 +7,19 @@ export default function ExportTab({ ctx }) {
             <div style={{ background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "8px", padding: "20px", marginBottom: "16px" }}>
               <div style={{ fontSize: "12px", color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>Download</div>
               <div style={{ display: "flex", gap: "6px", flexWrap: "nowrap", marginBottom: "16px", overflowX: "auto", alignItems: "center" }}>
-                <button onClick={downloadPage} style={{ padding: "8px 14px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
+                <button onClick={downloadPage} style={{ padding: "8px 14px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="download" size={14} color="#ffffff" /> Download Template
                 </button>
-                <button onClick={downloadHeader} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
+                <button onClick={downloadHeader} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="download" size={14} color="#09090b" /> Header Template
                 </button>
-                <button onClick={downloadFooter} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
+                <button onClick={downloadFooter} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="download" size={14} color="#09090b" /> Footer Template
                 </button>
-                <button onClick={exportBrief} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
+                <button onClick={exportBrief} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="file-text" size={14} color="#09090b" /> Export Brief
                 </button>
-                <button onClick={shareBrief} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
+                <button onClick={shareBrief} style={{ padding: "8px 14px", background: "#ffffff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
                   <Icon name="arrowRight" size={14} color="#09090b" /> Share Brief Link
                 </button>
                 {project.pages.length > 1 && (
