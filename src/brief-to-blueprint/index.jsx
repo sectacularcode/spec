@@ -546,15 +546,30 @@ export default function CustomBuild({ userId, role } = {}) {
   // to add them once a brief was already loaded; the swatch row was
   // read-only. Initializes brief.colors/fonts if they don't exist yet
   // rather than requiring them to already be present.
+  //
+  // Both call regenerateAllPages() (not just the active preview page) --
+  // confirmed real bug, July 2026: colors/fonts are brand-wide, but these
+  // two functions were the only brief-editing paths that never refreshed
+  // generated.pages at all. The live preview reads brief directly so the
+  // edit looked like it took, while the actual downloadable JSON silently
+  // kept whatever colors were baked in at the last "Generate" click.
+  // Every other brief-editing path (section styles, skip-checklist) was
+  // already wired to regenerateActivePage() when that safeguard was built;
+  // these two were just missed. Full regenerateAllPages() rather than the
+  // single-page regenerateActivePage() specifically because a color/font
+  // change should apply to every page in the project, not only whichever
+  // one happens to be in preview when the edit is made.
   function setBriefColor(key, hex) {
-    setBrief(b => ({ ...b, colors: { ...(b.colors || {}), [key]: hex } }));
+    var updatedBrief = { ...brief, colors: { ...(brief.colors || {}), [key]: hex } };
+    setBrief(updatedBrief);
+    regenerateAllPages(updatedBrief);
   }
   function setBriefFont(index, value) {
-    setBrief(b => {
-      const fonts = Array.isArray(b.fonts) ? [...b.fonts] : ["", ""];
-      fonts[index] = value;
-      return { ...b, fonts };
-    });
+    var fonts = Array.isArray(brief.fonts) ? [...brief.fonts] : ["", ""];
+    fonts[index] = value;
+    var updatedBrief = { ...brief, fonts: fonts };
+    setBrief(updatedBrief);
+    regenerateAllPages(updatedBrief);
   }
 
   // ── Section styles picker (landing/other pages) ──────────────────────
@@ -623,6 +638,18 @@ export default function CustomBuild({ userId, role } = {}) {
     if (!freshPages.length) return;
     var freshPage = freshPages[0];
     setGenerated(g => ({ ...g, pages: g.pages.map(p => p.id === previewPage ? freshPage : p) }));
+  }
+
+  // Same purpose as regenerateActivePage(), but for brief edits that apply
+  // to the whole project rather than one page -- colors and fonts are
+  // brand-wide, so scoping the refresh to just previewPage would leave
+  // every other selected page silently stale on download. Also costs
+  // nothing (no AI call), same as regenerateActivePage().
+  function regenerateAllPages(updatedBrief) {
+    if (!generated) return;
+    var freshPages = generatePages(updatedBrief, selectedPages, generated.inspoContext, generated.aiRecs, customPages);
+    if (!freshPages.length) return;
+    setGenerated(g => ({ ...g, pages: freshPages }));
   }
 
   function updateSectionLayout(newRows) {
