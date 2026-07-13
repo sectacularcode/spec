@@ -5,9 +5,13 @@ import {
   verifyThemeReasonAgainstColors,
   detectMissingRequestedColors,
   prefixMissingColorsWarning,
-  retryColorPalette,
-  mergeCorrectedColors,
+  retryColorPaletteUntilSatisfied,
 } from "../../utils/colorRequestCheck.js";
+import {
+  detectMissingRequestedFont,
+  prefixMissingFontWarning,
+  retryFontChoice,
+} from "../../utils/fontRequestCheck.js";
 
 // GenerateFromKeywordsModal
 // Opened from the "Generate from keywords" option in the Add Page dropdown.
@@ -123,15 +127,27 @@ Research what this theme looks, sounds, and feels like. Use authentic colors fro
         : [];
       if (missingColors.length > 0) {
         colorRetryFired = true;
-        const corrected = await retryColorPalette(authHeaders, rawInput, normalizedColors, missingColors);
-        if (corrected && corrected.colors) {
-          normalizedColors = mergeCorrectedColors(normalizedColors, corrected.colors);
-          themeReason = corrected.themeReason || themeReason;
-          colorRetrySucceeded = detectMissingRequestedColors(rawInput, normalizedColors).length === 0;
-        }
+        const result = await retryColorPaletteUntilSatisfied(authHeaders, rawInput, normalizedColors, missingColors, 2);
+        normalizedColors = result.colors;
+        themeReason = result.themeReason || themeReason;
+        colorRetrySucceeded = result.succeeded;
+      }
+      // Same idea for fonts: a much smaller, deliberately conservative
+      // check (fontRequestCheck.js) since font descriptors are far more
+      // ambiguous than color words -- only an explicit font name or a
+      // genuinely typography-specific word counts, not general brand
+      // adjectives.
+      let headingFont = parsed.headingFont;
+      const missingFont = rawInput ? detectMissingRequestedFont(rawInput, headingFont) : null;
+      if (missingFont) {
+        const correctedFont = await retryFontChoice(authHeaders, rawInput, missingFont);
+        if (correctedFont) headingFont = correctedFont;
       }
       if (normalizedColors) {
         themeReason = prefixMissingColorsWarning(rawInput, normalizedColors, themeReason);
+      }
+      if (rawInput) {
+        themeReason = prefixMissingFontWarning(rawInput, headingFont, themeReason);
       }
       // Map back to this file's own { primary, accent, text, card } shape
       // before it flows into buildPageFromAI, which already expects that
@@ -144,6 +160,7 @@ Research what this theme looks, sounds, and feels like. Use authentic colors fro
           text: normalizedColors.text,
           card: normalizedColors.card,
         } : (parsed.colors || {}),
+        headingFont,
         theme: themeReason,
       };
 

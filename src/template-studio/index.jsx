@@ -46,9 +46,13 @@ import {
   verifyThemeReasonAgainstColors,
   detectMissingRequestedColors,
   prefixMissingColorsWarning,
-  retryColorPalette,
-  mergeCorrectedColors,
+  retryColorPaletteUntilSatisfied,
 } from "../utils/colorRequestCheck.js";
+import {
+  detectMissingRequestedFont,
+  prefixMissingFontWarning,
+  retryFontChoice,
+} from "../utils/fontRequestCheck.js";
 
 // Styles
 
@@ -792,10 +796,13 @@ Rules:
           themeReason: verifyThemeReasonAgainstColors(verifiedResult.customColors, verifiedResult.themeReason),
         };
       }
-      // One automatic correction attempt when an explicitly-requested color
-      // is missing -- see retryColorPalette's own comment (colorRequestCheck.js)
-      // for why this exists (the prompt-level rule alone wasn't enough,
-      // confirmed live). Only fires when there's actually something to fix.
+      // Up to 2 automatic correction attempts when explicitly-requested
+      // colors are missing -- see retryColorPaletteUntilSatisfied's own
+      // comment (colorRequestCheck.js) for why this exists (the prompt-
+      // level rule alone wasn't enough, confirmed live) and why 1 attempt
+      // wasn't always enough either (a 4-simultaneous-color request is a
+      // meaningfully harder case). Only fires when there's actually
+      // something to fix.
       let colorRetryFired = false;
       let colorRetrySucceeded = false;
       const missingColors = (text && verifiedResult.customColors)
@@ -803,29 +810,48 @@ Rules:
         : [];
       if (missingColors.length > 0) {
         colorRetryFired = true;
-        const corrected = await retryColorPalette(authHeaders, text, verifiedResult.customColors, missingColors);
-        // Re-check staleness -- the retry itself awaits a second network
-        // call, so a newer request could have been issued while it was in
+        const result = await retryColorPaletteUntilSatisfied(authHeaders, text, verifiedResult.customColors, missingColors, 2);
+        // Re-check staleness -- each retry attempt is its own network call,
+        // so a newer request could have been issued while this was in
         // flight.
         if (briefRecReqRef.current !== reqId) return;
-        if (corrected && corrected.colors) {
-          const mergedColors = mergeCorrectedColors(verifiedResult.customColors, corrected.colors);
-          verifiedResult = {
-            ...verifiedResult,
-            customColors: mergedColors,
-            themeReason: corrected.themeReason || verifiedResult.themeReason,
-          };
-          colorRetrySucceeded = detectMissingRequestedColors(text, mergedColors).length === 0;
+        verifiedResult = {
+          ...verifiedResult,
+          customColors: result.colors,
+          themeReason: result.themeReason || verifiedResult.themeReason,
+        };
+        colorRetrySucceeded = result.succeeded;
+      }
+      // Same idea for fonts: a much smaller, deliberately conservative
+      // check (fontRequestCheck.js) since font descriptors are far more
+      // ambiguous than color words -- only an explicit font name or a
+      // genuinely typography-specific word (serif, monospace, condensed)
+      // counts, not general brand adjectives. One retry attempt is enough
+      // here since it's a single value picked from a small fixed list, not
+      // 4 hex values that need to work together.
+      const missingFont = text ? detectMissingRequestedFont(text, verifiedResult.headingFont) : null;
+      if (missingFont) {
+        const correctedFont = await retryFontChoice(authHeaders, text, missingFont);
+        if (briefRecReqRef.current !== reqId) return;
+        if (correctedFont) {
+          verifiedResult = { ...verifiedResult, headingFont: correctedFont };
         }
       }
       // Runs again regardless of whether a retry happened -- silently
-      // passes through unchanged if the (possibly corrected) palette now
-      // honors the request, or shows the visible warning with whatever's
-      // still actually missing if the retry didn't fully resolve it.
+      // passes through unchanged if the (possibly corrected) palette/font
+      // now honors the request, or shows the visible warning with
+      // whatever's still actually missing if the retry didn't fully
+      // resolve it.
       if (verifiedResult.customColors) {
         verifiedResult = {
           ...verifiedResult,
           themeReason: prefixMissingColorsWarning(text, verifiedResult.customColors, verifiedResult.themeReason),
+        };
+      }
+      if (text) {
+        verifiedResult = {
+          ...verifiedResult,
+          themeReason: prefixMissingFontWarning(text, verifiedResult.headingFont, verifiedResult.themeReason),
         };
       }
       // Log every resolved (non-stale) attempt regardless of outcome --
@@ -1907,7 +1933,7 @@ Rules:
 
         {/* Keyword Builds — recovery history for custom keyword-generated builds */}
         {keywordBuilds.length > 0 && (
-          <div style={{ marginTop: "40px" }}>
+          <div style={{ marginTop: "40px", marginBottom: "40px" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
               <div>
                 <div style={{ fontSize: "20px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>Keyword Builds</div>

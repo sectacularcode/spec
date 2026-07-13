@@ -78,8 +78,18 @@ const COLOR_WORD_FAMILY = {
   brown: ["orange"], tan: ["orange"], bronze: ["orange"], copper: ["orange"], terracotta: ["orange", "red"], clay: ["orange"],
   yellow: ["yellow"], gold: ["orange", "yellow"], mustard: ["yellow"],
   green: ["green"], emerald: ["green"], sage: ["green"], olive: ["green", "yellow"], forest: ["green"], mint: ["green"], sewer: ["green"],
-  teal: ["teal"], turquoise: ["teal"], cyan: ["teal"], aqua: ["teal"],
-  blue: ["blue"], navy: ["blue"], cobalt: ["blue"], indigo: ["blue", "purple"],
+  // teal widened to accept blue and green -- audited a broad sample of
+  // real pastel shades (2026-07-13, after "blue" alone proved insufficient
+  // for a candy/kids palette request): light/pastel versions of blue and
+  // teal drift into each other's bucket constantly (sky blue, baby blue,
+  // powder blue all compute as "teal" not "blue"), and pastel teal/mint
+  // shades occasionally drift into "green". Saturated canonical colors
+  // (the original 2026-07-12 audit) don't show this drift nearly as much
+  // as their lighter, less saturated real-world variants do -- worth
+  // remembering for any future word added here: test the pastel version,
+  // not just the saturated one.
+  teal: ["teal", "blue", "green"], turquoise: ["teal"], cyan: ["teal"], aqua: ["teal"],
+  blue: ["blue", "teal"], navy: ["blue"], cobalt: ["blue"], indigo: ["blue", "purple"],
   purple: ["purple", "pink"], violet: ["purple"], lavender: ["purple", "blue"], plum: ["purple", "pink"], lilac: ["purple", "pink"],
   pink: ["pink", "red"], magenta: ["pink", "purple"], rose: ["orange", "pink", "red"], fuchsia: ["pink", "purple"],
   black: ["black"], charcoal: ["black", "gray", "blue"], onyx: ["black"], ebony: ["black"],
@@ -246,4 +256,31 @@ export function mergeCorrectedColors(originalColors, correctedColors) {
     text: isValidHex(cc.text) ? cc.text : orig.text,
     card: isValidHex(cc.card) ? cc.card : orig.card,
   };
+}
+
+// Runs retryColorPalette up to maxAttempts times, stopping as soon as the
+// palette genuinely satisfies the request or attempts run out. A single
+// retry sometimes wasn't enough for harder requests -- confirmed live: a
+// request naming 4 distinct colors at once ("pink, yellow, green and
+// blue") is a meaningfully harder case than 1-2 colors, since it leaves
+// far less room for the model to miss on the first correction attempt too.
+// Keeps looping logic in one shared place rather than duplicated in both
+// callers. Bounded and cheap to abandon: each attempt is the same small,
+// targeted request as a single retry (colors + reason only, not a full
+// regenerate), and this stops immediately once satisfied rather than
+// always running the full maxAttempts.
+export async function retryColorPaletteUntilSatisfied(authHeadersFn, rawInput, initialColors, initialMissingWords, maxAttempts = 2) {
+  let colors = initialColors;
+  let themeReason = null;
+  let attempts = 0;
+  let missing = initialMissingWords;
+  while (missing.length > 0 && attempts < maxAttempts) {
+    attempts++;
+    const corrected = await retryColorPalette(authHeadersFn, rawInput, colors, missing);
+    if (!corrected || !corrected.colors) break; // retry itself failed -- no point looping further
+    colors = mergeCorrectedColors(colors, corrected.colors);
+    themeReason = corrected.themeReason || themeReason;
+    missing = detectMissingRequestedColors(rawInput, colors);
+  }
+  return { colors, themeReason, attempts, succeeded: missing.length === 0 };
 }
