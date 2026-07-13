@@ -23,6 +23,17 @@ function RolePill({ role }) {
   );
 }
 
+// Server-side save already validates source_url is a real, parseable
+// http/https URL (see api/brand-styles.js) -- but that validation was
+// added after the table went live, so rows saved before it exists don't
+// retroactively become clean. Defensive here rather than trusting every
+// existing row predates that fix: falls back to showing the raw string
+// if it isn't parseable, instead of letting a bad legacy value throw and
+// crash this whole panel's render.
+function safeHostname(url) {
+  try { return new URL(url).hostname; } catch { return url; }
+}
+
 export default function AdminPanel({ isAdmin }) {
   const { user } = useUser();
   const [users, setUsers]           = useState([]);
@@ -141,6 +152,30 @@ export default function AdminPanel({ isAdmin }) {
     setTemplateQueriesLoading(false);
   }
   useEffect(() => { if (isAdmin && user?.id) loadTemplateQueries(); }, [isAdmin, user?.id]);
+
+  // Saved Style Guides (admin only) — every user's saved Style Guide brand
+  // entries, real colors/fonts, cross-user. Purely a reference list for
+  // picking real brand data when building a new Template Studio template
+  // -- not a live connection between the two tools, just a faster way to
+  // see what's actually available than asking in chat each time.
+  const [allStyleGuides, setAllStyleGuides] = useState([]);
+  const [styleGuidesLoading, setStyleGuidesLoading] = useState(false);
+  const [styleGuidesMsg, setStyleGuidesMsg] = useState({ text: "", type: "ok" });
+  async function loadAllStyleGuides() {
+    setStyleGuidesLoading(true);
+    try {
+      const res = await fetch("/api/brand-styles?all=true", { headers: await authHeaders() });
+      const data = await res.json();
+      if (res.ok) {
+        setAllStyleGuides(data.styles || []);
+        setStyleGuidesMsg({ text: "", type: "ok" });
+      } else {
+        setStyleGuidesMsg({ text: data.error || "Failed to load saved style guides.", type: "err" });
+      }
+    } catch { setStyleGuidesMsg({ text: "Error loading saved style guides.", type: "err" }); }
+    setStyleGuidesLoading(false);
+  }
+  useEffect(() => { if (isAdmin && user?.id) loadAllStyleGuides(); }, [isAdmin, user?.id]);
 
   function startEditLimit(scope, scopeId, currentCents) {
     setEditingLimit({ scope, scopeId });
@@ -688,6 +723,74 @@ export default function AdminPanel({ isAdmin }) {
 
           <div style={{ padding: "10px 20px 16px", fontSize: "11px", color: "#9ca3af" }}>
             Top 200 queries by frequency, grouped by normalized text. A high "Custom" count with no matched template is a real candidate for a new Template Studio template. "Color Retry Fixed It" shows successes/attempts for the automatic color-request correction -- a low ratio here means the retry mechanism itself needs work, not just individual prompts.
+          </div>
+        </div>
+      )}
+
+      {/* Saved Style Guides — admin only. Every user's saved Style Guide
+          brand entries (real colors/fonts extracted or entered by hand),
+          cross-user. Read-only reference list for picking real brand data
+          when building a new Template Studio template -- not a live
+          connection to Template Studio, just a faster way to see what's
+          actually saved than asking in chat each time. */}
+      {isAdmin && (
+        <div style={{ borderTop: "1px solid #dde0e6" }}>
+          <div style={S.header}>
+            <div style={S.headerTitle}>Saved Style Guides</div>
+            <button style={S.btnSecondary} onClick={loadAllStyleGuides} disabled={styleGuidesLoading}>
+              {styleGuidesLoading ? "Loading…" : "Refresh"}
+            </button>
+          </div>
+
+          {styleGuidesMsg.text && (
+            <div style={{ ...S.msg, padding: "8px 20px 0", color: styleGuidesMsg.type === "err" ? "#dc2626" : "#b45309" }}>{styleGuidesMsg.text}</div>
+          )}
+
+          {styleGuidesLoading ? (
+            <div style={S.empty}>Loading saved style guides…</div>
+          ) : allStyleGuides.length === 0 ? (
+            <div style={S.empty}>No saved style guides yet.</div>
+          ) : (
+            <table style={S.table}>
+              <thead>
+                <tr>
+                  <th style={S.th}>Brand</th>
+                  <th style={S.th}>Colors</th>
+                  <th style={S.th}>Heading Font</th>
+                  <th style={S.th}>Body Font</th>
+                  <th style={S.th}>Source</th>
+                  <th style={S.th}>Owner</th>
+                  <th style={S.th}>Updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                {allStyleGuides.map(sg => (
+                  <tr key={sg.user_id + "::" + sg.brand_name}>
+                    <td style={S.td}>{sg.brand_name}</td>
+                    <td style={S.td}>
+                      <div style={{ display: "flex", gap: "4px" }}>
+                        {Object.entries(sg.colors || {}).map(([key, hex]) => (
+                          <div key={key} title={key + ": " + hex} style={{ width: "16px", height: "16px", borderRadius: "3px", background: hex, border: "1px solid #dde0e6", flexShrink: 0 }} />
+                        ))}
+                      </div>
+                    </td>
+                    <td style={S.td}>{sg.fonts?.heading || "—"}</td>
+                    <td style={S.td}>{sg.fonts?.body || "—"}</td>
+                    <td style={S.td}>
+                      {sg.source_url
+                        ? <a href={sg.source_url} target="_blank" rel="noreferrer" style={{ color: "#b45309" }}>{safeHostname(sg.source_url)}</a>
+                        : <span style={{ color: "#9ca3af" }}>manual</span>}
+                    </td>
+                    <td style={S.td}><code style={{ fontSize: "11px" }}>{sg.user_id}</code></td>
+                    <td style={S.td}>{new Date(sg.updated_at).toLocaleDateString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+
+          <div style={{ padding: "10px 20px 16px", fontSize: "11px", color: "#9ca3af" }}>
+            Every saved Style Guide brand, across all users. When a template gets built using one of these as reference, note the brand name in a comment at that template's definition in constants/templates.js -- durable, visible in the file itself, no separate system to keep in sync.
           </div>
         </div>
       )}

@@ -5,10 +5,23 @@
 //
 // GET    /api/brand-styles              — list the caller's saved brand styles
 // GET    /api/brand-styles?brand_name=X — look up one brand's saved style
+// GET    /api/brand-styles?all=true     — admin only, every user's saved
+//                                          styles. Reference list for
+//                                          picking real brand colors/fonts
+//                                          when building a new Template
+//                                          Studio template -- same "admin
+//                                          sees everything" scoping as
+//                                          error-logs.js and template-
+//                                          queries.js, not its own new
+//                                          pattern. Ignored entirely for
+//                                          non-admin callers, who keep
+//                                          getting exactly the same
+//                                          user-scoped response as before
+//                                          -- this is additive only.
 // POST   /api/brand-styles              — { brand_name, colors, fonts, buttons } — upsert
 // DELETE /api/brand-styles?brand_name=X — remove one saved style
 
-import { requireAuth } from "./_lib/auth.js";
+import { requireAuth, getProfile } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { validText, validJsonSize } from "./_lib/validate.js";
 import { logError } from "./_lib/errorLog.js";
@@ -140,6 +153,21 @@ export default async function handler(req, res) {
     await ensureTable();
 
     if (req.method === "GET") {
+      // Admin-only, cross-user reference list -- checked first since it's
+      // a completely separate response shape (every user's styles, plus
+      // which user_id each belongs to) from the two existing GET paths
+      // below, not a variant of either one.
+      if (req.query.all === "true") {
+        const profile = await getProfile(userId);
+        if (profile.role !== "admin") return res.status(403).json({ error: "Forbidden" });
+        if (!(await rateLimit(userId, "brand-styles-admin-all", 30))) return tooMany(res);
+        const { rows } = await sql`
+          SELECT user_id, brand_name, colors, fonts, buttons, source_url, updated_at FROM brand_styles
+          ORDER BY updated_at DESC
+        `;
+        return res.status(200).json({ styles: rows });
+      }
+
       const brandName = req.query.brand_name;
       if (brandName) {
         if (!validText(brandName, 200)) return res.status(400).json({ error: "Invalid brand_name" });
