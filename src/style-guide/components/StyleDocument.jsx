@@ -113,10 +113,10 @@ export default function StyleDocument({ brandName, sourceUrl, colors, fonts, but
                 {[["H1", 40], ["H2", 30], ["H3", 23], ["H4", 18]].map(([label, px]) => (
                   <div key={label} style={typeRow}>
                     <div style={typeLabel}>{label}<small style={typeLabelSmall}>{px}px</small></div>
-                    {label === "H1" ? <h1 style={{ margin: 0, fontFamily: `'${headingFont.name}', serif`, fontWeight: 500, fontSize: px, color: readableHeadingColor }}>Built for the long haul</h1>
-                    : label === "H2" ? <h2 style={{ margin: 0, fontFamily: `'${headingFont.name}', serif`, fontWeight: 500, fontSize: px, color: readableHeadingColor }}>Every piece, field-tested</h2>
-                    : label === "H3" ? <h3 style={{ margin: 0, fontFamily: `'${headingFont.name}', serif`, fontWeight: 500, fontSize: px, color: readableHeadingColor }}>Made to be repaired, not replaced</h3>
-                    : <h4 style={{ margin: 0, fontFamily: `'${headingFont.name}', serif`, fontWeight: 500, fontSize: px, color: readableHeadingColor }}>Care and maintenance</h4>}
+                    {label === "H1" ? <h1 style={{ margin: 0, fontFamily: `'${headingFont.name}', serif`, fontWeight: 500, fontSize: px, color: readableHeadingColor }}>A headline in your heading font</h1>
+                    : label === "H2" ? <h2 style={{ margin: 0, fontFamily: `'${headingFont.name}', serif`, fontWeight: 500, fontSize: px, color: readableHeadingColor }}>A subheading right below it</h2>
+                    : label === "H3" ? <h3 style={{ margin: 0, fontFamily: `'${headingFont.name}', serif`, fontWeight: 500, fontSize: px, color: readableHeadingColor }}>A smaller section heading</h3>
+                    : <h4 style={{ margin: 0, fontFamily: `'${headingFont.name}', serif`, fontWeight: 500, fontSize: px, color: readableHeadingColor }}>The smallest heading size</h4>}
                   </div>
                 ))}
               </div>
