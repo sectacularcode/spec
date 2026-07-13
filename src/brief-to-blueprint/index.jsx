@@ -1183,33 +1183,42 @@ export default function CustomBuild({ userId, role } = {}) {
                 const colors = draft.colors || {};
                 const colorValues = Object.values(colors).filter(Boolean);
                 return (
-                  <div key={draft.id} style={{ background: "#fff", border: "1px solid #dde0e6", borderRadius: "10px", overflow: "hidden" }}>
-                    {/* Color preview */}
-                    <div style={{ height: "6px", background: colorValues.length > 0 ? `linear-gradient(to right, ${colorValues.slice(0,4).join(", ")})` : "#dde0e6" }} />
-                    <div style={{ padding: "18px" }}>
-                      <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>{draft.clientName}</div>
-                      <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>
-                        {draft.date} · {draft.pages.length} page{draft.pages.length !== 1 ? "s" : ""}
-                        {draft.hasGenerated && <span style={{ marginLeft: "8px", fontSize: "11px", background: "#b45309", color: "#ffffff", padding: "2px 6px", borderRadius: "3px", fontWeight: 600 }}>Generated</span>}
-                      </div>
-                      <div style={{ display: "flex", gap: "4px", marginBottom: "14px", flexWrap: "wrap" }}>
-                        {draft.pages.slice(0, 4).map(p => (
-                          <span key={p} style={{ fontSize: "9px", padding: "3px 8px", background: "rgba(180, 83, 9, 0.1)", color: "#b45309", borderRadius: "10px", whiteSpace: "nowrap", fontWeight: 500, letterSpacing: "0.02em" }}>{(ALL_PAGES.find(pg => pg.id === p) || {}).label || p.replace(/-\d+$/, "").replace(/(^|-)(.)/g, (_, s, c) => (s ? " " : "") + c.toUpperCase())}</span>
+                  <div key={draft.id} style={{ background: "#fff", border: "1px solid #dde0e6", borderRadius: "10px", padding: "22px 20px", display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", textAlign: "center" }}>
+                    <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b" }}>{draft.clientName}</div>
+                    {/* Color preview -- discrete swatches, same pattern as
+                        Component Library's cards (name, then swatches, then
+                        metadata) rather than this card's old blended
+                        gradient, which could smear unrelated colors
+                        together at a 6px height. Consistent with the rest
+                        of the app instead of its own one-off. */}
+                    {colorValues.length > 0 && (
+                      <div style={{ display: "flex", gap: "6px" }}>
+                        {colorValues.slice(0, 4).map((hex, i) => (
+                          <div key={i} style={{ width: "24px", height: "24px", borderRadius: "5px", background: hex, flexShrink: 0 }} />
                         ))}
-                        {draft.pages.length > 4 && <span style={{ fontSize: "11px", color: "#9ca3af" }}>+{draft.pages.length - 4}</span>}
                       </div>
-                      <div style={{ display: "flex", gap: "8px" }}>
-                        <button
-                          onClick={() => resumeDraft(draft)}
-                          style={{ flex: 1, padding: "8px 0", fontSize: "12px", fontWeight: 600, background: "#3f3f46", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" }}>
-                          Resume
-                        </button>
-                        <button
-                          onClick={() => setConfirmDraftDeleteId(draft.id)}
-                          style={{ padding: "8px 12px", fontSize: "12px", background: "#fff", color: "#6b7280", border: "1px solid #dde0e6", borderRadius: "4px", cursor: "pointer" }}>
-                          Delete
-                        </button>
-                      </div>
+                    )}
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", color: "#6b7280" }}>
+                      <span>{draft.date} · {draft.pages.length} page{draft.pages.length !== 1 ? "s" : ""}</span>
+                      {draft.hasGenerated && <span style={{ fontSize: "10px", fontWeight: 600, background: "#b45309", color: "#fff", padding: "3px 8px", borderRadius: "20px" }}>Generated</span>}
+                    </div>
+                    <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", justifyContent: "center" }}>
+                      {draft.pages.slice(0, 4).map(p => (
+                        <span key={p} style={{ fontSize: "9px", padding: "3px 8px", background: "rgba(180, 83, 9, 0.1)", color: "#b45309", borderRadius: "20px", whiteSpace: "nowrap", fontWeight: 500, letterSpacing: "0.02em" }}>{(ALL_PAGES.find(pg => pg.id === p) || {}).label || p.replace(/-\d+$/, "").replace(/(^|-)(.)/g, (_, s, c) => (s ? " " : "") + c.toUpperCase())}</span>
+                      ))}
+                      {draft.pages.length > 4 && <span style={{ fontSize: "11px", color: "#9ca3af" }}>+{draft.pages.length - 4}</span>}
+                    </div>
+                    <div style={{ display: "flex", gap: "8px", width: "100%", marginTop: "4px" }}>
+                      <button
+                        onClick={() => resumeDraft(draft)}
+                        style={{ flex: 1, padding: "9px 0", fontSize: "12px", fontWeight: 600, background: "#3f3f46", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
+                        Resume
+                      </button>
+                      <button
+                        onClick={() => setConfirmDraftDeleteId(draft.id)}
+                        style={{ flex: 1, padding: "9px 0", fontSize: "12px", fontWeight: 600, background: "#fff", color: "#6b7280", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
+                        Delete
+                      </button>
                     </div>
                   </div>
                 );
