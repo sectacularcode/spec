@@ -312,14 +312,18 @@ export default function AdminPanel({ isAdmin }) {
   }
 
   const S = {
-    wrap: { background: "#fff", border: "1px solid #dde0e6", borderRadius: "10px", overflow: "hidden", marginTop: "32px" },
+    wrap: { background: "#fff", border: "1px solid #dde0e6", borderRadius: "10px", overflow: "hidden", marginTop: "32px", fontFamily: "'Be Vietnam Pro', sans-serif" },
     header: { padding: "16px 20px", borderBottom: "1px solid #dde0e6", display: "flex", justifyContent: "space-between", alignItems: "center" },
     headerTitle: { fontSize: "13px", fontWeight: 700, color: "#09090b", textTransform: "uppercase", letterSpacing: "0.08em" },
     addBlock: { padding: "20px", borderBottom: "1px solid #dde0e6", background: "#fafafa" },
     addLabel: { fontSize: "11px", fontWeight: 600, color: "#6b7280", marginBottom: "10px" },
     addRow: { display: "grid", gridTemplateColumns: "1fr 120px 200px auto", gap: "8px", alignItems: "end" },
     fieldLabel: { fontSize: "11px", color: "#6b7280", fontWeight: 600, marginBottom: "4px" },
-    input: { padding: "8px 10px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", width: "100%", boxSizing: "border-box", fontFamily: "Inter, system-ui, sans-serif" },
+    // Form controls (input/select/button) don't inherit font-family from
+    // an ancestor the way divs/spans do -- wrap's fontFamily above covers
+    // most of this file's text, but these need it set explicitly or
+    // they'd silently fall back to the browser default UI font.
+    input: { padding: "8px 10px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "13px", width: "100%", boxSizing: "border-box", fontFamily: "'Be Vietnam Pro', sans-serif" },
     // Custom SVG chevron, same proven pattern already used throughout
     // Template Studio (index.jsx's Blueprint Library filters and locked-
     // template picker) -- this file was relying on each browser's own
@@ -330,15 +334,25 @@ export default function AdminPanel({ isAdmin }) {
     // WebkitAppearance:none suppresses the native arrow everywhere so
     // this SVG is the only one that renders, instead of the browser
     // drawing its own on top of or next to it.
-    select: { padding: "8px 34px 8px 10px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", background: "#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%236b635c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\") no-repeat right 12px center", width: "100%", fontFamily: "Inter, system-ui, sans-serif", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none", boxSizing: "border-box" },
-    btnPrimary: { padding: "8px 18px", background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" },
-    btnSecondary: { padding: "6px 12px", background: "#fff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer" },
-    btnDanger: { padding: "6px 12px", background: "none", color: "#dc2626", border: "none", fontSize: "12px", fontWeight: 600, cursor: "pointer" },
-    btnSave: { padding: "6px 12px", background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 600, cursor: "pointer" },
-    table: { width: "100%", borderCollapse: "collapse" },
-    th: { textAlign: "left", padding: "10px 16px", borderBottom: "1px solid #dde0e6", color: "#6b7280", fontWeight: 600, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", background: "#fafafa" },
-    td: { padding: "12px 16px", borderBottom: "1px solid #eeedf1", fontSize: "13px", color: "#09090b", verticalAlign: "middle" },
-    editRow: { display: "flex", gap: "8px", alignItems: "center" },
+    select: { padding: "8px 34px 8px 10px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "13px", color: "#09090b", background: "#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%236b635c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\") no-repeat right 12px center", width: "100%", fontFamily: "'Be Vietnam Pro', sans-serif", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none", boxSizing: "border-box" },
+    // 4px radius everywhere below, matching the standing convention (non-
+    // pill buttons) -- this file had drifted to 6px, one of several small
+    // things that added up to feeling off-brand.
+    btnPrimary: { padding: "8px 18px", background: "#b45309", color: "#fff", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "'Be Vietnam Pro', sans-serif" },
+    btnSecondary: { padding: "6px 12px", background: "#fff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Be Vietnam Pro', sans-serif" },
+    btnDanger: { padding: "6px 12px", background: "none", color: "#dc2626", border: "none", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Be Vietnam Pro', sans-serif" },
+    btnSave: { padding: "6px 12px", background: "#09090b", color: "#fff", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Be Vietnam Pro', sans-serif" },
+    // Row layout replaces table/th/td entirely -- every section (Users,
+    // Usage x2, Error Log, Template Queries, Saved Style Guides) now uses
+    // this same shared pattern instead of five near-duplicate wide
+    // tables, none of which ever fit this panel's fixed width without
+    // either scrolling or squeezing.
+    row: { padding: "14px 20px", borderBottom: "1px solid #eeedf1", display: "flex", flexDirection: "column", gap: "6px" },
+    rowTop: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" },
+    rowTitle: { fontSize: "13px", fontWeight: 600, color: "#09090b" },
+    rowMeta: { fontSize: "11px", color: "#9ca3af" },
+    badge: { fontSize: "10px", fontWeight: 600, padding: "3px 8px", borderRadius: "4px", background: "#fef3e2", color: "#b45309", whiteSpace: "nowrap", flexShrink: 0 },
+    editRow: { display: "flex", gap: "8px", alignItems: "center", flexShrink: 0 },
     msg: { fontSize: "12px", marginTop: "8px" },
     empty: { padding: "24px 16px", textAlign: "center", color: "#6b7280", fontSize: "13px" },
   };
@@ -393,86 +407,51 @@ export default function AdminPanel({ isAdmin }) {
       ) : users.length === 0 ? (
         <div style={S.empty}>No users configured yet. Add one above.</div>
       ) : (
-        // Same fix as Template Queries below: S.table's width:100% means
-        // the table could never actually exceed its container, so instead
-        // of scrolling, Tools (a comma-joined list like "template-studio,
-        // brief-to-blueprint") was wrapping across several lines and the
-        // Edit/Remove buttons were getting squeezed off the right edge.
-        // width:auto + minWidth:100% lets it grow past 100% when real
-        // content needs it, which is what makes overflow-x meaningful.
-        <div style={{ overflowX: "auto" }}>
-        <table style={{ ...S.table, width: "auto", minWidth: "100%" }}>
-          <thead>
-            <tr>
-              <th style={S.th}>User</th>
-              <th style={S.th}>Role</th>
-              <th style={S.th}>Tools</th>
-              <th style={S.th}>Last updated</th>
-              <th style={S.th}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map(u => (
-              <tr key={u.userId} style={{ background: editingId === u.userId ? "#fffbf5" : "transparent" }}>
-                <td style={{ ...S.td, whiteSpace: "nowrap" }}>
-                  <div style={{ fontWeight: 500, color: "#09090b", fontSize: "13px" }}>
-                    {u.name || u.email || "Unknown"}
-                  </div>
-                  {u.email && u.name && (
-                    <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "1px" }}>{u.email}</div>
-                  )}
-                </td>
-                <td style={S.td}>
-                  {editingId === u.userId ? (
+        <div>
+          {users.map(u => (
+            <div key={u.userId} style={{ ...S.row, background: editingId === u.userId ? "#fffbf5" : "transparent" }}>
+              <div style={S.rowTop}>
+                <div style={{ minWidth: 0 }}>
+                  <div style={S.rowTitle}>{u.name || u.email || "Unknown"}</div>
+                  {u.email && u.name && <div style={S.rowMeta}>{u.email}</div>}
+                </div>
+                {editingId !== u.userId && <RolePill role={u.role} />}
+              </div>
+
+              {editingId === u.userId ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <div style={{ display: "flex", gap: "8px" }}>
                     <select style={{ ...S.select, width: "auto" }} value={editRole} onChange={e => setEditRole(e.target.value)}>
                       {isAdmin && <option value="admin">Admin</option>}
                       {isAdmin && <option value="manager">Manager</option>}
                       <option value="staff">Staff</option>
                     </select>
-                  ) : (
-                    <RolePill role={u.role} />
-                  )}
-                </td>
-                <td style={{ ...S.td, whiteSpace: "nowrap" }}>
-                  {editingId === u.userId ? (
                     <select style={{ ...S.select, width: "auto" }} value={editTools} onChange={e => setEditTools(e.target.value)}>
                       {TOOL_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                     </select>
-                  ) : (
-                    <span style={{ fontSize: "12px", color: "#6b7280" }}>
-                      {(u.tools || []).join(", ")}
-                    </span>
-                  )}
-                </td>
-                <td style={{ ...S.td, fontSize: "12px", color: "#6b7280", whiteSpace: "nowrap" }}>
-                  {u.updatedAt ? new Date(u.updatedAt).toLocaleDateString() : "—"}
-                </td>
-                <td style={{ ...S.td, whiteSpace: "nowrap" }}>
-                  {editingId === u.userId ? (
-                    <div style={S.editRow}>
-                      <button style={S.btnSave} onClick={() => saveEdit(u.userId)} disabled={saving}>
-                        {saving ? "…" : "Save"}
+                  </div>
+                  <div style={S.editRow}>
+                    <button style={S.btnSave} onClick={() => saveEdit(u.userId)} disabled={saving}>{saving ? "…" : "Save"}</button>
+                    <button style={S.btnSecondary} onClick={() => setEditingId(null)}>Cancel</button>
+                  </div>
+                </div>
+              ) : (
+                <div style={S.rowTop}>
+                  <div style={S.rowMeta}>
+                    {(u.tools || []).join(", ") || "No tools"} · updated {u.updatedAt ? new Date(u.updatedAt).toLocaleDateString() : "—"}
+                  </div>
+                  <div style={S.editRow}>
+                    <button style={S.btnSecondary} onClick={() => startEdit(u)}>Edit</button>
+                    {isAdmin && (
+                      <button style={S.btnDanger} onClick={() => deleteUser(u.userId)} disabled={deleting === u.userId}>
+                        {deleting === u.userId ? "…" : "Remove"}
                       </button>
-                      <button style={S.btnSecondary} onClick={() => setEditingId(null)}>Cancel</button>
-                    </div>
-                  ) : (
-                    <div style={S.editRow}>
-                      <button style={S.btnSecondary} onClick={() => startEdit(u)}>Edit</button>
-                      {isAdmin && (
-                        <button
-                          style={S.btnDanger}
-                          onClick={() => deleteUser(u.userId)}
-                          disabled={deleting === u.userId}>
-                          {deleting === u.userId ? "…" : "Remove"}
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       )}
 
@@ -516,57 +495,40 @@ export default function AdminPanel({ isAdmin }) {
           ) : usageByUser.length === 0 ? (
             <div style={S.empty}>No API calls logged this month yet.</div>
           ) : (
-            <div style={{ overflowX: "auto" }}>
-            <table style={{ ...S.table, width: "auto", minWidth: "100%" }}>
-              <thead>
-                <tr>
-                  <th style={S.th}>Account</th>
-                  <th style={S.th}>Calls</th>
-                  <th style={S.th}>Spend</th>
-                  <th style={S.th}>Limit</th>
-                  <th style={S.th}></th>
-                </tr>
-              </thead>
-              <tbody>
-                {usageByUser.map(u => (
-                  <tr key={u.userId}>
-                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>
-                      <div style={{ fontWeight: 500, fontSize: "13px" }}>{u.name || u.email || u.userId}</div>
-                    </td>
-                    <td style={S.td}>{u.callCount}</td>
-                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>
-                      {formatCents(u.costCents)}
+            <div>
+              {usageByUser.map(u => (
+                <div key={u.userId} style={S.row}>
+                  <div style={S.rowTop}>
+                    <div style={S.rowTitle}>{u.name || u.email || u.userId}</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
+                      <span style={{ fontSize: "13px", fontWeight: 600, color: "#09090b" }}>{formatCents(u.costCents)}</span>
                       {u.limitCents != null && u.costCents > u.limitCents && (
-                        <span style={{ marginLeft: "6px", fontSize: "10px", fontWeight: 700, color: "#dc2626" }}>OVER LIMIT</span>
+                        <span style={{ ...S.badge, background: "#fee2e2", color: "#dc2626" }}>Over limit</span>
                       )}
-                    </td>
-                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>
-                      {editingLimit?.scope === "user" && editingLimit?.scopeId === u.userId ? (
-                        <div style={S.editRow}>
-                          <input style={{ ...S.input, width: "80px" }} value={limitInput} onChange={e => setLimitInput(e.target.value)} placeholder="0.00" />
-                          <button style={S.btnSave} onClick={saveLimit} disabled={savingLimit}>{savingLimit ? "…" : "Save"}</button>
-                          <button style={S.btnSecondary} onClick={() => setEditingLimit(null)}>Cancel</button>
-                        </div>
-                      ) : (
-                        <span style={{ fontSize: "12px", color: "#6b7280" }}>{formatCents(u.limitCents)}</span>
-                      )}
-                    </td>
-                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>
-                      {!(editingLimit?.scope === "user" && editingLimit?.scopeId === u.userId) && (
-                        <div style={S.editRow}>
-                          <button style={S.btnSecondary} onClick={() => startEditLimit("user", u.userId, u.limitCents)}>
-                            {u.limitCents != null ? "Edit limit" : "Set limit"}
-                          </button>
-                          {u.limitCents != null && (
-                            <button style={S.btnDanger} onClick={() => removeLimit("user", u.userId)}>Remove</button>
-                          )}
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+                  </div>
+
+                  {editingLimit?.scope === "user" && editingLimit?.scopeId === u.userId ? (
+                    <div style={S.editRow}>
+                      <input style={{ ...S.input, width: "80px" }} value={limitInput} onChange={e => setLimitInput(e.target.value)} placeholder="0.00" />
+                      <button style={S.btnSave} onClick={saveLimit} disabled={savingLimit}>{savingLimit ? "…" : "Save"}</button>
+                      <button style={S.btnSecondary} onClick={() => setEditingLimit(null)}>Cancel</button>
+                    </div>
+                  ) : (
+                    <div style={S.rowTop}>
+                      <div style={S.rowMeta}>{u.callCount} call{u.callCount === 1 ? "" : "s"} · limit {formatCents(u.limitCents)}</div>
+                      <div style={S.editRow}>
+                        <button style={S.btnSecondary} onClick={() => startEditLimit("user", u.userId, u.limitCents)}>
+                          {u.limitCents != null ? "Edit limit" : "Set limit"}
+                        </button>
+                        {u.limitCents != null && (
+                          <button style={S.btnDanger} onClick={() => removeLimit("user", u.userId)}>Remove</button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           )}
 
@@ -577,55 +539,40 @@ export default function AdminPanel({ isAdmin }) {
           ) : usageByClient.length === 0 ? (
             <div style={S.empty}>No client-tagged calls logged this month yet.</div>
           ) : (
-            <div style={{ overflowX: "auto" }}>
-            <table style={{ ...S.table, width: "auto", minWidth: "100%" }}>
-              <thead>
-                <tr>
-                  <th style={S.th}>Client</th>
-                  <th style={S.th}>Calls</th>
-                  <th style={S.th}>Spend</th>
-                  <th style={S.th}>Limit</th>
-                  <th style={S.th}></th>
-                </tr>
-              </thead>
-              <tbody>
-                {usageByClient.map(c => (
-                  <tr key={c.clientName}>
-                    <td style={{ ...S.td, whiteSpace: "nowrap" }}><div style={{ fontWeight: 500, fontSize: "13px" }}>{c.clientName}</div></td>
-                    <td style={S.td}>{c.callCount}</td>
-                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>
-                      {formatCents(c.costCents)}
+            <div>
+              {usageByClient.map(c => (
+                <div key={c.clientName} style={S.row}>
+                  <div style={S.rowTop}>
+                    <div style={S.rowTitle}>{c.clientName}</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
+                      <span style={{ fontSize: "13px", fontWeight: 600, color: "#09090b" }}>{formatCents(c.costCents)}</span>
                       {c.limitCents != null && c.costCents > c.limitCents && (
-                        <span style={{ marginLeft: "6px", fontSize: "10px", fontWeight: 700, color: "#dc2626" }}>OVER LIMIT</span>
+                        <span style={{ ...S.badge, background: "#fee2e2", color: "#dc2626" }}>Over limit</span>
                       )}
-                    </td>
-                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>
-                      {editingLimit?.scope === "client" && editingLimit?.scopeId === c.clientName ? (
-                        <div style={S.editRow}>
-                          <input style={{ ...S.input, width: "80px" }} value={limitInput} onChange={e => setLimitInput(e.target.value)} placeholder="0.00" />
-                          <button style={S.btnSave} onClick={saveLimit} disabled={savingLimit}>{savingLimit ? "…" : "Save"}</button>
-                          <button style={S.btnSecondary} onClick={() => setEditingLimit(null)}>Cancel</button>
-                        </div>
-                      ) : (
-                        <span style={{ fontSize: "12px", color: "#6b7280" }}>{formatCents(c.limitCents)}</span>
-                      )}
-                    </td>
-                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>
-                      {!(editingLimit?.scope === "client" && editingLimit?.scopeId === c.clientName) && (
-                        <div style={S.editRow}>
-                          <button style={S.btnSecondary} onClick={() => startEditLimit("client", c.clientName, c.limitCents)}>
-                            {c.limitCents != null ? "Edit limit" : "Set limit"}
-                          </button>
-                          {c.limitCents != null && (
-                            <button style={S.btnDanger} onClick={() => removeLimit("client", c.clientName)}>Remove</button>
-                          )}
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+                  </div>
+
+                  {editingLimit?.scope === "client" && editingLimit?.scopeId === c.clientName ? (
+                    <div style={S.editRow}>
+                      <input style={{ ...S.input, width: "80px" }} value={limitInput} onChange={e => setLimitInput(e.target.value)} placeholder="0.00" />
+                      <button style={S.btnSave} onClick={saveLimit} disabled={savingLimit}>{savingLimit ? "…" : "Save"}</button>
+                      <button style={S.btnSecondary} onClick={() => setEditingLimit(null)}>Cancel</button>
+                    </div>
+                  ) : (
+                    <div style={S.rowTop}>
+                      <div style={S.rowMeta}>{c.callCount} call{c.callCount === 1 ? "" : "s"} · limit {formatCents(c.limitCents)}</div>
+                      <div style={S.editRow}>
+                        <button style={S.btnSecondary} onClick={() => startEditLimit("client", c.clientName, c.limitCents)}>
+                          {c.limitCents != null ? "Edit limit" : "Set limit"}
+                        </button>
+                        {c.limitCents != null && (
+                          <button style={S.btnDanger} onClick={() => removeLimit("client", c.clientName)}>Remove</button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           )}
 
@@ -656,39 +603,25 @@ export default function AdminPanel({ isAdmin }) {
           ) : errorLogs.length === 0 ? (
             <div style={S.empty}>No errors logged. That's a good sign.</div>
           ) : (
-            <div style={{ overflowX: "auto" }}>
-            <table style={{ ...S.table, width: "auto", minWidth: "100%" }}>
-              <thead>
-                <tr>
-                  <th style={S.th}>Time</th>
-                  <th style={S.th}>Route</th>
-                  <th style={S.th}>Method</th>
-                  <th style={S.th}>User</th>
-                  <th style={S.th}>Status</th>
-                  <th style={S.th}>Message</th>
-                </tr>
-              </thead>
-              <tbody>
-                {errorLogs.map(log => (
-                  <tr key={log.id}>
-                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>{new Date(log.occurred_at).toLocaleString()}</td>
-                    <td style={{ ...S.td, whiteSpace: "nowrap" }}><code style={{ fontSize: "12px" }}>{log.route}</code></td>
-                    <td style={S.td}>{log.method || "—"}</td>
-                    {/* Truncated with a title tooltip, same convention as
-                        Owner in Saved Style Guides -- a full Clerk user_id
-                        wasn't meaningfully readable in full here either,
-                        and was one of the widest columns in the table. */}
-                    <td style={S.td}>
-                      <code style={{ fontSize: "11px" }} title={log.user_id || ""}>
-                        {log.user_id ? (log.user_id.length > 16 ? log.user_id.slice(0, 16) + "…" : log.user_id) : "—"}
-                      </code>
-                    </td>
-                    <td style={S.td}>{log.status_code || "—"}</td>
-                    <td style={{ ...S.td, maxWidth: "360px", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{log.message}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div>
+              {errorLogs.map(log => (
+                <div key={log.id} style={S.row}>
+                  <div style={S.rowTop}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", minWidth: 0, flexWrap: "wrap" }}>
+                      <span style={S.rowMeta}>{new Date(log.occurred_at).toLocaleString()}</span>
+                      <code style={{ fontSize: "12px", color: "#09090b" }}>{log.method || "—"} {log.route}</code>
+                    </div>
+                    <span style={{ ...S.badge, background: "#fee2e2", color: "#dc2626" }}>{log.status_code || "—"}</span>
+                  </div>
+                  <div style={{ fontSize: "13px", color: "#09090b", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{log.message}</div>
+                  {/* Truncated with a title tooltip, same convention as
+                      Owner in Saved Style Guides -- a full Clerk user_id
+                      isn't meaningfully readable in full anyway. */}
+                  <div style={S.rowMeta}>
+                    user <code title={log.user_id || ""}>{log.user_id ? (log.user_id.length > 16 ? log.user_id.slice(0, 16) + "…" : log.user_id) : "—"}</code>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
@@ -720,50 +653,24 @@ export default function AdminPanel({ isAdmin }) {
           ) : templateQueries.length === 0 ? (
             <div style={S.empty}>Nothing logged yet.</div>
           ) : (
-            // Same overflow-x wrapper as Saved Style Guides below, for the
-            // same reason -- an 8-column table with a free-text Query
-            // column (people type full sentences into "Describe your
-            // site") is routinely wider than the panel. Also overrides
-            // S.table's width:100% with width:auto + minWidth:100%: at
-            // 100% fixed, the table can never actually exceed its
-            // container, so it was squeezing/wrapping every column
-            // instead of the wrapper ever getting a chance to scroll --
-            // width:auto lets it grow to its real content width when
-            // that's wider than the panel, which is what makes the scroll
-            // wrapper meaningful in the first place.
-            <div style={{ overflowX: "auto" }}>
-            <table style={{ ...S.table, width: "auto", minWidth: "100%" }}>
-              <thead>
-                <tr>
-                  <th style={S.th}>Query</th>
-                  <th style={S.th}>Total</th>
-                  <th style={S.th}>Custom</th>
-                  <th style={S.th}>Matched</th>
-                  <th style={S.th}>Top Matched Template</th>
-                  <th style={S.th}>Color Retry Fired</th>
-                  <th style={S.th}>Color Retry Fixed It</th>
-                  <th style={S.th}>Last Seen</th>
-                </tr>
-              </thead>
-              <tbody>
-                {templateQueries.map(q => (
-                  <tr key={q.normalized_query}>
-                    <td style={{ ...S.td, maxWidth: "240px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} title={q.normalized_query}>{q.normalized_query}</td>
-                    <td style={S.td}>{q.total_count}</td>
-                    <td style={S.td}>{q.custom_count > 0 ? q.custom_count : "—"}</td>
-                    <td style={S.td}>{q.matched_count > 0 ? q.matched_count : "—"}</td>
-                    <td style={S.td}><code style={{ fontSize: "12px" }}>{q.top_matched_template_id || "—"}</code></td>
-                    <td style={S.td}>{q.color_retry_fired_count > 0 ? q.color_retry_fired_count : "—"}</td>
-                    <td style={S.td}>
-                      {q.color_retry_fired_count > 0
-                        ? `${q.color_retry_succeeded_count} / ${q.color_retry_fired_count}`
-                        : "—"}
-                    </td>
-                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>{new Date(q.last_seen).toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div>
+              {templateQueries.map(q => (
+                <div key={q.normalized_query} style={S.row}>
+                  <div style={S.rowTop}>
+                    <div style={{ fontSize: "13px", color: "#09090b", lineHeight: 1.5 }}>{q.normalized_query}</div>
+                    {q.top_matched_template_id && (
+                      <span style={S.badge}><code style={{ fontFamily: "inherit" }}>{q.top_matched_template_id}</code></span>
+                    )}
+                  </div>
+                  <div style={S.rowMeta}>
+                    {q.total_count} total
+                    {q.custom_count > 0 && <> · {q.custom_count} custom</>}
+                    {q.matched_count > 0 && <> · {q.matched_count} matched</>}
+                    {q.color_retry_fired_count > 0 && <> · retry {q.color_retry_succeeded_count}/{q.color_retry_fired_count}</>}
+                    {" "}· {new Date(q.last_seen).toLocaleDateString()}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
@@ -809,21 +716,21 @@ export default function AdminPanel({ isAdmin }) {
             // instead of forcing scroll.
             <div>
               {allStyleGuides.map(sg => (
-                <div key={sg.user_id + "::" + sg.brand_name} style={{ padding: "14px 20px", borderBottom: "1px solid #eeedf1", display: "flex", flexDirection: "column", gap: "6px" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+                <div key={sg.user_id + "::" + sg.brand_name} style={S.row}>
+                  <div style={S.rowTop}>
                     <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
                       <div style={{ display: "flex", gap: "3px", flexShrink: 0 }}>
                         {Object.entries(sg.colors || {}).map(([key, hex]) => (
                           <div key={key} title={key + ": " + hex} style={{ width: "14px", height: "14px", borderRadius: "3px", background: hex, border: "1px solid #dde0e6", flexShrink: 0 }} />
                         ))}
                       </div>
-                      <span style={{ fontSize: "13px", fontWeight: 600, color: "#09090b" }}>{sg.brand_name}</span>
+                      <span style={S.rowTitle}>{sg.brand_name}</span>
                     </div>
                     {sg.source_url
                       ? <a href={sg.source_url} target="_blank" rel="noreferrer" style={{ fontSize: "12px", color: "#b45309", flexShrink: 0, whiteSpace: "nowrap" }}>{safeHostname(sg.source_url)}</a>
                       : <span style={{ fontSize: "12px", color: "#9ca3af", flexShrink: 0 }}>manual</span>}
                   </div>
-                  <div style={{ fontSize: "11px", color: "#9ca3af" }}>
+                  <div style={S.rowMeta}>
                     Heading {sg.fonts?.heading || "—"} · Body {sg.fonts?.body || "—"} ·{" "}
                     {/* Truncated with a title tooltip for the full value --
                         a full Clerk user_id (user_2AbCdEfGh...) isn't
