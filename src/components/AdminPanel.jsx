@@ -393,7 +393,15 @@ export default function AdminPanel({ isAdmin }) {
       ) : users.length === 0 ? (
         <div style={S.empty}>No users configured yet. Add one above.</div>
       ) : (
-        <table style={S.table}>
+        // Same fix as Template Queries below: S.table's width:100% means
+        // the table could never actually exceed its container, so instead
+        // of scrolling, Tools (a comma-joined list like "template-studio,
+        // brief-to-blueprint") was wrapping across several lines and the
+        // Edit/Remove buttons were getting squeezed off the right edge.
+        // width:auto + minWidth:100% lets it grow past 100% when real
+        // content needs it, which is what makes overflow-x meaningful.
+        <div style={{ overflowX: "auto" }}>
+        <table style={{ ...S.table, width: "auto", minWidth: "100%" }}>
           <thead>
             <tr>
               <th style={S.th}>User</th>
@@ -406,7 +414,7 @@ export default function AdminPanel({ isAdmin }) {
           <tbody>
             {users.map(u => (
               <tr key={u.userId} style={{ background: editingId === u.userId ? "#fffbf5" : "transparent" }}>
-                <td style={S.td}>
+                <td style={{ ...S.td, whiteSpace: "nowrap" }}>
                   <div style={{ fontWeight: 500, color: "#09090b", fontSize: "13px" }}>
                     {u.name || u.email || "Unknown"}
                   </div>
@@ -425,7 +433,7 @@ export default function AdminPanel({ isAdmin }) {
                     <RolePill role={u.role} />
                   )}
                 </td>
-                <td style={S.td}>
+                <td style={{ ...S.td, whiteSpace: "nowrap" }}>
                   {editingId === u.userId ? (
                     <select style={{ ...S.select, width: "auto" }} value={editTools} onChange={e => setEditTools(e.target.value)}>
                       {TOOL_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -436,10 +444,10 @@ export default function AdminPanel({ isAdmin }) {
                     </span>
                   )}
                 </td>
-                <td style={{ ...S.td, fontSize: "12px", color: "#6b7280" }}>
+                <td style={{ ...S.td, fontSize: "12px", color: "#6b7280", whiteSpace: "nowrap" }}>
                   {u.updatedAt ? new Date(u.updatedAt).toLocaleDateString() : "—"}
                 </td>
-                <td style={S.td}>
+                <td style={{ ...S.td, whiteSpace: "nowrap" }}>
                   {editingId === u.userId ? (
                     <div style={S.editRow}>
                       <button style={S.btnSave} onClick={() => saveEdit(u.userId)} disabled={saving}>
@@ -465,6 +473,7 @@ export default function AdminPanel({ isAdmin }) {
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       {/* Usage & Limits — admin only, per explicit instruction; managers see
@@ -507,7 +516,8 @@ export default function AdminPanel({ isAdmin }) {
           ) : usageByUser.length === 0 ? (
             <div style={S.empty}>No API calls logged this month yet.</div>
           ) : (
-            <table style={S.table}>
+            <div style={{ overflowX: "auto" }}>
+            <table style={{ ...S.table, width: "auto", minWidth: "100%" }}>
               <thead>
                 <tr>
                   <th style={S.th}>Account</th>
@@ -520,17 +530,17 @@ export default function AdminPanel({ isAdmin }) {
               <tbody>
                 {usageByUser.map(u => (
                   <tr key={u.userId}>
-                    <td style={S.td}>
+                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>
                       <div style={{ fontWeight: 500, fontSize: "13px" }}>{u.name || u.email || u.userId}</div>
                     </td>
                     <td style={S.td}>{u.callCount}</td>
-                    <td style={S.td}>
+                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>
                       {formatCents(u.costCents)}
                       {u.limitCents != null && u.costCents > u.limitCents && (
                         <span style={{ marginLeft: "6px", fontSize: "10px", fontWeight: 700, color: "#dc2626" }}>OVER LIMIT</span>
                       )}
                     </td>
-                    <td style={S.td}>
+                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>
                       {editingLimit?.scope === "user" && editingLimit?.scopeId === u.userId ? (
                         <div style={S.editRow}>
                           <input style={{ ...S.input, width: "80px" }} value={limitInput} onChange={e => setLimitInput(e.target.value)} placeholder="0.00" />
@@ -541,7 +551,7 @@ export default function AdminPanel({ isAdmin }) {
                         <span style={{ fontSize: "12px", color: "#6b7280" }}>{formatCents(u.limitCents)}</span>
                       )}
                     </td>
-                    <td style={S.td}>
+                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>
                       {!(editingLimit?.scope === "user" && editingLimit?.scopeId === u.userId) && (
                         <div style={S.editRow}>
                           <button style={S.btnSecondary} onClick={() => startEditLimit("user", u.userId, u.limitCents)}>
@@ -557,6 +567,7 @@ export default function AdminPanel({ isAdmin }) {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
 
           {/* By client/brand */}
@@ -566,7 +577,8 @@ export default function AdminPanel({ isAdmin }) {
           ) : usageByClient.length === 0 ? (
             <div style={S.empty}>No client-tagged calls logged this month yet.</div>
           ) : (
-            <table style={S.table}>
+            <div style={{ overflowX: "auto" }}>
+            <table style={{ ...S.table, width: "auto", minWidth: "100%" }}>
               <thead>
                 <tr>
                   <th style={S.th}>Client</th>
@@ -579,15 +591,15 @@ export default function AdminPanel({ isAdmin }) {
               <tbody>
                 {usageByClient.map(c => (
                   <tr key={c.clientName}>
-                    <td style={S.td}><div style={{ fontWeight: 500, fontSize: "13px" }}>{c.clientName}</div></td>
+                    <td style={{ ...S.td, whiteSpace: "nowrap" }}><div style={{ fontWeight: 500, fontSize: "13px" }}>{c.clientName}</div></td>
                     <td style={S.td}>{c.callCount}</td>
-                    <td style={S.td}>
+                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>
                       {formatCents(c.costCents)}
                       {c.limitCents != null && c.costCents > c.limitCents && (
                         <span style={{ marginLeft: "6px", fontSize: "10px", fontWeight: 700, color: "#dc2626" }}>OVER LIMIT</span>
                       )}
                     </td>
-                    <td style={S.td}>
+                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>
                       {editingLimit?.scope === "client" && editingLimit?.scopeId === c.clientName ? (
                         <div style={S.editRow}>
                           <input style={{ ...S.input, width: "80px" }} value={limitInput} onChange={e => setLimitInput(e.target.value)} placeholder="0.00" />
@@ -598,7 +610,7 @@ export default function AdminPanel({ isAdmin }) {
                         <span style={{ fontSize: "12px", color: "#6b7280" }}>{formatCents(c.limitCents)}</span>
                       )}
                     </td>
-                    <td style={S.td}>
+                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>
                       {!(editingLimit?.scope === "client" && editingLimit?.scopeId === c.clientName) && (
                         <div style={S.editRow}>
                           <button style={S.btnSecondary} onClick={() => startEditLimit("client", c.clientName, c.limitCents)}>
@@ -614,6 +626,7 @@ export default function AdminPanel({ isAdmin }) {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
 
           <div style={{ padding: "10px 20px 16px", fontSize: "11px", color: "#9ca3af" }}>
@@ -643,7 +656,8 @@ export default function AdminPanel({ isAdmin }) {
           ) : errorLogs.length === 0 ? (
             <div style={S.empty}>No errors logged. That's a good sign.</div>
           ) : (
-            <table style={S.table}>
+            <div style={{ overflowX: "auto" }}>
+            <table style={{ ...S.table, width: "auto", minWidth: "100%" }}>
               <thead>
                 <tr>
                   <th style={S.th}>Time</th>
@@ -657,16 +671,25 @@ export default function AdminPanel({ isAdmin }) {
               <tbody>
                 {errorLogs.map(log => (
                   <tr key={log.id}>
-                    <td style={S.td}>{new Date(log.occurred_at).toLocaleString()}</td>
-                    <td style={S.td}><code style={{ fontSize: "12px" }}>{log.route}</code></td>
+                    <td style={{ ...S.td, whiteSpace: "nowrap" }}>{new Date(log.occurred_at).toLocaleString()}</td>
+                    <td style={{ ...S.td, whiteSpace: "nowrap" }}><code style={{ fontSize: "12px" }}>{log.route}</code></td>
                     <td style={S.td}>{log.method || "—"}</td>
-                    <td style={S.td}><code style={{ fontSize: "11px" }}>{log.user_id || "—"}</code></td>
+                    {/* Truncated with a title tooltip, same convention as
+                        Owner in Saved Style Guides -- a full Clerk user_id
+                        wasn't meaningfully readable in full here either,
+                        and was one of the widest columns in the table. */}
+                    <td style={S.td}>
+                      <code style={{ fontSize: "11px" }} title={log.user_id || ""}>
+                        {log.user_id ? (log.user_id.length > 16 ? log.user_id.slice(0, 16) + "…" : log.user_id) : "—"}
+                      </code>
+                    </td>
                     <td style={S.td}>{log.status_code || "—"}</td>
                     <td style={{ ...S.td, maxWidth: "360px", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{log.message}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            </div>
           )}
 
           <div style={{ padding: "10px 20px 16px", fontSize: "11px", color: "#9ca3af" }}>
