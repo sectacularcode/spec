@@ -78,7 +78,23 @@ const pickImage = (category, seed, w, h) => {
 
 // Returns the provided URL, or a category-appropriate Unsplash photo as fallback.
 // Category steers the type of image (marketing/production/product/lifestyle/editorial/portrait).
-export const imgOrPlaceholder = (url, seed, w = 800, h = 1000, category = "editorial") => {
+//
+// Default category deliberately changed from "editorial" to "default".
+// "editorial" specifically means beauty/skincare/fashion photography (see
+// IMAGE_LIBRARY above) -- it was never meant to be a generic catch-all, but
+// as the function's own PARAMETER default, any call site that doesn't
+// explicitly pass a category (or passes undefined) silently got fashion/
+// beauty imagery regardless of what the actual business was. Confirmed
+// this independently of and in addition to the earlier BLANK_BRAND.
+// imageCategory fix (f7649cc) -- that fix addressed the object-level
+// default; this is a separate layer (the function's own parameter
+// default) that call site can still fall through to if imageCategory
+// isn't correctly threaded all the way to render time for any reason.
+// Found while investigating a candy/kids-themed site that was showing a
+// fashion bomber jacket and an actual skincare brand's product photo
+// (visible branding included) -- both images live in exactly this
+// "editorial" pool, strongly indicating this default was what got hit.
+export const imgOrPlaceholder = (url, seed, w = 800, h = 1000, category = "default") => {
   if (url && url.trim()) return url.trim();
   return pickImage(category, seed, w, h);
 };

@@ -681,6 +681,8 @@ Return ONLY a valid JSON object — no preamble, no markdown fences:
   "heroHeading": "8-14 word hero headline in the theme's voice",
   "heroSubhead": "1-2 sentences. What this site is about, in the theme's authentic voice.",
   "aboutBody": "60-100 words of dummy body copy fully immersed in the theme's world.",
+  "aboutHeading": "5-9 words. A pointed statement fully in the theme's voice, not a generic label like \"About Us\" or \"Why clients keep coming back\" -- must sound like it belongs to THIS specific theme.",
+  "ctaHeading": "5-10 words. A closing call-to-action line fully in the theme's voice, not a generic phrase like \"Ready to get started?\".",
   "sections": ["Hero", "About", "CTA"],
   "projectName": "1-3 word project name"
 }
@@ -898,6 +900,19 @@ Rules:
         heroSubhead: r.heroSubhead || "",
         heroEyebrow: r.heroEyebrow || "",
         aboutBody: r.aboutBody || "",
+        // aboutHeading and ctaHeading were previously never set here, so
+        // they silently kept whatever newPage()'s generic starter defaults
+        // were ("Why clients keep coming back.", "Ready to get started?"
+        // -- both written for a generic professional-services template,
+        // not tailored to any actual theme). Confirmed live: a candy/kids
+        // shop's About section displayed exactly that generic heading
+        // while its body copy was correctly AI-generated and on-theme --
+        // the body was always being set here, the heading never was. Real
+        // violation of "every text element must be driven by a brief
+        // field, no hardcoded strings" -- these are the two fields that
+        // were the exception.
+        aboutHeading: r.aboutHeading || page.aboutHeading,
+        ctaHeading: r.ctaHeading || page.ctaHeading,
         sections: r.sections && r.sections.length ? r.sections : page.sections,
       };
       // Layer AI brand settings
