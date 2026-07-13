@@ -2,8 +2,23 @@
 // (Heading/Body, Confirmed/Estimated badge) or a custom entry (free-text
 // name only -- a font doesn't have a "usage" note the way a color does).
 
+// Matches ColorSwatch's confidence-tier colors exactly, not just its
+// language -- these two components describe the same underlying
+// extraction mechanisms and need to look the same everywhere they show
+// up, not just use similar-sounding labels. Found and fixed a real
+// mismatch here: this "computed" tier was using #E3F2FA/#1D6FA5, which
+// is ColorSwatch's color for its SAMPLED tier (a person manually reading
+// a pixel) -- a different and deliberately distinct thing from computed
+// (a headless browser's real getComputedStyle() read, no person
+// involved; see ColorSwatch.jsx's own comment on why sampled and
+// computed are intentionally different colors). A blue "Computed" badge
+// here next to a blue "Sampled" badge in ColorSwatch would have taught
+// the wrong association -- same color, opposite meaning. No "sampled"
+// tier exists for fonts at all (there's no manual pixel-read equivalent
+// for typography), so this only needed the computed value corrected to
+// match ColorSwatch's actual computed teal, not a new tier added.
 const CONFIDENCE_STYLES = {
-  computed: { background: "#E3F2FA", color: "#1D6FA5" }, // real getComputedStyle() read via headless browser -- strongest signal available, same blue language as ColorSwatch's "Sampled" tier
+  computed: { background: "#E0F5F1", color: "#0D7862" },
   confirmed: { background: "#E8F3E9", color: "#2F6E3E" },
   estimated: { background: "#FEF3E2", color: "#B45309" },
 };
