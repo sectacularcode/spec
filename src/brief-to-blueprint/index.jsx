@@ -1505,7 +1505,7 @@ export default function CustomBuild({ userId, role } = {}) {
                     Fill out intake form
                   </button>
                   </div>
-                  {parsing && <div style={{ marginTop: "12px", padding: "12px", background: "#ffffff", borderRadius: "6px", fontSize: "13px", color: "#09090b" }}>Reading brief — this takes a few seconds...</div>}
+                  {parsing && <div style={{ marginTop: "12px", fontSize: "13px", color: "#09090b" }}>Reading brief — this takes a few seconds...</div>}
                   {briefError && <div style={{ fontSize: "12px", color: "#dc2626", marginTop: "8px", whiteSpace: "pre-wrap" }}>{briefError}</div>}
                   {placeholderButtons && (
                     <div style={{ marginTop: "8px", padding: "10px 12px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: "8px" }}>
