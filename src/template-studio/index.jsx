@@ -589,6 +589,12 @@ Return ONLY the new ${fieldName} value as plain text.`;
   // were black/orange/white): the prompt's own few-shot example primes the
   // model's reasoning text more strongly than it constrains the actual hex
   // values, so the two can drift apart within one response.
+  // Used to validate individual customColors fields returned by
+  // retryColorPalette before trusting them -- a malformed or missing field
+  // in that response must never silently overwrite a good original value.
+  function isValidHex(s) {
+    return typeof s === "string" && /^#[0-9a-f]{6}$/i.test(s);
+  }
   function hexHueFamily(hex) {
     if (!hex || typeof hex !== "string") return null;
     const h = hex.replace("#", "");
@@ -688,6 +694,22 @@ Return ONLY the new ${fieldName} value as plain text.`;
   // used both by the visible-warning check below AND by the automatic
   // retry in describeMySite (which needs the raw list to build a targeted
   // correction request, not a pre-formatted warning string).
+  //
+  // Requires at least 2 DISTINCT color words in the raw input before
+  // treating ANY of them as a genuine palette request. Found this gap
+  // auditing the mechanism after it shipped: ordinary business
+  // descriptions are full of single incidental color words that aren't
+  // color requests at all -- "we help companies go green", "get clients
+  // out of the red financially" -- and with only 1 match required, both of
+  // those triggered a false "missing color" detection, which now costs a
+  // real wasted API call (the automatic retry) and shows a confusing
+  // warning for something that was never actually broken. Two or more
+  // distinct color words together is a much stronger, more specific signal
+  // that someone is actually describing a palette -- matches how people
+  // naturally phrase color requests anyway ("browns, blues, and hues of
+  // pink"), and the accepted tradeoff is that a genuine single-color ask
+  // ("make it red") won't trigger the check -- that's reverting to the
+  // pre-existing behavior for that narrower case, not a regression.
   function detectMissingRequestedColors(rawInput, parsed) {
     if (!parsed || !parsed.customColors || !rawInput) return [];
     const bc = parsed.customColors;
@@ -695,16 +717,20 @@ Return ONLY the new ${fieldName} value as plain text.`;
       [bc.background, bc.accent, bc.text, bc.card].filter(Boolean).map(hexHueFamily).filter(Boolean)
     );
     const words = rawInput.toLowerCase().match(/[a-z]+/g) || [];
-    const missingWords = [];
+    const allColorWords = [];
     const seen = new Set();
     for (const word of words) {
       if (seen.has(word)) continue;
       const acceptable = wordAcceptableFamilies(word);
       if (!acceptable) continue;
       seen.add(word);
-      if (!acceptable.some(f => actualFamilies.has(f))) missingWords.push(word);
+      allColorWords.push(word);
     }
-    return missingWords;
+    if (allColorWords.length < 2) return [];
+    return allColorWords.filter(word => {
+      const acceptable = wordAcceptableFamilies(word);
+      return !acceptable.some(f => actualFamilies.has(f));
+    });
   }
 
   // Checks the ACTUAL palette against what the person themselves explicitly
@@ -999,10 +1025,25 @@ Rules:
         // call, so a newer request could have been issued while it was
         // in flight.
         if (briefRecReqRef.current !== reqId) return;
-        if (corrected) {
+        if (corrected && corrected.customColors) {
+          // Field-by-field merge, not a wholesale replace -- if the retry's
+          // response is missing a field or returns a malformed value for
+          // one, that must fall back to the original good value, not
+          // silently disappear. Found this while auditing the mechanism:
+          // a wholesale `customColors: corrected.customColors` would lose
+          // text/card entirely if the retry's response happened to only
+          // include background/accent, even though those were already
+          // fine and didn't need correcting.
+          const cc = corrected.customColors;
+          const origCc = verifiedResult.customColors || {};
           verifiedResult = {
             ...verifiedResult,
-            customColors: corrected.customColors,
+            customColors: {
+              background: isValidHex(cc.background) ? cc.background : origCc.background,
+              accent: isValidHex(cc.accent) ? cc.accent : origCc.accent,
+              text: isValidHex(cc.text) ? cc.text : origCc.text,
+              card: isValidHex(cc.card) ? cc.card : origCc.card,
+            },
             themeReason: corrected.themeReason || verifiedResult.themeReason,
           };
         }
