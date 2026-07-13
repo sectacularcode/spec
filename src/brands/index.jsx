@@ -190,6 +190,9 @@ export default function Brands() {
   if (view === "form" && editing) {
     const isNew = !brands.find(b => b.id === editing.id);
     const structureRows = (editing.feature_layout || []).length + (editing.post_closing_layout || []).length;
+    // Same truncation convention as the Saved Style Guides admin panel —
+    // a full Clerk user_id isn't meaningfully readable in full anyway.
+    const shortId = id => id ? id.slice(0, 12) + "…" : "—";
     return (
       <div style={S.wrap}>
         <button style={S.backBtn} onClick={backToGrid}>← Back to Brands</button>
@@ -197,6 +200,11 @@ export default function Brands() {
           <div style={S.section}>
             <p style={S.label}>Brand / client name</p>
             <input style={S.input} value={editing.name} onChange={e => setEditing({ ...editing, name: e.target.value })} placeholder="e.g. Northfield Coffee Roasters" />
+            {!isNew && (
+              <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "6px" }}>
+                Added by {shortId(editing.created_by)} · Last updated by {shortId(editing.updated_by)}
+              </div>
+            )}
           </div>
 
           <div style={S.section}>

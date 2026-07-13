@@ -2,21 +2,33 @@
 //
 // Unlike every other table in this app, rows here are NOT scoped by
 // user_id — a client isn't "owned" by whoever created it, it's a team
-// resource. Access is gated by role instead (admin only for now; manager
-// is the planned next tier — see ALLOWED_ROLES below). created_by is kept
-// purely for audit/display ("added by X"), never used as an access check.
+// resource. Permission is per-operation, not one blanket role check:
+//   - Browsing the full list is the admin management surface.
+//   - Saving a brand's style (from Brief to Blueprint's or Style Guide's
+//     Save button) is open to any authenticated user with tool access --
+//     that's the actual day-to-day work, not an admin-only action.
+//   - Delete is its own, stricter tier (admin/manager), since it's
+//     destructive and writes aren't.
+// created_by/updated_by are audit/display only ("added by X" / "last
+// touched by Y"), never used as an access check themselves.
 //
-// GET    /api/brands                        — list every brand (admin/manager only)
-// GET    /api/brands?id=X                    — one brand's full profile
-// GET    /api/brands?manifest_brand_id=X      — lookup by Manifest's stable brand id
-//                                                (for the future auto-link step in
-//                                                Brief to Blueprint — not wired yet)
+// GET    /api/brands                          — list every brand (admin only)
+// GET    /api/brands?id=X                      — one brand's full profile (admin only)
+// GET    /api/brands?name=X                    — case-insensitive lookup by name (any
+//                                                authenticated user -- lets Brief to
+//                                                Blueprint/Style Guide's Save button find
+//                                                an existing brand to update instead of
+//                                                minting a colliding duplicate)
+// GET    /api/brands?manifest_brand_id=X       — lookup by Manifest's stable brand id
+//                                                (any authenticated user, same reasoning
+//                                                as the name lookup -- for the future
+//                                                auto-link step, not wired yet)
 // POST   /api/brands                          — { id, name, manifest_brand_id?, colors?,
 //                                                fonts?, buttons?, feature_layout?,
 //                                                post_closing_layout?,
 //                                                skip_services_checklist?, source_url? }
-//                                                — upsert by id
-// DELETE /api/brands?id=X                     — remove one brand
+//                                                — upsert by id (any authenticated user)
+// DELETE /api/brands?id=X                     — remove one brand (admin/manager only)
 
 import { requireAuth, getProfile } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
@@ -27,10 +39,15 @@ import {
 } from "./_lib/brandValidation.js";
 import { sql } from "@vercel/postgres";
 
-// Admin only today. Add "manager" here when that tier is ready — the rest
-// of this file already reads from this list rather than a hardcoded
-// "admin" check, so that's a one-line change when the time comes.
-const ALLOWED_ROLES = ["admin"];
+// Browsing the full list (and, for now, single-id lookup -- only reachable
+// from that same admin-only grid today) stays the admin management
+// surface. Everything else -- saving a brand's style from Brief to
+// Blueprint or Style Guide, and the lookups those saves need -- opens to
+// anyone with tool access, since those are the people actually doing
+// client work day to day. Delete is its own tier: destructive, so it
+// stays above staff even though writes don't.
+const BROWSE_ROLES = ["admin"];
+const DELETE_ROLES = ["admin", "manager"];
 
 const MAX_NAME_LEN = 200;
 const MAX_NOTES_LEN = 5000;
@@ -51,10 +68,20 @@ async function ensureTable() {
       skip_services_checklist  BOOLEAN NOT NULL DEFAULT false,
       source_url               TEXT,
       notes                    TEXT,
+      updated_by               TEXT,
       created_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
       updated_at               TIMESTAMPTZ NOT NULL DEFAULT now()
     )
   `;
+  // Self-healing for the table as it already exists in production (created
+  // before updated_by existed) -- same ADD COLUMN IF NOT EXISTS pattern
+  // brand-styles.js used for source_url/buttons. Now that writes are open
+  // to staff/manager/admin, not just the person who first created a row,
+  // created_by alone ("who added this client") stops being enough to
+  // answer "who touched this last" -- updated_by is set on every save,
+  // create or update, distinct from created_by which is set once and
+  // never changes after insert.
+  await sql`ALTER TABLE brands ADD COLUMN IF NOT EXISTS updated_by TEXT`;
   await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_brands_manifest_brand_id ON brands(manifest_brand_id) WHERE manifest_brand_id IS NOT NULL`;
   await sql`CREATE INDEX IF NOT EXISTS idx_brands_name_lower ON brands(LOWER(name))`;
 }
@@ -83,8 +110,10 @@ export default async function handler(req, res) {
 
   if (!(await rateLimit(userId, "brands", 60))) return tooMany(res);
 
+  // Fetched once, checked per-operation below rather than one blanket
+  // gate — GET-by-name/manifest_brand_id and POST are open to any
+  // authenticated user; full list, single-id GET, and DELETE are not.
   const profile = await getProfile(userId);
-  if (!ALLOWED_ROLES.includes(profile.role)) return res.status(403).json({ error: "Forbidden" });
 
   try {
     await ensureTable();
@@ -97,13 +126,22 @@ export default async function handler(req, res) {
         return res.status(200).json({ brand: rows[0] || null });
       }
 
+      const name = req.query.name;
+      if (name) {
+        if (!validText(name, 200)) return res.status(400).json({ error: "Invalid name" });
+        const { rows } = await sql`SELECT * FROM brands WHERE LOWER(name) = LOWER(${name}) LIMIT 1`;
+        return res.status(200).json({ brand: rows[0] || null });
+      }
+
       const id = req.query.id;
       if (id) {
+        if (!BROWSE_ROLES.includes(profile.role)) return res.status(403).json({ error: "Forbidden" });
         if (!validId(id)) return res.status(400).json({ error: "Invalid id" });
         const { rows } = await sql`SELECT * FROM brands WHERE id = ${id} LIMIT 1`;
         return res.status(200).json({ brand: rows[0] || null });
       }
 
+      if (!BROWSE_ROLES.includes(profile.role)) return res.status(403).json({ error: "Forbidden" });
       const { rows } = await sql`SELECT * FROM brands ORDER BY updated_at DESC`;
       return res.status(200).json({ brands: rows });
     }
@@ -185,21 +223,24 @@ export default async function handler(req, res) {
             skip_services_checklist = ${cleanSkipChecklist},
             source_url = ${urlCheck.value},
             notes = ${cleanNotes},
+            updated_by = ${userId},
             updated_at = NOW()
           WHERE id = ${id}
         `;
         // created_by is deliberately untouched — audit trail reflects who
-        // added the brand, not who most recently edited it.
+        // added the brand, not who most recently edited it. updated_by
+        // (above) is the one that changes on every save, since writes are
+        // now open to anyone with tool access, not just the creator.
       } else {
         await sql`
           INSERT INTO brands (
             id, created_by, name, manifest_brand_id, colors, fonts, buttons,
-            feature_layout, post_closing_layout, skip_services_checklist, source_url, notes
+            feature_layout, post_closing_layout, skip_services_checklist, source_url, notes, updated_by
           ) VALUES (
             ${id}, ${userId}, ${trimmedName}, ${manifest_brand_id || null},
             ${cleanColors}, ${cleanFonts}, ${JSON.stringify(cleanButtons)},
             ${JSON.stringify(cleanFeatureLayout)}, ${JSON.stringify(cleanPostClosingLayout)},
-            ${cleanSkipChecklist}, ${urlCheck.value}, ${cleanNotes}
+            ${cleanSkipChecklist}, ${urlCheck.value}, ${cleanNotes}, ${userId}
           )
         `;
       }
@@ -217,6 +258,7 @@ export default async function handler(req, res) {
     }
 
     if (req.method === "DELETE") {
+      if (!DELETE_ROLES.includes(profile.role)) return res.status(403).json({ error: "Forbidden" });
       const id = req.query.id;
       if (!validId(id)) return res.status(400).json({ error: "Invalid id" });
       await sql`DELETE FROM brands WHERE id = ${id}`;
