@@ -634,7 +634,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 32px;'>" + (brief.servicesHeading||"What We Do") + "</h2>" +
             "<div style='display:grid;grid-template-columns:1fr 1fr;gap:0;max-width:900px;'>" +
               svcs.map(function(s) {
-                return "<div style='padding:12px 0;border-bottom:1px solid #f0f0f0;font-size:15px;color:" + text + ";display:flex;align-items:center;gap:10px;'><span style='color:" + brass + ";font-weight:700;'>✓</span>" + s + "</div>";
+                return "<div style='padding:12px 0;border-bottom:1px solid #f0f0f0;font-size:19px;color:" + text + ";display:flex;align-items:center;gap:10px;'><span style='font-size:19px;color:" + brass + ";font-weight:700;'>✓</span>" + s + "</div>";
               }).join("") +
             "</div>" +
           "</section>") +
@@ -707,7 +707,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 32px;'>" + (brief.servicesHeading||"What We Do") + "</h2>" +
             "<div style='display:grid;grid-template-columns:1fr 1fr;gap:0;max-width:900px;'>" +
               svcs.map(function(s) {
-                return "<div style='padding:12px 0;border-bottom:1px solid #f0f0f0;font-size:15px;color:" + text + ";display:flex;align-items:center;gap:10px;'><span style='color:" + brass + ";font-weight:700;'>✓</span>" + s + "</div>";
+                return "<div style='padding:12px 0;border-bottom:1px solid #f0f0f0;font-size:19px;color:" + text + ";display:flex;align-items:center;gap:10px;'><span style='font-size:19px;color:" + brass + ";font-weight:700;'>✓</span>" + s + "</div>";
               }).join("") +
             "</div>" +
           "</section>") +
@@ -813,7 +813,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 32px;'>" + (brief.servicesHeading||"What We Do") + "</h2>" +
           "<div style='display:grid;grid-template-columns:1fr 1fr;gap:0;max-width:900px;'>" +
             svcs.map(function(s) {
-              return "<div style='padding:12px 0;border-bottom:1px solid #f0f0f0;font-size:15px;color:" + text + ";display:flex;align-items:center;gap:10px;'><span style='color:" + brass + ";font-weight:700;'>✓</span>" + s + "</div>";
+              return "<div style='padding:12px 0;border-bottom:1px solid #f0f0f0;font-size:19px;color:" + text + ";display:flex;align-items:center;gap:10px;'><span style='font-size:19px;color:" + brass + ";font-weight:700;'>✓</span>" + s + "</div>";
             }).join("") +
           "</div>" +
         "</section>") +
