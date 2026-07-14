@@ -576,7 +576,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     return mkContainer([
       mkHeading(f.heading, ink, "h3", { weight: 700, px: 30 }),
       mkSpacer(16),
-      mkIconList(clauses, accent, text, { fontSize: 17 }),
+      mkIconList(clauses, accent, text, { fontSize: 19 }),
     ], rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "56", padX: "48" });
   }
 
@@ -617,9 +617,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var textOnBg = lightTextOn(sectionBg);
     return mkContainer([
       mkHeading(closingLine, textOnBg, "h2", { weight: 700, px: 40, align: "center" }),
-      mkSpacer(12),
       mkText("<p style='text-align:center'>" + he(closingBody) + "</p>", textOnBg === "#FFFFFF" ? "rgba(255,255,255,0.8)" : textOnBg),
-      mkSpacer(28),
       makeDualBtnRow(phoneCta, contactCta, brief.heroPrimaryUrl, brief.heroSecondaryUrl, sectionBg),
     ], sectionBg, { padY: "80", center: true });
   }
