@@ -740,9 +740,27 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       ], null, { direction: "row", gap: "48", padY: "0", isInner: true, full: true }),
     ], warmWhite, { padY: "80" });
 
+    // Testimonials — same Testimonial Carousel widget variant B/E already
+    // use. Confirmed real gap, July 2026: A (and D, which reuses this same
+    // block) had no testimonial section anywhere in its content array.
+    // Before testimonials were correctly tagged, this went unnoticed
+    // because testimonial content still showed up (badly) via the
+    // feature-row cycle; once tagged properly and separated out of
+    // brief.features, it had nowhere left to render at all. Conditional on
+    // real testimonial content existing -- matches the checklist fix's
+    // same principle: no real content there should mean the section
+    // doesn't render, not that it renders with invented placeholder quotes.
+    var testimonialsSectionA = brief.testimonial1Name ? mkContainer([
+      mkTestimonialCarousel([
+        { quote: brief.testimonial1Quote || "", name: brief.testimonial1Name || "", title: brief.testimonial1Title || "" },
+        { quote: brief.testimonial2Quote || "", name: brief.testimonial2Name || "", title: brief.testimonial2Title || "" },
+        { quote: brief.testimonial3Quote || "", name: brief.testimonial3Name || "", title: brief.testimonial3Title || "" },
+      ].filter(function (t) { return t.quote || t.name; }), { textColor: warmWhite, nameColor: warmWhite, jobColor: "rgba(255,255,255,0.7)" }),
+    ], dark, { padY: "80", center: true }) : null;
+
     return {
       version: "0.4", title: he(brandName || "Site") + " — Landing Page", type: "page", page_settings: {},
-      content: [heroA, makeTrustStrip(), ...makeFeatureRows(), checklistSection, makeFormSection(), makeMapSection(), makeClosingCta(), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),
+      content: [heroA, makeTrustStrip(), testimonialsSectionA, ...makeFeatureRows(), checklistSection, makeFormSection(), makeMapSection(), makeClosingCta(), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),
     };
   }
 
