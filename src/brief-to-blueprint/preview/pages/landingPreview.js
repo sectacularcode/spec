@@ -474,6 +474,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             "</div>" +
           "</section>" +
           "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
+            "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + brass + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
             "<div style='max-width:640px;margin:0 auto;'>" +
               "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
               "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
@@ -608,6 +609,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           // the actual structural difference from Awareness, not just a
           // different color cycle.
           "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
+            "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + brass + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
             "<div style='max-width:640px;margin:0 auto;'>" +
               "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
               "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
