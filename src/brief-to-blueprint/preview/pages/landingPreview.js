@@ -656,16 +656,25 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
       // hero and no standalone map section further down (it's already up
       // top). New variant, added alongside the existing ones.
       if (variant === "F") {
-        var heroFAddress = brief.mapAddress ? "<p style='font-size:15px;color:" + ink + ";line-height:1.6;margin:0 0 10px;'>" + he(brief.mapAddress) + "</p>" : "";
+        var heroFAddressParts = brief.mapAddress ? brief.mapAddress.split(",").map(function (s) { return s.trim(); }).filter(Boolean) : [];
+        var heroFAddressLines = heroFAddressParts.length > 1 ? [heroFAddressParts[0], heroFAddressParts.slice(1).join(", ")] : heroFAddressParts;
+        var heroFAddressHtml = heroFAddressLines.map(function (l) { return he(l); }).join("<br>");
+        if (brief.mapPhone) heroFAddressHtml += (heroFAddressHtml ? "<br>" : "") + "Telephone: " + he(brief.mapPhone);
+        var heroFAddress = heroFAddressHtml ? "<p style='font-size:15px;color:" + ink + ";line-height:1.6;margin:0 0 10px;'>" + heroFAddressHtml + "</p>" : "";
         var heroFHours = brief.mapHours ? "<p style='font-size:14px;color:" + ink + ";line-height:1.6;margin:0 0 20px;'>" + he(brief.mapHours) + "</p>" : "";
-        var heroFCallBtn = (brief.mapPhone || cta1) ? "<a class='cta-btn' style='" + mapCallBtnStyle + "'>" + (brief.mapPhone ? "Call " + he(brief.mapPhone) : cta1) + "</a>" : "";
-        var heroFDirectionsBtn = brief.mapUrl ? "<a class='cta-btn' style='" + mapDirectionsBtnStyle + "'>" + he(brief.mapButtonLabel || "Get Directions") + "</a>" : "";
+        var heroFHasForm = !!(brief.formHeading || (Array.isArray(brief.formFields) && brief.formFields.length));
+        // Call/Email/Contact Us -- matches the real reference (LubeZone)
+        // exactly, confirmed against its live page source. No separate
+        // Get Directions button: the embedded map itself carries that.
+        var heroFCallBtn = brief.mapPhone ? "<a class='cta-btn' style='" + mapCallBtnStyle + "'>" + he(brief.mapPhone) + "</a>" : "";
+        var heroFEmailBtn = brief.mapEmail ? "<a class='cta-btn' style='" + mapDirectionsBtnStyle + "'>Email Us</a>" : "";
+        var heroFContactBtn = heroFHasForm ? "<a class='cta-btn' href='#contact-form' style='" + mapDirectionsBtnStyle + "'>Contact Us</a>" : "";
         return "<section style='background:" + bone + ";padding:0;'>" +
             "<div style='display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:stretch;' class='hero-f-grid'>" +
               "<div style='padding:clamp(40px,6vw,72px) clamp(24px,5vw,56px);display:flex;flex-direction:column;justify-content:center;'>" +
                 "<h1 style='font-weight:800;font-size:clamp(28px,4vw,42px);color:" + ink + ";margin:0 0 20px;line-height:1.15;'>" + h1 + "</h1>" +
                 heroFAddress + heroFHours +
-                "<div style='display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;'>" + heroFCallBtn + heroFDirectionsBtn + "</div>" +
+                "<div style='display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;'>" + heroFCallBtn + heroFEmailBtn + heroFContactBtn + "</div>" +
               "</div>" +
               "<div style='min-height:340px;'>" + mapEmbedHTML + "</div>" +
             "</div>" +
@@ -707,7 +716,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             var ffSubhead = brief.formSubhead || "";
             var ffFields  = (Array.isArray(brief.formFields) && brief.formFields.length) ? brief.formFields : ["Name", "Phone", "Message"];
             var ffCta     = brief.formCta || "Request a Quote";
-            return "<section style='background:" + bone + ";padding:56px clamp(24px,6vw,64px);'>" +
+            return "<section id='contact-form' style='background:" + bone + ";padding:56px clamp(24px,6vw,64px);'>" +
                 "<div style='max-width:560px;'>" +
                 "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + ffHeading + "</h3>" +
                 (ffSubhead ? "<p style='font-size:14px;color:" + stone + ";margin:0 0 20px;'>" + ffSubhead + "</p>" : "") +

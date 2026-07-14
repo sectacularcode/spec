@@ -723,25 +723,50 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // now-redundant standalone map section differ.
   if (variant === "F") {
     var heroFH1 = mkHeading(heroH1, ink, "h1", { weight: 800, px: 40 });
-    var heroFAddressText = brief.mapAddress ? mkText("<p>" + he(brief.mapAddress) + "</p>", ink) : null;
+
+    // Address as separate lines ending in a "Telephone:" line -- matches
+    // the real reference (LubeZone) exactly, confirmed against its live
+    // page source, not guessed from a screenshot. mapAddress is a single
+    // comma-joined string (street, city, region, postal_code); splitting
+    // it back into its own lines here rather than changing how mapAddress
+    // itself is built everywhere else it's used.
+    var heroFAddressParts = brief.mapAddress ? brief.mapAddress.split(",").map(function (s) { return s.trim(); }).filter(Boolean) : [];
+    var heroFAddressLines = heroFAddressParts.length > 1
+      ? [heroFAddressParts[0], heroFAddressParts.slice(1).join(", ")]
+      : heroFAddressParts;
+    var heroFAddressHtml = heroFAddressLines.map(function (line) { return he(line); }).join("<br>");
+    if (brief.mapPhone) heroFAddressHtml += (heroFAddressHtml ? "<br>" : "") + "Telephone: " + he(brief.mapPhone);
+    var heroFAddressText = heroFAddressHtml ? mkText("<p>" + heroFAddressHtml + "</p>", ink) : null;
     var heroFHoursText = brief.mapHours ? mkText("<p>" + he(brief.mapHours) + "</p>", ink) : null;
 
+    // Contact Us needs a real on-page form to jump to -- checked here,
+    // independent of calling makeFormSection() itself, using the exact
+    // same condition it uses internally, so the button only appears when
+    // there's actually somewhere for it to go.
+    var heroFHasForm = !!(brief.formHeading || (Array.isArray(brief.formFields) && brief.formFields.length));
+
+    // Call/Email/Contact Us -- the real reference's own button set, not
+    // Call/Get Directions. No separate directions button: the embedded
+    // map itself carries that, same as the reference.
     var heroFButtons = [];
-    if (brief.mapPhone || phoneCta) {
-      var heroFPhoneDigits = brief.mapPhone ? String(brief.mapPhone).replace(/\D/g, "") : "";
-      heroFButtons.push(mkButton(
-        brief.mapPhone ? ("Call " + brief.mapPhone) : phoneCta,
-        lightCtxBtnBg, lightCtxBtnText,
-        brief.mapPhone ? sanitizeUrl("tel:" + heroFPhoneDigits) : brief.heroPrimaryUrl
-      ));
+    if (brief.mapPhone) {
+      heroFButtons.push(mkButton(brief.mapPhone, lightCtxBtnBg, lightCtxBtnText, sanitizeUrl("tel:" + String(brief.mapPhone).replace(/\D/g, ""))));
     }
-    if (brief.mapUrl) {
-      var heroFDirectionsBtn = mkButton(brief.mapButtonLabel || "Get Directions", "transparent", ink);
-      heroFDirectionsBtn.settings.border_border = "solid";
-      heroFDirectionsBtn.settings.border_width = { unit: "px", top: "1", right: "1", bottom: "1", left: "1", isLinked: true };
-      heroFDirectionsBtn.settings.border_color = ink;
-      heroFDirectionsBtn.settings.link = { url: sanitizeUrl(brief.mapUrl), is_external: "true" };
-      heroFButtons.push(heroFDirectionsBtn);
+    if (brief.mapEmail) {
+      var heroFEmailBtn = mkButton("Email Us", "transparent", ink);
+      heroFEmailBtn.settings.border_border = "solid";
+      heroFEmailBtn.settings.border_width = { unit: "px", top: "1", right: "1", bottom: "1", left: "1", isLinked: true };
+      heroFEmailBtn.settings.border_color = ink;
+      heroFEmailBtn.settings.link = { url: sanitizeUrl("mailto:" + brief.mapEmail) };
+      heroFButtons.push(heroFEmailBtn);
+    }
+    if (heroFHasForm) {
+      var heroFContactBtn = mkButton("Contact Us", "transparent", ink);
+      heroFContactBtn.settings.border_border = "solid";
+      heroFContactBtn.settings.border_width = { unit: "px", top: "1", right: "1", bottom: "1", left: "1", isLinked: true };
+      heroFContactBtn.settings.border_color = ink;
+      heroFContactBtn.settings.link = { url: "#contact-form" };
+      heroFButtons.push(heroFContactBtn);
     }
     var heroFButtonRow = heroFButtons.length
       ? mkContainer(heroFButtons, null, { isInner: true, direction: "row", buttonRow: true, gap: "12", padY: "0", padX: "0" })
@@ -780,11 +805,17 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       ], null, { direction: "row", gap: "48", padY: "0", isInner: true, full: true }),
     ], warmWhite, { padY: "80" });
 
+    // Give the form section a real anchor ID so "Contact Us" above
+    // actually has somewhere to jump to -- matches the reference's own
+    // #contact-form pattern exactly.
+    var formSectionF = makeFormSection();
+    if (formSectionF) formSectionF.settings._element_id = "contact-form";
+
     return {
       version: "0.4", title: he(brandName || "Site") + " — Landing Page (Location)", type: "page", page_settings: {},
       // No makeMapSection() here -- the map is already part of heroF, a
       // second one further down would just duplicate it.
-      content: [heroF, testimonialsSectionF, ...makeFeatureRows(), checklistSectionF, makeFormSection(), makeClosingCta(), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),
+      content: [heroF, testimonialsSectionF, ...makeFeatureRows(), checklistSectionF, formSectionF, makeClosingCta(), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),
     };
   }
 
