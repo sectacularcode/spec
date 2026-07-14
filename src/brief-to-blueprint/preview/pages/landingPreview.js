@@ -398,6 +398,42 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
       var btnOutline = "display:inline-block;padding:13px 28px;background:transparent;color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:2px solid rgba(255,255,255,0.6);border-radius:3px;";
       var btnDark = "display:inline-block;padding:10px 24px;background:transparent;color:" + ink + ";font-weight:600;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border:2px solid " + brass + ";border-radius:3px;align-self:flex-start;width:fit-content;";
 
+      // Standalone map section — mirrors the real export's mkMapSection
+      // (helpers.js): heading, an address/phone/hours info strip when
+      // phone/hours are known (falls back to a plain address line
+      // otherwise), a real Google Maps embed, and Call/Get Directions
+      // buttons. Confirmed real gap, July 2026: this section existed in
+      // every variant's real downloadable export but had no preview
+      // equivalent at all -- what showed in-app never matched what
+      // downloaded. Empty string when there's no real address, matching
+      // makeMapSection()'s own early-exit.
+      var mapHeadingText = brief.mapHeading || (brief.mapMode === "service_area" ? "Areas We Serve" : "Find Us");
+      var mapEmbedHTML = brief.mapAddress
+        ? "<iframe src=\"https://maps.google.com/maps?q=" + encodeURIComponent(brief.mapAddress) + "&output=embed\" style='border:0;width:100%;height:100%;min-height:320px;display:block;' loading='lazy'></iframe>"
+        : "";
+      var mapInfoStripHTML = (brief.mapPhone || brief.mapHours)
+        ? "<div style='display:flex;gap:32px;flex-wrap:wrap;margin-bottom:24px;'>" +
+            "<div><div style='font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:" + stone + ";margin-bottom:6px;'>Address</div><div style='font-size:14px;color:" + ink + ";'>" + he(brief.mapAddress || "") + "</div></div>" +
+            (brief.mapPhone ? "<div><div style='font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:" + stone + ";margin-bottom:6px;'>Phone</div><div style='font-size:14px;color:" + ink + ";font-weight:600;'>" + he(brief.mapPhone) + "</div></div>" : "") +
+            (brief.mapHours ? "<div><div style='font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:" + stone + ";margin-bottom:6px;'>Hours</div><div style='font-size:14px;color:" + ink + ";'>" + he(brief.mapHours) + "</div></div>" : "") +
+          "</div>"
+        : "<p style='font-size:15px;color:" + ink + ";margin:0 0 20px;'>" + he(brief.mapAddress || "") + "</p>";
+      var mapCallBtnStyle = "display:inline-block;padding:12px 24px;background:" + lightCtxBtnBg + ";color:" + lightCtxBtnText + ";font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;";
+      var mapDirectionsBtnStyle = "display:inline-block;padding:11px 24px;background:transparent;color:" + ink + ";font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border:2px solid " + ink + ";border-radius:4px;";
+      var mapButtonsHTML = "<div style='display:flex;gap:12px;flex-wrap:wrap;'>" +
+          (brief.mapPhone ? "<a class='cta-btn' style='" + mapCallBtnStyle + "'>Call " + he(brief.mapPhone) + "</a>" : "") +
+          (brief.mapUrl ? "<a class='cta-btn' style='" + mapDirectionsBtnStyle + "'>" + he(brief.mapButtonLabel || (brief.mapMode === "service_area" ? "Check Your Area" : "Get Directions")) + "</a>" : "") +
+        "</div>";
+      var mapSectionHTML = brief.mapAddress ? (
+        "<section style='background:" + bone + ";padding:60px clamp(24px,6vw,80px);'>" +
+          "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 24px;'>" + he(mapHeadingText) + "</h2>" +
+          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;' class='map-section-grid'>" +
+            "<div>" + mapInfoStripHTML + mapButtonsHTML + "</div>" +
+            "<div style='min-height:320px;border-radius:8px;overflow:hidden;'>" + mapEmbedHTML + "</div>" +
+          "</div>" +
+        "</section>"
+      ) : "";
+
       // ── VARIANT B — Lead Form ──────────────────────────────────────────────
       if (variant === "B") {
         var formFieldsB = Array.isArray(brief.formFields) ? brief.formFields : ["Name", "Company", "Phone", "What do you need?", "Message"];
@@ -488,6 +524,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             var imgRight = !imgLeft ? "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>" : "";
             return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + cols + textContent + imgRight + "</section>";
           }).join("")) +
+          mapSectionHTML +
           "<section style='background:" + dark + ";padding:80px 40px;text-align:center;'>" +
             "<h2 style='font-size:clamp(26px,4vw,40px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
             "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:560px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
@@ -529,6 +566,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<div style='font-size:13px;color:" + stone + ";'>" + tt1 + "</div>" +
             "</div>" +
           "</section>" +
+          mapSectionHTML +
           "<section style='background:" + brass + ";padding:100px 40px;text-align:center;'>" +
             "<h2 style='font-size:clamp(26px,4vw,44px);font-weight:800;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
             "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 36px;max-width:480px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
@@ -598,6 +636,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               }).join("") +
             "</div>" +
           "</section>") +
+          mapSectionHTML +
           "<section style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
             "<h2 style='font-size:clamp(26px,4vw,42px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
             "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:540px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
@@ -606,6 +645,95 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
             "</div>" +
           "</section>" +
+          faqHTML;
+      }
+
+      // ── VARIANT F — Location: headline + address/hours/map combined into
+      // one light section instead of a separate dark hero. Mirrors
+      // landing.js's Variant F exactly -- same trust strip, conditional
+      // testimonial, feature-row cycling, conditional checklist, form, and
+      // closing as Variant D, just with this section swapped in for the
+      // hero and no standalone map section further down (it's already up
+      // top). New variant, added alongside the existing ones.
+      if (variant === "F") {
+        var heroFAddress = brief.mapAddress ? "<p style='font-size:15px;color:" + ink + ";line-height:1.6;margin:0 0 10px;'>" + he(brief.mapAddress) + "</p>" : "";
+        var heroFHours = brief.mapHours ? "<p style='font-size:14px;color:" + ink + ";line-height:1.6;margin:0 0 20px;'>" + he(brief.mapHours) + "</p>" : "";
+        var heroFCallBtn = (brief.mapPhone || cta1) ? "<a class='cta-btn' style='" + mapCallBtnStyle + "'>" + (brief.mapPhone ? "Call " + he(brief.mapPhone) : cta1) + "</a>" : "";
+        var heroFDirectionsBtn = brief.mapUrl ? "<a class='cta-btn' style='" + mapDirectionsBtnStyle + "'>" + he(brief.mapButtonLabel || "Get Directions") + "</a>" : "";
+        return "<section style='background:" + bone + ";padding:0;'>" +
+            "<div style='display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:stretch;' class='hero-f-grid'>" +
+              "<div style='padding:clamp(40px,6vw,72px) clamp(24px,5vw,56px);display:flex;flex-direction:column;justify-content:center;'>" +
+                "<h1 style='font-weight:800;font-size:clamp(28px,4vw,42px);color:" + ink + ";margin:0 0 20px;line-height:1.15;'>" + h1 + "</h1>" +
+                heroFAddress + heroFHours +
+                "<div style='display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;'>" + heroFCallBtn + heroFDirectionsBtn + "</div>" +
+              "</div>" +
+              "<div style='min-height:340px;'>" + mapEmbedHTML + "</div>" +
+            "</div>" +
+          "</section>" +
+          "<section class='va-trust' style='background:#ffffff;padding:0;border-bottom:1px solid #f0f0f0;'>" +
+            "<div style='display:grid;grid-template-columns:repeat(3,1fr);'>" +
+              [{ s:s1,l:l1 },{ s:s2,l:l2 },{ s:s3,l:l3 }].map(function(t,i) {
+                return "<div class='grid-cell' style='padding:40px 32px;text-align:center;" + (i<2?"border-right:1px solid #f0f0f0;":"") + "'><div style='font-size:42px;font-weight:800;color:" + brass + ";line-height:1;margin-bottom:6px;'>" + t.s + "</div><div style='font-size:14px;color:" + stone + ";font-weight:500;letter-spacing:0.02em;'>" + t.l + "</div></div>";
+              }).join("") +
+            "</div>" +
+          "</section>" +
+          (brief.testimonial1Name ? (
+            "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
+              "<div style='max-width:640px;margin:0 auto;'>" +
+                "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
+                "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
+                "<p style='font-size:14px;color:rgba(255,255,255,0.7);margin:0;'>" + tn1 + (tt1 ? " &middot; " + tt1 : "") + "</p>" +
+              "</div>" +
+            "</section>"
+          ) : "") +
+          (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.featureLayout) :
+          renderCuratedFeatureLayoutHTML((Array.isArray(brief.features) ? brief.features : []).map(function (_, i) {
+            var hasVideo = !!brief.videoUrl;
+            var cyclePattern = hasVideo
+              ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
+              : ["split-right", "centered-cta", "checklist", "split-left", "split-cta-right", "plain"];
+            return { style: cyclePattern[i % cyclePattern.length], indices: [i] };
+          }))) +
+          (brief.skipServicesChecklist ? "" :
+          "<section style='background:" + bone + ";padding:80px clamp(24px,6vw,80px);border-top:1px solid rgba(0,0,0,0.08);'>" +
+            "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 32px;'>" + (brief.servicesHeading||"What We Do") + "</h2>" +
+            "<div style='display:grid;grid-template-columns:1fr 1fr;gap:0;max-width:900px;'>" +
+              svcs.map(function(s) {
+                return "<div style='padding:12px 0;border-bottom:1px solid #f0f0f0;font-size:15px;color:" + text + ";display:flex;align-items:center;gap:10px;'><span style='color:" + brass + ";font-weight:700;'>✓</span>" + s + "</div>";
+              }).join("") +
+            "</div>" +
+          "</section>") +
+          (function () {
+            var hasForm = brief.formHeading || (Array.isArray(brief.formFields) && brief.formFields.length);
+            if (!hasForm) return "";
+            var formAlreadyPlaced =
+              (Array.isArray(brief.featureLayout) && brief.featureLayout.some(function (e) { return e.style === "embedded-form"; })) ||
+              (Array.isArray(brief.postClosingLayout) && brief.postClosingLayout.some(function (e) { return e.style === "embedded-form"; }));
+            if (formAlreadyPlaced) return "";
+            var ffHeading = brief.formHeading || "Get a Quote";
+            var ffSubhead = brief.formSubhead || "";
+            var ffFields  = (Array.isArray(brief.formFields) && brief.formFields.length) ? brief.formFields : ["Name", "Phone", "Message"];
+            var ffCta     = brief.formCta || "Request a Quote";
+            return "<section style='background:" + bone + ";padding:56px clamp(24px,6vw,64px);'>" +
+                "<div style='max-width:560px;'>" +
+                "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + ffHeading + "</h3>" +
+                (ffSubhead ? "<p style='font-size:14px;color:" + stone + ";margin:0 0 20px;'>" + ffSubhead + "</p>" : "") +
+                ffFields.map(function (lbl) {
+                  return "<div style='margin-bottom:12px;'><label style='display:block;font-size:12px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;'>" + lbl + "</label><div style='width:100%;padding:10px 14px;border:1px solid #dde0e6;border-radius:4px;background:#ffffff;font-size:14px;color:#bbb;box-sizing:border-box;'>" + lbl + "...</div></div>";
+                }).join("") +
+                "<button style='padding:12px 28px;background:" + lightCtxBtnBg + ";color:" + lightCtxBtnText + ";font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:6px;'>" + ffCta + "</button>" +
+                "</div>" +
+              "</section>";
+          })() +
+          "<section class='va-cta' style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
+            "<h2 style='font-size:clamp(26px,4vw,42px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
+            "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:540px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
+            "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
+              "<a class='cta-btn' style='" + btnStyle + "'>" + cta1 + "</a>" +
+              "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
+            "</div>" +
+          "</section>" +
+          (Array.isArray(brief.postClosingLayout) && brief.postClosingLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.postClosingLayout) : "") +
           faqHTML;
       }
 
@@ -632,6 +760,15 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             }).join("") +
           "</div>" +
         "</section>" +
+        (brief.testimonial1Name ? (
+          "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
+            "<div style='max-width:640px;margin:0 auto;'>" +
+              "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
+              "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
+              "<p style='font-size:14px;color:rgba(255,255,255,0.7);margin:0;'>" + tn1 + (tt1 ? " &middot; " + tt1 : "") + "</p>" +
+            "</div>" +
+          "</section>"
+        ) : "") +
         (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.featureLayout) :
         variant === "D" ? renderCuratedFeatureLayoutHTML((Array.isArray(brief.features) ? brief.features : []).map(function (_, i) {
           // Mirrors landing.js's Variant D dispatch -- the same proven,
@@ -700,6 +837,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "</div>" +
             "</section>";
         })() +
+        mapSectionHTML +
         "<section class='va-cta' style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
           "<h2 style='font-size:clamp(26px,4vw,42px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
           "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:540px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
