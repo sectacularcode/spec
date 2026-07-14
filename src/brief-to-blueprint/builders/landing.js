@@ -230,7 +230,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // lead-capture form lives in its hero area, separate from this cycle,
     // and "embedded-form" was never one of the cycle's styles to begin
     // with, so there's no duplicate-form risk.
-    if (variant === "D" || variant === "B" || variant === "E") {
+    if (variant === "D" || variant === "B" || variant === "E" || variant === "F") {
       var hasVideo = !!brief.videoUrl;
       var cyclePattern = hasVideo
         ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
@@ -709,6 +709,82 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     return {
       version: "0.4", title: he(brandName || "Site") + " — Landing Page (Narrative)", type: "page", page_settings: {},
       content: [heroE, makeTrustStrip(), testimonialsSectionE, ...interleavedE, checklistSectionE, makeFormSection(), makeMapSection(), makeClosingCta(), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),
+    };
+  }
+
+  // ── VARIANT F — Location: headline + address/hours/map combined into one
+  // light section instead of a separate dark hero, map beside the info
+  // instead of further down the page. Confirmed real reference (LubeZone's
+  // own location pages), July 2026 -- built for pages with a real business
+  // address where the location info IS the hero, not a separate section.
+  // Everything below the top section reuses the exact same proven sections
+  // as Variant D (feature-row cycling, conditional testimonial carousel,
+  // conditional services checklist) -- only the top section and the
+  // now-redundant standalone map section differ.
+  if (variant === "F") {
+    var heroFH1 = mkHeading(heroH1, ink, "h1", { weight: 800, px: 40 });
+    var heroFAddressText = brief.mapAddress ? mkText("<p>" + he(brief.mapAddress) + "</p>", ink) : null;
+    var heroFHoursText = brief.mapHours ? mkText("<p>" + he(brief.mapHours) + "</p>", ink) : null;
+
+    var heroFButtons = [];
+    if (brief.mapPhone || phoneCta) {
+      var heroFPhoneDigits = brief.mapPhone ? String(brief.mapPhone).replace(/\D/g, "") : "";
+      heroFButtons.push(mkButton(
+        brief.mapPhone ? ("Call " + brief.mapPhone) : phoneCta,
+        lightCtxBtnBg, lightCtxBtnText,
+        brief.mapPhone ? sanitizeUrl("tel:" + heroFPhoneDigits) : brief.heroPrimaryUrl
+      ));
+    }
+    if (brief.mapUrl) {
+      var heroFDirectionsBtn = mkButton(brief.mapButtonLabel || "Get Directions", "transparent", ink);
+      heroFDirectionsBtn.settings.border_border = "solid";
+      heroFDirectionsBtn.settings.border_width = { unit: "px", top: "1", right: "1", bottom: "1", left: "1", isLinked: true };
+      heroFDirectionsBtn.settings.border_color = ink;
+      heroFDirectionsBtn.settings.link = { url: sanitizeUrl(brief.mapUrl), is_external: "true" };
+      heroFButtons.push(heroFDirectionsBtn);
+    }
+    var heroFButtonRow = heroFButtons.length
+      ? mkContainer(heroFButtons, null, { isInner: true, direction: "row", buttonRow: true, gap: "12", padY: "0", padX: "0" })
+      : null;
+
+    var heroFLeftChildren = [heroFH1];
+    if (heroFAddressText) { heroFLeftChildren.push(mkSpacer(18)); heroFLeftChildren.push(heroFAddressText); }
+    if (heroFHoursText) { heroFLeftChildren.push(mkSpacer(10)); heroFLeftChildren.push(heroFHoursText); }
+    if (heroFButtonRow) { heroFLeftChildren.push(mkSpacer(20)); heroFLeftChildren.push(heroFButtonRow); }
+
+    var heroFLeftCol = mkContainer(heroFLeftChildren, null, { isInner: true, width: 50, padY: "60", padX: "48" });
+    var heroFMapWidget = mkGoogleMapsWidget(brief.mapAddress, { height: 340 }) || mkImageBg("Map", { width: 50 });
+    var heroFRightCol = mkContainer([heroFMapWidget], null, { isInner: true, width: 50, padY: "0", padX: "0" });
+    var heroF = mkContainer([heroFLeftCol, heroFRightCol], bone, { direction: "row", padY: "0", padX: "0", gap: "0" });
+
+    // Testimonials -- same conditional carousel as Variant A/D: only when
+    // real testimonial content exists, never fabricated placeholder quotes.
+    var testimonialsSectionF = brief.testimonial1Name ? mkContainer([
+      mkTestimonialCarousel([
+        { quote: brief.testimonial1Quote || "", name: brief.testimonial1Name || "", title: brief.testimonial1Title || "" },
+        { quote: brief.testimonial2Quote || "", name: brief.testimonial2Name || "", title: brief.testimonial2Title || "" },
+        { quote: brief.testimonial3Quote || "", name: brief.testimonial3Name || "", title: brief.testimonial3Title || "" },
+      ].filter(function (t) { return t.quote || t.name; }), { textColor: warmWhite, nameColor: warmWhite, jobColor: "rgba(255,255,255,0.7)" }),
+    ], dark, { padY: "80", center: true }) : null;
+
+    // Services checklist -- same pattern as Variant A/D, including the
+    // skipServicesChecklist auto-hide for Manifest imports.
+    var checklistItemsF = brief.servicesList || ["Reduced overall cost", "Reduced downtime", "Proactive planning", "Expert team", "Fast response time", "Tailored reporting", "Direct billing", "Add more below..."];
+    var halfF = Math.ceil(checklistItemsF.length / 2);
+    var checklistSectionF = brief.skipServicesChecklist ? null : mkContainer([
+      mkHeading(brief.servicesHeading || "What We Do", text, "h2", { weight: 700, px: 36 }),
+      mkSpacer(24), mkDivider(accent), mkSpacer(32),
+      mkContainer([
+        mkContainer([mkIconList(checklistItemsF.slice(0, halfF), accent, text, {})], null, { isInner: true, width: 50, padY: "0", padX: "0" }),
+        mkContainer([mkIconList(checklistItemsF.slice(halfF), accent, text, {})], null, { isInner: true, width: 50, padY: "0", padX: "0" }),
+      ], null, { direction: "row", gap: "48", padY: "0", isInner: true, full: true }),
+    ], warmWhite, { padY: "80" });
+
+    return {
+      version: "0.4", title: he(brandName || "Site") + " — Landing Page (Location)", type: "page", page_settings: {},
+      // No makeMapSection() here -- the map is already part of heroF, a
+      // second one further down would just duplicate it.
+      content: [heroF, makeTrustStrip(), testimonialsSectionF, ...makeFeatureRows(), checklistSectionF, makeFormSection(), makeClosingCta(), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),
     };
   }
 

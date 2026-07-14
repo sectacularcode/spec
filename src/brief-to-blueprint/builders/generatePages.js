@@ -99,11 +99,16 @@ export function generatePages(brief, selectedPages, inspoContext, aiRecs, custom
         // awareness-stage structure (social proof moved up, secondary
         // CTAs interleaved), not just another style cycle.
         var landE = buildLandingPage(colors, brief, inspoContext, "E");
+        // Variant F — Location: headline + address/hours/map combined into
+        // one section instead of a separate dark hero. New, added alongside
+        // the others (not a replacement) -- best for pages with a real
+        // business address, picked per-page like every other variant.
+        var landF = buildLandingPage(colors, brief, inspoContext, "F");
         // Score B/C/D/E against real content signals in the brief instead
         // of a hardcoded default -- see scoreLandingVariants in landing.js.
         var landRec = scoreLandingVariants(brief);
-        // Attach C/D/E as named extras so the UI can expose them alongside A/B
-        var landResult = { id: pid, label: label, data: landA, variantA: landA, variantB: landB, variantC: landC, variantD: landD, variantE: landE, recommended: landRec, recommendedReasoned: true, hasVariants: true, hasVariantC: true, hasVariantD: true, hasVariantE: true };
+        // Attach C/D/E/F as named extras so the UI can expose them alongside A/B
+        var landResult = { id: pid, label: label, data: landA, variantA: landA, variantB: landB, variantC: landC, variantD: landD, variantE: landE, variantF: landF, recommended: landRec, recommendedReasoned: true, hasVariants: true, hasVariantC: true, hasVariantD: true, hasVariantE: true, hasVariantF: true };
         return landResult;
       }
       // Utility pages — no meaningful A/B variation
