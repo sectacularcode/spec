@@ -103,6 +103,16 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   var accent   = colors.brass         || colors.accent || "#C2A35B";
   var bone     = colors.bone          || colors.background || "#F2F2F2";
   var warmWhite= colors["warm-white"] || "#FFFFFF";
+  // lightSectionBg is ALWAYS literal white -- the preview's alternating
+  // feature-row background. The "warm-white" brand token is really the
+  // "Text on dark" slot in Style Guide (see brands/index.jsx and
+  // style-guide/index.jsx label mappings); using it as a section background
+  // meant a brand with a saturated color in that slot (e.g. Push & Pull's
+  // green) painted every alternating landing section that color. The
+  // preview never had this bug because it hardcodes "#ffffff" for these
+  // sections; the export was using warmWhite. Text/heading uses of
+  // warmWhite (on dark sections) stay -- that's what the slot is for.
+  var lightSectionBg = "#FFFFFF";
   var text     = colors.text          || "#1A1A1A";
   var stone    = colors.stone         || colors.muted || "#666666";
   var dark     = colors.asphalt       || colors["dark-panel"] || "";
@@ -270,7 +280,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
           mkSpacer(10),
           mkText(he(f.body), text),
         ];
-        return mkContainer(children, i % 2 === 0 ? warmWhite : bone, { padY: "56", padX: "48", full: true });
+        return mkContainer(children, i % 2 === 0 ? lightSectionBg : bone, { padY: "56", padX: "48", full: true });
       });
     }
 
@@ -330,7 +340,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       var textCol = mkContainer([innerBox], null, { isInner: true, padY: "30", padX: "30", width: 50, full: true });
       var imgCol  = mkImageBg(f.imgCaption, { width: 50, bg: accentTint });
       var cols    = f.imageLeft ? [imgCol, textCol] : [textCol, imgCol];
-      var row     = mkContainer(cols, i % 2 === 0 ? warmWhite : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
+      var row     = mkContainer(cols, i % 2 === 0 ? lightSectionBg : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
       return row;
     });
   }
@@ -409,7 +419,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var textCol = mkContainer([innerBox], null, { isInner: true, padY: "30", padX: "30", width: 50, full: true });
     var imgCol  = mkImageBg(f.imgCaption, { width: 50, bg: accentTint });
     var cols    = imageLeft ? [imgCol, textCol] : [textCol, imgCol];
-    return mkContainer(cols, rowIdx % 2 === 0 ? warmWhite : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
+    return mkContainer(cols, rowIdx % 2 === 0 ? lightSectionBg : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
   }
 
   // Single centered block with a real contact button — for content that's
@@ -423,7 +433,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       body,
       mkSpacer(20),
       mkButton(contactCta, lightCtxBtnBg, lightCtxBtnText, brief.heroSecondaryUrl),
-    ], rowIdx % 2 === 0 ? warmWhite : bone, { padY: "72", center: true });
+    ], rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "72", center: true });
   }
 
   // A secondary CTA woven mid-list -- needs no feature content of its own,
@@ -439,7 +449,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkHeading(phoneCta, accent, "h2", { weight: 800, px: 32, align: "center" }),
       mkSpacer(8),
       mkText("<p style='text-align:center'>" + he(brief.midCtaText || "Questions before you reach out? " + contactCta + " and we'll get back to you within one business day.") + "</p>", stone),
-    ], warmWhite, { padY: "60", center: true });
+    ], lightSectionBg, { padY: "60", center: true });
   }
 
   // Several features sharing one heading (e.g. two related services under
@@ -457,7 +467,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkHeading(header, accent, "h6", { eyebrow: true }),
       mkSpacer(20),
       mkContainer(cols, null, { direction: "row", gap: "32", padY: "0", padX: "0", isInner: true, full: true }),
-    ], warmWhite, { padY: "80", padX: "48" });
+    ], lightSectionBg, { padY: "80", padX: "48" });
   }
 
   // Real Elementor Pro form widget embedded mid-page (same mkForm() used
@@ -501,7 +511,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var mapCol = mapWidget
       ? mkContainer([mapWidget], null, { isInner: true, padY: "0", padX: "0", width: 50, full: true })
       : mkImageBg("[Map placeholder]", { width: 50, bg: bone }); // preview's map placeholder is bone
-    return mkContainer([textCol, mapCol], rowIdx % 2 === 0 ? warmWhite : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
+    return mkContainer([textCol, mapCol], rowIdx % 2 === 0 ? lightSectionBg : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
   }
 
   // A single clean text block, no image, no divider — for content the
@@ -512,7 +522,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkHeading(f.heading, ink, "h3", { weight: 700, px: 22 }),
       mkSpacer(10),
       mkText(he(f.body), text),
-    ], rowIdx % 2 === 0 ? warmWhite : bone, { padY: "56", padX: "48", full: true });
+    ], rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "56", padX: "48", full: true });
   }
 
   // A heading with a short checkmark list beneath it — real native
@@ -529,7 +539,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkHeading(f.heading, ink, "h3", { weight: 700, px: 22 }),
       mkSpacer(16),
       mkIconList(clauses, accent, text, { fontSize: 15 }),
-    ], rowIdx % 2 === 0 ? warmWhite : bone, { padY: "56", padX: "48", full: true });
+    ], rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "56", padX: "48", full: true });
   }
 
   // A real native Elementor Video widget — UNVERIFIED against an actual
@@ -557,7 +567,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkText(he(f.body), text),
     ], null, { isInner: true, padY: "30", padX: "30", width: 50, full: true });
     var videoCol = mkContainer([videoWidget], null, { isInner: true, padY: "0", padX: "0", width: 50, full: true });
-    return mkContainer([textCol, videoCol], rowIdx % 2 === 0 ? warmWhite : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
+    return mkContainer([textCol, videoCol], rowIdx % 2 === 0 ? lightSectionBg : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
   }
 
   function makeClosingCta(bg) {
@@ -590,7 +600,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkHeading(brief.faqHeading || "Frequently Asked Questions", accent, "h2", { weight: 800, px: 32 }),
       mkSpacer(28),
       mkAccordion(faqItems, { titleColor: ink, activeColor: accent, iconColor: accent, contentColor: stone, borderColor: "#DDE0E6" }),
-    ], warmWhite, { padY: "80" });
+    ], lightSectionBg, { padY: "80" });
   }
 
   // Optional map/location section — renders only when the brief supplies a
@@ -716,7 +726,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         mkContainer([mkIconList(checklistItemsE.slice(0, halfE), accent, text, {})], null, { isInner: true, width: 50, padY: "0", padX: "0" }),
         mkContainer([mkIconList(checklistItemsE.slice(halfE), accent, text, {})], null, { isInner: true, width: 50, padY: "0", padX: "0" }),
       ], null, { direction: "row", gap: "48", padY: "0", isInner: true, full: true }),
-    ], warmWhite, { padY: "80" });
+    ], lightSectionBg, { padY: "80" });
 
     return {
       version: "0.4", title: he(brandName || "Site") + " — Landing Page (Narrative)", type: "page", page_settings: {},
@@ -823,7 +833,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         mkContainer([mkIconList(checklistItemsF.slice(0, halfF), accent, text, {})], null, { isInner: true, width: 50, padY: "0", padX: "0" }),
         mkContainer([mkIconList(checklistItemsF.slice(halfF), accent, text, {})], null, { isInner: true, width: 50, padY: "0", padX: "0" }),
       ], null, { direction: "row", gap: "48", padY: "0", isInner: true, full: true }),
-    ], warmWhite, { padY: "80" });
+    ], lightSectionBg, { padY: "80" });
 
     // Give the form section a real anchor ID so "Contact Us" above
     // actually has somewhere to jump to -- matches the reference's own
@@ -865,7 +875,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         mkContainer([mkIconList(checklistItems.slice(0, half), accent, text, {})], null, { isInner: true, width: 50, padY: "0", padX: "0" }),
         mkContainer([mkIconList(checklistItems.slice(half), accent, text, {})], null, { isInner: true, width: 50, padY: "0", padX: "0" }),
       ], null, { direction: "row", gap: "48", padY: "0", isInner: true, full: true }),
-    ], warmWhite, { padY: "80" });
+    ], lightSectionBg, { padY: "80" });
 
     // Testimonials — same Testimonial Carousel widget variant B/E already
     // use. Confirmed real gap, July 2026: A (and D, which reuses this same
@@ -987,7 +997,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkHeading(phoneCta, accent, "h2", { weight: 800, px: 36, align: "center" }),
       mkSpacer(8),
       mkText("<p style='text-align:center'>" + midCtaHtml + "</p>", stone),
-    ], warmWhite, { padY: "60", center: true });
+    ], lightSectionBg, { padY: "60", center: true });
 
     return {
       version: "0.4", title: he(brandName || "Site") + " — Landing Page (Form)", type: "page", page_settings: {},
@@ -1021,7 +1031,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkText("<p style='text-align:center;font-size:18px;font-weight:600;line-height:1.4'>" + he(b) + "</p>", ink),
     ], warmWhite, { isInner: true, padY: "48", padX: "32", center: true, grow: "1" });
   });
-  var benefitsSection = mkContainer(benefitCols, warmWhite, { direction: "row", padY: "0", padX: "0", gap: "0" });
+  var benefitsSection = mkContainer(benefitCols, lightSectionBg, { direction: "row", padY: "0", padX: "0", gap: "0" });
 
   // Trust bar — compact stat row
   var compactTrust = mkContainer([

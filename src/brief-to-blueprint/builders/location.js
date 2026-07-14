@@ -22,6 +22,10 @@ function getColors(colors) {
     brass:     colors.brass      || "#C2A35B",
     brassDp:   colors["brass-deep"] || "#9C7E3A",
     warmWhite: colors["warm-white"] || "#FBFAF7",
+    // See landing.js note: warm-white is a text-on-dark slot, not a section
+    // background. A brand with green in that slot (Push & Pull) would paint
+    // every alternating section green if we used C.warmWhite as a bg.
+    lightSectionBg: "#FFFFFF",
     text:      colors.text       || "#2A2722",
     stone:     colors.stone      || "#8A8170",
     asphalt:   colors.asphalt    || "#2B2823",
@@ -138,7 +142,7 @@ export function buildLocationPageA(colors, brief, loc) {
     mkText("Our " + he(city) + " team handles all of the following:", C.stone),
     mkSpacer(20),
     mkServicesList(services, C.text, C.brass),
-  ], C.warmWhite, { padY: "80" }));
+  ], C.lightSectionBg, { padY: "80" }));
 
   // Supporting body + image split
   var supportText = mkContainer([
@@ -163,7 +167,7 @@ export function buildLocationPageA(colors, brief, loc) {
     mkMapEmbed(loc.mapEmbed, C.stone),
     mkSpacer(8),
     mkText(he(loc.address || "") + " · " + he(city) + ", " + he(state), C.stone),
-  ], C.warmWhite, { padY: "80" }));
+  ], C.lightSectionBg, { padY: "80" }));
 
   // Closing CTA
   sections.push(mkContainer([
@@ -222,7 +226,7 @@ export function buildLocationPageB(colors, brief, loc) {
     mkServicesList(services, C.text, C.brass),
     mkSpacer(24),
     mkButton(ctaText, btnBg, btnText),
-  ], C.warmWhite, { padY: "80" }));
+  ], C.lightSectionBg, { padY: "80" }));
 
   // Map embed — prominent
   sections.push(mkContainer([
