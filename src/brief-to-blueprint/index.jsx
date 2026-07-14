@@ -10,6 +10,7 @@ import { getSessionDraft, saveSessionDraft, clearSessionDraft, listDraftSnapshot
 import { getInspoPatterns, saveInspoPatterns } from "../utils/inspoPatterns.js";
 import { buildInspoContext } from "./utils/inspo.js";
 import { saveToLibrary } from "./utils/library.js";
+import { he } from "./utils/htmlEscape.js";
 import { extractBrief } from "./utils/extractBrief.js";
 
 // Builders
@@ -93,6 +94,7 @@ export default function CustomBuild({ userId, role } = {}) {
   const [storedPatterns, setStoredPatterns] = useState({}); // persisted across sessions
   const [selectedPages, setPages]       = useState(["home"]);
   const [customPages, setCustomPages]   = useState([]); // user-added pages beyond the defaults
+  const [pageDownloadNames, setPageDownloadNames] = useState({}); // keyed by page.id -- optional user override for exported Elementor title + filename
   const [showAddPage, setShowAddPage]   = useState(false); // add page dropdown open
   const [showAddPagePreview, setShowAddPagePreview] = useState(false); // separate state for preview header dropdown
   const [copyBriefOnly, setCopy]        = useState(true);
@@ -1040,9 +1042,12 @@ export default function CustomBuild({ userId, role } = {}) {
   }
 
   function downloadPage(p) {
-    const blob = new Blob([JSON.stringify(getPageData(p), null, 2)], { type: "application/json" });
+    const customName = (pageDownloadNames[p.id] || "").trim();
+    const pageData = getPageData(p);
+    const exportData = customName ? { ...pageData, title: he(customName) } : pageData;
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-    a.download = slugify(clientName || brief?.brandName) + "-" + p.id + "-elementor.json";
+    a.download = slugify(customName || clientName || brief?.brandName) + "-" + p.id + "-elementor.json";
     a.click(); URL.revokeObjectURL(a.href);
     // Auto-save this single page to the library
     if (brief && generated) {
@@ -1053,9 +1058,12 @@ export default function CustomBuild({ userId, role } = {}) {
   function downloadAll() {
     if (!generated) return;
     generated.pages.forEach((p, i) => setTimeout(() => {
-      const blob = new Blob([JSON.stringify(getPageData(p), null, 2)], { type: "application/json" });
+      const customName = (pageDownloadNames[p.id] || "").trim();
+      const pageData = getPageData(p);
+      const exportData = customName ? { ...pageData, title: he(customName) } : pageData;
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
       const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-      a.download = slugify(clientName || brief?.brandName) + "-" + p.id + "-elementor.json";
+      a.download = slugify(customName || clientName || brief?.brandName) + "-" + p.id + "-elementor.json";
       a.click(); URL.revokeObjectURL(a.href);
     }, i * 300));
     // Auto-save full build to library
@@ -1175,7 +1183,7 @@ export default function CustomBuild({ userId, role } = {}) {
                 ↓ Intake Form
               </button>
               <button
-                onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setDraftsView(false); setPlaceholderButtons(null); }}
+                onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setPageDownloadNames({}); setDraftsView(false); setPlaceholderButtons(null); }}
                 style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
                 + New build
               </button>
@@ -1192,7 +1200,7 @@ export default function CustomBuild({ userId, role } = {}) {
               <div style={{ fontSize: "15px", fontWeight: 600, color: "#09090b", marginBottom: "8px" }}>No saved builds yet</div>
               <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "24px" }}>Upload a brief or fill out the intake form to get started.</div>
               <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
-                <button onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setDraftsView(false); setPlaceholderButtons(null); }} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>Start a build</button>
+                <button onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setPageDownloadNames({}); setDraftsView(false); setPlaceholderButtons(null); }} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>Start a build</button>
                 <button onClick={() => { setShowIntake(true); setDraftsView(false); }} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#ffffff", border: "none", borderRadius: "6px", cursor: "pointer" }}>Fill out intake form</button>
               </div>
             </div>
@@ -1200,7 +1208,7 @@ export default function CustomBuild({ userId, role } = {}) {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px" }}>
               {/* New build card */}
               <div
-                onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setDraftsView(false); setPlaceholderButtons(null); }}
+                onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setPageDownloadNames({}); setDraftsView(false); setPlaceholderButtons(null); }}
                 style={{ border: "2px dashed #dde0e6", borderRadius: "10px", padding: "24px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "8px" }}
                 onMouseOver={e => e.currentTarget.style.borderColor = "#b45309"}
                 onMouseOut={e => e.currentTarget.style.borderColor = "#dde0e6"}>
@@ -1305,7 +1313,7 @@ export default function CustomBuild({ userId, role } = {}) {
                   await clearSessionDraft();
                   setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setPlaceholderButtons(null);
                   setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({});
-                  setPreviewPage("home"); setPageOverrides({}); setCustomPages([]);
+                  setPreviewPage("home"); setPageOverrides({}); setCustomPages([]); setPageDownloadNames({});
                   setClearingDraft(false);
                 }}
                 style={{ fontSize: "12px", color: "#6b7280", background: "none", border: "1px solid #dde0e6", borderRadius: "5px", padding: "5px 10px", cursor: clearingDraft ? "default" : "pointer", opacity: clearingDraft ? 0.6 : 1, display: "inline-flex", alignItems: "center", lineHeight: 1 }}>
@@ -1657,7 +1665,7 @@ export default function CustomBuild({ userId, role } = {}) {
                   <div style={{ fontSize: "11px", color: "#9ca3af", marginBottom: "12px" }}>
                     Files will download as: <span style={{ color: "#09090b", fontWeight: 600 }}>{slugify(clientName || brief?.brandName)}-home-elementor.json</span>
                   </div>
-                  <button style={T.btnGhost} onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setPlaceholderButtons(null); }}>Replace brief</button>
+                  <button style={T.btnGhost} onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setPlaceholderButtons(null); setPageDownloadNames({}); }}>Replace brief</button>
                 </div>
               )}
             </div>
@@ -1880,14 +1888,23 @@ export default function CustomBuild({ userId, role } = {}) {
                 </div>
               )}
               <div style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "12px" }}>Download</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 {generated.pages.map(p => (
-                  <button key={p.id} onClick={() => downloadPage(p)} style={{ ...T.btnGhost, textAlign: "left", display: "flex", justifyContent: "space-between" }}>
-                    <span>{p.label}</span><span style={{ color: "#9ca3af" }}>↓ .json</span>
-                  </button>
+                  <div key={p.id} style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <input
+                      type="text"
+                      value={pageDownloadNames[p.id] || ""}
+                      onChange={(e) => setPageDownloadNames(prev => ({ ...prev, [p.id]: e.target.value }))}
+                      placeholder={`Name this template (optional) — defaults to "${p.label}"`}
+                      style={{ fontSize: "12px", padding: "7px 10px", border: "1px solid #dde0e6", borderRadius: "6px", color: "#09090b", fontFamily: "inherit" }}
+                    />
+                    <button onClick={() => downloadPage(p)} style={{ ...T.btnGhost, textAlign: "left", display: "flex", justifyContent: "space-between" }}>
+                      <span>{p.label}</span><span style={{ color: "#9ca3af" }}>↓ .json</span>
+                    </button>
+                  </div>
                 ))}
                 {generated.pages.length > 1 && (
-                  <button onClick={downloadAll} style={{ ...T.btnPrimary, justifyContent: "center", marginTop: "4px" }}>Download All Pages</button>
+                  <button onClick={downloadAll} style={{ ...T.btnPrimary, justifyContent: "center", marginTop: "-6px" }}>Download All Pages</button>
                 )}
                 <div style={{ height: "1px", background: "#dde0e6", margin: "8px 0" }} />
                 <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "4px" }}>Global Templates</div>
