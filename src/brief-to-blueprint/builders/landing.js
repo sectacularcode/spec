@@ -113,6 +113,29 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // sections; the export was using warmWhite. Text/heading uses of
   // warmWhite (on dark sections) stay -- that's what the slot is for.
   var lightSectionBg = "#FFFFFF";
+
+  // Text/heading/outline-button color for use on DARK section backgrounds.
+  // Cannot be `warmWhite` directly: warm-white is the "Text on dark" slot
+  // in Style Guide labeling, but some brands set it to a saturated color
+  // (Push & Pull: green) meant for a specific dark-panel design that
+  // doesn't apply on the brand-accent closing CTA either. When warmWhite
+  // matches the section bg (green heading on green section) it silently
+  // renders invisible. bestTextColor picks the first candidate that
+  // clears WCAG contrast against the actual section background --
+  // warmWhite first (so a brand that DID set a genuine off-white gets
+  // it), else literal #FFFFFF (always readable on any dark-enough bg).
+  // Applied to closing CTA heading, closing CTA outline button text +
+  // border, and any other dark-context heading/body use downstream.
+  function lightTextOn(bg) {
+    var candidates = [warmWhite, "#FFFFFF"];
+    for (var i = 0; i < candidates.length; i++) {
+      var c = candidates[i];
+      if (c && bestTextColor(bg, c) === c) return c;
+    }
+    // Explicit fallback: bestTextColor returned the dark fallback,
+    // meaning neither light candidate was readable enough. Force white.
+    return "#FFFFFF";
+  }
   var text     = colors.text          || "#1A1A1A";
   var stone    = colors.stone         || colors.muted || "#666666";
   var dark     = colors.asphalt       || colors["dark-panel"] || "";
@@ -155,17 +178,34 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   var lightCtxBtnText = (definedBtn && definedBtn.textColor) || bestTextColor(lightCtxBtnBg, text);
 
   // ── Shared helpers ────────────────────────────────────────────────────────
-  function makeOutlineBtn(label, url) {
-    var btn = mkButton(label, "transparent", warmWhite, url);
+  function makeOutlineBtn(label, url, color) {
+    // color param lets callers pass a computed section-bg-safe color
+    // (e.g. from lightTextOn) instead of always using warmWhite, which
+    // can silently match the section bg under certain brand palettes.
+    var c = color || warmWhite;
+    var btn = mkButton(label, "transparent", c, url);
     btn.settings.border_border = "solid";
     btn.settings.border_width  = { unit: "px", top: "2", right: "2", bottom: "2", left: "2", isLinked: true };
-    btn.settings.border_color  = warmWhite;
+    btn.settings.border_color  = c;
     btn.settings.background_color = "transparent";
     return btn;
   }
 
-  function makeDualBtnRow(primaryLabel, secondaryLabel, primaryUrl, secondaryUrl) {
-    return mkContainer([mkButton(primaryLabel, darkCtxBtnBg, darkCtxBtnText, primaryUrl), makeOutlineBtn(secondaryLabel, secondaryUrl)], null, {
+  function makeDualBtnRow(primaryLabel, secondaryLabel, primaryUrl, secondaryUrl, sectionBg) {
+    // Outline button color follows the section bg it's sitting on. When
+    // the closing CTA's bg is accent (green) and warmWhite is also green,
+    // the outline button used to render as green text on green -- invisible.
+    // Same story for the SOLID (primary) button: if darkCtxBtnBg matches
+    // sectionBg it also disappears -- force it to lightTextOn(sectionBg)
+    // (usually white) as its bg, with dark text on it.
+    var outlineColor = sectionBg ? lightTextOn(sectionBg) : warmWhite;
+    var primaryBg = darkCtxBtnBg;
+    var primaryText = darkCtxBtnText;
+    if (sectionBg && String(primaryBg).toLowerCase() === String(sectionBg).toLowerCase()) {
+      primaryBg = outlineColor; // usually #FFFFFF
+      primaryText = bestTextColor(primaryBg, ink);
+    }
+    return mkContainer([mkButton(primaryLabel, primaryBg, primaryText, primaryUrl), makeOutlineBtn(secondaryLabel, secondaryUrl, outlineColor)], null, {
       isInner: true, direction: "row", buttonRow: true, gap: "16", padY: "0", padX: "0", center: true
     });
   }
@@ -575,13 +615,15 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // A/D/E/F (the preview's va-cta section), dark only for B. The export
     // used to hardcode dark for every variant, so the approved green
     // closing section imported as a near-black one.
+    var sectionBg = bg || accent;
+    var textOnBg = lightTextOn(sectionBg);
     return mkContainer([
-      mkHeading(closingLine, warmWhite, "h2", { weight: 700, px: 40, align: "center" }),
+      mkHeading(closingLine, textOnBg, "h2", { weight: 700, px: 40, align: "center" }),
       mkSpacer(12),
-      mkText("<p style='text-align:center'>" + he(closingBody) + "</p>", "rgba(255,255,255,0.8)"),
+      mkText("<p style='text-align:center'>" + he(closingBody) + "</p>", textOnBg === "#FFFFFF" ? "rgba(255,255,255,0.8)" : textOnBg),
       mkSpacer(28),
-      makeDualBtnRow(phoneCta, contactCta, brief.heroPrimaryUrl, brief.heroSecondaryUrl),
-    ], bg || accent, { padY: "80", center: true });
+      makeDualBtnRow(phoneCta, contactCta, brief.heroPrimaryUrl, brief.heroSecondaryUrl, sectionBg),
+    ], sectionBg, { padY: "80", center: true });
   }
 
   // Optional FAQ section — accordion widget, staged with generic placeholder
@@ -792,7 +834,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     heroFContactBtn.settings.border_color = ink;
     heroFContactBtn.settings.link = { url: heroFHasForm ? "#contact-form" : "#" };
     heroFButtons.push(heroFContactBtn);
-    var heroFButtonRow = mkContainer(heroFButtons, null, { isInner: true, direction: "row", buttonRow: true, gap: "12", padY: "0", padX: "0" });
+    var heroFButtonRow = mkContainer(heroFButtons, null, { isInner: true, direction: "row", buttonRow: true, gap: "16", padY: "0", padX: "0" });
 
     var heroFLeftChildren = [heroFH1];
     if (heroFAddressText) { heroFLeftChildren.push(mkSpacer(20)); heroFLeftChildren.push(heroFAddressText); }
@@ -1056,13 +1098,15 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   ], bone, { padY: "80", center: true });
 
   // Single strong CTA
+  var singleCtaBg = accent;
+  var singleCtaText = lightTextOn(singleCtaBg);
   var singleCtaSection = mkContainer([
-    mkHeading(closingLine, warmWhite, "h2", { weight: 700, px: 40, align: "center" }),
+    mkHeading(closingLine, singleCtaText, "h2", { weight: 700, px: 40, align: "center" }),
     mkSpacer(24),
     mkButton(phoneCta, darkCtxBtnBg, darkCtxBtnText, brief.heroPrimaryUrl),
     mkSpacer(16),
-    mkText("<p style='text-align:center;font-size:14px'>" + he(brief.formReassurance || "No sales team. A real reply within one business day.") + "</p>", "rgba(255,255,255,0.7)"),
-  ], accent, { padY: "100", center: true }); // brass closing, matching Variant C's preview
+    mkText("<p style='text-align:center;font-size:14px'>" + he(brief.formReassurance || "No sales team. A real reply within one business day.") + "</p>", singleCtaText === "#FFFFFF" ? "rgba(255,255,255,0.7)" : singleCtaText),
+  ], singleCtaBg, { padY: "100", center: true }); // brass closing, matching Variant C's preview
 
   return {
     version: "0.4", title: he(brandName || "Site") + " — Landing Page (Minimal)", type: "page", page_settings: {},
