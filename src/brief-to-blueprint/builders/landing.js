@@ -469,9 +469,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var body = mkText("<p style='text-align:center'>" + he(f.body) + "</p>", text);
     return mkContainer([
       mkHeading(f.heading, ink, "h3", { weight: 700, px: 32, align: "center" }),
-      mkSpacer(12),
       body,
-      mkSpacer(20),
       mkButton(contactCta, lightCtxBtnBg, lightCtxBtnText, brief.heroSecondaryUrl),
     ], rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "72", center: true });
   }
@@ -578,7 +576,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     return mkContainer([
       mkHeading(f.heading, ink, "h3", { weight: 700, px: 30 }),
       mkSpacer(16),
-      mkIconList(clauses, accent, text, { fontSize: 15 }),
+      mkIconList(clauses, accent, text, { fontSize: 17 }),
     ], rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "56", padX: "48" });
   }
 
@@ -886,7 +884,13 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     // Testimonials -- same conditional carousel as Variant A/D: only when
     // real testimonial content exists, never fabricated placeholder quotes.
+    // Heading added above the carousel (confirmed against a real edited
+    // export, July 2026) -- every variant using mkTestimonialCarousel was
+    // missing a section title; scoped to F only since that's what was
+    // actually reviewed.
     var testimonialsSectionF = brief.testimonial1Name ? mkContainer([
+      mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", accent, "h2", { weight: 800, px: 32, align: "center" }),
+      mkSpacer(24),
       mkTestimonialCarousel([
         { quote: brief.testimonial1Quote || "", name: brief.testimonial1Name || "", title: brief.testimonial1Title || "" },
         { quote: brief.testimonial2Quote || "", name: brief.testimonial2Name || "", title: brief.testimonial2Title || "" },
