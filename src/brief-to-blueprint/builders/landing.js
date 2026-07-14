@@ -468,7 +468,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   function renderCenteredCta(f, rowIdx) {
     var body = mkText("<p style='text-align:center'>" + he(f.body) + "</p>", text);
     return mkContainer([
-      mkHeading(f.heading, ink, "h3", { weight: 700, px: 26, align: "center" }),
+      mkHeading(f.heading, ink, "h3", { weight: 700, px: 32, align: "center" }),
       mkSpacer(12),
       body,
       mkSpacer(20),
@@ -559,10 +559,10 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // curated layout.
   function renderPlainRow(f, rowIdx) {
     return mkContainer([
-      mkHeading(f.heading, ink, "h3", { weight: 700, px: 22 }),
+      mkHeading(f.heading, ink, "h3", { weight: 700, px: 30 }),
       mkSpacer(10),
       mkText(he(f.body), text),
-    ], rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "56", padX: "48", full: true });
+    ], rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "56", padX: "48" });
   }
 
   // A heading with a short checkmark list beneath it — real native
@@ -576,10 +576,10 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var clauses = (f.body || "").split(/\.\s+/).map(function (s) { return s.trim().replace(/\.$/, ""); }).filter(function (s) { return s.length > 0; });
     if (clauses.length === 0) clauses = [f.body || ""];
     return mkContainer([
-      mkHeading(f.heading, ink, "h3", { weight: 700, px: 22 }),
+      mkHeading(f.heading, ink, "h3", { weight: 700, px: 30 }),
       mkSpacer(16),
       mkIconList(clauses, accent, text, { fontSize: 15 }),
-    ], rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "56", padX: "48", full: true });
+    ], rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "56", padX: "48" });
   }
 
   // A real native Elementor Video widget — UNVERIFIED against an actual
@@ -639,7 +639,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       { question: "[FAQ question five]",  answer: "[Answer, in brand voice]" },
     ];
     return mkContainer([
-      mkHeading(brief.faqHeading || "Frequently Asked Questions", accent, "h2", { weight: 800, px: 32 }),
+      mkHeading(brief.faqHeading || "Frequently Asked Questions", accent, "h2", { weight: 800, px: 36 }),
       mkSpacer(28),
       mkAccordion(faqItems, { titleColor: ink, activeColor: accent, iconColor: accent, contentColor: stone, borderColor: "#DDE0E6" }),
     ], lightSectionBg, { padY: "80" });
@@ -697,7 +697,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var fCtaLabel = brief.formCta || "Request a Quote";
     var formWidget = mkForm(fFields, fCtaLabel, { formName: (brandName || "Site") + " Quote Request" });
     return mkContainer([
-      mkHeading(fHeading, ink, "h3", { weight: 700, px: 26 }),
+      mkHeading(fHeading, ink, "h3", { weight: 700, px: 34 }),
       mkSpacer(10),
       fSubhead ? mkText(he(fSubhead), stone) : null,
       mkSpacer(20),
@@ -878,9 +878,11 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     heroFRightCol.settings.flex_justify_content = "center";
 
     // Section outer gets bone bg + no vertical pad (columns own their own
-    // padding). Container width is boxed at 1160px via mkContainer's
-    // default so the section aligns with the rest of the page.
-    var heroF = mkContainer([heroFLeftCol, heroFRightCol], bone, { direction: "row", padY: "0", padX: "0", gap: "0" });
+    // padding). Widened to 1357px (from mkContainer's 1160 default) to
+    // match the approved wider look -- confirmed against a real edited
+    // export (Freeway Fleet Services, July 2026). Scoped to Variant F only
+    // via maxWidth so Home/About/Contact/etc. keep the standard 1160.
+    var heroF = mkContainer([heroFLeftCol, heroFRightCol], bone, { direction: "row", padY: "0", padX: "0", gap: "0", maxWidth: 1357 });
 
     // Testimonials -- same conditional carousel as Variant A/D: only when
     // real testimonial content exists, never fabricated placeholder quotes.
