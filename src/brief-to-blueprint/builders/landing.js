@@ -786,22 +786,38 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // conditional services checklist) -- only the top section and the
   // now-redundant standalone map section differ.
   if (variant === "F") {
+    // Variant F hero -- rebuilt to match the approved Bethlehem live page
+    // (July 2026): address + hours as a real supporting paragraph under
+    // the H1 rather than tiny stacked lines, buttons in a wrapping row
+    // with a visible gap, map column with proper padding so it doesn't
+    // touch the section edge and reads balanced next to the text column.
+    // Section outer gets its own padding so the map isn't edge-to-edge.
     var heroFH1 = mkHeading(heroH1, ink, "h1", { weight: 800, px: 40 });
 
-    // Address as separate lines ending in a "Telephone:" line -- matches
-    // the real reference (LubeZone) exactly, confirmed against its live
-    // page source, not guessed from a screenshot. mapAddress is a single
-    // comma-joined string (street, city, region, postal_code); splitting
-    // it back into its own lines here rather than changing how mapAddress
-    // itself is built everywhere else it's used.
-    var heroFAddressParts = brief.mapAddress ? brief.mapAddress.split(",").map(function (s) { return s.trim(); }).filter(Boolean) : [];
-    var heroFAddressLines = heroFAddressParts.length > 1
-      ? [heroFAddressParts[0], heroFAddressParts.slice(1).join(", ")]
-      : heroFAddressParts;
-    var heroFAddressHtml = heroFAddressLines.map(function (line) { return he(line); }).join("<br>");
-    if (brief.mapPhone) heroFAddressHtml += (heroFAddressHtml ? "<br>" : "") + "Telephone: " + he(brief.mapPhone);
-    var heroFAddressText = heroFAddressHtml ? mkText("<p>" + heroFAddressHtml + "</p>", ink) : null;
-    var heroFHoursText = brief.mapHours ? mkText("<p>" + he(brief.mapHours) + "</p>", ink) : null;
+    // Address as one flowing sentence in a paragraph -- matches Bethlehem
+    // exactly ("Our shop is at 850 13th Ave, Bethlehem, PA 18018, and our
+    // mobile trucks reach ..."). If a brief provides an explicit
+    // heroSubhead/hookStatement, we use that. Otherwise auto-compose from
+    // mapAddress + mapPhone into a natural sentence.
+    var heroFParagraphHtml = "";
+    if (brief.heroSubhead || brief.hookStatement) {
+      heroFParagraphHtml = "<p>" + he(brief.heroSubhead || brief.hookStatement) + "</p>";
+    } else if (brief.mapAddress) {
+      var addrLine = "Our shop is at " + he(brief.mapAddress);
+      if (brief.mapPhone) {
+        addrLine += ". Call " + he(brief.mapPhone) + " to dispatch or schedule.";
+      } else {
+        addrLine += ".";
+      }
+      heroFParagraphHtml = "<p>" + addrLine + "</p>";
+    }
+    var heroFParagraph = heroFParagraphHtml ? mkText(heroFParagraphHtml, ink) : null;
+
+    // Hours as its own line with a bold label prefix -- matches Bethlehem
+    // exactly ("**Hours:** Monday through Friday..."). Only rendered when
+    // real hours data is present.
+    var heroFHoursHtml = brief.mapHours ? "<p><strong>Hours:</strong> " + he(brief.mapHours) + "</p>" : "";
+    var heroFHoursText = heroFHoursHtml ? mkText(heroFHoursHtml, ink) : null;
 
     // Contact Us needs a real on-page form to jump to -- checked here,
     // independent of calling makeFormSection() itself, using the exact
@@ -809,16 +825,16 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // there's actually somewhere for it to go.
     var heroFHasForm = !!(brief.formHeading || (Array.isArray(brief.formFields) && brief.formFields.length));
 
-    // Call/Email/Contact Us -- the real reference's own button set, not
-    // Call/Get Directions. No separate directions button: the embedded
-    // map itself carries that, same as the reference. Always rendered,
-    // same as every other button slot in this file -- real data fills
-    // them in when available (phone/email/a real on-page form), a "#"
-    // placeholder otherwise so the layout is visible and editable in
-    // Elementor before that data exists, not missing entirely.
+    // Buttons -- primary call, outline email, outline contact. Same set
+    // as the real reference; always rendered so the layout is visible
+    // before real data lands (phone/email/form). Outline buttons use the
+    // brand accent (ink) for text/border so they read as green on the
+    // light bone hero, matching the Bethlehem-approved styling. The
+    // primary Call button uses the accent bg + white text.
     var heroFButtons = [];
+    var heroFCallLabel = brief.mapPhone ? ("Call now: " + brief.mapPhone) : phoneCta;
     heroFButtons.push(mkButton(
-      brief.mapPhone || phoneCta,
+      heroFCallLabel,
       lightCtxBtnBg, lightCtxBtnText,
       brief.mapPhone ? sanitizeUrl("tel:" + String(brief.mapPhone).replace(/\D/g, "")) : (brief.heroPrimaryUrl || "#")
     ));
@@ -834,24 +850,36 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     heroFContactBtn.settings.border_color = ink;
     heroFContactBtn.settings.link = { url: heroFHasForm ? "#contact-form" : "#" };
     heroFButtons.push(heroFContactBtn);
+    // gap 16px + flex-wrap so the three buttons stay separated on a single
+    // row at desktop and wrap cleanly at narrower widths.
     var heroFButtonRow = mkContainer(heroFButtons, null, { isInner: true, direction: "row", buttonRow: true, gap: "16", padY: "0", padX: "0" });
+    heroFButtonRow.settings.flex_wrap = "wrap";
+    heroFButtonRow.settings.flex_align_items = "center";
 
+    // Left column stack: H1 -> paragraph -> hours -> buttons. Spacer sizes
+    // set to Bethlehem's approved rhythm (24 between H1 and paragraph, 12
+    // between paragraph and hours, 32 before the button row). Container
+    // gap is 0 so ONLY the spacers control the rhythm -- previously the
+    // default 20px container gap was stacking on top of every spacer.
     var heroFLeftChildren = [heroFH1];
-    if (heroFAddressText) { heroFLeftChildren.push(mkSpacer(20)); heroFLeftChildren.push(heroFAddressText); }
-    if (heroFHoursText) { heroFLeftChildren.push(mkSpacer(10)); heroFLeftChildren.push(heroFHoursText); }
-    if (heroFButtonRow) { heroFLeftChildren.push(mkSpacer(heroFHoursText ? 28 : 18)); heroFLeftChildren.push(heroFButtonRow); }
+    if (heroFParagraph) { heroFLeftChildren.push(mkSpacer(24)); heroFLeftChildren.push(heroFParagraph); }
+    if (heroFHoursText) { heroFLeftChildren.push(mkSpacer(12)); heroFLeftChildren.push(heroFHoursText); }
+    if (heroFButtonRow)  { heroFLeftChildren.push(mkSpacer(heroFHoursText || heroFParagraph ? 32 : 24)); heroFLeftChildren.push(heroFButtonRow); }
 
-    // gap "0": mkContainer's default 20px flex gap was stacking on top of
-    // every spacer (gap + spacer + gap ≈ 58px where the preview shows 20px),
-    // which is why the imported hero looked stretched out compared to the
-    // preview. With gap 0, the spacer sizes above ARE the preview's margins
-    // (20 / 10 / 28, or 18 straight to the buttons when there are no hours).
-    var heroFLeftCol = mkContainer(heroFLeftChildren, null, { isInner: true, width: 50, padY: "60", padX: "48", gap: "0" });
-    // Vertically center against the map column, same as the preview's
-    // justify-content:center on this column.
+    var heroFLeftCol = mkContainer(heroFLeftChildren, null, { isInner: true, width: 50, padY: "72", padX: "56", gap: "0" });
     heroFLeftCol.settings.flex_justify_content = "center";
-    var heroFMapWidget = mkGoogleMapsWidget(brief.mapAddress, { height: 340 }) || mkImageBg("Map", { width: 50, bg: bone });
-    var heroFRightCol = mkContainer([heroFMapWidget], null, { isInner: true, width: 50, padY: "0", padX: "0" });
+
+    // Map column: real padding on all sides so the map floats within the
+    // section instead of touching the edges. min_height bumped to 460px
+    // (from 340) so it reads balanced next to the taller text column,
+    // and a small border-radius matches the Bethlehem-approved look.
+    var heroFMapWidget = mkGoogleMapsWidget(brief.mapAddress, { height: 460 }) || mkImageBg("Map", { width: 100, bg: bone });
+    var heroFRightCol = mkContainer([heroFMapWidget], null, { isInner: true, width: 50, padY: "72", padX: "56" });
+    heroFRightCol.settings.flex_justify_content = "center";
+
+    // Section outer gets bone bg + no vertical pad (columns own their own
+    // padding). Container width is boxed at 1160px via mkContainer's
+    // default so the section aligns with the rest of the page.
     var heroF = mkContainer([heroFLeftCol, heroFRightCol], bone, { direction: "row", padY: "0", padX: "0", gap: "0" });
 
     // Testimonials -- same conditional carousel as Variant A/D: only when
