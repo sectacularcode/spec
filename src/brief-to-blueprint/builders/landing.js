@@ -95,6 +95,10 @@ export function scoreLandingVariants(brief) {
 //   Best for: retargeting, people who already know the brand, stripped-down conversion push
 
 export function buildLandingPage(colors, brief, inspoContext, variant) {
+  // Preview paints photo drop-zones with the accent at ~9% alpha
+  // (brass + "18"); mirror that here, with the preview's own guard, so
+  // placeholder boxes import in the same tint they were approved in.
+  // (Assigned after `accent` is resolved below.)
   var ink      = colors.ink           || "#1A1A1A";
   var accent   = colors.brass         || colors.accent || "#C2A35B";
   var bone     = colors.bone          || colors.background || "#F2F2F2";
@@ -112,6 +116,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   if (!dark || dark.toLowerCase() === accent.toLowerCase() || dark.toLowerCase() === brassDeepCheck) {
     dark = "#1F2328";
   }
+  var accentTint = /^#[0-9a-fA-F]{6}$/.test(accent) ? accent + "18" : "#e8f4ea";
 
   var brandName   = brief.brandName    || "";
   var heroEyebrowText = brief.heroEyebrow != null ? brief.heroEyebrow : brandName;
@@ -120,7 +125,10 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   var phoneCta    = brief.phoneCta     || brief.heroCta1 || "Call Us Now";
   var contactCta  = brief.contactCta   || brief.heroCta2 || "Contact Us";
   var closingLine = brief.closingCta   || brief.tagline  || "Ready to get started?";
-  var closingBody = brief.closingBody  || "[One sentence that removes hesitation and drives action]";
+  // Same fallback sentence the preview uses (landingPreview.js) — the two
+  // used to differ, so an approved preview showed real copy while the
+  // imported page showed a bracketed placeholder.
+  var closingBody = brief.closingBody  || "Reach out today and we'll get back to you within one business day.";
 
   // Landing pages have two real button contexts: dark hero/closing
   // sections (which have always inverted -- a light button pops against
@@ -320,7 +328,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         innerBox.settings.border_color = accent;
       }
       var textCol = mkContainer([innerBox], null, { isInner: true, padY: "30", padX: "30", width: 50, full: true });
-      var imgCol  = mkImageBg(f.imgCaption, { width: 50 });
+      var imgCol  = mkImageBg(f.imgCaption, { width: 50, bg: accentTint });
       var cols    = f.imageLeft ? [imgCol, textCol] : [textCol, imgCol];
       var row     = mkContainer(cols, i % 2 === 0 ? warmWhite : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
       return row;
@@ -399,7 +407,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     innerBox.settings.flex_justify_content = "center";
     innerBox.settings.flex_align_items = "flex-start";
     var textCol = mkContainer([innerBox], null, { isInner: true, padY: "30", padX: "30", width: 50, full: true });
-    var imgCol  = mkImageBg(f.imgCaption, { width: 50 });
+    var imgCol  = mkImageBg(f.imgCaption, { width: 50, bg: accentTint });
     var cols    = imageLeft ? [imgCol, textCol] : [textCol, imgCol];
     return mkContainer(cols, rowIdx % 2 === 0 ? warmWhite : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
   }
@@ -492,7 +500,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var mapWidget = brief.mapMode === "service_area" ? null : mkGoogleMapsWidget(brief.mapAddress, { isInner: false });
     var mapCol = mapWidget
       ? mkContainer([mapWidget], null, { isInner: true, padY: "0", padX: "0", width: 50, full: true })
-      : mkImageBg("[Map placeholder]", { width: 50 });
+      : mkImageBg("[Map placeholder]", { width: 50, bg: bone }); // preview's map placeholder is bone
     return mkContainer([textCol, mapCol], rowIdx % 2 === 0 ? warmWhite : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
   }
 
@@ -552,14 +560,18 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     return mkContainer([textCol, videoCol], rowIdx % 2 === 0 ? warmWhite : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
   }
 
-  function makeClosingCta() {
+  function makeClosingCta(bg) {
+    // Background follows the variant's own preview: brass/accent for
+    // A/D/E/F (the preview's va-cta section), dark only for B. The export
+    // used to hardcode dark for every variant, so the approved green
+    // closing section imported as a near-black one.
     return mkContainer([
       mkHeading(closingLine, warmWhite, "h2", { weight: 700, px: 40, align: "center" }),
       mkSpacer(12),
       mkText("<p style='text-align:center'>" + he(closingBody) + "</p>", "rgba(255,255,255,0.8)"),
       mkSpacer(28),
       makeDualBtnRow(phoneCta, contactCta, brief.heroPrimaryUrl, brief.heroSecondaryUrl),
-    ], dark, { padY: "80", center: true });
+    ], bg || accent, { padY: "80", center: true });
   }
 
   // Optional FAQ section — accordion widget, staged with generic placeholder
@@ -577,7 +589,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     return mkContainer([
       mkHeading(brief.faqHeading || "Frequently Asked Questions", accent, "h2", { weight: 800, px: 32 }),
       mkSpacer(28),
-      mkAccordion(faqItems),
+      mkAccordion(faqItems, { titleColor: ink, activeColor: accent, iconColor: accent, contentColor: stone, borderColor: "#DDE0E6" }),
     ], warmWhite, { padY: "80" });
   }
 
@@ -773,12 +785,20 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var heroFButtonRow = mkContainer(heroFButtons, null, { isInner: true, direction: "row", buttonRow: true, gap: "12", padY: "0", padX: "0" });
 
     var heroFLeftChildren = [heroFH1];
-    if (heroFAddressText) { heroFLeftChildren.push(mkSpacer(18)); heroFLeftChildren.push(heroFAddressText); }
+    if (heroFAddressText) { heroFLeftChildren.push(mkSpacer(20)); heroFLeftChildren.push(heroFAddressText); }
     if (heroFHoursText) { heroFLeftChildren.push(mkSpacer(10)); heroFLeftChildren.push(heroFHoursText); }
-    if (heroFButtonRow) { heroFLeftChildren.push(mkSpacer(20)); heroFLeftChildren.push(heroFButtonRow); }
+    if (heroFButtonRow) { heroFLeftChildren.push(mkSpacer(heroFHoursText ? 28 : 18)); heroFLeftChildren.push(heroFButtonRow); }
 
-    var heroFLeftCol = mkContainer(heroFLeftChildren, null, { isInner: true, width: 50, padY: "60", padX: "48" });
-    var heroFMapWidget = mkGoogleMapsWidget(brief.mapAddress, { height: 340 }) || mkImageBg("Map", { width: 50 });
+    // gap "0": mkContainer's default 20px flex gap was stacking on top of
+    // every spacer (gap + spacer + gap ≈ 58px where the preview shows 20px),
+    // which is why the imported hero looked stretched out compared to the
+    // preview. With gap 0, the spacer sizes above ARE the preview's margins
+    // (20 / 10 / 28, or 18 straight to the buttons when there are no hours).
+    var heroFLeftCol = mkContainer(heroFLeftChildren, null, { isInner: true, width: 50, padY: "60", padX: "48", gap: "0" });
+    // Vertically center against the map column, same as the preview's
+    // justify-content:center on this column.
+    heroFLeftCol.settings.flex_justify_content = "center";
+    var heroFMapWidget = mkGoogleMapsWidget(brief.mapAddress, { height: 340 }) || mkImageBg("Map", { width: 50, bg: bone });
     var heroFRightCol = mkContainer([heroFMapWidget], null, { isInner: true, width: 50, padY: "0", padX: "0" });
     var heroF = mkContainer([heroFLeftCol, heroFRightCol], bone, { direction: "row", padY: "0", padX: "0", gap: "0" });
 
@@ -969,7 +989,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     return {
       version: "0.4", title: he(brandName || "Site") + " — Landing Page (Form)", type: "page", page_settings: {},
-      content: [heroB, formSection, testimonialsSection, ...makeFeatureRows(), midCta, makeMapSection(), makeClosingCta(), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),
+      content: [heroB, formSection, testimonialsSection, ...makeFeatureRows(), midCta, makeMapSection(), makeClosingCta(dark), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),
     };
   }
 
@@ -1030,7 +1050,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     mkButton(phoneCta, darkCtxBtnBg, darkCtxBtnText, brief.heroPrimaryUrl),
     mkSpacer(16),
     mkText("<p style='text-align:center;font-size:14px'>" + he(brief.formReassurance || "No sales team. A real reply within one business day.") + "</p>", "rgba(255,255,255,0.7)"),
-  ], dark, { padY: "100", center: true });
+  ], accent, { padY: "100", center: true }); // brass closing, matching Variant C's preview
 
   return {
     version: "0.4", title: he(brandName || "Site") + " — Landing Page (Minimal)", type: "page", page_settings: {},

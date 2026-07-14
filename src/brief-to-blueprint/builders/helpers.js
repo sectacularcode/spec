@@ -130,7 +130,11 @@ export function mkHeading(text, color, size, opts) {
     s.typography_font_size_mobile = { unit:"px", size: 10 };
   } else if (opts.font || opts.weight || opts.px || opts.italic) {
     s.typography_typography = "custom";
-    if (opts.font)   s.typography_font_family = opts.font;
+    // The preview renders in Inter (buildPreviewHTML's body rule). Custom
+    // typography without a family inherits the WordPress kit's font on
+    // import, so headings stopped matching the approved preview. Explicit
+    // opts.font still wins.
+    s.typography_font_family = opts.font || "Inter";
     if (opts.weight) s.typography_font_weight = String(opts.weight);
     if (opts.italic) s.typography_font_style = "italic";
     Object.assign(s, rFont(opts.px));
@@ -144,6 +148,8 @@ export function mkText(html, color, align) {
   var s = {
     editor: "<p>" + html + "</p>", text_color: color,
     typography_typography: "custom",
+    // Inter to match the preview's body font — see mkHeading note above.
+    typography_font_family: "Inter",
     typography_font_size: { unit:"px", size: 17 }, typography_font_size_tablet: { unit:"px", size: 16 }, typography_font_size_mobile: { unit:"px", size: 15 },
     typography_line_height: { unit:"em", size: 1.65 }, typography_line_height_tablet: { unit:"em", size: 1.6 }, typography_line_height_mobile: { unit:"em", size: 1.55 },
   };
@@ -192,7 +198,10 @@ export function mkImageBg(caption, opts) {
   var passThrough = Object.assign({}, opts);
   delete passThrough.width;
   delete passThrough.minHeight;
-  var box = mkContainer([], "#DDE0E6", Object.assign({
+  delete passThrough.bg;
+  // opts.bg lets callers match the preview's accent-tinted photo drop-zone
+  // instead of the old flat gray-blue; default unchanged for other callers.
+  var box = mkContainer([], opts.bg || "#DDE0E6", Object.assign({
     isInner: true, full: true, padY: "0", padX: "0",
   }, passThrough));
   box.settings.background_image = { url: "", id: "" };
@@ -306,47 +315,65 @@ export function mkForm(fields, ctaLabel, opts) {
 // and active/hover state styling aren't set here (those style-tab keys
 // aren't confirmed) — do one style pass in the Elementor editor after
 // import if the open/closed icon colors need to match brand exactly.
-export function mkAccordion(items) {
-  return {
-    id: nid(), elType: "widget", widgetType: "accordion",
-    settings: {
-      tabs: items.map(function(item) {
-        return {
-          _id: nid().slice(0, 7),
-          tab_title: he(item.question),
-          tab_content: he(item.answer),
-        };
-      }),
-      selected_icon: { value: "fas fa-plus", library: "fa-solid" },
-      selected_active_icon: { value: "fas fa-minus", library: "fa-solid" },
-    },
-    elements: [],
+// Color/border opts use Elementor's real accordion.php control names
+// (title_color / tab_active_color / icon_color / icon_active_color /
+// content_color / border_color). Without them the imported accordion took
+// the WordPress theme's defaults and stopped matching the preview's FAQ.
+export function mkAccordion(items, opts) {
+  opts = opts || {};
+  var s = {
+    tabs: items.map(function(item) {
+      return {
+        _id: nid().slice(0, 7),
+        tab_title: he(item.question),
+        tab_content: he(item.answer),
+      };
+    }),
+    selected_icon: { value: "fas fa-plus", library: "fa-solid" },
+    selected_active_icon: { value: "fas fa-minus", library: "fa-solid" },
   };
+  if (opts.titleColor)   s.title_color = opts.titleColor;
+  if (opts.activeColor)  s.tab_active_color = opts.activeColor;
+  if (opts.iconColor)    { s.icon_color = opts.iconColor; s.icon_active_color = opts.iconColor; }
+  if (opts.contentColor) s.content_color = opts.contentColor;
+  if (opts.borderColor)  s.border_color = opts.borderColor;
+  return { id: nid(), elType: "widget", widgetType: "accordion", settings: s, elements: [] };
 }
-// "testimonial-carousel" against Elementor Pro's own source
-// (modules/carousel/widgets/testimonial-carousel.php get_name()). The
-// per-slide field names (testimonial_content/name/job) follow Elementor's
-// standard Testimonial-widget field naming, carried over into the carousel
-// version — this part is NOT verified against a real production export, so
-// spot-check one real import before this goes out to many client sites.
+// "testimonial-carousel" schema — verified against Elementor Pro's actual
+// widget source (modules/carousel/widgets/testimonial-carousel.php plus the
+// carousel base.php it extends), July 2026, after the original guessed
+// schema shipped and a real WordPress import rendered Elementor's built-in
+// "Lorem ipsum / John Doe / CEO" default slides instead of the real quotes.
+// The repeater key is `slides` (per-slide fields: content/name/title) — the
+// old `testimonials` key with testimonial_* fields is silently ignored by
+// Elementor, which then falls back to the widget's own defaults. Same for
+// the additional options: the real keys are show_arrows and pagination
+// ("bullets"/"fraction"/"progressbar"/""), not arrows/dots.
 export function mkTestimonialCarousel(testimonials, opts) {
   opts = opts || {};
   return {
     id: nid(), elType: "widget", widgetType: "testimonial-carousel",
     settings: {
-      testimonials: testimonials.map(function(t) {
+      slides: testimonials.map(function(t) {
         return {
           _id: nid().slice(0, 7),
-          testimonial_content: he(t.quote),
-          testimonial_name: he(t.name),
-          testimonial_job: he(t.title),
+          content: he(t.quote),
+          name: he(t.name),
+          title: he(t.title),
         };
       }),
       content_color: opts.textColor || "#FFFFFF",
       name_color: opts.nameColor || "#FFFFFF",
-      job_color: opts.jobColor || "rgba(255,255,255,0.7)",
-      dots: "yes",
-      arrows: "",
+      title_color: opts.jobColor || "rgba(255,255,255,0.7)",
+      // Italic quote at 21px in Inter — the preview's testimonial styling,
+      // so the imported page reads the same as what was approved on screen.
+      content_typography_typography: "custom",
+      content_typography_font_family: "Inter",
+      content_typography_font_style: "italic",
+      content_typography_font_size: { unit: "px", size: 21 },
+      // Dots only, no arrows — matches the preview's clean quote block.
+      show_arrows: "",
+      pagination: "bullets",
       autoplay: "yes",
       pause_on_hover: "yes",
       loop: "yes",
