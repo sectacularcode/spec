@@ -593,6 +593,18 @@ function manifestPageDocumentToBrief(raw) {
 // validation fails for whichever path is used -- callers should catch this
 // and show the .issues list rather than a generic parse error.
 export function manifestToBrief(raw) {
+  // Wrong-file guard: a Spec-generated Elementor template dragged back into
+  // this importer used to fail with a generic "brand: missing / page: missing"
+  // list, which reads like a Manifest schema problem when it's really the
+  // reverse of the July 2026 mix-up (Manifest export uploaded to WordPress).
+  // Elementor templates are unmistakable: content array + version, and none
+  // of Manifest's identifying fields (format/brand/sections).
+  if (raw && Array.isArray(raw.content) && raw.version && !raw.format && !raw.brand && !raw.sections) {
+    throw new ManifestImportError(
+      "This is a Spec-generated Elementor template, not a Manifest export. This file gets uploaded to WordPress/Elementor -- the file that goes here is Manifest's export (usually named ..._page.json).",
+      ["root: Elementor template detected (content + version fields)"]
+    );
+  }
   if (raw && raw.format === PAGE_DOCUMENT_FORMAT) {
     return manifestPageDocumentToBrief(raw);
   }

@@ -2025,7 +2025,7 @@ Rules:
                                   const blob = new Blob([JSON.stringify(p.data, null, 2)], { type: "application/json" });
                                   const a = document.createElement("a");
                                   a.href = URL.createObjectURL(blob);
-                                  a.download = (build.client || "build").replace(/\s+/g, "-").toLowerCase() + "-" + p.id + ".json";
+                                  a.download = (build.client || "build").replace(/\s+/g, "-").toLowerCase() + "-" + p.id + "-elementor.json";
                                   a.click();
                                   URL.revokeObjectURL(a.href);
                                 }, i * 300);

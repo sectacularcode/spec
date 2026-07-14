@@ -995,7 +995,7 @@ export default function CustomBuild({ userId, role } = {}) {
     const data = buildHeaderJSON(colors, brief, inspoContext);
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-    a.download = slugify(clientName || brief?.brandName) + "-header.json";
+    a.download = slugify(clientName || brief?.brandName) + "-header-elementor.json";
     a.click(); URL.revokeObjectURL(a.href);
   }
 
@@ -1006,7 +1006,7 @@ export default function CustomBuild({ userId, role } = {}) {
     const data = buildFooterJSON(colors, brief, inspoContext);
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-    a.download = slugify(clientName || brief?.brandName) + "-footer.json";
+    a.download = slugify(clientName || brief?.brandName) + "-footer-elementor.json";
     a.click(); URL.revokeObjectURL(a.href);
   }
 
@@ -1042,7 +1042,7 @@ export default function CustomBuild({ userId, role } = {}) {
   function downloadPage(p) {
     const blob = new Blob([JSON.stringify(getPageData(p), null, 2)], { type: "application/json" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-    a.download = slugify(clientName || brief?.brandName) + "-" + p.id + ".json";
+    a.download = slugify(clientName || brief?.brandName) + "-" + p.id + "-elementor.json";
     a.click(); URL.revokeObjectURL(a.href);
     // Auto-save this single page to the library
     if (brief && generated) {
@@ -1055,7 +1055,7 @@ export default function CustomBuild({ userId, role } = {}) {
     generated.pages.forEach((p, i) => setTimeout(() => {
       const blob = new Blob([JSON.stringify(getPageData(p), null, 2)], { type: "application/json" });
       const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-      a.download = slugify(clientName || brief?.brandName) + "-" + p.id + ".json";
+      a.download = slugify(clientName || brief?.brandName) + "-" + p.id + "-elementor.json";
       a.click(); URL.revokeObjectURL(a.href);
     }, i * 300));
     // Auto-save full build to library
@@ -1655,7 +1655,7 @@ export default function CustomBuild({ userId, role } = {}) {
                     placeholder="e.g. Specish Studio"
                   />
                   <div style={{ fontSize: "11px", color: "#9ca3af", marginBottom: "12px" }}>
-                    Files will download as: <span style={{ color: "#09090b", fontWeight: 600 }}>{slugify(clientName || brief?.brandName)}-home.json</span>
+                    Files will download as: <span style={{ color: "#09090b", fontWeight: 600 }}>{slugify(clientName || brief?.brandName)}-home-elementor.json</span>
                   </div>
                   <button style={T.btnGhost} onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setPlaceholderButtons(null); }}>Replace brief</button>
                 </div>
