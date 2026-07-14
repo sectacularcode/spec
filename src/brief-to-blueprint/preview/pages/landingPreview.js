@@ -670,13 +670,6 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<div style='min-height:340px;'>" + mapEmbedHTML + "</div>" +
             "</div>" +
           "</section>" +
-          "<section class='va-trust' style='background:#ffffff;padding:0;border-bottom:1px solid #f0f0f0;'>" +
-            "<div style='display:grid;grid-template-columns:repeat(3,1fr);'>" +
-              [{ s:s1,l:l1 },{ s:s2,l:l2 },{ s:s3,l:l3 }].map(function(t,i) {
-                return "<div class='grid-cell' style='padding:40px 32px;text-align:center;" + (i<2?"border-right:1px solid #f0f0f0;":"") + "'><div style='font-size:42px;font-weight:800;color:" + brass + ";line-height:1;margin-bottom:6px;'>" + t.s + "</div><div style='font-size:14px;color:" + stone + ";font-weight:500;letter-spacing:0.02em;'>" + t.l + "</div></div>";
-              }).join("") +
-            "</div>" +
-          "</section>" +
           (brief.testimonial1Name ? (
             "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
               "<div style='max-width:640px;margin:0 auto;'>" +

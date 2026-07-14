@@ -784,7 +784,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       version: "0.4", title: he(brandName || "Site") + " — Landing Page (Location)", type: "page", page_settings: {},
       // No makeMapSection() here -- the map is already part of heroF, a
       // second one further down would just duplicate it.
-      content: [heroF, makeTrustStrip(), testimonialsSectionF, ...makeFeatureRows(), checklistSectionF, makeFormSection(), makeClosingCta(), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),
+      content: [heroF, testimonialsSectionF, ...makeFeatureRows(), checklistSectionF, makeFormSection(), makeClosingCta(), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),
     };
   }
 
