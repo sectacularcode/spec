@@ -888,7 +888,6 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // actually reviewed.
     var testimonialsSectionF = brief.testimonial1Name ? mkContainer([
       mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", accent, "h2", { weight: 800, px: 32, align: "center" }),
-      mkSpacer(24),
       mkTestimonialCarousel([
         { quote: brief.testimonial1Quote || "", name: brief.testimonial1Name || "", title: brief.testimonial1Title || "" },
         { quote: brief.testimonial2Quote || "", name: brief.testimonial2Name || "", title: brief.testimonial2Title || "" },
