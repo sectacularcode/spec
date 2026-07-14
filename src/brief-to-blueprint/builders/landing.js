@@ -732,6 +732,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       { quote: brief.testimonial3Quote || "[Third testimonial — reliability or speed]",        name: brief.testimonial3Name || "Client Name", title: brief.testimonial3Title || "Title, Company" },
     ];
     var testimonialsSectionE = mkContainer([
+      mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", accent, "h2", { weight: 800, px: 32, align: "center" }),
       mkTestimonialCarousel(testimonialsE, { textColor: warmWhite, nameColor: warmWhite, jobColor: "rgba(255,255,255,0.7)" }),
     ], dark, { padY: "80", center: true });
 
@@ -961,6 +962,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // same principle: no real content there should mean the section
     // doesn't render, not that it renders with invented placeholder quotes.
     var testimonialsSectionA = brief.testimonial1Name ? mkContainer([
+      mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", accent, "h2", { weight: 800, px: 32, align: "center" }),
       mkTestimonialCarousel([
         { quote: brief.testimonial1Quote || "", name: brief.testimonial1Name || "", title: brief.testimonial1Title || "" },
         { quote: brief.testimonial2Quote || "", name: brief.testimonial2Name || "", title: brief.testimonial2Title || "" },
@@ -1059,6 +1061,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       { quote: brief.testimonial3Quote || "[Third testimonial — reliability or speed]",        name: brief.testimonial3Name || "Client Name", title: brief.testimonial3Title || "Title, Company" },
     ];
     var testimonialsSection = mkContainer([
+      mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", accent, "h2", { weight: 800, px: 32, align: "center" }),
       mkTestimonialCarousel(testimonials, { textColor: warmWhite, nameColor: warmWhite, jobColor: "rgba(255,255,255,0.7)" }),
     ], dark, { padY: "80", center: true });
 
