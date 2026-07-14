@@ -16,7 +16,7 @@ export function buildProcessPage(C, brief, inspoHint, patterns) {
     mkHeading(brief.processH1 || "How it gets made.", ink, "h1", { weight: 800, px: 64 }),
     mkSpacer(16),
     mkText(he(brief.processIntro || "Simple and calm, from first call to final files. No maze, no surprises."), text),
-  ], bone, { padY: "88" });
+  ], bone, { padY: "96" });
 
   var defaultSteps = [
     ["01", "The intro", "A short call to understand the company and the goal. No charge, no maze."],
@@ -31,9 +31,9 @@ export function buildProcessPage(C, brief, inspoHint, patterns) {
     mkHeading(brief.calloutEyebrow || "What to expect", brass, "h6", { eyebrow: true }),
     mkSpacer(16),
     mkText(he(brief.calloutBody || "[What to expect — timeline and delivery details. Fill in from client brief.]"), warmWhite),
-  ], ink, { padY: "80" });
+  ], ink, { padY: "96" });
 
-  var closing = mkContainer([mkButton("Start a project", btnBg, btnText)], bone, { padY: "80", center: true });
+  var closing = mkContainer([mkButton("Start a project", btnBg, btnText)], bone, { padY: "96", center: true });
 
   // ── Variant A: Two-column numbered grid ───────────────────────────────────
   var gridSteps = steps.map(function(step, i) {
@@ -46,7 +46,7 @@ export function buildProcessPage(C, brief, inspoHint, patterns) {
       mkHeading(title, ink, "h3", { weight: 700, px: 22 }),
       mkSpacer(12),
       mkText(he(body), text),
-    ], i % 2 === 0 ? bone : "#ffffff", { padY: "56", padX: "40" });
+    ], i % 2 === 0 ? bone : "#ffffff", { padY: "64", padX: "40" });
   });
 
   var stepsRow1 = mkContainer(gridSteps.slice(0, 2), null, { direction: "row", gap: "0", padY: "0", isInner: true });
@@ -79,7 +79,7 @@ export function buildProcessPage(C, brief, inspoHint, patterns) {
   });
   var timelineRow = mkContainer(timelineSteps, null, { direction: "row", gap: "20", padY: "0", isInner: true });
   timelineRow.settings.flex_wrap = "wrap";
-  var timelineSection = mkContainer([timelineRow], bone, { padY: "80" });
+  var timelineSection = mkContainer([timelineRow], bone, { padY: "96" });
 
   var variantB = { version: "0.4", title: "Process", type: "page", page_settings: {},
     content: [header, timelineSection, callout, closing] };

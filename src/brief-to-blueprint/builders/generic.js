@@ -21,7 +21,7 @@ export function buildGenericPage(colors, brief, pageDef, inspoContext, variant) 
   // Hero — Variant A: light bone bg, Variant B: dark ink bg
   var heroEyebrow = mkHeading(brief.brandName || "", isDark ? brass : brass, "h6", { eyebrow: true, align: isDark ? "left" : "left" });
   var heroH1 = mkHeading(label, isDark ? warmWhite : ink, "h1", { font: (brief.fonts && brief.fonts[1]) || "Inter", weight: 800, px: 52 });
-  var heroContainer = mkContainer([heroEyebrow, mkSpacer(16), heroH1], isDark ? ink : bone, { padY: "80", minH: 50, center: true });
+  var heroContainer = mkContainer([heroEyebrow, mkSpacer(16), heroH1], isDark ? ink : bone, { padY: "112", minH: 50, center: true });
 
   // Page-type specific sections
   var sections = [];
@@ -114,7 +114,7 @@ export function buildGenericPage(colors, brief, pageDef, inspoContext, variant) 
     mkHeading(brief.tagline || brief.closingCta || "Ready to get started?", warmWhite, "h2", { font: (brief.fonts && brief.fonts[1]) || "Inter", weight: 400, px: 40 }),
     mkSpacer(24),
     mkButton(brief.headerCta || "Start a project", btnBg, btnText),
-  ], asphalt, { padY: "80", center: true }));
+  ], asphalt, { padY: "96", center: true }));
 
   return { version: "0.4", title: he(brief.brandName || "Site") + " — " + he(label), type: "page", page_settings: {}, content: sections };
 }

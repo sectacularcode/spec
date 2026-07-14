@@ -20,11 +20,23 @@ import { buildLandingPage, scoreLandingVariants } from "./landing.js";
 //   3. Add the page to ADDITIONAL_PAGE_TYPES in constants/pages.js
 
 export function generatePages(brief, selectedPages, inspoContext, aiRecs, customPagesArg) {
-  var colors = brief.colors || {
+  // Per-key merge with the SAME defaults buildPreviewHTML.js uses — not an
+  // object-level ||. brief.colors is often a present-but-empty {} (every
+  // Manifest import ships no color data), and {} is truthy, so the old
+  // `brief.colors || {defaults}` never fell through; each builder's own,
+  // slightly DIFFERENT per-key fallback constants then took over and the
+  // exported palette silently drifted from the preview's whenever any color
+  // key was missing. Falsy values ("" / null) also fall back per key.
+  var colorDefaults = {
     ink: "#1C1A17", brass: "#C2A35B", "brass-deep": "#9C7E3A",
     bone: "#EDE7DB", asphalt: "#2B2823", stone: "#8A8170",
     "warm-white": "#FBFAF7", text: "#2A2722"
   };
+  var providedColors = brief.colors || {};
+  var colors = Object.assign({}, colorDefaults);
+  Object.keys(providedColors).forEach(function(k) {
+    if (providedColors[k]) colors[k] = providedColors[k];
+  });
   var recs = aiRecs || {};
   var allPageDefs = ALL_PAGES.concat(ADDITIONAL_PAGE_TYPES).concat(customPagesArg || []);
   var patterns = selectPatterns(brief, inspoContext || "");

@@ -21,9 +21,9 @@ export function buildWorkPage(C, brief, inspoHint) {
     mkHeading(brief.workH1 || "Selected work.", ink, "h1", { weight: 800, px: 64 }),
     mkSpacer(16),
     mkText(he(brief.workIntro || "A look at the stories so far. Customer and team films, brand work, and the films that help a company show what it has become."), text),
-  ], bone, { padY: "88" });
+  ], bone, { padY: "96" });
 
-  var closing = mkContainer([mkButton("Start a project", btnBg, btnText)], bone, { padY: "80", center: true });
+  var closing = mkContainer([mkButton("Start a project", btnBg, btnText)], bone, { padY: "96", center: true });
 
   // ── Variant A: Standard grid with filter row ──────────────────────────────
   var filterCategories = brief.workCategories || ["All", "Stories & testimonials", "People & culture", "Brand & leadership", "Exit"];
@@ -38,7 +38,7 @@ export function buildWorkPage(C, brief, inspoHint) {
         return btn;
       }), null, { direction: "row", gap: "10", padY: "0", isInner: true }
     ),
-  ], bone, { padY: "24", padX: "40" });
+  ], bone, { padY: "32", padX: "40" });
 
   var gridTiles = (brief.workItems || []).map(function(title) {
     var tile = mkContainer([
@@ -59,9 +59,9 @@ export function buildWorkPage(C, brief, inspoHint) {
       var pt = mkContainer([
         mkImageBg("[Upload project image " + (wi+1) + "]", { minHeight: 200 }),
         mkSpacer(16),
-        mkHeading("[Project title " + (wi+1) + "]", ink, "h4", { weight: 700 }),
+        mkHeading("Project Title " + (wi+1), ink, "h4", { weight: 700 }),
         mkSpacer(4),
-        mkText("[Project type]", stone),
+        mkText("Project type", stone),
       ], "#ffffff", { padY: "0", isInner: true });
       pt.settings.border_border = "solid";
       pt.settings.border_width = { unit:"px", top:"1", right:"1", bottom:"1", left:"1", isLinked:true };
@@ -72,14 +72,14 @@ export function buildWorkPage(C, brief, inspoHint) {
   }
   var grid = mkContainer(gridTiles, null, { direction: "row", gap: "24", padY: "0", isInner: true });
   grid.settings.flex_wrap = "wrap";
-  var gridSection = mkContainer([grid], bone, { padY: "64" });
+  var gridSection = mkContainer([grid], bone, { padY: "80" });
 
   var variantA = { version: "0.4", title: "Work", type: "page", page_settings: {},
     content: [header, filterRow, gridSection, closing] };
 
   // ── Variant B: Editorial — featured hero tile + supporting grid ───────────
   var items = brief.workItems || [];
-  var featured = items[0] || "[Featured project title]";
+  var featured = items[0] || "Featured Project Title";
   var featuredTile = mkContainer([
     mkImageBg(featured, { grow: 1, minHeight: 420 }),
     mkContainer([
@@ -101,7 +101,7 @@ export function buildWorkPage(C, brief, inspoHint) {
     var t = mkContainer([
       mkImageBg(title, { minHeight: 180 }),
       mkSpacer(4),
-      mkText("[Project type]", stone),
+      mkText("Project type", stone),
     ], "#ffffff", { padY: "24", isInner: true });
     t.settings.border_border = "solid";
     t.settings.border_width = { unit:"px", top:"1", right:"1", bottom:"1", left:"1", isLinked:true };
@@ -112,7 +112,7 @@ export function buildWorkPage(C, brief, inspoHint) {
   var supportingRow = mkContainer(supportingTiles, null, { direction: "row", gap: "20", padY: "0", isInner: true });
   supportingRow.settings.flex_wrap = "wrap";
 
-  var editorialSection = mkContainer([featuredTile, mkSpacer(20), supportingRow], bone, { padY: "64" });
+  var editorialSection = mkContainer([featuredTile, mkSpacer(20), supportingRow], bone, { padY: "80" });
 
   var variantB = { version: "0.4", title: "Work", type: "page", page_settings: {},
     content: [header, editorialSection, closing] };

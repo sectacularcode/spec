@@ -24,7 +24,7 @@ export function buildContactPage(C, brief, inspoHint, patterns) {
       { font: "Fraunces", weight: 300, px: 52, italic: true, align: "center" }),
     mkSpacer(40),
     mkHeading(brief.signatureLine || "", stone, "h4", { align: "center" }),
-  ], ink, { padY: "96", center: true });
+  ], ink, { padY: "112", center: true });
 
   // ── Variant A: Stacked — header, form, reassurance, info split ────────────
   var headerA = mkContainer([
@@ -33,7 +33,7 @@ export function buildContactPage(C, brief, inspoHint, patterns) {
     mkHeading(brief.contactH1 || "Tell us about your project.", ink, "h1", { weight: 800, px: 56 }),
     mkSpacer(16),
     mkText(he(brief.contactIntro || "A quick note about what you need. You will get a real reply from a real person, usually within one business day."), text),
-  ], bone, { padY: "88" });
+  ], bone, { padY: "96" });
 
   var formSectionA = mkContainer([
     formPlaceholder,
@@ -41,7 +41,7 @@ export function buildContactPage(C, brief, inspoHint, patterns) {
     mkContainer([mkButton(brief.contactCta || "Send it over", btnBg, btnText)], null, { padY: "0", isInner: true }),
     mkSpacer(24),
     mkText(he(brief.contactReassurance || "No sales team. No automated funnel. A real reply from a real person."), stone),
-  ], bone, { padY: "64" });
+  ], bone, { padY: "80" });
 
   var infoLeft = mkContainer([
     mkHeading("What happens next", brassDp, "h6", { eyebrow: true }),
@@ -56,7 +56,7 @@ export function buildContactPage(C, brief, inspoHint, patterns) {
   ], null, { padY: "0", grow: 1, isInner: true });
 
   var infoRow = mkContainer([infoLeft, infoRight], null, { direction: "row", gap: "64", padY: "0", isInner: true });
-  var infoSection = mkContainer([infoRow], bone, { padY: "72" });
+  var infoSection = mkContainer([infoRow], bone, { padY: "88" });
 
   var variantA = { version: "0.4", title: "Contact", type: "page", page_settings: {},
     content: [headerA, formSectionA, infoSection, closingDark] };
@@ -79,7 +79,7 @@ export function buildContactPage(C, brief, inspoHint, patterns) {
   ], null, { padY: "0", grow: 1, isInner: true });
 
   var splitRow = mkContainer([statementLeft, formRight], null, { direction: "row", gap: "80", padY: "0", isInner: true });
-  var splitSection = mkContainer([splitRow], bone, { padY: "96" });
+  var splitSection = mkContainer([splitRow], bone, { padY: "112" });
 
   var variantB = { version: "0.4", title: "Contact", type: "page", page_settings: {},
     content: [splitSection, closingDark] };

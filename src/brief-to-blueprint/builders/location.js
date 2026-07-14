@@ -41,13 +41,13 @@ function mkMapEmbed(mapEmbed, stone) {
   // Placeholder block
   return mkContainer([
     mkHeading("[ Map — paste Google Maps embed in Elementor HTML widget ]", stone, "h6", { eyebrow: true }),
-  ], "#e8e8e8", { padY: "40", center: true });
+  ], "#E0DDD7", { padY: "40", center: true }); // preview's map-placeholder color
 }
 
 function mkServicesList(services, text, brass) {
   var items = (Array.isArray(services) && services.length > 0)
     ? services
-    : ["[Service 1]", "[Service 2]", "[Service 3]", "[Service 4]"];
+    : ["Service one", "Service two", "Service three", "Service four"];
   var html = "<ul style=\"margin:0;padding:0;list-style:none;\">" +
     items.map(function(s) {
       return "<li style=\"padding:8px 0 8px 28px;position:relative;border-bottom:1px solid rgba(0,0,0,0.07);\">" +
@@ -59,11 +59,11 @@ function mkServicesList(services, text, brass) {
 }
 
 function mkInfoBlock(loc, ink, stone, bone) {
-  var address = loc.address       || "[Street Address]";
-  var city    = loc.city          || "[City]";
-  var state   = loc.state         || "[State]";
-  var phone   = String(loc.phone  || "[Phone Number]");
-  var hours   = loc.hours         || "[Hours]";
+  var address = loc.address       || "123 Main Street";
+  var city    = loc.city          || "City";
+  var state   = loc.state         || "State";
+  var phone   = String(loc.phone  || "(555) 000-0000");
+  var hours   = loc.hours         || "Monday – Friday: 9am – 5pm";
 
   var addrCol = mkContainer([
     mkHeading("Address", stone, "h6", { eyebrow: true }),
@@ -88,7 +88,7 @@ function mkInfoBlock(loc, ink, stone, bone) {
   });
   row.settings.flex_wrap = "wrap";
 
-  return mkContainer([row], bone, { padY: "40" });
+  return mkContainer([row], bone, { padY: "56" });
 }
 
 // ── Variant A: Content-heavy / SEO ────────────────────────────────────────────
@@ -99,8 +99,8 @@ export function buildLocationPageA(colors, brief, loc) {
   var btnBg = (definedBtn && definedBtn.background) || C.brassDp;
   var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, C.text);
 
-  var city         = loc.city         || "[City]";
-  var state        = loc.state        || "[State]";
+  var city         = loc.city         || "City";
+  var state        = loc.state        || "State";
   var brandName    = brief.brandName  || "[Brand Name]";
   var headline     = loc.headline     || (brandName + " in " + city + ", " + state);
   var intro        = loc.intro        || ("When you need fast, reliable service in " + city + ", " + state + ", our team is ready. " + brandName + " provides " + city + " with the same quality and standards our customers expect.");
@@ -119,7 +119,7 @@ export function buildLocationPageA(colors, brief, loc) {
     mkText(he(city) + ", " + he(state), C.stone),
     mkSpacer(32),
     mkButton(ctaText, btnBg, btnText),
-  ], C.ink, { padY: "80", center: false }));
+  ], C.ink, { padY: "112", center: false }));
 
   // Address / phone / hours info strip
   sections.push(mkInfoBlock(loc, C.ink, C.stone, C.bone));
@@ -129,7 +129,7 @@ export function buildLocationPageA(colors, brief, loc) {
     mkHeading("Service in " + city + " You Can Count On", C.ink, "h2", { weight: 700, px: 40 }),
     mkSpacer(20),
     mkText(he(intro), C.text),
-  ], C.bone, { padY: "60" }));
+  ], C.bone, { padY: "80" }));
 
   // Services checklist
   sections.push(mkContainer([
@@ -138,7 +138,7 @@ export function buildLocationPageA(colors, brief, loc) {
     mkText("Our " + he(city) + " team handles all of the following:", C.stone),
     mkSpacer(20),
     mkServicesList(services, C.text, C.brass),
-  ], C.warmWhite, { padY: "60" }));
+  ], C.warmWhite, { padY: "80" }));
 
   // Supporting body + image split
   var supportText = mkContainer([
@@ -154,7 +154,7 @@ export function buildLocationPageA(colors, brief, loc) {
   var supportRow = mkContainer([supportText, supportImg], null, {
     direction: "row", gap: "48", padY: "0", isInner: true,
   });
-  sections.push(mkContainer([supportRow], C.bone, { padY: "60" }));
+  sections.push(mkContainer([supportRow], C.bone, { padY: "80" }));
 
   // Map embed
   sections.push(mkContainer([
@@ -163,14 +163,14 @@ export function buildLocationPageA(colors, brief, loc) {
     mkMapEmbed(loc.mapEmbed, C.stone),
     mkSpacer(8),
     mkText(he(loc.address || "") + " · " + he(city) + ", " + he(state), C.stone),
-  ], C.warmWhite, { padY: "60" }));
+  ], C.warmWhite, { padY: "80" }));
 
   // Closing CTA
   sections.push(mkContainer([
     mkHeading("Ready to get started in " + city + "?", C.warmWhite, "h2", { weight: 700, px: 40, align: "center" }),
     mkSpacer(24),
     mkButton(ctaText, btnBg, btnText),
-  ], C.asphalt, { padY: "80", center: true }));
+  ], C.asphalt, { padY: "96", center: true }));
 
   return {
     version: "0.4",
@@ -189,8 +189,8 @@ export function buildLocationPageB(colors, brief, loc) {
   var btnBg = (definedBtn && definedBtn.background) || C.brassDp;
   var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, C.text);
 
-  var city         = loc.city         || "[City]";
-  var state        = loc.state        || "[State]";
+  var city         = loc.city         || "City";
+  var state        = loc.state        || "State";
   var brandName    = brief.brandName  || "[Brand Name]";
   var headline     = loc.headline     || (city + " Service: On-Site or In Our Shop.");
   var intro        = loc.intro        || ("When a job is down, everything slows down. In " + city + ", " + brandName + " gives you fast, reliable service so you can get back to work with less disruption.");
@@ -209,7 +209,7 @@ export function buildLocationPageB(colors, brief, loc) {
       mkText(he(intro), C.warmWhite),
       mkSpacer(28),
       mkButton(ctaText, btnBg, btnText),
-    ], C.asphalt, { padY: "60" }),
+    ], C.asphalt, { padY: "80" }),
   ], C.asphalt, { padY: "0", gap: "0" }));
 
   // Address + phone + hours — tight strip right below hero
@@ -222,21 +222,21 @@ export function buildLocationPageB(colors, brief, loc) {
     mkServicesList(services, C.text, C.brass),
     mkSpacer(24),
     mkButton(ctaText, btnBg, btnText),
-  ], C.warmWhite, { padY: "60" }));
+  ], C.warmWhite, { padY: "80" }));
 
   // Map embed — prominent
   sections.push(mkContainer([
     mkMapEmbed(loc.mapEmbed, C.stone),
     mkSpacer(12),
-    mkText("<strong>" + he(loc.address || "[Address]") + "</strong><br>" + he(city) + ", " + he(state) + " · " + he(String(loc.phone || "[Phone]")) + " · " + he(loc.hours || "[Hours]"), C.stone, "center"),
-  ], C.bone, { padY: "48", center: true }));
+    mkText("<strong>" + he(loc.address || "123 Main Street") + "</strong><br>" + he(city) + ", " + he(state) + " · " + he(String(loc.phone || "(555) 000-0000")) + " · " + he(loc.hours || "Monday – Friday: 9am – 5pm"), C.stone, "center"),
+  ], C.bone, { padY: "64", center: true }));
 
   // Closing CTA
   sections.push(mkContainer([
     mkHeading("Serving " + city + " and surrounding areas.", C.warmWhite, "h2", { weight: 700, px: 36, align: "center" }),
     mkSpacer(24),
     mkButton(ctaText, btnBg, btnText),
-  ], C.asphalt, { padY: "72", center: true }));
+  ], C.asphalt, { padY: "96", center: true }));
 
   return {
     version: "0.4",

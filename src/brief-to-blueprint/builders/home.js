@@ -81,7 +81,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
   var hook = mkContainer([
     mkHeading(brief.hookStatement || "Your honest hook statement.", ink, "h2",
       { font: "Inter", weight: 700, px: 36, align: "center" }),
-  ], bone, { padY: "60", center: true });
+  ], bone, { padY: "88", center: true });
 
   var cards = (function() {
     var cds = (brief.serviceCards || [
@@ -116,7 +116,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
         row.settings.border_color = "#E2DBCC";
         return row;
       });
-      return mkContainer(numberedRows, bone, { padY: "80" });
+      return mkContainer(numberedRows, bone, { padY: "96" });
     }
 
     // "card-grid" (default) — the original bordered card grid.
@@ -136,7 +136,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
     });
     var row = mkContainer(cardEls, null, { direction: "row", gap: "20", padY: "0", isInner: true });
     row.settings.flex_wrap = "wrap";
-    return mkContainer([row], bone, { padY: "80" });
+    return mkContainer([row], bone, { padY: "96" });
   })();
 
   var split = (function() {
@@ -174,7 +174,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
           null, { padY: "0", grow: 1, isInner: true });
       }), null, { direction: "row", gap: "24", padY: "0", isInner: true }
     ),
-  ], bone, { padY: "80" });
+  ], bone, { padY: "96" }); // Recent work grid — preview uses 96, matching the other split sections above
 
   var pricingTeaser = mkContainer([
     mkHeading(brief.pricingH2 || "Clear prices. No discovery-call maze.", ink, "h2",

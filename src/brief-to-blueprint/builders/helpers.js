@@ -19,9 +19,12 @@ export function nid() { return Math.random().toString(16).slice(2, 9); }
 function rPad(padY, padX) {
   padX = padX || "40";
   var y = parseInt(padY); var x = parseInt(padX);
+  // Responsive scaling now mirrors the preview's clamp() rhythm (0.85 / 0.75 /
+  // 0.6 of the desktop pad). The prior 0.7 / 0.55 factors were the source of
+  // the "everything looks squeezed on tablet" gap between preview and export.
   var yl = Math.round(y * 0.85);
-  var yt = Math.round(y * 0.7); var ym = Math.round(y * 0.55);
-  var xt = Math.min(parseInt(padX), 32);
+  var yt = Math.max(48, Math.round(y * 0.75)); var ym = Math.max(40, Math.round(y * 0.6));
+  var xt = Math.min(parseInt(padX), 40);
   return {
     padding:        { unit:"px", top:String(y),  right:String(x),  bottom:String(y),  left:String(x),  isLinked:false },
     padding_laptop: { unit:"px", top:String(yl), right:String(x),  bottom:String(yl), left:String(x),  isLinked:false },
@@ -49,13 +52,27 @@ function rFont(px) {
 export function mkContainer(children, bg, opts) {
   opts = opts || {};
   var direction = opts.direction || "column";
+  var isBoxed = !opts.full;
   var s = {
-    content_width: opts.full ? "full" : "boxed",
+    content_width: isBoxed ? "boxed" : "full",
     flex_direction: direction,
     flex_gap: { unit:"px", size: opts.gap||"20", column: opts.gap||"20", row: opts.gap||"20" },
     flex_gap_mobile: { unit:"px", size: "16", column: "16", row: "16" },
   };
-  Object.assign(s, rPad(opts.padY || "80", opts.padX || "40"));
+  // boxed_width caps the content at the preview's actual max-width. Verified
+  // key against Elementor's container.php (`boxed_width`, only read when
+  // content_width === "boxed"). The preview's outer sections all sit inside
+  // max-width:1100–1160px containers; without this, the export rendered every
+  // section edge-to-edge on wide viewports and text sprawled across the row.
+  // Inner containers (opts.isInner) never get boxed_width — they're already
+  // constrained by the parent section and their own width:% setting.
+  if (isBoxed && !opts.isInner) {
+    var mw = opts.maxWidth || 1160;
+    s.boxed_width = { unit: "px", size: mw };
+    s.boxed_width_tablet = { unit: "%", size: 100 };
+    s.boxed_width_mobile = { unit: "%", size: 100 };
+  }
+  Object.assign(s, rPad(opts.padY || "88", opts.padX || "40"));
   // Explicit zero margin at every breakpoint — matches CS Repair's confirmed
   // production template, prevents unwanted vertical space leaking between
   // stacked top-level rows on desktop/laptop breakpoints.
@@ -199,9 +216,11 @@ export function mkImageBg(caption, opts) {
   delete passThrough.width;
   delete passThrough.minHeight;
   delete passThrough.bg;
-  // opts.bg lets callers match the preview's accent-tinted photo drop-zone
-  // instead of the old flat gray-blue; default unchanged for other callers.
-  var box = mkContainer([], opts.bg || "#DDE0E6", Object.assign({
+  // opts.bg lets callers override (the landing pages pass their preview's
+  // accent tint). Default is #E0DDD7 — the exact image-placeholder color
+  // every page preview in buildPreviewHTML.js uses. The old #DDE0E6 default
+  // was a transposed near-miss that never matched any preview.
+  var box = mkContainer([], opts.bg || "#E0DDD7", Object.assign({
     isInner: true, full: true, padY: "0", padX: "0",
   }, passThrough));
   box.settings.background_image = { url: "", id: "" };
@@ -264,6 +283,7 @@ export function mkIconList(items, accent, textColor, opts) {
     space_between: { unit: "px", size: opts.spaceBetween || 14 },
     icon_size: { unit: "px", size: opts.iconSize || 16 },
     typography_typography: "custom",
+    typography_font_family: "Inter", // matches the preview's body font — see mkHeading note
     typography_font_size: { unit: "px", size: fontSize },
     typography_font_size_tablet: { unit: "px", size: fontSize },
     typography_font_size_mobile: { unit: "px", size: Math.max(13, fontSize - 1) },

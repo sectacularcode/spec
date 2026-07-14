@@ -193,9 +193,9 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
           };
         })
       : [
-          { heading: brief.feature1Heading || "What We Do Best",     body: brief.feature1Body || "[Describe the primary service or capability that sets you apart]", imgCaption: "[Photo placeholder]", imageLeft: false },
-          { heading: brief.feature2Heading || "Built for Your Needs", body: brief.feature2Body || "[Explain how your approach is tailored to the specific customer]", imgCaption: "[Photo placeholder]", imageLeft: true  },
-          { heading: brief.feature3Heading || "Results You Can Count On", body: brief.feature3Body || "[Speak to reliability, track record, or outcomes]", imgCaption: "[Photo placeholder]", imageLeft: false },
+          { heading: brief.feature1Heading || "What We Do Best",     body: brief.feature1Body || "Detail the primary service or capability that sets you apart.", imgCaption: "[Photo placeholder]", imageLeft: false },
+          { heading: brief.feature2Heading || "Built for Your Needs", body: brief.feature2Body || "Explain how your approach is tailored to the specific customer.", imgCaption: "[Photo placeholder]", imageLeft: true  },
+          { heading: brief.feature3Heading || "Results You Can Count On", body: brief.feature3Body || "Speak to reliability, track record, or outcomes.", imgCaption: "[Photo placeholder]", imageLeft: false },
         ];
   }
 
@@ -270,7 +270,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
           mkSpacer(10),
           mkText(he(f.body), text),
         ];
-        return mkContainer(children, i % 2 === 0 ? warmWhite : bone, { padY: "48", padX: "48", full: true });
+        return mkContainer(children, i % 2 === 0 ? warmWhite : bone, { padY: "56", padX: "48", full: true });
       });
     }
 
@@ -292,7 +292,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
           mkText(he(f.body), text),
         ], null, { isInner: true, padY: "0", padX: "0", grow: "1" });
 
-        var row = mkContainer([numberCol, textCol], null, { direction: "row", padY: "20", padX: "32", gap: "20", full: true });
+        var row = mkContainer([numberCol, textCol], null, { direction: "row", padY: "28", padX: "32", gap: "20", full: true });
         row.settings.flex_align_items = "flex-start";
         row.settings.border_border = "solid";
         row.settings.border_width = { unit: "px", top: "0", right: "0", bottom: "1", left: "0", isLinked: false };
@@ -423,7 +423,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       body,
       mkSpacer(20),
       mkButton(contactCta, lightCtxBtnBg, lightCtxBtnText, brief.heroSecondaryUrl),
-    ], rowIdx % 2 === 0 ? warmWhite : bone, { padY: "56", center: true });
+    ], rowIdx % 2 === 0 ? warmWhite : bone, { padY: "72", center: true });
   }
 
   // A secondary CTA woven mid-list -- needs no feature content of its own,
@@ -439,7 +439,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkHeading(phoneCta, accent, "h2", { weight: 800, px: 32, align: "center" }),
       mkSpacer(8),
       mkText("<p style='text-align:center'>" + he(brief.midCtaText || "Questions before you reach out? " + contactCta + " and we'll get back to you within one business day.") + "</p>", stone),
-    ], warmWhite, { padY: "48", center: true });
+    ], warmWhite, { padY: "60", center: true });
   }
 
   // Several features sharing one heading (e.g. two related services under
@@ -457,7 +457,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkHeading(header, accent, "h6", { eyebrow: true }),
       mkSpacer(20),
       mkContainer(cols, null, { direction: "row", gap: "32", padY: "0", padX: "0", isInner: true, full: true }),
-    ], warmWhite, { padY: "56", padX: "48" });
+    ], warmWhite, { padY: "80", padX: "48" });
   }
 
   // Real Elementor Pro form widget embedded mid-page (same mkForm() used
@@ -476,7 +476,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       fSubhead ? mkText(he(fSubhead), stone) : null,
       mkSpacer(20),
       formWidget,
-    ].filter(Boolean), bone, { padY: "56", padX: "48" });
+    ].filter(Boolean), bone, { padY: "80", padX: "48" });
   }
 
   // Text beside a real, native Elementor Google Maps widget when a real
@@ -512,7 +512,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkHeading(f.heading, ink, "h3", { weight: 700, px: 22 }),
       mkSpacer(10),
       mkText(he(f.body), text),
-    ], rowIdx % 2 === 0 ? warmWhite : bone, { padY: "44", padX: "48", full: true });
+    ], rowIdx % 2 === 0 ? warmWhite : bone, { padY: "56", padX: "48", full: true });
   }
 
   // A heading with a short checkmark list beneath it — real native
@@ -529,7 +529,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkHeading(f.heading, ink, "h3", { weight: 700, px: 22 }),
       mkSpacer(16),
       mkIconList(clauses, accent, text, { fontSize: 15 }),
-    ], rowIdx % 2 === 0 ? warmWhite : bone, { padY: "44", padX: "48", full: true });
+    ], rowIdx % 2 === 0 ? warmWhite : bone, { padY: "56", padX: "48", full: true });
   }
 
   // A real native Elementor Video widget — UNVERIFIED against an actual
@@ -650,7 +650,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       fSubhead ? mkText(he(fSubhead), stone) : null,
       mkSpacer(20),
       formWidget,
-    ].filter(Boolean), bone, { padY: "56", padX: "48" });
+    ].filter(Boolean), bone, { padY: "80", padX: "48" });
   }
 
   // ── VARIANT E — Narrative / Trust-First layout ────────────────────────────
@@ -685,7 +685,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     ];
     var testimonialsSectionE = mkContainer([
       mkTestimonialCarousel(testimonialsE, { textColor: warmWhite, nameColor: warmWhite, jobColor: "rgba(255,255,255,0.7)" }),
-    ], dark, { padY: "72", center: true });
+    ], dark, { padY: "80", center: true });
 
     // A fresh element each call -- not a single reused block -- since
     // this gets interleaved more than once and every Elementor element
@@ -900,8 +900,10 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkHeading(heroH1, warmWhite, "h1", { weight: 800, px: 52, align: "center" }),
       mkSpacer(16),
       mkText("<p style='text-align:center'>" + he(heroSub) + "</p>", "rgba(255,255,255,0.85)"),
-      mkSpacer(12),
-      mkText("<p style='text-align:center'>" + he(brief.hookStatement || "[What sets you apart in one line]") + "</p>", "rgba(255,255,255,0.7)"),
+      // Hook line only when the brief actually has one — the preview renders
+      // nothing here otherwise, so the export shouldn't ship a bracketed
+      // placeholder line the preview never showed.
+      ...(brief.hookStatement ? [mkSpacer(12), mkText("<p style='text-align:center'>" + he(brief.hookStatement) + "</p>", "rgba(255,255,255,0.7)")] : []),
       mkSpacer(32),
       mkButton(phoneCta, darkCtxBtnBg, darkCtxBtnText, brief.heroPrimaryUrl),
     ], dark, { padY: "80", center: true });
@@ -949,7 +951,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // list, no separate boxed section) + the stat row. Benefits reuse the
     // same brief.benefit1/benefit2 fields Variant C already uses, rather
     // than introducing a new brief field just for this variant.
-    var whyUsIntro = brief.whyUsIntro || "[Add 1–2 sentences on why this business is the right choice]";
+    var whyUsIntro = brief.whyUsIntro || "Add 1–2 sentences on why this business is the right choice.";
     var whyUsBenefits = [
       brief.benefit1 || "[Key benefit one]",
       brief.benefit2 || "[Key benefit two]",

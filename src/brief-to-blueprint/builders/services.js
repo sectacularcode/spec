@@ -17,7 +17,7 @@ export function buildServicesPage(C, brief, _inspoHint) {
     mkHeading(brief.servicesH1 || "Straightforward pricing, upfront.", ink, "h1", { weight: 800, px: 56 }),
     mkSpacer(20),
     mkText("Real prices, in the open. Pick a package, or build a plan. No 30 minute call required to learn what something costs.", text),
-  ], bone, { padY: "88" });
+  ], bone, { padY: "96" });
 
   // Three tiers on dark background
   var tiers = (brief.pricingTiers || [
@@ -54,7 +54,7 @@ export function buildServicesPage(C, brief, _inspoHint) {
   alwaysIncluded.settings.border_width = { unit:"px", top:"1", right:"1", bottom:"1", left:"1", isLinked:true };
   alwaysIncluded.settings.border_color = "#E2DBCC";
 
-  var tiersSection = mkContainer([tiersRow, mkSpacer(24), alwaysIncluded], ink, { padY: "80" });
+  var tiersSection = mkContainer([tiersRow, mkSpacer(24), alwaysIncluded], ink, { padY: "88" });
 
   // Full menu — grouped by category. Read entirely from brief.pricingMenu:
   // an array of { category, items: [{ name, price, desc, includes }] }.
@@ -102,7 +102,7 @@ export function buildServicesPage(C, brief, _inspoHint) {
       mkHeading(brief.pricingMenuHeading || "The full menu", ink, "h2", { weight: 800, px: 44 }),
       mkSpacer(48),
       menuRow,
-    ], bone, { padY: "80" });
+    ], bone, { padY: "96" });
   }
 
   // How pricing works
@@ -110,18 +110,18 @@ export function buildServicesPage(C, brief, _inspoHint) {
     mkHeading("How pricing works", brassDp, "h6", { eyebrow: true }),
     mkSpacer(16),
     mkText(he(brief.pricingNote || "Every price is a starting point. It scales with scope. Most packages come in good, better, and best versions, so a client can choose by budget without a negotiation."), text),
-  ], "#ffffff", { padY: "48", padX: "40" });
+  ], "#ffffff", { padY: "56", padX: "40" });
   pricingNote.settings.border_border = "solid";
   pricingNote.settings.border_width = { unit:"px", top:"1", right:"1", bottom:"1", left:"3", isLinked:false };
   pricingNote.settings.border_color = brass;
 
-  var pricingNoteSection = mkContainer([pricingNote], bone, { padY: "48" });
+  var pricingNoteSection = mkContainer([pricingNote], bone, { padY: "64" });
 
   var closing = mkContainer([
     mkText("Not sure where to start? Tell me about the company.", stone, "center"),
     mkSpacer(24),
     mkButton(brief.headerCta || "Start a project", btnBg, btnText),
-  ], bone, { padY: "80", center: true });
+  ], bone, { padY: "96", center: true });
 
   return { version: "0.4", title: "Services & Pricing", type: "page", page_settings: {},
     content: [header, tiersSection, menuSection, pricingNoteSection, closing].filter(Boolean) };
@@ -141,7 +141,7 @@ export function buildServicesPageLight(C, brief, _inspoHint) {
     mkHeading(brief.servicesH1 || "Straightforward pricing, upfront.", ink, "h1", { weight: 800, px: 56 }),
     mkSpacer(20),
     mkText("Real prices, in the open. Pick a package, or build a plan.", text),
-  ], bone, { padY: "88" });
+  ], bone, { padY: "96" });
 
   var tiers = (brief.pricingTiers || [
     ["Front Door", "CASH FLOW & TRUST", "Productized story and testimonial packages with set scope and open pricing.", "From 2.5K per film"],
@@ -173,13 +173,13 @@ export function buildServicesPageLight(C, brief, _inspoHint) {
 
   var tiersRow = mkContainer(tiers, null, { direction: "row", gap: "20", padY: "0", isInner: true });
   tiersRow.settings.flex_wrap = "wrap";
-  var tiersSection = mkContainer([tiersRow], bone, { padY: "64" });
+  var tiersSection = mkContainer([tiersRow], bone, { padY: "80" });
 
   var closing = mkContainer([
     mkText("Not sure where to start? Tell us about the company.", stone, "center"),
     mkSpacer(24),
     mkButton(brief.headerCta || "Start a project", btnBg, btnText),
-  ], bone, { padY: "80", center: true });
+  ], bone, { padY: "96", center: true });
 
   return { version: "0.4", title: "Services & Pricing", type: "page", page_settings: {},
     content: [header, tiersSection, closing] };

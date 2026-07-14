@@ -16,29 +16,29 @@ export function buildAboutPage(C, brief, inspoHint, patterns) {
     mkHeading(brief.aboutEyebrow || "About", brassDp, "h6", { eyebrow: true }),
     mkSpacer(16),
     mkHeading(brief.aboutH1 || "One person. Every frame.", ink, "h1", { weight: 800, px: 64 }),
-  ], bone, { padY: "88" });
+  ], bone, { padY: "96" });
 
-  var closing = mkContainer([mkButton("Start a project", btnBg, btnText)], bone, { padY: "80", center: true });
+  var closing = mkContainer([mkButton("Start a project", btnBg, btnText)], bone, { padY: "96", center: true });
 
   // ── Variant A: Story + portrait split ─────────────────────────────────────
   var storyLeft = mkContainer([
-    mkText(he(brief.aboutStory || "[Founder story — pulled from brief. Fill in if missing.]"), text),
+    mkText(he(brief.aboutStory || "Your company story goes here."), text),
     mkSpacer(24),
-    mkText(he(brief.aboutStory2 || "[Second paragraph — additional context about the founder's background and what led to this work.]"), text),
+    mkText(he(brief.aboutStory2 || "Additional context about the founder's background and what led to this work."), text),
   ], null, { padY: "0", width: 50, isInner: true });
 
   var storyRight = mkImageBg("Founder portrait — on location, not in a studio.", { width: 50 });
 
   var storyRow = mkContainer([storyLeft, storyRight], null, { direction: "row", gap: "64", padY: "0", isInner: true });
-  var storySection = mkContainer([storyRow], bone, { padY: "80" });
+  var storySection = mkContainer([storyRow], bone, { padY: "96" });
 
   var whySection = mkContainer([
     mkHeading(brief.whyEyebrow || "Why this approach", brassDp, "h6", { eyebrow: true }),
     mkSpacer(16),
     mkHeading(brief.whyH2 || "One mind on the whole project.", ink, "h2", { weight: 800, px: 44 }),
     mkSpacer(24),
-    mkText(he(brief.whyOneMaker || "[Why this approach — pulled from brief. Explain what makes the method different and why it matters to clients.]"), text),
-  ], "#ffffff", { padY: "80" });
+    mkText(he(brief.whyOneMaker || "Why this approach works for the people you serve."), text),
+  ], "#ffffff", { padY: "96" });
 
   var values = (brief.founderValues || ["Grounded", "Forward", "Exact", "Singular", "Human"]).map(function(v) {
     var card = mkContainer([
@@ -58,7 +58,7 @@ export function buildAboutPage(C, brief, inspoHint, patterns) {
     mkHeading(brief.valuesEyebrow || "What we stand for", brassDp, "h6", { eyebrow: true }),
     mkSpacer(32),
     valuesRow,
-  ], bone, { padY: "72" });
+  ], bone, { padY: "88" });
 
   var variantA = { version: "0.4", title: "About", type: "page", page_settings: {},
     content: [header, storySection, whySection, valuesSection, closing] };
@@ -94,11 +94,11 @@ export function buildAboutPage(C, brief, inspoHint, patterns) {
     mkContainer([
       mkHeading(brief.whyEyebrow || "Why this approach", brassDp, "h6", { eyebrow: true }),
       mkSpacer(16),
-      mkText(he(brief.whyOneMaker || "[Why this approach — pulled from brief.]"), text),
+      mkText(he(brief.whyOneMaker || "Why this approach works for the people you serve."), text),
       mkSpacer(32),
       mkButton("Start a project", btnBg, btnText),
     ], null, { padY: "0", width: 50, isInner: true }),
-  ], bone, { direction: "row", gap: "64", padY: "80" });
+  ], bone, { direction: "row", gap: "64", padY: "96" });
 
   var variantB = { version: "0.4", title: "About", type: "page", page_settings: {},
     content: [header, timeline, portraitSection, valuesSection, closing] };
