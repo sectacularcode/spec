@@ -912,7 +912,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     if (formSectionF) formSectionF.settings._element_id = "contact-form";
 
     return {
-      version: "0.4", title: he(brandName || "Site") + " — Landing Page (Location)", type: "page", page_settings: {},
+      version: "0.4", title: he(brandName || "Site") + (brief.mapCity ? " — " + he(brief.mapCity) : "") + " — Landing Page (Location)", type: "page", page_settings: {},
       // No makeMapSection() here -- the map is already part of heroF, a
       // second one further down would just duplicate it.
       content: [heroF, testimonialsSectionF, ...makeFeatureRows(), checklistSectionF, formSectionF, makeClosingCta(), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),

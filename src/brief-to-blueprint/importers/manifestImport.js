@@ -465,6 +465,11 @@ function manifestPageDocumentToBrief(raw) {
       if (addressParts.length) {
         brief.mapAddress = addressParts.join(", ");
         brief.mapMode = mode;
+        // Kept separately from the concatenated mapAddress string above --
+        // needed to disambiguate multiple location pages for the same
+        // brand (e.g. Allentown vs Bethlehem) in the generated page title,
+        // which a parsed substring of mapAddress can't cleanly provide.
+        if (loc.city) brief.mapCity = loc.city;
         // phone/hours/email: not part of the schema yet (requested
         // alongside the structured location object), but reading them now
         // means this works the moment Manifest starts sending them, with
