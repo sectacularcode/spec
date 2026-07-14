@@ -576,7 +576,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     return mkContainer([
       mkHeading(f.heading, ink, "h3", { weight: 700, px: 30 }),
       mkSpacer(16),
-      mkIconList(clauses, accent, text, { fontSize: 19 }),
+      mkIconList(clauses, accent, text, { fontSize: 19, iconSize: 19 }),
     ], rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "56", padX: "48" });
   }
 

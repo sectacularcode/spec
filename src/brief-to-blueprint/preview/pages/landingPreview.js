@@ -282,7 +282,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
                 "<h3 style='font-size:clamp(17px,2vw,22px);font-weight:700;color:" + ink + ";margin:0 0 16px;'>" + he(f.heading || "") + "</h3>" +
                 "<div style='display:flex;flex-direction:column;gap:10px;'>" +
                   clauses.map(function (c) {
-                    return "<div style='display:flex;align-items:flex-start;gap:10px;'><span style='color:" + brass + ";font-weight:700;flex-shrink:0;margin-top:2px;'>&#10003;</span><span style='font-size:15px;color:" + text + ";line-height:1.5;'>" + he(c) + "</span></div>";
+                    return "<div style='display:flex;align-items:flex-start;gap:10px;'><span style='font-size:19px;color:" + brass + ";font-weight:700;flex-shrink:0;margin-top:2px;'>&#10003;</span><span style='font-size:19px;color:" + text + ";line-height:1.5;'>" + he(c) + "</span></div>";
                   }).join("") +
                 "</div>" +
               "</section>"
