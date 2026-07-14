@@ -604,6 +604,8 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       heading: brief.mapHeading,
       buttonLabel: brief.mapButtonLabel,
       mode: brief.mapMode,
+      phone: brief.mapPhone,
+      hours: brief.mapHours,
       buttonColors: { background: lightCtxBtnBg, textColor: lightCtxBtnText },
     });
   }

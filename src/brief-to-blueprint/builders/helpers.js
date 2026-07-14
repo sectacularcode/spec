@@ -412,6 +412,7 @@ export function mkMapSection(address, mapUrl, colors, opts) {
   var ink = colors.ink || colors.text || "#1A1A1A";
   var accent = colors.brass || colors.accent || "#C2A35B";
   var bone = colors.bone || colors.background || "#F2F2F2";
+  var stone = colors.stone || colors.muted || "#666666";
   // Optional real button colors from the caller (a defined Style Guide
   // button) -- falls back to the same accent/#FFFFFF pairing this always
   // used when not supplied, so any future caller that doesn't pass this
@@ -424,7 +425,36 @@ export function mkMapSection(address, mapUrl, colors, opts) {
     mkHeading(heading, ink, "h2", { weight: 700, px: 32, align: opts.center ? "center" : "left" }),
     mkSpacer(16),
   ];
-  if (address) {
+  // Address/Phone/Hours info strip -- matches the pattern already proven in
+  // location.js's mkInfoBlock. Built whenever real phone or hours copy is
+  // available alongside the address; falls back to the original plain
+  // address line otherwise, so a brief without this data renders exactly
+  // as it always has.
+  if (address && (opts.phone || opts.hours)) {
+    var infoCols = [mkContainer([
+      mkHeading("Address", stone, "h6", { eyebrow: true }),
+      mkSpacer(8),
+      mkText(he(address), ink),
+    ], null, { isInner: true, padY: "0", grow: "1" })];
+    if (opts.phone) {
+      infoCols.push(mkContainer([
+        mkHeading("Phone", stone, "h6", { eyebrow: true }),
+        mkSpacer(8),
+        mkText("<a href=\"tel:" + he(String(opts.phone).replace(/\D/g, "")) + "\" style=\"color:inherit;text-decoration:none;font-weight:600;\">" + he(opts.phone) + "</a>", ink),
+      ], null, { isInner: true, padY: "0", grow: "1" }));
+    }
+    if (opts.hours) {
+      infoCols.push(mkContainer([
+        mkHeading("Hours", stone, "h6", { eyebrow: true }),
+        mkSpacer(8),
+        mkText(he(opts.hours), ink),
+      ], null, { isInner: true, padY: "0", grow: "1" }));
+    }
+    var infoRow = mkContainer(infoCols, null, { direction: "row", gap: "40", padY: "0", isInner: true });
+    infoRow.settings.flex_wrap = "wrap";
+    children.push(infoRow);
+    children.push(mkSpacer(28));
+  } else if (address) {
     var addressLine = mode === "service_area"
       ? (opts.coverageText || ("Based in " + address + " -- serving the surrounding area."))
       : address;
@@ -435,12 +465,25 @@ export function mkMapSection(address, mapUrl, colors, opts) {
     var mapWidget = mkGoogleMapsWidget(address, { height: opts.mapHeight || 400 });
     if (mapWidget) children.push(mapWidget);
   }
+  // Button row -- Call Now alongside Get Directions/Check Your Area when a
+  // real phone number is known, instead of directions being the only CTA.
+  var mapButtons = [];
+  if (opts.phone) {
+    var callBtn = mkButton("Call " + opts.phone, mapBtnBg, mapBtnText);
+    callBtn.settings.link = { url: sanitizeUrl("tel:" + String(opts.phone).replace(/\D/g, "")) };
+    mapButtons.push(callBtn);
+  }
   if (mapUrl) {
-    children.push(mkSpacer(20));
     var btnLabel = opts.buttonLabel || (mode === "service_area" ? "Check Your Area" : "Get Directions");
     var btn = mkButton(btnLabel, mapBtnBg, mapBtnText);
     btn.settings.link = { url: sanitizeUrl(mapUrl), is_external: "true" };
-    children.push(btn);
+    mapButtons.push(btn);
+  }
+  if (mapButtons.length) {
+    children.push(mkSpacer(20));
+    children.push(mapButtons.length > 1
+      ? mkContainer(mapButtons, null, { isInner: true, direction: "row", buttonRow: true, gap: "16", padY: "0", padX: "0", center: true })
+      : mapButtons[0]);
   }
   return mkContainer(children, bone, { padY: opts.padY || "60", center: !!opts.center });
 }

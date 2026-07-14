@@ -465,6 +465,12 @@ function manifestPageDocumentToBrief(raw) {
       if (addressParts.length) {
         brief.mapAddress = addressParts.join(", ");
         brief.mapMode = mode;
+        // phone/hours: not part of the schema yet (requested alongside the
+        // structured location object), but reading them now means this
+        // works the moment Manifest starts sending them, with zero further
+        // Spec changes needed.
+        if (section.phone) brief.mapPhone = section.phone;
+        if (section.hours) brief.mapHours = section.hours;
         // Manifest's own section heading/button label were previously
         // discarded here in favor of the builder's hardcoded "Find Us" /
         // "Get Directions" -- inconsistent with every other section type in
