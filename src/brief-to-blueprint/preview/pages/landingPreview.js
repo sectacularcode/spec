@@ -666,9 +666,12 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
         // Call/Email/Contact Us -- matches the real reference (LubeZone)
         // exactly, confirmed against its live page source. No separate
         // Get Directions button: the embedded map itself carries that.
-        var heroFCallBtn = brief.mapPhone ? "<a class='cta-btn' style='" + mapCallBtnStyle + "'>" + he(brief.mapPhone) + "</a>" : "";
-        var heroFEmailBtn = brief.mapEmail ? "<a class='cta-btn' style='" + mapDirectionsBtnStyle + "'>Email Us</a>" : "";
-        var heroFContactBtn = heroFHasForm ? "<a class='cta-btn' href='#contact-form' style='" + mapDirectionsBtnStyle + "'>Contact Us</a>" : "";
+        // Always rendered, same as the real export -- real data fills
+        // them in, a "#" placeholder otherwise so the layout is visible
+        // before that data exists.
+        var heroFCallBtn = "<a class='cta-btn' style='" + mapCallBtnStyle + "'>" + he(brief.mapPhone || cta1) + "</a>";
+        var heroFEmailBtn = "<a class='cta-btn' href='" + (brief.mapEmail ? "mailto:" + he(brief.mapEmail) : "#") + "' style='" + mapDirectionsBtnStyle + "'>Email Us</a>";
+        var heroFContactBtn = "<a class='cta-btn' href='" + (heroFHasForm ? "#contact-form" : "#") + "' style='" + mapDirectionsBtnStyle + "'>Contact Us</a>";
         return "<section style='background:" + bone + ";padding:0;'>" +
             "<div style='display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:stretch;' class='hero-f-grid'>" +
               "<div style='padding:clamp(40px,6vw,72px) clamp(24px,5vw,56px);display:flex;flex-direction:column;justify-content:center;'>" +

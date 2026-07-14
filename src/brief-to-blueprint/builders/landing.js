@@ -747,30 +747,30 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     // Call/Email/Contact Us -- the real reference's own button set, not
     // Call/Get Directions. No separate directions button: the embedded
-    // map itself carries that, same as the reference.
+    // map itself carries that, same as the reference. Always rendered,
+    // same as every other button slot in this file -- real data fills
+    // them in when available (phone/email/a real on-page form), a "#"
+    // placeholder otherwise so the layout is visible and editable in
+    // Elementor before that data exists, not missing entirely.
     var heroFButtons = [];
-    if (brief.mapPhone) {
-      heroFButtons.push(mkButton(brief.mapPhone, lightCtxBtnBg, lightCtxBtnText, sanitizeUrl("tel:" + String(brief.mapPhone).replace(/\D/g, ""))));
-    }
-    if (brief.mapEmail) {
-      var heroFEmailBtn = mkButton("Email Us", "transparent", ink);
-      heroFEmailBtn.settings.border_border = "solid";
-      heroFEmailBtn.settings.border_width = { unit: "px", top: "1", right: "1", bottom: "1", left: "1", isLinked: true };
-      heroFEmailBtn.settings.border_color = ink;
-      heroFEmailBtn.settings.link = { url: sanitizeUrl("mailto:" + brief.mapEmail) };
-      heroFButtons.push(heroFEmailBtn);
-    }
-    if (heroFHasForm) {
-      var heroFContactBtn = mkButton("Contact Us", "transparent", ink);
-      heroFContactBtn.settings.border_border = "solid";
-      heroFContactBtn.settings.border_width = { unit: "px", top: "1", right: "1", bottom: "1", left: "1", isLinked: true };
-      heroFContactBtn.settings.border_color = ink;
-      heroFContactBtn.settings.link = { url: "#contact-form" };
-      heroFButtons.push(heroFContactBtn);
-    }
-    var heroFButtonRow = heroFButtons.length
-      ? mkContainer(heroFButtons, null, { isInner: true, direction: "row", buttonRow: true, gap: "12", padY: "0", padX: "0" })
-      : null;
+    heroFButtons.push(mkButton(
+      brief.mapPhone || phoneCta,
+      lightCtxBtnBg, lightCtxBtnText,
+      brief.mapPhone ? sanitizeUrl("tel:" + String(brief.mapPhone).replace(/\D/g, "")) : (brief.heroPrimaryUrl || "#")
+    ));
+    var heroFEmailBtn = mkButton("Email Us", "transparent", ink);
+    heroFEmailBtn.settings.border_border = "solid";
+    heroFEmailBtn.settings.border_width = { unit: "px", top: "1", right: "1", bottom: "1", left: "1", isLinked: true };
+    heroFEmailBtn.settings.border_color = ink;
+    heroFEmailBtn.settings.link = { url: brief.mapEmail ? sanitizeUrl("mailto:" + brief.mapEmail) : "#" };
+    heroFButtons.push(heroFEmailBtn);
+    var heroFContactBtn = mkButton("Contact Us", "transparent", ink);
+    heroFContactBtn.settings.border_border = "solid";
+    heroFContactBtn.settings.border_width = { unit: "px", top: "1", right: "1", bottom: "1", left: "1", isLinked: true };
+    heroFContactBtn.settings.border_color = ink;
+    heroFContactBtn.settings.link = { url: heroFHasForm ? "#contact-form" : "#" };
+    heroFButtons.push(heroFContactBtn);
+    var heroFButtonRow = mkContainer(heroFButtons, null, { isInner: true, direction: "row", buttonRow: true, gap: "12", padY: "0", padX: "0" });
 
     var heroFLeftChildren = [heroFH1];
     if (heroFAddressText) { heroFLeftChildren.push(mkSpacer(18)); heroFLeftChildren.push(heroFAddressText); }
