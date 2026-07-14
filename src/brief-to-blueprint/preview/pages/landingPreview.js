@@ -365,7 +365,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             "<style>.faq-icon::before{content:'+';}.faq-toggle:checked ~ label .faq-icon::before{content:'\u2212';}.faq-toggle:checked ~ label{color:" + brass + " !important;}.faq-toggle:checked + label + .faq-answer{display:block !important;}.faq-item:first-child{border-top:1px solid #dde0e6;}</style>" +
           "</div>" +
         "</section>";
-      var svcs  = Array.isArray(brief.servicesList) ? brief.servicesList : ["Service one","Service two","Service three","Service four","Service five","Service six"];
+      var svcs  = Array.isArray(brief.servicesList) ? brief.servicesList : ["Reduced overall cost", "Reduced downtime", "Proactive planning", "Expert team", "Fast response time", "Tailored reporting", "Direct billing", "Add more below..."];
       var b1    = brief.benefit1 || "Faster results with less hassle";
       var b2    = brief.benefit2 || "One team handles everything end to end";
       var b3    = brief.benefit3 || "Decades of proven experience";

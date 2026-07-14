@@ -202,6 +202,16 @@ function legacyManifestToBrief(raw) {
   if (context.phone && !brief.phoneCta) brief.phoneCta = "Call " + context.phone;
   if (context.address && !brief.mapAddress) brief.mapAddress = context.address;
 
+  // Manifest has no concept of a real services checklist and never sends
+  // brief.servicesList -- without this, the checklist section defaulted to
+  // showing fabricated "Service one, Service two..." filler on every single
+  // imported page, requiring it to be manually hidden every time. Confirmed
+  // real complaint, July 2026: no real content there should mean the section
+  // doesn't render, not that it renders with invented placeholder text.
+  if (!Array.isArray(brief.servicesList) || brief.servicesList.length === 0) {
+    brief.skipServicesChecklist = true;
+  }
+
   return brief;
 }
 
@@ -555,6 +565,16 @@ function manifestPageDocumentToBrief(raw) {
   // right/centered callout/split left/grouped "Our Services" pair/split +
   // button/plain rows/map beside, with the pricing form moved after the
   // closing CTA) can be reproduced through that picker directly.
+
+  // Manifest has no concept of a real services checklist and never sends
+  // brief.servicesList -- without this, the checklist section defaulted to
+  // showing fabricated "Service one, Service two..." filler on every single
+  // imported page, requiring it to be manually hidden every time. Confirmed
+  // real complaint, July 2026: no real content there should mean the section
+  // doesn't render, not that it renders with invented placeholder text.
+  if (!Array.isArray(brief.servicesList) || brief.servicesList.length === 0) {
+    brief.skipServicesChecklist = true;
+  }
 
   return brief;
 }
