@@ -60,7 +60,7 @@ export function buildAboutPage(C, brief, inspoHint, patterns) {
     valuesRow,
   ], bone, { padY: "88" });
 
-  var variantA = { version: "0.4", title: "About", type: "page", page_settings: {},
+  var variantA = { version: "0.4", title: he(brief.brandName || "Site") + " — About", type: "page", page_settings: {},
     content: [header, storySection, whySection, valuesSection, closing] };
 
   // ── Variant B: Vertical milestone timeline ─────────────────────────────────
@@ -100,7 +100,7 @@ export function buildAboutPage(C, brief, inspoHint, patterns) {
     ], null, { padY: "0", width: 50, isInner: true }),
   ], bone, { direction: "row", gap: "64", padY: "96" });
 
-  var variantB = { version: "0.4", title: "About", type: "page", page_settings: {},
+  var variantB = { version: "0.4", title: he(brief.brandName || "Site") + " — About", type: "page", page_settings: {},
     content: [header, timeline, portraitSection, valuesSection, closing] };
 
   var aboutPattern = (patterns && patterns.about) || "split-image";

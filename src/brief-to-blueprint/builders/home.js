@@ -194,7 +194,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
       null, { padY: "0", center: true, isInner: true }),
   ], ink, { padY: "120", minH: 70, center: true });
 
-  return { version: "0.4", title: "Home", type: "page", page_settings: {},
+  return { version: "0.4", title: he(brief.brandName || "Site") + " — Home", type: "page", page_settings: {},
     content: [hero, hook, cards, split, whoSection, work, pricingTeaser, closing] };
 }
 

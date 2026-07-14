@@ -74,7 +74,7 @@ export function buildWorkPage(C, brief, inspoHint) {
   grid.settings.flex_wrap = "wrap";
   var gridSection = mkContainer([grid], bone, { padY: "80" });
 
-  var variantA = { version: "0.4", title: "Work", type: "page", page_settings: {},
+  var variantA = { version: "0.4", title: he(brief.brandName || "Site") + " — Work", type: "page", page_settings: {},
     content: [header, filterRow, gridSection, closing] };
 
   // ── Variant B: Editorial — featured hero tile + supporting grid ───────────
@@ -114,7 +114,7 @@ export function buildWorkPage(C, brief, inspoHint) {
 
   var editorialSection = mkContainer([featuredTile, mkSpacer(20), supportingRow], bone, { padY: "80" });
 
-  var variantB = { version: "0.4", title: "Work", type: "page", page_settings: {},
+  var variantB = { version: "0.4", title: he(brief.brandName || "Site") + " — Work", type: "page", page_settings: {},
     content: [header, editorialSection, closing] };
 
   // Recommend B if inspo hints suggest editorial/featured/case-study style

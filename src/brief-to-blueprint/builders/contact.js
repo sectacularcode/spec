@@ -58,7 +58,7 @@ export function buildContactPage(C, brief, inspoHint, patterns) {
   var infoRow = mkContainer([infoLeft, infoRight], null, { direction: "row", gap: "64", padY: "0", isInner: true });
   var infoSection = mkContainer([infoRow], bone, { padY: "88" });
 
-  var variantA = { version: "0.4", title: "Contact", type: "page", page_settings: {},
+  var variantA = { version: "0.4", title: he(brief.brandName || "Site") + " — Contact", type: "page", page_settings: {},
     content: [headerA, formSectionA, infoSection, closingDark] };
 
   // ── Variant B: Split — big statement left, lean form right ────────────────
@@ -81,7 +81,7 @@ export function buildContactPage(C, brief, inspoHint, patterns) {
   var splitRow = mkContainer([statementLeft, formRight], null, { direction: "row", gap: "80", padY: "0", isInner: true });
   var splitSection = mkContainer([splitRow], bone, { padY: "112" });
 
-  var variantB = { version: "0.4", title: "Contact", type: "page", page_settings: {},
+  var variantB = { version: "0.4", title: he(brief.brandName || "Site") + " — Contact", type: "page", page_settings: {},
     content: [splitSection, closingDark] };
 
   var contactPattern = (patterns && patterns.contact) || "split-form";

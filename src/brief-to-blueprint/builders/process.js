@@ -58,7 +58,7 @@ export function buildProcessPage(C, brief, inspoHint, patterns) {
     ? mkContainer([stepsRow1, stepsRow2, stepsRow3], bone, { padY: "0", padX: "0", gap: "0" })
     : mkContainer([stepsRow1, stepsRow2], bone, { padY: "0", padX: "0", gap: "0" });
 
-  var variantA = { version: "0.4", title: "Process", type: "page", page_settings: {},
+  var variantA = { version: "0.4", title: he(brief.brandName || "Site") + " — Process", type: "page", page_settings: {},
     content: [header, gridContent, callout, closing] };
 
   // ── Variant B: Horizontal flowing timeline ────────────────────────────────
@@ -81,7 +81,7 @@ export function buildProcessPage(C, brief, inspoHint, patterns) {
   timelineRow.settings.flex_wrap = "wrap";
   var timelineSection = mkContainer([timelineRow], bone, { padY: "96" });
 
-  var variantB = { version: "0.4", title: "Process", type: "page", page_settings: {},
+  var variantB = { version: "0.4", title: he(brief.brandName || "Site") + " — Process", type: "page", page_settings: {},
     content: [header, timelineSection, callout, closing] };
 
   var processPattern = (patterns && patterns.process) || "numbered-vertical";

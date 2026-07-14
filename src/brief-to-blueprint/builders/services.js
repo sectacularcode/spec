@@ -123,7 +123,7 @@ export function buildServicesPage(C, brief, _inspoHint) {
     mkButton(brief.headerCta || "Start a project", btnBg, btnText),
   ], bone, { padY: "96", center: true });
 
-  return { version: "0.4", title: "Services & Pricing", type: "page", page_settings: {},
+  return { version: "0.4", title: he(brief.brandName || "Site") + " — Services & Pricing", type: "page", page_settings: {},
     content: [header, tiersSection, menuSection, pricingNoteSection, closing].filter(Boolean) };
 }
 
@@ -181,7 +181,7 @@ export function buildServicesPageLight(C, brief, _inspoHint) {
     mkButton(brief.headerCta || "Start a project", btnBg, btnText),
   ], bone, { padY: "96", center: true });
 
-  return { version: "0.4", title: "Services & Pricing", type: "page", page_settings: {},
+  return { version: "0.4", title: he(brief.brandName || "Site") + " — Services & Pricing", type: "page", page_settings: {},
     content: [header, tiersSection, closing] };
 }
 
