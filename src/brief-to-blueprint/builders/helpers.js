@@ -345,8 +345,16 @@ export function mkAccordion(items, opts) {
     tabs: items.map(function(item) {
       return {
         _id: nid().slice(0, 7),
+        // answerIsHtml (set by manifestImport.js's richTextToSafeHtml,
+        // used when a faq answer contains a real link Manifest sent) means
+        // item.answer is already safe, ready-to-embed HTML -- running it
+        // through he() again would escape the real <a> tags into visible
+        // text instead of rendering as links. Every other caller (plain
+        // hand-typed strings, landing.js's own placeholder defaults) has
+        // no such flag and keeps the original escape-on-the-way-in
+        // behavior, unchanged.
         tab_title: he(item.question),
-        tab_content: he(item.answer),
+        tab_content: item.answerIsHtml ? item.answer : he(item.answer),
       };
     }),
     selected_icon: { value: "fas fa-plus", library: "fa-solid" },

@@ -348,9 +348,17 @@ export default function CustomBuild({ userId, role } = {}) {
             // (the default selectedPages value) reads entirely different
             // field names than what manifestToBrief() populates, so
             // leaving the default in place silently builds an
-            // empty-looking page. "Other" routes to the same builder that
-            // actually reads brief.features/faqItems/testimonials.
-            setPages(["other"]);
+            // empty-looking page. parsed._suggestedPid (from page.type,
+            // manifestImport.js) is "landing" or "other" -- both route to
+            // the same builder that actually reads brief.features/
+            // faqItems/testimonials, so this never regresses to a
+            // mismatched page type; see manifestImport.js for why it's
+            // deliberately not the wider table Manifest suggested.
+            var suggestedPid = parsed._suggestedPid || "other";
+            setPages([suggestedPid]);
+            if (parsed._suggestedVariant) {
+              setLayoutVariants({ [suggestedPid]: parsed._suggestedVariant });
+            }
             // _placeholderButtons is the one thing worth showing prominently:
             // a real "you must supply this before publishing" requirement,
             // verified structurally by Spec itself, not by parsing

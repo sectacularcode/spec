@@ -222,12 +222,51 @@ const PAGE_DOCUMENT_FORMAT = "manifest.page-document/1";
 // Flattens a rich-text array (e.g. hero.subheading: [{type:"text", text},
 // {type:"link", text, url}]) into a plain string. Every run type with a
 // .text field contributes its visible text -- including link runs, whose
-// visible text is real content even though the href itself has nowhere to
-// go, since Spec's text widgets are plain text, not rich HTML with
-// embedded anchors.
+// visible text is real content even though the href gets dropped here.
+// Correct for every RichText field EXCEPT faq item.answer -- see
+// richTextToSafeHtml below for that one, and why it needs different
+// handling (most of Spec's text widgets genuinely are plain text with no
+// anchor support, but Elementor's accordion tab_content, which is what faq
+// answers render into, is a real WYSIWYG field -- confirmed against
+// helpers.js's mkAccordion).
 function flattenRichText(arr) {
   if (!Array.isArray(arr)) return "";
   return arr.map(function (item) { return item && item.text ? item.text : ""; }).join("").trim();
+}
+
+// Minimal, local HTML-escape -- duplicated rather than imported, same
+// reasoning as sanitizeUrl above: this parser stays free of any dependency
+// on the widget/rendering layer so it can be unit-tested or reused on its
+// own.
+function escapeHtml(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+// Renders a rich-text array to safe, ready-to-embed HTML, preserving link
+// runs as real <a href> anchors instead of dropping their destination --
+// unlike flattenRichText, which is correct everywhere else RichText
+// appears but was silently losing every link inside a faq answer (flagged
+// directly in Manifest's own v1.5.0 handoff doc). Escapes each run's own
+// text individually before assembling, so the result is safe to drop
+// straight into Elementor JSON as-is -- callers must NOT run this through
+// an HTML-escape again, or the real <a> tags themselves get escaped into
+// visible text instead of rendering as links. An unresolvable/unsafe URL
+// (sanitizeUrl returns "") keeps the run's visible text and silently
+// drops just the link, rather than shipping a broken or dangerous href.
+function richTextToSafeHtml(arr) {
+  if (!Array.isArray(arr)) return "";
+  return arr.map(function (item) {
+    if (!item || !item.text) return "";
+    if (item.type === "link") {
+      var safeUrl = sanitizeUrl(item.url);
+      if (safeUrl) return '<a href="' + escapeHtml(safeUrl) + '">' + escapeHtml(item.text) + "</a>";
+    }
+    return escapeHtml(item.text);
+  }).join("").trim();
 }
 
 // Flattens a text_section's `items` into a plain string. Handles both
@@ -372,6 +411,40 @@ function manifestPageDocumentToBrief(raw) {
     _placeholderButtons: [],
   };
 
+  // page.type (1.5.0, additive) -- routes an import to the right Spec page
+  // type instead of every Manifest import hardcoding "other" at the call
+  // site. Deliberately narrower than Manifest's own suggested mapping
+  // table: checked each candidate builder's real field reads before
+  // trusting it, not just the table. home.js reads brief.serviceCards/
+  // whoH2/differenceEyebrow/workItems/pricingH2..., services.js reads
+  // brief.pricingTiers/pricingMenu/servicesH1..., and the generic-page
+  // fallback (buildGenericPage, what any other unmapped pid lands on)
+  // reads only brandName/tagline/hookStatement/buttons -- none of them
+  // read brief.features/faqItems/testimonials/mapAddress, which is the
+  // entire vocabulary this function actually produces. Only pid "landing"
+  // and pid "other" dispatch to buildLandingPage, the one builder that
+  // reads that vocabulary (generatePages.js: `pid === "landing" || pid
+  // === "other"`) -- routing "homepage"/"service_detail"/"blog"/
+  // "category" to their suggested builders would silently ship a page
+  // missing every real section from the export. So: "landing" gets its
+  // own real pid (a genuine improvement over "other" -- correct label,
+  // correct slug); "local_service" also routes to "landing", not
+  // Manifest's suggested "location" pid (that builder is Spec's own
+  // manually-curated multi-location workflow -- brief.locationData:
+  // intro/services/supportBody/mapEmbed, none of which this parser
+  // produces -- Variant F already consumes exactly what map_location
+  // sends and is production-tested on MESO and Freeway); everything else
+  // (including absent/unrecognized types) falls back to "other",
+  // unchanged from today's existing behavior.
+  if (page.type === "landing") {
+    brief._suggestedPid = "landing";
+  } else if (page.type === "local_service") {
+    brief._suggestedPid = "landing";
+    brief._suggestedVariant = "F";
+  } else {
+    brief._suggestedPid = "other";
+  }
+
   // Tracks a button in _placeholderButtons only when it's a genuine labeled
   // button with no resolvable URL -- an empty button slot (no label at all)
   // isn't a placeholder, it's just absent, and shouldn't show up as
@@ -441,7 +514,7 @@ function manifestPageDocumentToBrief(raw) {
 
     if (section.type === "faq") {
       (section.items || []).forEach(function (item) {
-        faqPairs.push({ question: item.question || "", answer: flattenRichText(item.answer) });
+        faqPairs.push({ question: item.question || "", answer: richTextToSafeHtml(item.answer), answerIsHtml: true });
       });
       if (headingText && !brief.faqHeading) brief.faqHeading = headingText;
       return;
