@@ -266,7 +266,34 @@ export function buildColorSet(css) {
   // guess, and only for roles that came up empty above.
   if (!headingOk) { const c = nextRanked(); if (c) add("Heading", c, "estimated"); }
   if (!bodyOk) { const c = nextRanked(); if (c) add("Body text", c, "estimated"); }
-  if (!accentOk) { const c = nextRanked(); if (c) add("Accent", c, "estimated"); }
+  if (!accentOk) {
+    const c = nextRanked();
+    if (c) {
+      add("Accent", c, "estimated");
+    } else {
+      // No distinct color left in the ranked list -- a real, confirmed
+      // case: simple two-tone brands (e.g. a navy + white/gray trucking
+      // site) with no separate accent color anywhere in the CSS at all.
+      // Leaving Accent absent here used to mean brief.colors.brass came
+      // back undefined everywhere downstream (landing.js,
+      // buildPreviewHTML.js), which silently falls back to Spec's own
+      // stock gold (#C2A35B) -- a color with zero relationship to the
+      // actual brand, with no indication to the user that anything was
+      // inferred rather than extracted. Reusing Heading's color as
+      // Accent is a deliberate choice, not a guess: for a monochrome
+      // brand, the one color they do have IS their brand/CTA color.
+      // Bypasses add()'s used-check on purpose (same precedent as
+      // Background's white default below) -- Heading's hex is already
+      // in `used`, and this role is explicitly allowed to duplicate an
+      // existing color rather than being left empty. Marked "inferred"
+      // (not "estimated") so the UI can tell the user this one wasn't
+      // extracted from anything on the page -- and so the computed-style
+      // pass below still treats it as unconfirmed and tries to upgrade
+      // it with a real accent read straight from the live page.
+      const headingHex = (result.find(r => r.role === "Heading") || {}).hex;
+      if (headingHex) result.push({ role: "Accent", hex: headingHex, confidence: "inferred", custom: false });
+    }
+  }
   if (!bgOk) {
     // White is a safe structural default even if it collides with
     // something already assigned via a confirmed signal -- an unfilled
@@ -548,7 +575,16 @@ export default async function handler(req, res) {
 
     const brandNameGuess = guessBrandName(html);
 
-    return res.status(200).json({ origin, brandNameGuess, colors, fonts, _fontExtractionDebug: fontExtractionDebug });
+    // True only if Accent is STILL "inferred" after the computed-style
+    // pass above had its chance to upgrade it with a real value read off
+    // the live page (upsertColor("Accent", ..., false) only skips an
+    // already-"confirmed" entry, so "inferred" was always eligible to be
+    // overwritten there). If it's still "inferred" here, no accent color
+    // exists anywhere Spec could find one -- Heading's color was reused,
+    // and the UI should say so rather than let it look like a real find.
+    const accentInferred = colors.some(c => c.role === "Accent" && c.confidence === "inferred");
+
+    return res.status(200).json({ origin, brandNameGuess, colors, fonts, _fontExtractionDebug: fontExtractionDebug, _accentInferred: accentInferred });
   } catch (err) {
     await logError("extract-style", req.method, userId, 500, err.message);
     return res.status(500).json({ error: err.message });

@@ -123,6 +123,18 @@ export default function StyleGuide({ role }) {
     return ` (${label} — ${reason.slice(0, 150)})`;
   }
 
+  // Separate from describeFontExtraction on purpose: that note is about
+  // whether the live-render pass ran/succeeded at all, this one is about
+  // a specific role's origin. A monochrome brand (e.g. a simple navy +
+  // white/gray site) with no separate accent color anywhere in the CSS
+  // gets Heading's own color reused for Accent rather than Spec's stock
+  // gold default -- real and correct, but the user should know it was
+  // reused, not actually found, so they can pick something else if they
+  // want a true accent instead.
+  function describeAccentInference(accentInferred) {
+    return accentInferred ? " Accent inferred from your Heading color — no separate accent color found on the site." : "";
+  }
+
   async function analyzeUrl() {
     const trimmed = url.trim();
     if (!trimmed) return;
@@ -137,7 +149,8 @@ export default function StyleGuide({ role }) {
       const data = await res.json();
       if (res.ok) {
         const fontNote = describeFontExtraction(data._fontExtractionDebug);
-        const result = { colors: data.colors || [], fonts: data.fonts || [], brandNameGuess: data.brandNameGuess, origin: data.origin || trimmed, fontNote };
+        const accentNote = describeAccentInference(data._accentInferred);
+        const result = { colors: data.colors || [], fonts: data.fonts || [], brandNameGuess: data.brandNameGuess, origin: data.origin || trimmed, fontNote, accentNote };
         // Only interrupt with a choice if there's actually something on
         // the page that a silent overwrite could destroy -- an empty grid
         // has nothing to lose, so apply straight through same as before.
@@ -181,7 +194,7 @@ export default function StyleGuide({ role }) {
     }
     if (result.brandNameGuess && !brandName) setBrandName(result.brandNameGuess);
     setSourceUrl(result.origin);
-    setAnalyzeStatus(`Found ${result.colors.length} colors, ${result.fonts.length} fonts.${result.fontNote || ""}`);
+    setAnalyzeStatus(`Found ${result.colors.length} colors, ${result.fonts.length} fonts.${result.fontNote || ""}${result.accentNote || ""}`);
     setPendingAnalyzeResult(null);
   }
 
