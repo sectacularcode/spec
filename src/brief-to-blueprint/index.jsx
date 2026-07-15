@@ -708,6 +708,25 @@ export default function CustomBuild({ userId, role } = {}) {
     regenerateActivePage(updatedBrief);
   }
 
+  // Manual override for Location (Variant F)'s map/address -- Manifest is
+  // the only other source for these two fields (manifestImport.js's
+  // map_location handling), and Manifest doesn't always send a
+  // map_location section (e.g. a service page with no location content
+  // at all). Typing updates brief state immediately so the fields feel
+  // responsive; the map iframe/variant regeneration itself only fires on
+  // blur (commitLocationFields) rather than every keystroke, since
+  // regenerating rebuilds all 6 landing variants (A-F) each time -- no
+  // reason to pay that cost per character typed.
+  function updateMapAddress(value) {
+    setBrief(b => ({ ...b, mapAddress: value }));
+  }
+  function updateMapCity(value) {
+    setBrief(b => ({ ...b, mapCity: value }));
+  }
+  function commitLocationFields() {
+    regenerateActivePage(brief);
+  }
+
   async function saveBrandStyle() {
     if (!brief || !brief.brandName || !brief.colors) return;
     setStylePanelStatus("Saving...");
@@ -1384,6 +1403,56 @@ export default function CustomBuild({ userId, role } = {}) {
                       </div>
                     );
                   })}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Location details — manual override for Variant F's map/address
+              when Manifest didn't send a map_location section for this page
+              (e.g. a service page with no location content at all, like
+              MESO's Atlanta DOT-inspection page). Same visibility scope as
+              Section Styles below: any landing/other page, since Variant F
+              is always available there regardless of whether address data
+              exists yet (see generatePages.js's hasVariantF: true). Blank
+              fields fall back to the existing placeholder/no-city behavior
+              already built into landing.js and landingPreview.js -- this
+              is purely an alternate way to fill brief.mapAddress/mapCity,
+              not a new rendering path. */}
+          {generated && (() => {
+            const locPage = activePreviewPage;
+            if (!locPage || !/^(landing|other)(-\d+)?$/.test(locPage.id)) return null;
+            return (
+              <div style={{ marginBottom: "28px" }}>
+                <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>
+                  Location Details
+                </div>
+                <div style={{ fontSize: "11px", color: "#9ca3af", marginBottom: "10px", lineHeight: 1.5 }}>
+                  Only needed if Manifest didn't send an address for this page. Powers the map on Variant F (Location).
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: "11px", color: "#6b7280", marginBottom: "4px" }}>Address</label>
+                    <input
+                      type="text"
+                      value={brief.mapAddress || ""}
+                      onChange={e => updateMapAddress(e.target.value)}
+                      onBlur={commitLocationFields}
+                      placeholder="16070 OH-170, East Liverpool, OH 43920"
+                      style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", color: "#09090b", boxSizing: "border-box" }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "11px", color: "#6b7280", marginBottom: "4px" }}>City (for the page title, e.g. "Brand — City — Landing Page (Location)")</label>
+                    <input
+                      type="text"
+                      value={brief.mapCity || ""}
+                      onChange={e => updateMapCity(e.target.value)}
+                      onBlur={commitLocationFields}
+                      placeholder="East Liverpool"
+                      style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", color: "#09090b", boxSizing: "border-box" }}
+                    />
+                  </div>
                 </div>
               </div>
             );
