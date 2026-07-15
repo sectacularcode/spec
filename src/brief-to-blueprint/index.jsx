@@ -722,7 +722,7 @@ export default function CustomBuild({ userId, role } = {}) {
   // map_location section (e.g. a service page with no location content
   // at all). Typing updates brief state immediately so the fields feel
   // responsive; the map iframe/variant regeneration itself only fires on
-  // blur (commitLocationFields) rather than every keystroke, since
+  // blur (commitBriefFieldEdit) rather than every keystroke, since
   // regenerating rebuilds all 6 landing variants (A-F) each time -- no
   // reason to pay that cost per character typed.
   function updateMapAddress(value) {
@@ -731,7 +731,20 @@ export default function CustomBuild({ userId, role } = {}) {
   function updateMapCity(value) {
     setBrief(b => ({ ...b, mapCity: value }));
   }
-  function commitLocationFields() {
+  // Hero eyebrow -- landing.js already reads brief.heroEyebrow (falls back
+  // to brandName when unset: `brief.heroEyebrow != null ? brief.heroEyebrow
+  // : brandName`), and IntakeForm.jsx already has a text box for it -- but
+  // that form is a separate from-scratch client-intake flow. There was
+  // never a way to edit it for an already-loaded brief (e.g. after a
+  // Manifest import, which has no concept of "eyebrow" in its own schema
+  // at all, so every import silently falls back to showing the brand name
+  // as the eyebrow). This closes that gap the same way the address field
+  // above does: writes straight to the same brief.heroEyebrow field
+  // landing.js already reads, no new rendering path.
+  function updateHeroEyebrow(value) {
+    setBrief(b => ({ ...b, heroEyebrow: value }));
+  }
+  function commitBriefFieldEdit() {
     regenerateActivePage(brief);
   }
 
@@ -1416,6 +1429,40 @@ export default function CustomBuild({ userId, role } = {}) {
             );
           })()}
 
+          {/* Hero eyebrow — landing.js reads brief.heroEyebrow directly,
+              falling back to the brand name when it's unset. Manifest's own
+              hero section has no eyebrow concept at all, so every
+              Manifest-imported page was silently showing the brand name as
+              its eyebrow with no way to change it short of a JSON re-upload
+              with the field hand-added. IntakeForm.jsx already has this
+              exact input for its own from-scratch intake flow -- this is
+              the same field, just also exposed for an already-loaded
+              brief. Same visibility scope as Location Details below:
+              landing/other pages, since heroEyebrowText is only read by
+              landing.js's variants. */}
+          {generated && (() => {
+            const eyebrowPage = activePreviewPage;
+            if (!eyebrowPage || !/^(landing|other)(-\d+)?$/.test(eyebrowPage.id)) return null;
+            return (
+              <div style={{ marginBottom: "28px" }}>
+                <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>
+                  Hero Eyebrow
+                </div>
+                <div style={{ fontSize: "11px", color: "#9ca3af", marginBottom: "10px", lineHeight: 1.5 }}>
+                  Small label above the hero headline. Leave blank to show the brand name (today's default).
+                </div>
+                <input
+                  type="text"
+                  value={brief.heroEyebrow || ""}
+                  onChange={e => updateHeroEyebrow(e.target.value)}
+                  onBlur={commitBriefFieldEdit}
+                  placeholder={brief.brandName || "e.g. Federal DOT Inspections"}
+                  style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", color: "#09090b", boxSizing: "border-box" }}
+                />
+              </div>
+            );
+          })()}
+
           {/* Location details — manual override for Variant F's map/address
               when Manifest didn't send a map_location section for this page
               (e.g. a service page with no location content at all, like
@@ -1445,7 +1492,7 @@ export default function CustomBuild({ userId, role } = {}) {
                       type="text"
                       value={brief.mapAddress || ""}
                       onChange={e => updateMapAddress(e.target.value)}
-                      onBlur={commitLocationFields}
+                      onBlur={commitBriefFieldEdit}
                       placeholder="16070 OH-170, East Liverpool, OH 43920"
                       style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", color: "#09090b", boxSizing: "border-box" }}
                     />
@@ -1456,7 +1503,7 @@ export default function CustomBuild({ userId, role } = {}) {
                       type="text"
                       value={brief.mapCity || ""}
                       onChange={e => updateMapCity(e.target.value)}
-                      onBlur={commitLocationFields}
+                      onBlur={commitBriefFieldEdit}
                       placeholder="East Liverpool"
                       style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", color: "#09090b", boxSizing: "border-box" }}
                     />
