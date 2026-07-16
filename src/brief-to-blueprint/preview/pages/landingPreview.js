@@ -624,7 +624,16 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<p style='font-size:14px;color:rgba(255,255,255,0.7);margin:0 0 22px;'>" + tn1 + " &middot; " + tt1 + "</p>" +
             "</div>" +
           "</section>" +
+          (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.featureLayout) :
           (function () {
+            // The one variant missing this check entirely -- B/D/F all
+            // correctly prioritize brief.featureLayout before falling
+            // back to this auto-cycle; E always rebuilt the auto-cycle
+            // from scratch regardless of what the Section Styles picker
+            // had saved. Confirmed via a live-session test (Variant E is
+            // "Narrative", the actual default-active layout) and a direct
+            // render diff showing identical output regardless of
+            // featureLayout content before this fix.
             var featuresArr = Array.isArray(brief.features) ? brief.features : [];
             var dynamicLayout = [];
             featuresArr.forEach(function (_, i) {
@@ -636,7 +645,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               if ((i + 1) % 3 === 0 && i < featuresArr.length - 1) dynamicLayout.push({ style: "midcta", indices: [] });
             });
             return renderCuratedFeatureLayoutHTML(dynamicLayout);
-          })() +
+          })()) +
           (brief.skipServicesChecklist ? "" :
           "<section style='background:" + bone + ";padding:80px clamp(24px,6vw,80px);border-top:1px solid rgba(0,0,0,0.08);'>" +
             "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 32px;'>" + (brief.servicesHeading||"What We Do") + "</h2>" +
