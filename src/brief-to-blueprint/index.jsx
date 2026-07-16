@@ -2201,8 +2201,8 @@ export default function CustomBuild({ userId, role } = {}) {
 
         {generated && (
           <div style={{ display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
-            <div style={{ padding: "12px 16px", borderBottom: "1px solid #dde0e6", background: "#fff", display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
-              <span style={{ fontSize: "12px", color: "#6b7280", fontWeight: 600, marginRight: "4px" }}>PREVIEW</span>
+            <div style={{ padding: "18px 20px", borderBottom: "1px solid #dde0e6", background: "#fff", display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap" }}>
+              <span style={{ fontSize: "11px", color: "#9ca3af", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginRight: "8px" }}>Preview</span>
               {generated.pages.map(p => {
                 const cleanLabel = (p.label || p.id).replace(/-\d{5,}$/, "").replace(/(^|-)(.)/g, (_, s, c) => (s ? " " : "") + c.toUpperCase());
                 const isActive = previewPage === p.id;
@@ -2217,10 +2217,10 @@ export default function CustomBuild({ userId, role } = {}) {
                 const isCustomInstance = !!customPages.find(cp => cp.id === p.id);
                 const canRemove = generated.pages.length > 1;
                 return (
-                <div key={p.id} style={{ display: "flex", alignItems: "stretch", border: isActive ? "1px solid #3f3f46" : "1px solid #dde0e6", borderRadius: "20px", background: isActive ? "#3f3f46" : "#fff", overflow: "hidden" }}>
+                <div key={p.id} style={{ display: "flex", alignItems: "stretch", borderRadius: "8px", background: isActive ? "rgba(180,83,9,0.08)" : "transparent" }}>
                   <button
                     onClick={() => setPreviewPage(p.id)}
-                    style={{ padding: canRemove ? "6px 4px 6px 14px" : "6px 14px", fontSize: "13px", fontWeight: 500, cursor: "pointer", border: "none", background: "transparent", color: isActive ? "#fff" : "#09090b" }}>
+                    style={{ padding: canRemove ? "9px 4px 9px 14px" : "9px 14px", fontSize: "13px", fontWeight: 500, cursor: "pointer", border: "none", background: "transparent", color: isActive ? "#b45309" : "#3f3f46" }}>
                     {cleanLabel}
                   </button>
                   {canRemove && (
@@ -2234,14 +2234,20 @@ export default function CustomBuild({ userId, role } = {}) {
                         if (isActive) setPreviewPage(remaining[0]?.id || "home");
                       }}
                       title={isCustomInstance ? "Remove this page and its configuration" : "Remove from this build"}
-                      style={{ padding: "6px 12px 6px 4px", fontSize: "14px", lineHeight: 1, cursor: "pointer", border: "none", background: "transparent", color: isActive ? "rgba(255,255,255,0.65)" : "#9ca3af" }}>
+                      style={{ padding: "9px 11px 9px 2px", fontSize: "13px", lineHeight: 1, cursor: "pointer", border: "none", background: "transparent", color: isActive ? "rgba(180,83,9,0.55)" : "#c7c7cc" }}
+                      onMouseOver={e => e.currentTarget.style.color = isActive ? "#b45309" : "#6b7280"}
+                      onMouseOut={e => e.currentTarget.style.color = isActive ? "rgba(180,83,9,0.55)" : "#c7c7cc"}>
                       ×
                     </button>
                   )}
                 </div>);
               })}
+              <div style={{ width: "1px", height: "20px", background: "#e5e7eb", margin: "0 6px" }} />
               <div style={{ position: "relative" }}>
-                <button onClick={() => setShowAddPagePreview(!showAddPagePreview)} style={{ padding: "6px 14px", fontSize: "12px", fontWeight: 500, cursor: "pointer", border: "1px dashed #dde0e6", borderRadius: "20px", background: "#fff", color: "#6b7280" }}>+ Add Page</button>
+                <button
+                  onClick={() => setShowAddPagePreview(!showAddPagePreview)}
+                  title="Add page"
+                  style={{ width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", fontWeight: 500, cursor: "pointer", border: "1px solid #e5e7eb", borderRadius: "8px", background: "#fff", color: "#6b7280" }}>+</button>
                 {showAddPagePreview && (() => {
                   // Core page types (home/work/services/about/process/contact/landing/other)
                   // plus the additional types, so a build that doesn't already have every
