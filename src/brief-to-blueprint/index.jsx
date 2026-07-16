@@ -1536,20 +1536,22 @@ export default function CustomBuild({ userId, role } = {}) {
             if (!eyebrowPage || !/^(landing|other)(-\d+)?$/.test(eyebrowPage.id)) return null;
             return (
               <div style={{ marginBottom: "32px" }}>
-                <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
+                <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>
                   Hero Eyebrow
                 </div>
-                <div style={{ fontSize: "12px", color: "#9ca3af", marginBottom: "10px", lineHeight: 1.5 }}>
-                  Small label above the hero headline. Leave blank to show the brand name (today's default).
+                <div style={T.surface}>
+                  <div style={{ fontSize: "12px", color: "#9ca3af", marginBottom: "10px", lineHeight: 1.5 }}>
+                    Small label above the hero headline. Leave blank to show the brand name (today's default).
+                  </div>
+                  <input
+                    type="text"
+                    value={brief.heroEyebrow || ""}
+                    onChange={e => updateHeroEyebrow(e.target.value)}
+                    onBlur={commitBriefFieldEdit}
+                    placeholder={brief.brandName || "e.g. Federal DOT Inspections"}
+                    style={{ width: "100%", padding: "12px 14px", fontSize: "14px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", color: "#09090b", boxSizing: "border-box" }}
+                  />
                 </div>
-                <input
-                  type="text"
-                  value={brief.heroEyebrow || ""}
-                  onChange={e => updateHeroEyebrow(e.target.value)}
-                  onBlur={commitBriefFieldEdit}
-                  placeholder={brief.brandName || "e.g. Federal DOT Inspections"}
-                  style={{ width: "100%", padding: "12px 14px", fontSize: "14px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", color: "#09090b", boxSizing: "border-box" }}
-                />
               </div>
             );
           })()}
@@ -1570,34 +1572,36 @@ export default function CustomBuild({ userId, role } = {}) {
             if (!locPage || !/^(landing|other)(-\d+)?$/.test(locPage.id)) return null;
             return (
               <div style={{ marginBottom: "32px" }}>
-                <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
+                <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>
                   Location Details
                 </div>
-                <div style={{ fontSize: "12px", color: "#9ca3af", marginBottom: "10px", lineHeight: 1.5 }}>
-                  Only needed if Manifest didn't send an address for this page. Powers the map on Variant F (Location).
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                  <div>
-                    <label style={{ display: "block", fontSize: "12px", color: "#6b7280", marginBottom: "5px" }}>Address</label>
-                    <input
-                      type="text"
-                      value={brief.mapAddress || ""}
-                      onChange={e => updateMapAddress(e.target.value)}
-                      onBlur={commitBriefFieldEdit}
-                      placeholder="123 Main St, Your City, ST 00000"
-                      style={{ width: "100%", padding: "12px 14px", fontSize: "14px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", color: "#09090b", boxSizing: "border-box" }}
-                    />
+                <div style={T.surface}>
+                  <div style={{ fontSize: "12px", color: "#9ca3af", marginBottom: "10px", lineHeight: 1.5 }}>
+                    Only needed if Manifest didn't send an address for this page. Powers the map on Variant F (Location).
                   </div>
-                  <div>
-                    <label style={{ display: "block", fontSize: "12px", color: "#6b7280", marginBottom: "5px" }}>City (for the page title, e.g. "Brand — City — Landing Page (Location)")</label>
-                    <input
-                      type="text"
-                      value={brief.mapCity || ""}
-                      onChange={e => updateMapCity(e.target.value)}
-                      onBlur={commitBriefFieldEdit}
-                      placeholder="Your City"
-                      style={{ width: "100%", padding: "12px 14px", fontSize: "14px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", color: "#09090b", boxSizing: "border-box" }}
-                    />
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    <div>
+                      <label style={{ display: "block", fontSize: "12px", color: "#6b7280", marginBottom: "5px" }}>Address</label>
+                      <input
+                        type="text"
+                        value={brief.mapAddress || ""}
+                        onChange={e => updateMapAddress(e.target.value)}
+                        onBlur={commitBriefFieldEdit}
+                        placeholder="123 Main St, Your City, ST 00000"
+                        style={{ width: "100%", padding: "12px 14px", fontSize: "14px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", color: "#09090b", boxSizing: "border-box" }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: "block", fontSize: "12px", color: "#6b7280", marginBottom: "5px" }}>City (for the page title, e.g. "Brand — City — Landing Page (Location)")</label>
+                      <input
+                        type="text"
+                        value={brief.mapCity || ""}
+                        onChange={e => updateMapCity(e.target.value)}
+                        onBlur={commitBriefFieldEdit}
+                        placeholder="Your City"
+                        style={{ width: "100%", padding: "12px 14px", fontSize: "14px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", color: "#09090b", boxSizing: "border-box" }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1796,68 +1800,72 @@ export default function CustomBuild({ userId, role } = {}) {
                     </div>
                   )}
                   <div style={{ marginBottom: "32px" }}>
-                    <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
+                    <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>
                       Colors
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                      {COLOR_FIELDS.map(f => (
-                        <div key={f.key} style={{ display: "grid", gridTemplateColumns: "90px 34px 1fr", gap: "8px", alignItems: "center" }}>
-                          <span style={{ fontSize: "13px", color: "#6b7280" }}>{f.label}</span>
-                          <input
-                            type="color"
-                            value={(brief.colors && brief.colors[f.key]) || "#ffffff"}
-                            onChange={e => setBriefColor(f.key, e.target.value)}
-                            style={{ width: "34px", height: "34px", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", padding: "2px" }}
-                          />
-                          <input
-                            value={(brief.colors && brief.colors[f.key]) || ""}
-                            onChange={e => setBriefColor(f.key, e.target.value)}
-                            placeholder="#000000"
-                            style={{ padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", fontFamily: "monospace", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                    <div style={{ display: "grid", gridTemplateColumns: "90px 1fr", gap: "8px", alignItems: "center", marginTop: "12px" }}>
-                      <span style={{ fontSize: "13px", color: "#6b7280" }}>Heading font</span>
-                      <input
-                        value={(brief.fonts && brief.fonts[0]) || ""}
-                        onChange={e => setBriefFont(0, e.target.value)}
-                        placeholder="e.g. Inter"
-                        style={{ padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
-                      />
-                      <span style={{ fontSize: "13px", color: "#6b7280" }}>Body font</span>
-                      <input
-                        value={(brief.fonts && brief.fonts[1]) || ""}
-                        onChange={e => setBriefFont(1, e.target.value)}
-                        placeholder="e.g. Inter"
-                        style={{ padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
-                      />
+                    <div style={T.surface}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                        {COLOR_FIELDS.map(f => (
+                          <div key={f.key} style={{ display: "grid", gridTemplateColumns: "90px 34px 1fr", gap: "8px", alignItems: "center" }}>
+                            <span style={{ fontSize: "13px", color: "#6b7280" }}>{f.label}</span>
+                            <input
+                              type="color"
+                              value={(brief.colors && brief.colors[f.key]) || "#ffffff"}
+                              onChange={e => setBriefColor(f.key, e.target.value)}
+                              style={{ width: "34px", height: "34px", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", padding: "2px" }}
+                            />
+                            <input
+                              value={(brief.colors && brief.colors[f.key]) || ""}
+                              onChange={e => setBriefColor(f.key, e.target.value)}
+                              placeholder="#000000"
+                              style={{ padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", fontFamily: "monospace", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "90px 1fr", gap: "8px", alignItems: "center", marginTop: "12px" }}>
+                        <span style={{ fontSize: "13px", color: "#6b7280" }}>Heading font</span>
+                        <input
+                          value={(brief.fonts && brief.fonts[0]) || ""}
+                          onChange={e => setBriefFont(0, e.target.value)}
+                          placeholder="e.g. Inter"
+                          style={{ padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
+                        />
+                        <span style={{ fontSize: "13px", color: "#6b7280" }}>Body font</span>
+                        <input
+                          value={(brief.fonts && brief.fonts[1]) || ""}
+                          onChange={e => setBriefFont(1, e.target.value)}
+                          placeholder="e.g. Inter"
+                          style={{ padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
+                        />
+                      </div>
                     </div>
                   </div>
                   <div style={{ marginBottom: "32px" }}>
-                    <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
+                    <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>
                       Buttons
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                      <ButtonEditor
-                        locked
-                        button={(brief.buttons || []).find(b => isNamedButton(b, "primary")) || defaultBriefButton("primary")}
-                        onChange={updated => setBriefButtonByName("primary", updated)}
-                      />
-                      <ButtonEditor
-                        locked
-                        button={(brief.buttons || []).find(b => isNamedButton(b, "secondary")) || defaultBriefButton("secondary")}
-                        onChange={updated => setBriefButtonByName("secondary", updated)}
-                      />
-                      {(brief.buttons || []).map((b, i) => (isNamedButton(b, "primary") || isNamedButton(b, "secondary")) ? null : (
-                        <ButtonEditor key={i} button={b} onChange={updated => updateBriefButton(i, updated)} onRemove={() => removeBriefButton(i)} />
-                      ))}
-                      <button
-                        onClick={addBriefButton}
-                        style={{ padding: "8px", fontSize: "11px", fontWeight: 600, border: "1px dashed #dde0e6", borderRadius: "6px", background: "#fff", color: "#6b7280", cursor: "pointer" }}>
-                        + Add button
-                      </button>
+                    <div style={T.surface}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                        <ButtonEditor
+                          locked
+                          button={(brief.buttons || []).find(b => isNamedButton(b, "primary")) || defaultBriefButton("primary")}
+                          onChange={updated => setBriefButtonByName("primary", updated)}
+                        />
+                        <ButtonEditor
+                          locked
+                          button={(brief.buttons || []).find(b => isNamedButton(b, "secondary")) || defaultBriefButton("secondary")}
+                          onChange={updated => setBriefButtonByName("secondary", updated)}
+                        />
+                        {(brief.buttons || []).map((b, i) => (isNamedButton(b, "primary") || isNamedButton(b, "secondary")) ? null : (
+                          <ButtonEditor key={i} button={b} onChange={updated => updateBriefButton(i, updated)} onRemove={() => removeBriefButton(i)} />
+                        ))}
+                        <button
+                          onClick={addBriefButton}
+                          style={{ padding: "8px", fontSize: "11px", fontWeight: 600, border: "1px dashed #dde0e6", borderRadius: "6px", background: "#fff", color: "#6b7280", cursor: "pointer" }}>
+                          + Add button
+                        </button>
+                      </div>
                     </div>
                   </div>
                   {brief.brandName && (
@@ -1929,7 +1937,7 @@ export default function CustomBuild({ userId, role } = {}) {
           <div style={{ marginBottom: "32px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
               <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Inspo URLs</div>
-              <span style={{ fontSize: "12px", color: "#6b7280", marginLeft: "auto" }}>Optional</span>
+              <span style={{ fontSize: "12px", fontWeight: 600, color: "#b45309", marginLeft: "auto" }}>Optional</span>
             </div>
             {/* Stored patterns used silently — not shown to end users */}
             <div style={T.surface}>
@@ -2130,7 +2138,7 @@ export default function CustomBuild({ userId, role } = {}) {
                     onClick={() => { setSwapDrawer(swapDrawer === previewPage ? null : previewPage); setSwapFilter(""); }}
                     style={{ ...T.btnGhost, width: "100%", justifyContent: "space-between", padding: "12px 16px", fontSize: "13px" }}>
                     <span>Swap sections</span>
-                    <span style={{ color: "#9ca3af" }}>↗</span>
+                    <span style={{ color: "#b45309" }}>↗</span>
                   </button>
                 </div>
               )}
@@ -2146,7 +2154,7 @@ export default function CustomBuild({ userId, role } = {}) {
                       style={{ fontSize: "13px", padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", color: "#09090b", fontFamily: "inherit", boxSizing: "border-box" }}
                     />
                     <button onClick={() => downloadPage(p)} style={{ ...T.btnGhost, textAlign: "left", display: "flex", justifyContent: "space-between", padding: "12px 16px", fontSize: "13px" }}>
-                      <span>{p.label}</span><span style={{ color: "#9ca3af" }}>↓ .json</span>
+                      <span>{p.label}</span><span style={{ color: "#b45309" }}>↓ .json</span>
                     </button>
                   </div>
                 ))}
@@ -2156,10 +2164,10 @@ export default function CustomBuild({ userId, role } = {}) {
                 <div style={{ height: "1px", background: "#dde0e6", margin: "10px 0" }} />
                 <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "12px" }}>Global Templates</div>
                 <button onClick={downloadHeader} style={{ ...T.btnGhost, textAlign: "left", display: "flex", justifyContent: "space-between", padding: "12px 16px", fontSize: "13px" }}>
-                  <span>Header</span><span style={{ color: "#9ca3af" }}>↓ .json</span>
+                  <span>Header</span><span style={{ color: "#b45309" }}>↓ .json</span>
                 </button>
                 <button onClick={downloadFooter} style={{ ...T.btnGhost, textAlign: "left", display: "flex", justifyContent: "space-between", padding: "12px 16px", fontSize: "13px" }}>
-                  <span>Footer</span><span style={{ color: "#9ca3af" }}>↓ .json</span>
+                  <span>Footer</span><span style={{ color: "#b45309" }}>↓ .json</span>
                 </button>
               </div>
               <div style={{ height: "1px", background: "#dde0e6", margin: "18px 0" }} />
@@ -2167,7 +2175,7 @@ export default function CustomBuild({ userId, role } = {}) {
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 {generated.pages.map(p => (
                   <button key={p.id + "-preview"} onClick={() => downloadPreview(p.id, layoutVariants[p.id] || p.recommended || "A")} style={{ ...T.btnGhost, textAlign: "left", display: "flex", justifyContent: "space-between", padding: "12px 16px", fontSize: "13px" }}>
-                    <span>{(p.label || p.id).replace(/-\d{5,}$/, "")}</span><span style={{ color: "#9ca3af" }}>↓ .html</span>
+                    <span>{(p.label || p.id).replace(/-\d{5,}$/, "")}</span><span style={{ color: "#b45309" }}>↓ .html</span>
                   </button>
                 ))}
               </div>
