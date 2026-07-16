@@ -154,7 +154,7 @@ export default function StyleDocument({ brandName, sourceUrl, colors, fonts, but
                     buttons.map((b, i) => (
                       <div key={i} style={buttonDemoPanel(lightPanelHex)}>
                         {b.name && <p style={buttonDemoLabel(false)}>{b.name}</p>}
-                        <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: b.background || "#333" }}>
+                        <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "6px", background: b.background || "#333" }}>
                           <span style={{ fontFamily: buttonFontFamily, fontWeight: 600, fontSize: "13px", color: b.textColor || "#fff", letterSpacing: "0.02em" }}>Call to action</span>
                         </div>
                       </div>
@@ -167,13 +167,13 @@ export default function StyleDocument({ brandName, sourceUrl, colors, fonts, but
                     <>
                       <div style={buttonDemoPanel(lightPanelHex)}>
                         <p style={buttonDemoLabel(false)}>On light</p>
-                        <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: accentHex }}>
+                        <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "6px", background: accentHex }}>
                           <span style={{ fontFamily: buttonFontFamily, fontWeight: 600, fontSize: "13px", color: buttonTextColor, letterSpacing: "0.02em" }}>Call to action</span>
                         </div>
                       </div>
                       <div style={buttonDemoPanel(darkPanelDemoHex)}>
                         <p style={buttonDemoLabel(true)}>On dark</p>
-                        <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: accentHex }}>
+                        <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "6px", background: accentHex }}>
                           <span style={{ fontFamily: buttonFontFamily, fontWeight: 600, fontSize: "13px", color: buttonTextColor, letterSpacing: "0.02em" }}>Call to action</span>
                         </div>
                       </div>

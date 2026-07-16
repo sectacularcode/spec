@@ -87,7 +87,7 @@ export default function ButtonEditor({ button, onChange, onRemove, locked }) {
       <div style={{ display: "flex", justifyContent: "center", padding: "18px 12px", background: "#F5F5F5", borderRadius: "6px", marginBottom: "14px" }}>
         {isSecondary ? (
           <div style={{
-            display: "inline-block", padding: "9px 20px", borderRadius: "4px", background: "transparent",
+            display: "inline-block", padding: "9px 20px", borderRadius: "6px", background: "transparent",
             border: "2px solid " + (button.background || "#333"),
           }}>
             <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: "13px", color: button.background || "#333", letterSpacing: "0.02em" }}>
@@ -95,7 +95,7 @@ export default function ButtonEditor({ button, onChange, onRemove, locked }) {
             </span>
           </div>
         ) : (
-          <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: button.background || "#333" }}>
+          <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "6px", background: button.background || "#333" }}>
             <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: "13px", color: button.textColor || "#fff", letterSpacing: "0.02em" }}>
               Call to action
             </span>
