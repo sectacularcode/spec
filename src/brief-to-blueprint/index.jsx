@@ -1699,10 +1699,7 @@ export default function CustomBuild({ userId, role } = {}) {
 
           {/* STEP 1 */}
           <div style={{ marginBottom: "32px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-              <div style={T.stepNum(true, !!brief)}>1</div>
-              <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Brand Brief</div>
-            </div>
+            <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>Brand Brief</div>
             <div style={{ ...T.surface, border: brief ? "1px solid #dde0e6" : "1px solid #dde0e6" }}>
               {!brief ? (
                 <>
@@ -1931,7 +1928,6 @@ export default function CustomBuild({ userId, role } = {}) {
           {/* STEP 2 */}
           <div style={{ marginBottom: "32px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-              <div style={T.stepNum(true, inspoUrls.some(u => u.trim()))}>2</div>
               <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Inspo URLs</div>
               <span style={{ fontSize: "12px", color: "#6b7280", marginLeft: "auto" }}>Optional</span>
             </div>
@@ -1991,10 +1987,7 @@ export default function CustomBuild({ userId, role } = {}) {
 
           {/* STEP 3 */}
           <div style={{ marginBottom: "32px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-              <div style={T.stepNum(true, selectedPages.length > 0)}>3</div>
-              <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Pages to Build</div>
-            </div>
+            <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>Pages to Build</div>
             <div style={T.surface}>
               <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>Only checked pages are included in the export.</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
@@ -2049,10 +2042,7 @@ export default function CustomBuild({ userId, role } = {}) {
 
           {/* STEP 4 */}
           <div style={{ marginBottom: "32px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-              <div style={T.stepNum(true, true)}>4</div>
-              <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Copy Settings</div>
-            </div>
+            <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>Copy Settings</div>
             <div style={T.surface}>
               <div style={{ fontSize: "13px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>Use copy from brand brief only?</div>
               <div style={{ display: "flex", gap: "10px" }}>
