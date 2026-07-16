@@ -2121,56 +2121,58 @@ export default function CustomBuild({ userId, role } = {}) {
           )}
 
           {generated && (
-            <div style={{ marginTop: "24px", ...T.surface }}>
+            <div style={{ marginTop: "8px" }}>
               {/* Swap sections — moved from preview header into panel */}
               {sectionLibrary.length > 0 && (
-                <div style={{ marginBottom: "16px" }}>
-                  <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "6px" }}>Sections</div>
+                <div style={{ marginBottom: "32px" }}>
+                  <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "12px" }}>Sections</div>
                   <button
                     onClick={() => { setSwapDrawer(swapDrawer === previewPage ? null : previewPage); setSwapFilter(""); }}
-                    style={{ ...T.btnGhost, width: "100%", justifyContent: "space-between" }}>
+                    style={{ ...T.btnGhost, width: "100%", justifyContent: "space-between", padding: "12px 16px", fontSize: "13px" }}>
                     <span>Swap sections</span>
                     <span style={{ color: "#9ca3af" }}>↗</span>
                   </button>
                 </div>
               )}
-              <div style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "12px" }}>Download</div>
+              <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "12px" }}>Download</div>
               <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 {generated.pages.map(p => (
-                  <div key={p.id} style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <div key={p.id} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                     <input
                       type="text"
                       value={pageDownloadNames[p.id] || ""}
                       onChange={(e) => setPageDownloadNames(prev => ({ ...prev, [p.id]: e.target.value }))}
                       placeholder={`Name this template (optional) — defaults to "${p.label}"`}
-                      style={{ fontSize: "12px", padding: "7px 10px", border: "1px solid #dde0e6", borderRadius: "6px", color: "#09090b", fontFamily: "inherit" }}
+                      style={{ fontSize: "13px", padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", color: "#09090b", fontFamily: "inherit", boxSizing: "border-box" }}
                     />
-                    <button onClick={() => downloadPage(p)} style={{ ...T.btnGhost, textAlign: "left", display: "flex", justifyContent: "space-between" }}>
+                    <button onClick={() => downloadPage(p)} style={{ ...T.btnGhost, textAlign: "left", display: "flex", justifyContent: "space-between", padding: "12px 16px", fontSize: "13px" }}>
                       <span>{p.label}</span><span style={{ color: "#9ca3af" }}>↓ .json</span>
                     </button>
                   </div>
                 ))}
                 {generated.pages.length > 1 && (
-                  <button onClick={downloadAll} style={{ ...T.btnPrimary, justifyContent: "center", marginTop: "-6px" }}>Download All Pages</button>
+                  <button onClick={downloadAll} style={{ ...T.btnPrimary, justifyContent: "center", marginTop: "-6px", padding: "12px 16px", fontSize: "13px" }}>Download All Pages</button>
                 )}
-                <div style={{ height: "1px", background: "#dde0e6", margin: "8px 0" }} />
-                <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "4px" }}>Global Templates</div>
-                <button onClick={downloadHeader} style={{ ...T.btnGhost, textAlign: "left", display: "flex", justifyContent: "space-between" }}>
+                <div style={{ height: "1px", background: "#dde0e6", margin: "10px 0" }} />
+                <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "12px" }}>Global Templates</div>
+                <button onClick={downloadHeader} style={{ ...T.btnGhost, textAlign: "left", display: "flex", justifyContent: "space-between", padding: "12px 16px", fontSize: "13px" }}>
                   <span>Header</span><span style={{ color: "#9ca3af" }}>↓ .json</span>
                 </button>
-                <button onClick={downloadFooter} style={{ ...T.btnGhost, textAlign: "left", display: "flex", justifyContent: "space-between" }}>
+                <button onClick={downloadFooter} style={{ ...T.btnGhost, textAlign: "left", display: "flex", justifyContent: "space-between", padding: "12px 16px", fontSize: "13px" }}>
                   <span>Footer</span><span style={{ color: "#9ca3af" }}>↓ .json</span>
                 </button>
               </div>
-              <div style={{ height: "1px", background: "#dde0e6", margin: "8px 0" }} />
-              <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "4px" }}>Preview</div>
-              {generated.pages.map(p => (
-                <button key={p.id + "-preview"} onClick={() => downloadPreview(p.id, layoutVariants[p.id] || p.recommended || "A")} style={{ ...T.btnGhost, textAlign: "left", display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                  <span>{(p.label || p.id).replace(/-\d{5,}$/, "")}</span><span style={{ color: "#9ca3af" }}>↓ .html</span>
-                </button>
-              ))}
-              <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "6px", lineHeight: 1.5 }}>Open in browser to scroll and screenshot the full page.</div>
-              <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "12px" }}>
+              <div style={{ height: "1px", background: "#dde0e6", margin: "18px 0" }} />
+              <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "12px" }}>Preview</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {generated.pages.map(p => (
+                  <button key={p.id + "-preview"} onClick={() => downloadPreview(p.id, layoutVariants[p.id] || p.recommended || "A")} style={{ ...T.btnGhost, textAlign: "left", display: "flex", justifyContent: "space-between", padding: "12px 16px", fontSize: "13px" }}>
+                    <span>{(p.label || p.id).replace(/-\d{5,}$/, "")}</span><span style={{ color: "#9ca3af" }}>↓ .html</span>
+                  </button>
+                ))}
+              </div>
+              <div style={{ fontSize: "12px", color: "#9ca3af", marginTop: "10px", lineHeight: 1.5 }}>Open in browser to scroll and screenshot the full page.</div>
+              <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "14px" }}>
                 Import via WordPress → Templates → Saved Templates → Import Templates.
               </div>
             </div>
