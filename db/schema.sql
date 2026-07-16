@@ -129,51 +129,29 @@ CREATE TABLE usage_limits (
   UNIQUE (scope, scope_id)
 );
 
--- brand_styles: one saved color/font profile per (user, brand name),
--- reusable across every future page for that brand regardless of upload
--- source (Standard Brief, Manifest import, or the Style Guide tool's
--- URL-scrape/upload). Matching on brand_name is case-insensitive at the
--- application layer (see api/brand-styles.js) rather than a DB-level
--- constraint, so this UNIQUE stays a plain exact-match index -- the
--- case-folding logic lives in the handler, not the schema.
--- source_url is optional: null for anything entered manually, set when the
--- style came from a URL scrape or an uploaded file. Self-healing via
--- ALTER TABLE ... ADD COLUMN IF NOT EXISTS in api/brand-styles.js, since
--- it was added after this table was already live.
-CREATE TABLE brand_styles (
-  id         SERIAL PRIMARY KEY,
-  user_id    TEXT NOT NULL,
-  brand_name TEXT NOT NULL,
-  colors     JSONB NOT NULL DEFAULT '{}'::jsonb,
-  fonts      JSONB NOT NULL DEFAULT '{}'::jsonb,
-  source_url TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE (user_id, brand_name)
-);
-
 -- brands: one row per client/brand. Deliberately NOT scoped by user_id like
 -- every table above -- a client isn't "owned" by whoever created it, it's a
 -- shared team resource. Access is gated by role in api/brands.js instead
 -- (admin only for now, manager planned next). created_by is kept for
 -- audit/display only ("added by X"), never used as an access check.
 --
--- Absorbs what brand_styles used to do alone (colors/fonts/buttons/
--- source_url), plus the structure/layout defaults from Brief to
+-- Absorbs what the old brand_styles table used to do alone (colors/fonts/
+-- buttons/source_url), plus the structure/layout defaults from Brief to
 -- Blueprint's per-section style picker (feature_layout/post_closing_layout/
 -- skip_services_checklist) -- so a repeat client's look AND structure
 -- carry forward automatically instead of being re-picked on every new
--- brief. brand_styles' existing rows migrate in via
--- db/migrate-brand-styles-to-brands.mjs; brand_styles itself is left in
--- place (not dropped) until that migration is confirmed clean.
+-- brief. brand_styles' rows were migrated in via
+-- db/migrate-brand-styles-to-brands.mjs (July 2026); both the old table
+-- and api/brand-styles.js have since been removed -- confirmed zero
+-- remaining callers before deletion.
 --
 -- manifest_brand_id matches Manifest's own stable brand.id when a build
 -- came in through Manifest import (see _manifestBrandId in
 -- manifestImport.js) -- preferred over name matching when present, since a
 -- human-typed brand name and Manifest's own casing of the same brand won't
 -- always match exactly. Name matching (case-insensitive, at the
--- application layer, same convention brand_styles.js already used) is the
--- fallback for brands that never came through Manifest.
+-- application layer) is the fallback for brands that never came through
+-- Manifest.
 CREATE TABLE brands (
   id                       TEXT PRIMARY KEY,
   created_by               TEXT NOT NULL,
