@@ -1706,7 +1706,7 @@ export default function CustomBuild({ userId, role } = {}) {
           {/* STEP 1 */}
           <div style={{ marginBottom: "32px" }}>
             <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>Brand Brief</div>
-            <div style={{ ...T.surface, border: brief ? "1px solid #dde0e6" : "1px solid #dde0e6" }}>
+            <div style={T.surface}>
               {!brief ? (
                 <>
                   <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
