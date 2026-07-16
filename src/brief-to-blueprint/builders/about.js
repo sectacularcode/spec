@@ -8,7 +8,7 @@ export function buildAboutPage(C, brief, inspoHint, patterns) {
   // Real button colors from the Style Guide's Buttons section when
   // defined; otherwise the same brassDp fill as always, with a computed
   // (not blindly hardcoded) safe text color.
-  var definedBtn = brief.buttons && brief.buttons[0];
+  var definedBtn = (brief.buttons || []).find(function(b) { return (b.name || "").trim().toLowerCase() === "primary"; }) || (brief.buttons && brief.buttons[0]);
   var btnBg = (definedBtn && definedBtn.background) || brassDp;
   var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, text || "#1a1a1a");
 

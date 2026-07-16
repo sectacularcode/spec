@@ -99,7 +99,7 @@ function mkInfoBlock(loc, ink, stone, bone) {
 export function buildLocationPageA(colors, brief, loc) {
   var C = getColors(colors);
   var loc = loc || brief.locationData || {};
-  var definedBtn = brief.buttons && brief.buttons[0];
+  var definedBtn = (brief.buttons || []).find(function(b) { return (b.name || "").trim().toLowerCase() === "primary"; }) || (brief.buttons && brief.buttons[0]);
   var btnBg = (definedBtn && definedBtn.background) || C.brassDp;
   var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, C.text);
 
@@ -189,7 +189,7 @@ export function buildLocationPageA(colors, brief, loc) {
 export function buildLocationPageB(colors, brief, loc) {
   var C = getColors(colors);
   var loc = loc || brief.locationData || {};
-  var definedBtn = brief.buttons && brief.buttons[0];
+  var definedBtn = (brief.buttons || []).find(function(b) { return (b.name || "").trim().toLowerCase() === "primary"; }) || (brief.buttons && brief.buttons[0]);
   var btnBg = (definedBtn && definedBtn.background) || C.brassDp;
   var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, C.text);
 

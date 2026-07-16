@@ -4,34 +4,54 @@
 // AND button fill all at once, with no way to see what a real button
 // actually looks like while building. A button is its own thing here: two
 // colors the person picks directly, previewed live, not computed.
+//
+// locked (new): Primary and Secondary are guaranteed, always-present slots
+// now -- every builder across Brief to Blueprint looks buttons up BY NAME
+// ("primary"/"secondary", case-insensitive), not by array position, so
+// those two names have to actually exist and can't be typed wrong,
+// renamed away, or deleted. Locked hides the remove button and renders
+// the name as a static label instead of an editable input. Any button
+// beyond the first two stays fully free-form (name, add, remove) exactly
+// as before.
 
-export default function ButtonEditor({ button, onChange, onRemove }) {
+export default function ButtonEditor({ button, onChange, onRemove, locked }) {
   return (
     <div style={{ position: "relative", border: "1px solid #DDE0E6", borderRadius: "8px", padding: "16px" }}>
-      <button
-        onClick={onRemove}
-        title="Remove button"
-        aria-label="Remove button"
-        style={{
-          position: "absolute", top: "10px", right: "10px", width: "22px", height: "22px",
-          borderRadius: "50%", background: "#fff", border: "1px solid #DDE0E6",
-          color: "#6B635C", fontSize: "13px", lineHeight: 1, cursor: "pointer",
-          display: "flex", alignItems: "center", justifyContent: "center", padding: 0,
-        }}
-      >
-        ×
-      </button>
+      {!locked && (
+        <button
+          onClick={onRemove}
+          title="Remove button"
+          aria-label="Remove button"
+          style={{
+            position: "absolute", top: "10px", right: "10px", width: "22px", height: "22px",
+            borderRadius: "50%", background: "#fff", border: "1px solid #DDE0E6",
+            color: "#6B635C", fontSize: "13px", lineHeight: 1, cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center", padding: 0,
+          }}
+        >
+          ×
+        </button>
+      )}
 
-      <input
-        value={button.name || ""}
-        onChange={e => onChange({ ...button, name: e.target.value })}
-        placeholder="Name (e.g. Primary)"
-        style={{
+      {locked ? (
+        <p style={{
           fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: "11px", fontWeight: 600, textTransform: "uppercase",
-          letterSpacing: "0.05em", color: "#6B7280", border: "none", borderBottom: "1px solid #DDE0E6",
-          padding: "0 0 6px", marginBottom: "14px", width: "70%", background: "transparent",
-        }}
-      />
+          letterSpacing: "0.05em", color: "#6B7280", margin: "0 0 14px", paddingBottom: "6px", borderBottom: "1px solid #DDE0E6",
+        }}>
+          {button.name}
+        </p>
+      ) : (
+        <input
+          value={button.name || ""}
+          onChange={e => onChange({ ...button, name: e.target.value })}
+          placeholder="Name (e.g. Primary)"
+          style={{
+            fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: "11px", fontWeight: 600, textTransform: "uppercase",
+            letterSpacing: "0.05em", color: "#6B7280", border: "none", borderBottom: "1px solid #DDE0E6",
+            padding: "0 0 6px", marginBottom: "14px", width: "70%", background: "transparent",
+          }}
+        />
+      )}
 
       <div style={{ display: "flex", justifyContent: "center", padding: "18px 12px", background: "#F5F5F5", borderRadius: "6px", marginBottom: "14px" }}>
         <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: button.background || "#333" }}>

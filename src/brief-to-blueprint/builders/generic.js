@@ -11,7 +11,7 @@ export function buildGenericPage(colors, brief, pageDef, inspoContext, variant) 
   var text = colors.text || "#2A2722";
   var stone = colors.stone || "#8A8170";
   var asphalt = colors.asphalt || "#2B2823";
-  var definedBtn = brief.buttons && brief.buttons[0];
+  var definedBtn = (brief.buttons || []).find(function(b) { return (b.name || "").trim().toLowerCase() === "primary"; }) || (brief.buttons && brief.buttons[0]);
   var btnBg = (definedBtn && definedBtn.background) || brassDp;
   var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, text);
   var label = pageDef.label;

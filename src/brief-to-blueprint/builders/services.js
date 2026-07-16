@@ -7,7 +7,7 @@ export function buildServicesPage(C, brief, _inspoHint) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#3F3F46", asphalt = C.asphalt || "#2B2823", text = C.text;
-  var definedBtn = brief.buttons && brief.buttons[0];
+  var definedBtn = (brief.buttons || []).find(function(b) { return (b.name || "").trim().toLowerCase() === "primary"; }) || (brief.buttons && brief.buttons[0]);
   var btnBg = (definedBtn && definedBtn.background) || brassDp;
   var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, text || "#1a1a1a");
 
@@ -131,7 +131,7 @@ export function buildServicesPageLight(C, brief, _inspoHint) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
       brassDp = C["brass-deep"] || "#3F3F46", asphalt = C.asphalt || "#2B2823", text = C.text;
-  var definedBtn = brief.buttons && brief.buttons[0];
+  var definedBtn = (brief.buttons || []).find(function(b) { return (b.name || "").trim().toLowerCase() === "primary"; }) || (brief.buttons && brief.buttons[0]);
   var btnBg = (definedBtn && definedBtn.background) || brassDp;
   var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, text || "#1a1a1a");
 

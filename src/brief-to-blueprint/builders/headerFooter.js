@@ -10,7 +10,7 @@ export function buildHeaderJSON(C, brief, inspoContext) {
   var brass = C.brass || "#52525B";
   var brassDp = C["brass-deep"] || "#3F3F46";
   var warmWhite = C["warm-white"] || "#FBFAF7";
-  var definedBtn = brief.buttons && brief.buttons[0];
+  var definedBtn = (brief.buttons || []).find(function(b) { return (b.name || "").trim().toLowerCase() === "primary"; }) || (brief.buttons && brief.buttons[0]);
   var btnBg = (definedBtn && definedBtn.background) || brassDp;
   var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, C.text || "#1a1a1a");
 

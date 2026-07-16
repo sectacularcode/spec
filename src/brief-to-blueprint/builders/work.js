@@ -11,7 +11,7 @@ export function buildWorkPage(C, brief, inspoHint) {
   // project") -- NOT applied to the filter-tab pills below, which use
   // mkButton as a rendering primitive for category tabs, not a call to
   // action, and intentionally keep their own brass/brassDp pairing.
-  var definedBtn = brief.buttons && brief.buttons[0];
+  var definedBtn = (brief.buttons || []).find(function(b) { return (b.name || "").trim().toLowerCase() === "primary"; }) || (brief.buttons && brief.buttons[0]);
   var btnBg = (definedBtn && definedBtn.background) || brassDp;
   var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, text || "#1a1a1a");
 

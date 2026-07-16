@@ -171,7 +171,8 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // person's explicit choice either way; each context keeps its own
   // historical fallback color when no button has been defined yet --
   // only the previously-hardcoded text color becomes computed-safe.
-  var definedBtn = brief.buttons && brief.buttons[0];
+  var definedBtn = (brief.buttons || []).find(function(b) { return (b.name || "").trim().toLowerCase() === "primary"; }) || (brief.buttons && brief.buttons[0]);
+  var secondaryBtn = (brief.buttons || []).find(function(b) { return (b.name || "").trim().toLowerCase() === "secondary"; });
   var darkCtxBtnBg = (definedBtn && definedBtn.background) || warmWhite;
   var darkCtxBtnText = (definedBtn && definedBtn.textColor) || bestTextColor(darkCtxBtnBg, dark);
   var lightCtxBtnBg = (definedBtn && definedBtn.background) || accent;
@@ -192,13 +193,16 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   }
 
   function makeDualBtnRow(primaryLabel, secondaryLabel, primaryUrl, secondaryUrl, sectionBg) {
-    // Outline button color follows the section bg it's sitting on. When
-    // the closing CTA's bg is accent (green) and warmWhite is also green,
-    // the outline button used to render as green text on green -- invisible.
-    // Same story for the SOLID (primary) button: if darkCtxBtnBg matches
-    // sectionBg it also disappears -- force it to lightTextOn(sectionBg)
-    // (usually white) as its bg, with dark text on it.
-    var outlineColor = sectionBg ? lightTextOn(sectionBg) : warmWhite;
+    // Outline button color follows the section bg it's sitting on when no
+    // Secondary style has been saved -- when one has, it wins outright,
+    // same as definedBtn already does for the primary/filled button.
+    // Style Guide's Buttons section previously had zero effect on this
+    // button at all, regardless of what was saved, because nothing here
+    // ever read brief.buttons for it -- a real gap, not just a labeling
+    // issue. Section-bg collision guard below only applies to the
+    // fallback path; a person's explicit Secondary choice is trusted
+    // as-is, not second-guessed against the section it happens to sit on.
+    var outlineColor = (secondaryBtn && secondaryBtn.background) || (sectionBg ? lightTextOn(sectionBg) : warmWhite);
     var primaryBg = darkCtxBtnBg;
     var primaryText = darkCtxBtnText;
     if (sectionBg && String(primaryBg).toLowerCase() === String(sectionBg).toLowerCase()) {

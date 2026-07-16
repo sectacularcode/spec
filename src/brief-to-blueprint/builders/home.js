@@ -11,7 +11,7 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
   // this always used when it doesn't -- only the TEXT color changes, from
   // a blind hardcoded white to a computed-safe one, since brassDp was
   // never guaranteed dark enough for white text to actually read against.
-  var definedBtn = brief.buttons && brief.buttons[0];
+  var definedBtn = (brief.buttons || []).find(function(b) { return (b.name || "").trim().toLowerCase() === "primary"; }) || (brief.buttons && brief.buttons[0]);
   var btnBg = (definedBtn && definedBtn.background) || brassDp;
   var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, text || "#1a1a1a");
   var heroPattern = (patterns && patterns.hero) || "centered-bold";

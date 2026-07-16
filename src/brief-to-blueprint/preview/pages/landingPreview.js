@@ -45,7 +45,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
   // hardcode white text on the raw accent color with no contrast check
   // at all (the same class of bug already found and fixed on the Style
   // Guide brand sheet), so that becomes computed-safe instead.
-  var definedBtn = brief.buttons && brief.buttons[0];
+  var definedBtn = (brief.buttons || []).find(function(b) { return (b.name || "").trim().toLowerCase() === "primary"; }) || (brief.buttons && brief.buttons[0]);
+  var secondaryBtn = (brief.buttons || []).find(function(b) { return (b.name || "").trim().toLowerCase() === "secondary"; });
   var lightCtxBtnBg = (definedBtn && definedBtn.background) || brass;
   var lightCtxBtnText = (definedBtn && definedBtn.textColor) || bestTextColor(lightCtxBtnBg, text);
 
@@ -396,7 +397,12 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
       var darkCtxBtnText = (definedBtn && definedBtn.textColor) || bestTextColor(darkCtxBtnBg, dark);
       var btnStyle = "display:inline-block;padding:14px 32px;background:" + darkCtxBtnBg + ";color:" + darkCtxBtnText + ";font-weight:700;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:3px;";
       var btnOutline = "display:inline-block;padding:13px 28px;background:transparent;color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:2px solid rgba(255,255,255,0.6);border-radius:3px;";
-      var btnDark = "display:inline-block;padding:10px 24px;background:transparent;color:" + ink + ";font-weight:600;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border:2px solid " + brass + ";border-radius:3px;align-self:flex-start;width:fit-content;";
+      // Secondary style previously had zero effect here regardless of what
+      // was saved in Style Guide -- this always hardcoded brass directly.
+      // A saved Secondary color now wins outright; brass stays the
+      // fallback for briefs with none saved, unchanged from before.
+      var secondaryColor = (secondaryBtn && secondaryBtn.background) || brass;
+      var btnDark = "display:inline-block;padding:10px 24px;background:transparent;color:" + ink + ";font-weight:600;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border:2px solid " + secondaryColor + ";border-radius:3px;align-self:flex-start;width:fit-content;";
 
       // Standalone map section — mirrors the real export's mkMapSection
       // (helpers.js): heading, an address/phone/hours info strip when

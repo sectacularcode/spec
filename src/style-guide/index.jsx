@@ -316,6 +316,47 @@ export default function StyleGuide({ role }) {
     setButtons(bs => [...bs, { name: "", background, textColor }]);
   }
 
+  // Primary/Secondary are guaranteed, always-visible slots now -- every
+  // builder across Brief to Blueprint looks a button up BY NAME
+  // ("primary"/"secondary", case-insensitive), not by array position
+  // (that was the actual bug: buttons[0] got used everywhere regardless
+  // of what it was named, and a saved "Secondary" style was never read by
+  // anything). Deliberately NOT forced into `buttons` state itself --
+  // "Clear buttons" should still mean genuinely empty, not silently
+  // repopulated with defaults the moment you clear it. Instead: computed
+  // at render time (real saved entry if one exists, sensible default
+  // otherwise) and written back into `buttons` via upsert on edit, and
+  // guaranteed into the payload at the two real save points below so a
+  // saved style always has both, even if the person never touched the
+  // color pickers themselves.
+  function isNamed(b, role) { return (b.name || "").trim().toLowerCase() === role; }
+  function defaultButton(role, colorList) {
+    const accentHex = (colorList || []).find(c => c.role === "Accent")?.hex;
+    const inkHex = (colorList || []).find(c => c.role === "Ink")?.hex;
+    if (role === "primary") {
+      const background = accentHex || "#3F3F46";
+      return { name: "Primary", background, textColor: bestTextColor(background, "#1a1a1a") };
+    }
+    return { name: "Secondary", background: inkHex || "#18181B", textColor: "#FFFFFF" };
+  }
+  function upsertButtonByName(role, updated) {
+    setButtons(bs => {
+      const idx = bs.findIndex(b => isNamed(b, role));
+      const named = { ...updated, name: role === "primary" ? "Primary" : "Secondary" };
+      if (idx >= 0) return bs.map((b, i) => (i === idx ? named : b));
+      return [...bs, named];
+    });
+  }
+  // Guarantees both slots are present in whatever gets saved/exported,
+  // without touching live `buttons` state -- see the comment above.
+  function withGuaranteedPrimarySecondary(list, colorList) {
+    const has = role => (list || []).some(b => isNamed(b, role));
+    const extra = [];
+    if (!has("primary")) extra.push(defaultButton("primary", colorList));
+    if (!has("secondary")) extra.push(defaultButton("secondary", colorList));
+    return [...(list || []), ...extra];
+  }
+
   // Clearing an analyzed/edited section is real potential data loss --
   // re-typing 8 colors by hand isn't "trivial" the way removing one row
   // is (which is why individual swatch/font removal above doesn't
@@ -344,7 +385,7 @@ export default function StyleGuide({ role }) {
     all: { title: "Start a new style guide?", message: "This clears the brand name, colors, fonts, and buttons on this page. Anything already saved to the library is unaffected.", confirmLabel: "Start new" },
     colors: { title: "Clear all colors?", message: "Removes every color shown here, including anything found by analyzing a site. This only affects this page -- nothing saved to the library is touched.", confirmLabel: "Clear colors" },
     fonts: { title: "Clear all fonts?", message: "Removes every font shown here. This only affects this page -- nothing saved to the library is touched.", confirmLabel: "Clear fonts" },
-    buttons: { title: "Clear all buttons?", message: "Removes every button defined here. This only affects this page -- nothing saved to the library is touched.", confirmLabel: "Clear buttons" },
+    buttons: { title: "Reset buttons to defaults?", message: "Resets Primary and Secondary to colors computed from your palette, and removes any extra buttons defined here. This only affects this page -- nothing saved to the library is touched.", confirmLabel: "Reset buttons" },
   };
 
   // Custom ("Additional colors") entries and any font beyond Heading/Body
@@ -378,7 +419,7 @@ export default function StyleGuide({ role }) {
           name: brandName.trim(),
           colors: colorsToKeyedObject(colors),
           fonts: fontsToKeyedObject(fonts),
-          buttons,
+          buttons: withGuaranteedPrimarySecondary(buttons, colors),
           source_url: sourceUrl || undefined,
         }),
       });
@@ -541,14 +582,24 @@ export default function StyleGuide({ role }) {
 
       <Card>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
-          <CardLabel noMargin>Buttons {buttons.length > 0 ? `(${buttons.length})` : ""}</CardLabel>
-          {buttons.length > 0 && <button onClick={requestClearButtons} style={clearLink}>Clear buttons</button>}
+          <CardLabel noMargin>Buttons</CardLabel>
+          {buttons.length > 0 && <button onClick={requestClearButtons} style={clearLink}>Reset to defaults</button>}
         </div>
         <p style={{ fontSize: "12px", color: "#6B7280", margin: "0 0 14px" }}>
-          A background and text color you pick directly -- not guessed from "Accent," which could mean an icon, a hover state, or a button. Add 1-3 real button styles.
+          A background and text color you pick directly -- not guessed from "Accent," which could mean an icon, a hover state, or a button. Primary and Secondary are always applied across every generated page; add more below for extra styles like a ghost or tertiary button.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "14px" }}>
-          {buttons.map((b, i) => (
+          <ButtonEditor
+            locked
+            button={buttons.find(b => isNamed(b, "primary")) || defaultButton("primary", colors)}
+            onChange={updated => upsertButtonByName("primary", updated)}
+          />
+          <ButtonEditor
+            locked
+            button={buttons.find(b => isNamed(b, "secondary")) || defaultButton("secondary", colors)}
+            onChange={updated => upsertButtonByName("secondary", updated)}
+          />
+          {buttons.map((b, i) => (isNamed(b, "primary") || isNamed(b, "secondary")) ? null : (
             <ButtonEditor key={i} button={b} onChange={updated => updateButton(i, updated)} onRemove={() => removeButton(i)} />
           ))}
           <button onClick={addButton} style={{ ...addTile, minHeight: "180px" }}>
@@ -588,7 +639,7 @@ export default function StyleGuide({ role }) {
             <p style={{ fontSize: "11px", color: "#6B7280", margin: 0 }}>Brand name, swatches, and full type specimens on one shareable page.</p>
           </div>
           <button
-            onClick={() => { setDocumentSource({ brandName, sourceUrl, colors, fonts, buttons }); setView("document"); }}
+            onClick={() => { setDocumentSource({ brandName, sourceUrl, colors, fonts, buttons: withGuaranteedPrimarySecondary(buttons, colors) }); setView("document"); }}
             style={{ ...primaryBtn, flexShrink: 0 }}
           >
             View brand sheet
