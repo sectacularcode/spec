@@ -2121,10 +2121,10 @@ export default function CustomBuild({ userId, role } = {}) {
           )}
 
           {generated && (
-            <div style={{ marginTop: "8px" }}>
+            <div style={{ marginTop: "24px", ...T.surface }}>
               {/* Swap sections — moved from preview header into panel */}
               {sectionLibrary.length > 0 && (
-                <div style={{ marginBottom: "32px" }}>
+                <div style={{ marginBottom: "24px" }}>
                   <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "12px" }}>Sections</div>
                   <button
                     onClick={() => { setSwapDrawer(swapDrawer === previewPage ? null : previewPage); setSwapFilter(""); }}
