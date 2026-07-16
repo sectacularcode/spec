@@ -368,15 +368,9 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
       var b1    = brief.benefit1 || "Faster results with less hassle";
       var b2    = brief.benefit2 || "One team handles everything end to end";
       var b3    = brief.benefit3 || "Decades of proven experience";
-      var tq1   = brief.testimonial1Quote || "Working with this team was a game changer for our operation. The quality and speed exceeded every expectation.";
-      var tn1   = brief.testimonial1Name  || "Client Name";
-      var tt1   = brief.testimonial1Title || "Operations Manager";
-      var tq2   = brief.testimonial2Quote || "We've tried other vendors. Nobody comes close on turnaround time and quality of work.";
-      var tn2   = brief.testimonial2Name  || "Client Name";
-      var tt2   = brief.testimonial2Title || "Fleet Director";
-      var tq3   = brief.testimonial3Quote || "Straightforward pricing, no surprises, and they always deliver on time.";
-      var tn3   = brief.testimonial3Name  || "Client Name";
-      var tt3   = brief.testimonial3Title || "Business Owner";
+      var tq1   = brief.testimonial1Quote || "";
+      var tn1   = brief.testimonial1Name  || "";
+      var tt1   = brief.testimonial1Title || "";
       var formH = brief.formHeading    || "Request a Quote";
       var formS = brief.formSubhead    || "We'll get back to you within one business day.";
       var formC = brief.formCta        || "Send It Over";
@@ -478,19 +472,21 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "</div>" +
             "</div>" +
           "</section>" +
+          ((String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? (
           "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
             "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
             "<div style='max-width:640px;margin:0 auto;'>" +
               "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
               "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
-              "<p style='font-size:14px;color:rgba(255,255,255,0.7);margin:0 0 22px;'>" + tn1 + " &middot; " + tt1 + "</p>" +
+              "<p style='font-size:14px;color:rgba(255,255,255,0.7);margin:0 0 22px;'>" + tn1 + (tt1 ? " &middot; " + tt1 : "") + "</p>" +
               "<div style='display:flex;justify-content:center;gap:6px;'>" +
                 "<div style='width:6px;height:6px;border-radius:50%;background:" + brass + ";'></div>" +
                 "<div style='width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.25);'></div>" +
                 "<div style='width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.25);'></div>" +
               "</div>" +
             "</div>" +
-          "</section>" +
+          "</section>"
+          ) : "") +
           (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.featureLayout) :
           (variant === "D" || variant === "B") ? renderCuratedFeatureLayoutHTML((Array.isArray(brief.features) ? brief.features : []).map(function (_, i) {
             // Mirrors landing.js's Variant D/B dispatch -- Variant B's
@@ -563,6 +559,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               }).join("") +
             "</div>" +
           "</section>" +
+          ((String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? (
           "<section style='background:" + bone + ";padding:0;display:grid;grid-template-columns:1fr 1fr;'>" +
             "<div class='landing-img' style='min-height:420px;height:100%;overflow:hidden;'><img src=\"" + img1 + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:420px;'/></div>" +
             "<div style='padding:64px 56px;display:flex;flex-direction:column;justify-content:center;'>" +
@@ -571,7 +568,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<div style='font-size:15px;font-weight:600;color:" + ink + ";'>" + tn1 + "</div>" +
               "<div style='font-size:13px;color:" + stone + ";'>" + tt1 + "</div>" +
             "</div>" +
-          "</section>" +
+          "</section>"
+          ) : "") +
           mapSectionHTML +
           "<section style='background:" + brass + ";padding:100px 40px;text-align:center;'>" +
             "<h2 style='font-size:clamp(26px,4vw,44px);font-weight:800;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
@@ -614,14 +612,16 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           // Social proof moved up here, right after the trust strip --
           // the actual structural difference from Awareness, not just a
           // different color cycle.
+          ((String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? (
           "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
             "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
             "<div style='max-width:640px;margin:0 auto;'>" +
               "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
               "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
-              "<p style='font-size:14px;color:rgba(255,255,255,0.7);margin:0 0 22px;'>" + tn1 + " &middot; " + tt1 + "</p>" +
+              "<p style='font-size:14px;color:rgba(255,255,255,0.7);margin:0 0 22px;'>" + tn1 + (tt1 ? " &middot; " + tt1 : "") + "</p>" +
             "</div>" +
-          "</section>" +
+          "</section>"
+          ) : "") +
           (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.featureLayout) :
           (function () {
             // The one variant missing this check entirely -- B/D/F all
@@ -699,7 +699,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<div style='min-height:340px;'>" + mapEmbedHTML + "</div>" +
             "</div>" +
           "</section>" +
-          (brief.testimonial1Name ? (
+          ((String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? (
             "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
               "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
               "<div style='max-width:640px;margin:0 auto;'>" +
@@ -784,7 +784,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             }).join("") +
           "</div>" +
         "</section>") +
-        (brief.testimonial1Name ? (
+        ((String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? (
           "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
             "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
             "<div style='max-width:640px;margin:0 auto;'>" +

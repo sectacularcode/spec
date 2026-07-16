@@ -732,15 +732,14 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // on awareness-stage pages consistently flags trust cues appearing
     // only near the bottom as a missed opportunity; cold traffic decides
     // whether to keep reading well before they'd ever scroll that far.
-    var testimonialsE = [
-      { quote: brief.testimonial1Quote || "[Client testimonial — specific result or outcome]", name: brief.testimonial1Name || "Client Name", title: brief.testimonial1Title || "Title, Company" },
-      { quote: brief.testimonial2Quote || "[Second testimonial — different benefit angle]",    name: brief.testimonial2Name || "Client Name", title: brief.testimonial2Title || "Title, Company" },
-      { quote: brief.testimonial3Quote || "[Third testimonial — reliability or speed]",        name: brief.testimonial3Name || "Client Name", title: brief.testimonial3Title || "Title, Company" },
-    ];
-    var testimonialsSectionE = mkContainer([
+    var testimonialsSectionE = (String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? mkContainer([
       mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", warmWhite, "h2", { weight: 800, px: 32, align: "center" }),
-      mkTestimonialCarousel(testimonialsE, { textColor: warmWhite, nameColor: warmWhite, jobColor: "rgba(255,255,255,0.7)" }),
-    ], dark, { padY: "80", center: true });
+      mkTestimonialCarousel([
+        { quote: brief.testimonial1Quote || "", name: brief.testimonial1Name || "", title: brief.testimonial1Title || "" },
+        { quote: brief.testimonial2Quote || "", name: brief.testimonial2Name || "", title: brief.testimonial2Title || "" },
+        { quote: brief.testimonial3Quote || "", name: brief.testimonial3Name || "", title: brief.testimonial3Title || "" },
+      ].filter(function (t) { return t.quote || t.name; }), { textColor: warmWhite, nameColor: warmWhite, jobColor: "rgba(255,255,255,0.7)" }),
+    ], dark, { padY: "80", center: true }) : null;
 
     // A fresh element each call -- not a single reused block -- since
     // this gets interleaved more than once and every Elementor element
@@ -893,7 +892,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // export, July 2026) -- every variant using mkTestimonialCarousel was
     // missing a section title; scoped to F only since that's what was
     // actually reviewed.
-    var testimonialsSectionF = brief.testimonial1Name ? mkContainer([
+    var testimonialsSectionF = (String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? mkContainer([
       mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", warmWhite, "h2", { weight: 800, px: 32, align: "center" }),
       mkTestimonialCarousel([
         { quote: brief.testimonial1Quote || "", name: brief.testimonial1Name || "", title: brief.testimonial1Title || "" },
@@ -967,7 +966,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // real testimonial content existing -- matches the checklist fix's
     // same principle: no real content there should mean the section
     // doesn't render, not that it renders with invented placeholder quotes.
-    var testimonialsSectionA = brief.testimonial1Name ? mkContainer([
+    var testimonialsSectionA = (String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? mkContainer([
       mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", warmWhite, "h2", { weight: 800, px: 32, align: "center" }),
       mkTestimonialCarousel([
         { quote: brief.testimonial1Quote || "", name: brief.testimonial1Name || "", title: brief.testimonial1Title || "" },
@@ -1063,15 +1062,14 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     // Testimonials — Testimonial Carousel widget (single rotating quote)
     // instead of three stacked white cards, sitting on a dark panel.
-    var testimonials = [
-      { quote: brief.testimonial1Quote || "[Client testimonial — specific result or outcome]", name: brief.testimonial1Name || "Client Name", title: brief.testimonial1Title || "Title, Company" },
-      { quote: brief.testimonial2Quote || "[Second testimonial — different benefit angle]",    name: brief.testimonial2Name || "Client Name", title: brief.testimonial2Title || "Title, Company" },
-      { quote: brief.testimonial3Quote || "[Third testimonial — reliability or speed]",        name: brief.testimonial3Name || "Client Name", title: brief.testimonial3Title || "Title, Company" },
-    ];
-    var testimonialsSection = mkContainer([
+    var testimonialsSection = (String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? mkContainer([
       mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", warmWhite, "h2", { weight: 800, px: 32, align: "center" }),
-      mkTestimonialCarousel(testimonials, { textColor: warmWhite, nameColor: warmWhite, jobColor: "rgba(255,255,255,0.7)" }),
-    ], dark, { padY: "80", center: true });
+      mkTestimonialCarousel([
+        { quote: brief.testimonial1Quote || "", name: brief.testimonial1Name || "", title: brief.testimonial1Title || "" },
+        { quote: brief.testimonial2Quote || "", name: brief.testimonial2Name || "", title: brief.testimonial2Title || "" },
+        { quote: brief.testimonial3Quote || "", name: brief.testimonial3Name || "", title: brief.testimonial3Title || "" },
+      ].filter(function (t) { return t.quote || t.name; }), { textColor: warmWhite, nameColor: warmWhite, jobColor: "rgba(255,255,255,0.7)" }),
+    ], dark, { padY: "80", center: true }) : null;
 
     // Mid-page CTA after feature rows
     var midCtaText = brief.midCtaText || "Or {link} and we'll get back to you within one business day.";
@@ -1131,13 +1129,10 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   ], bone, { direction: "row", padY: "20", padX: "40", gap: "0" });
 
   // Single testimonial
-  var tQuote = brief.testimonial1Quote || "[Your strongest client quote goes here — one specific result]";
-  var tName  = brief.testimonial1Name  || "Client Name";
-  var tTitle = brief.testimonial1Title || "Title, Company";
-  var singleTestimonial = mkContainer([
-    mkText("<p style='font-size:22px;font-style:italic;line-height:1.6;text-align:center;margin:0 0 24px'>\"" + he(tQuote) + "\"</p>", ink),
-    mkText("<p style='text-align:center;font-weight:600'>" + he(tName) + " · " + he(tTitle) + "</p>", stone),
-  ], bone, { padY: "80", center: true });
+  var singleTestimonial = (String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? mkContainer([
+    mkText("<p style='font-size:22px;font-style:italic;line-height:1.6;text-align:center;margin:0 0 24px'>\"" + he(brief.testimonial1Quote || "") + "\"</p>", ink),
+    mkText("<p style='text-align:center;font-weight:600'>" + he(brief.testimonial1Name) + (brief.testimonial1Title ? " · " + he(brief.testimonial1Title) : "") + "</p>", stone),
+  ], bone, { padY: "80", center: true }) : null;
 
   // Single strong CTA
   var singleCtaBg = accent;

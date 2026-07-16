@@ -731,6 +731,12 @@ export default function CustomBuild({ userId, role } = {}) {
     regenerateActivePage(updatedBrief);
   }
 
+  function toggleSkipTestimonials(checked) {
+    var updatedBrief = { ...brief, skipTestimonials: checked };
+    setBrief(updatedBrief);
+    regenerateActivePage(updatedBrief);
+  }
+
   // Manual override for Location (Variant F)'s map/address -- Manifest is
   // the only other source for these two fields (manifestImport.js's
   // map_location handling), and Manifest doesn't always send a
@@ -1561,6 +1567,10 @@ export default function CustomBuild({ userId, role } = {}) {
                 <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
                   <input type="checkbox" checked={!!brief.skipFaqSection} onChange={e => toggleSkipFaqSection(e.target.checked)} style={{ cursor: "pointer" }} />
                   Hide the FAQ section
+                </label>
+                <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
+                  <input type="checkbox" checked={!!brief.skipTestimonials} onChange={e => toggleSkipTestimonials(e.target.checked)} style={{ cursor: "pointer" }} />
+                  Hide the testimonials section
                 </label>
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   {rows.map((row, rowIdx) => {
