@@ -1,6 +1,15 @@
 import { selectPatterns } from "../utils/patterns.js";
 import { he } from "../utils/htmlEscape.js";
 import { buildLandingPreview } from "./pages/landingPreview.js";
+import { buildHomePreview } from "./pages/homePreview.js";
+import { buildWorkPreview } from "./pages/workPreview.js";
+import { buildServicesPreview } from "./pages/servicesPreview.js";
+import { buildAboutPreview } from "./pages/aboutPreview.js";
+import { buildProcessPreview } from "./pages/processPreview.js";
+import { buildContactPreview } from "./pages/contactPreview.js";
+import { buildPricingPreview } from "./pages/pricingPreview.js";
+import { buildPortfolioPreview } from "./pages/portfolioPreview.js";
+import { buildLocationPreview } from "./pages/locationPreview.js";
 
 // Generates a complete HTML document string for the preview iframe.
 // All user-controlled brief fields are sanitized via he() before insertion.
@@ -135,360 +144,22 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       brassDp = C["brass-deep"] || colorDefaults["brass-deep"], asphalt = C.asphalt || colorDefaults.asphalt,
       text = C.text || colorDefaults.text;
   var fontUrl = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap";
+  // One resolved-palette object shared by every extracted page-preview module
+  var colorsObj = { ink: ink, brass: brass, bone: bone, warmWhite: warmWhite, stone: stone, brassDp: brassDp, asphalt: asphalt, text: text };
 
   var sections = {
-    home: (function() {
-      var hp = patterns.hero;
-      
-      // ── HERO VARIANTS ──
-      var heroHTML = "";
-      if (hp === "split-right") {
-        heroHTML = "<section style='background:" + ink + ";padding:clamp(60px,10vw,100px) clamp(24px,8vw,80px);'>" +
-          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;max-width:1160px;margin:0 auto;'>" +
-            "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:8px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Hero image</div>" +
-            "<div>" +
-              "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:20px;'>" + (brief.brandName || "Brand") + "</div>" +
-              "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(32px,5vw,56px);color:" + warmWhite + ";margin:0 0 20px;line-height:1.1;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
-              "<p style='font-size:17px;color:" + warmWhite + ";opacity:.8;margin:0 0 32px;line-height:1.7;'>" + (brief.heroSubhead || "Subheadline goes here.") + "</p>" +
-              "<a style='padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
-            "</div>" +
-          "</div>" +
-        "</section>";
-      } else if (hp === "centered-bold") {
-        heroHTML = "<section style='background:" + ink + ";padding:clamp(80px,12vw,140px) clamp(24px,8vw,80px);text-align:center;'>" +
-          "<div style='max-width:800px;margin:0 auto;'>" +
-            "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:24px;'>" + (brief.brandName || "Brand") + "</div>" +
-            "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,6vw,72px);color:" + warmWhite + ";margin:0 0 24px;line-height:1.05;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
-            "<p style='font-size:18px;color:" + warmWhite + ";opacity:.8;margin:0 auto 40px;line-height:1.7;max-width:560px;'>" + (brief.heroSubhead || "Subheadline goes here.") + "</p>" +
-            "<div style='display:flex;gap:12px;justify-content:center;flex-wrap:wrap;'>" +
-              "<a style='padding:14px 40px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
-              "<a style='padding:14px 40px;background:transparent;color:" + warmWhite + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border:1px solid rgba(255,255,255,0.3);border-radius:4px;display:inline-block;'>" + (brief.heroCta2 || "Learn more") + "</a>" +
-            "</div>" +
-          "</div>" +
-        "</section>";
-      } else if (hp === "full-image") {
-        heroHTML = "<section style='background:" + ink + ";padding:clamp(100px,15vw,180px) clamp(24px,8vw,80px);text-align:center;position:relative;'>" +
-          "<div style='position:absolute;inset:0;background:#e0ddd7;opacity:0.3;'></div>" +
-          "<div style='position:relative;max-width:700px;margin:0 auto;'>" +
-            "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(36px,6vw,64px);color:" + warmWhite + ";margin:0 0 20px;line-height:1.08;text-shadow:0 2px 20px rgba(0,0,0,0.3);'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
-            "<p style='font-size:18px;color:" + warmWhite + ";margin:0 0 36px;line-height:1.7;'>" + (brief.heroSubhead || "Subheadline goes here.") + "</p>" +
-            "<a style='padding:16px 48px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
-          "</div>" +
-        "</section>";
-      } else if (hp === "minimal") {
-        heroHTML = "<section style='background:" + bone + ";padding:clamp(100px,15vw,200px) clamp(24px,8vw,80px);'>" +
-          "<div style='max-width:800px;'>" +
-            "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(40px,7vw,80px);color:" + ink + ";margin:0 0 24px;line-height:1.05;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
-            "<p style='font-size:18px;color:" + stone + ";margin:0 0 40px;line-height:1.7;max-width:480px;'>" + (brief.heroSubhead || "Subheadline goes here.") + "</p>" +
-            "<a style='padding:14px 32px;background:" + ink + ";color:" + warmWhite + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:0;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
-          "</div>" +
-        "</section>";
-      } else { // split-left (default)
-        heroHTML = "<section style='background:" + ink + ";padding:clamp(60px,10vw,100px) clamp(24px,8vw,80px);'>" +
-          "<div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;max-width:1160px;margin:0 auto;'>" +
-            "<div>" +
-              "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brass + ";margin-bottom:20px;'>" + (brief.brandName || "Brand") + "</div>" +
-              "<h1 style='font-family:Inter,sans-serif;font-weight:800;font-size:clamp(32px,5vw,56px);color:" + warmWhite + ";margin:0 0 20px;line-height:1.1;'>" + (brief.heroHeadline || "Your headline here.") + "</h1>" +
-              "<p style='font-size:17px;color:" + warmWhite + ";opacity:.8;margin:0 0 32px;line-height:1.7;max-width:480px;'>" + (brief.heroSubhead || "Subheadline goes here.") + "</p>" +
-              "<div style='display:flex;gap:12px;flex-wrap:wrap;'>" +
-                "<a style='padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + (brief.heroCta1 || "Get started") + "</a>" +
-                "<a style='padding:14px 32px;background:transparent;color:" + warmWhite + ";font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border:1px solid rgba(255,255,255,0.3);border-radius:4px;display:inline-block;'>" + (brief.heroCta2 || "Learn more") + "</a>" +
-              "</div>" +
-            "</div>" +
-            "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:8px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Hero image</div>" +
-          "</div>" +
-        "</section>";
-      }
-      
-      // ── SERVICES VARIANTS ──
-      var sp = patterns.services;
-      var svcCards = (brief.serviceCards || [["Service One","Description of what this service provides."],["Service Two","Description of what this service provides."],["Service Three","Description of what this service provides."]]);
-      var servicesHTML = "";
-      if (sp === "alternating-rows") {
-        servicesHTML = "<section style='background:" + bone + ";padding:48px clamp(24px,6vw,80px);border-top:1px solid #e5e7eb;'><div style='max-width:1100px;margin:0 auto;'>" +
-          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>What we do</div>" +
-          "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 48px;'>" + (brief.servicesHeading || "Our services") + "</h2>" +
-          svcCards.map(function(pair, idx) {
-            var imgFirst = idx % 2 === 0;
-            return "<div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-bottom:48px;'>" +
-              (imgFirst ? "<div style='background:#e0ddd7;aspect-ratio:3/2;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Image</div>" : "") +
-              "<div><h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + pair[0] + "</h3><p style='font-size:16px;color:" + stone + ";line-height:1.7;margin:0;'>" + pair[1] + "</p></div>" +
-              (!imgFirst ? "<div style='background:#e0ddd7;aspect-ratio:3/2;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Image</div>" : "") +
-            "</div>";
-          }).join("") +
-        "</div></section>";
-      } else if (sp === "numbered-features") {
-        servicesHTML = "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);'><div style='max-width:900px;margin:0 auto;'>" +
-          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>What we do</div>" +
-          "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 48px;'>" + (brief.servicesHeading || "Our services") + "</h2>" +
-          svcCards.map(function(pair, idx) {
-            return "<div style='display:grid;grid-template-columns:60px 1fr;gap:24px;padding:28px 0;border-top:1px solid #E2DBCC;'>" +
-              "<div style='font-size:36px;font-weight:800;color:" + brass + ";line-height:1;'>0" + (idx+1) + "</div>" +
-              "<div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + pair[0] + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>" + pair[1] + "</p></div>" +
-            "</div>";
-          }).join("") +
-        "</div></section>";
-      } else { // card-grid
-        servicesHTML = "<section style='background:" + bone + ";padding:48px clamp(24px,6vw,80px);border-top:1px solid #e5e7eb;'><div style='max-width:1100px;margin:0 auto;'>" +
-          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>What we do</div>" +
-          "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 40px;'>" + (brief.servicesHeading || "Our services") + "</h2>" +
-          "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;'>" +
-            svcCards.map(function(pair) {
-              return "<div style='background:#ffffff;border:1px solid #E2DBCC;padding:32px;border-radius:4px;'><div style='width:40px;height:3px;background:" + brass + ";margin-bottom:20px;'></div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + pair[0] + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>" + pair[1] + "</p></div>";
-            }).join("") +
-          "</div>" +
-        "</div></section>";
-      }
+    home: buildHomePreview(brief, variant, inspoContext, colorsObj, patterns),
 
-      // ── ABOUT VARIANTS ──
-      var ap = patterns.about;
-      var aboutHTML = "";
-      if (ap === "centered-narrative") {
-        aboutHTML = "<section style='background:#ffffff;padding:80px clamp(24px,8vw,80px);'><div style='max-width:720px;margin:0 auto;text-align:center;'>" +
-          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>About</div>" +
-          "<h2 style='font-weight:800;font-size:clamp(24px,4vw,40px);color:" + ink + ";margin:0 0 24px;line-height:1.15;'>" + (brief.aboutHeading || "Our story") + "</h2>" +
-          "<p style='font-size:17px;color:" + text + ";line-height:1.8;margin:0;text-align:left;'>" + (brief.aboutBody || "Your company story goes here.") + "</p>" +
-        "</div></section>";
-      } else { // split-image
-        aboutHTML = "<section style='background:#ffffff;padding:48px clamp(24px,6vw,80px);border-top:1px solid #e5e7eb;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1100px;margin:0 auto;'>" +
-          "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>About image</div>" +
-          "<div>" +
-            "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>About</div>" +
-            "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 16px;line-height:1.15;'>" + (brief.aboutHeading || "About the company") + "</h2>" +
-            "<p style='font-size:16px;color:" + text + ";line-height:1.7;margin:0;'>" + (brief.aboutBody || "Your company story goes here.") + "</p>" +
-          "</div>" +
-        "</div></section>";
-      }
+    work: buildWorkPreview(brief, variant, inspoContext, colorsObj, patterns),
 
-      // ── TESTIMONIALS ──
-      var tp = patterns.testimonials;
-      var testimonialsHTML = "";
-      if (tp === "single-large") {
-        testimonialsHTML = "<section style='background:" + bone + ";padding:100px clamp(24px,8vw,80px);text-align:center;'><div style='max-width:720px;margin:0 auto;'>" +
-          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:32px;'>Kind words</div>" +
-          "<p style='font-size:clamp(20px,3vw,28px);color:" + ink + ";line-height:1.5;font-style:italic;margin:0 0 24px;'>This changed everything for our business. The quality of work exceeded every expectation.</p>" +
-          "<div style='font-size:14px;font-weight:600;color:" + ink + ";'>Client Name</div><div style='font-size:13px;color:" + stone + ";'>CEO, Company</div>" +
-        "</div></section>";
-      } else { // card-grid
-        testimonialsHTML = "<section style='background:" + bone + ";padding:48px clamp(24px,6vw,80px);border-top:1px solid #e5e7eb;'><div style='max-width:1100px;margin:0 auto;'>" +
-          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Kind words</div>" +
-          "<h2 style='font-weight:800;font-size:clamp(24px,3.5vw,36px);color:" + ink + ";margin:0 0 28px;'>What our clients say</h2>" +
-          "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;'>" +
-            ["This changed everything for our business.", "Professional and genuinely cared about the outcome.", "We saw results within the first month."].map(function(q) {
-              return "<div style='background:#ffffff;border-left:3px solid " + brass + ";padding:28px;'><p style='font-size:17px;color:" + ink + ";line-height:1.5;margin:0 0 16px;font-style:italic;'>" + q + "</p><div style='font-size:14px;font-weight:600;color:" + ink + ";'>Client Name</div><div style='font-size:13px;color:" + stone + ";'>Role, Company</div></div>";
-            }).join("") +
-          "</div>" +
-        "</div></section>";
-      }
+    services: buildServicesPreview(brief, variant, inspoContext, colorsObj, patterns),
+    about: buildAboutPreview(brief, variant, inspoContext, colorsObj, patterns),
 
-      // ── CTA VARIANTS ──
-      var cp = patterns.cta;
-      var ctaHTML = "";
-      if (cp === "split-cta") {
-        ctaHTML = "<section style='background:" + ink + ";padding:60px clamp(24px,8vw,80px);'><div style='display:flex;justify-content:space-between;align-items:center;max-width:1160px;margin:0 auto;flex-wrap:wrap;gap:24px;'>" +
-          "<h2 style='font-weight:800;font-size:clamp(20px,3vw,32px);color:" + warmWhite + ";margin:0;'>" + (brief.tagline || "Ready to get started?") + "</h2>" +
-          "<a style='padding:14px 40px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>Start a project</a>" +
-        "</div></section>";
-      } else if (cp === "minimal-line") {
-        ctaHTML = "<section style='background:" + bone + ";padding:60px clamp(24px,8vw,80px);text-align:center;border-top:1px solid #E2DBCC;'>" +
-          "<a style='font-size:16px;color:" + brassDp + ";text-decoration:underline;font-weight:600;'>" + (brief.heroCta1 || "Start a project") + " →</a>" +
-        "</section>";
-      } else { // dark-full
-        ctaHTML = "<section style='background:" + ink + ";padding:80px clamp(24px,8vw,80px);text-align:center;'>" +
-          "<h2 style='font-weight:800;font-size:clamp(24px,4vw,44px);color:" + warmWhite + ";margin:0 0 12px;'>" + (brief.tagline || "Ready to get started?") + "</h2>" +
-          "<p style='font-size:14px;color:" + stone + ";letter-spacing:2px;text-transform:uppercase;margin:0 0 32px;'>" + (brief.signatureLine || "") + "</p>" +
-          "<a style='padding:14px 40px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>Start a project</a>" +
-        "</section>";
-      }
+    process: buildProcessPreview(brief, variant, inspoContext, colorsObj, patterns),
 
-      // ── HOOK ──
-      var hookHTML = "<section style='background:" + bone + ";padding:80px clamp(24px,8vw,80px);text-align:center;'><div style='max-width:720px;margin:0 auto;'>" +
-        "<h2 style='font-weight:800;font-size:clamp(24px,4vw,40px);color:" + ink + ";margin:0 0 16px;line-height:1.15;'>" + (brief.hookStatement || "The problem you solve, stated clearly.") + "</h2>" +
-        "<p style='font-size:17px;color:" + text + ";line-height:1.7;margin:0;'>" + (brief.hookBody || "") + "</p>" +
-      "</div></section>";
+    contact: buildContactPreview(brief, variant, inspoContext, colorsObj, patterns),
 
-      // ── PRICING TEASER ──
-      var pricingHTML = "<section style='background:#ffffff;padding:80px clamp(24px,8vw,80px);text-align:center;'><div style='max-width:720px;margin:0 auto;'>" +
-        "<h2 style='font-weight:800;font-size:clamp(24px,4vw,40px);color:" + ink + ";margin:0 0 16px;'>Clear pricing. No surprises.</h2>" +
-        "<p style='font-size:17px;color:" + text + ";line-height:1.7;margin:0 0 32px;'>See what it costs before you book a call.</p>" +
-        "<a style='padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>See pricing</a>" +
-      "</div></section>";
-
-      return heroHTML + hookHTML + servicesHTML + aboutHTML + testimonialsHTML + pricingHTML + ctaHTML;
-    })(),
-
-    work: (function() {
-      var wp = patterns.portfolio || "masonry-grid";
-      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +
-        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Work</div>" +
-        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>Selected projects</h1>" +
-        "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0;line-height:1.65;'>A look at what we have built.</p>" +
-      "</div></section>";
-      var body = "";
-      if (wp === "case-study-cards") {
-        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:1160px;margin:0 auto;'>" +
-          [1,2,3,4].map(function(n) {
-            return "<div style='display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;margin-bottom:40px;background:#fff;border:1px solid #E2DBCC;border-radius:4px;overflow:hidden;'>" +
-              "<div style='background:#e0ddd7;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Project image</div>" +
-              "<div style='padding:32px;'><div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;'>Category</div>" +
-              "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 12px;'>Project Title " + n + "</h3>" +
-              "<p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>Brief description of this project and the results achieved.</p></div></div>";
-          }).join("") + "</div></section>";
-      } else if (wp === "full-width-stacked") {
-        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:1160px;margin:0 auto;'>" +
-          [1,2,3].map(function(n) {
-            return "<div style='margin-bottom:48px;'><div style='background:#e0ddd7;aspect-ratio:21/9;display:flex;align-items:center;justify-content:center;color:" + stone + ";margin-bottom:20px;border-radius:4px;'>Project " + n + " — full width image</div>" +
-              "<div style='display:flex;justify-content:space-between;align-items:baseline;'>" +
-              "<h3 style='font-size:20px;font-weight:700;color:" + ink + ";margin:0;'>Project Title " + n + "</h3>" +
-              "<span style='font-size:13px;color:" + stone + ";'>Category · Year</span></div></div>";
-          }).join("") + "</div></section>";
-      } else {
-        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px;max-width:1160px;margin:0 auto;'>" +
-          [1,2,3,4,5,6].map(function(n) {
-            return "<div><div style='background:#e0ddd7;aspect-ratio:" + (n % 2 === 0 ? "4/3" : "3/4") + ";display:flex;align-items:center;justify-content:center;color:" + stone + ";border-radius:4px;margin-bottom:12px;'>Project " + n + "</div>" +
-              "<div style='font-size:15px;font-weight:600;color:" + ink + ";'>Project Title " + n + "</div>" +
-              "<div style='font-size:13px;color:" + stone + ";'>Category</div></div>";
-          }).join("") + "</div></section>";
-      }
-      return header + body;
-    })(),
-
-    services: (function() {
-      var sp = patterns.services;
-      var svcCards = brief.serviceCards || [["Service One","Description goes here."],["Service Two","Description goes here."],["Service Three","Description goes here."]];
-      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'>" +
-        "<div style='max-width:1160px;margin:0 auto;'>" +
-          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Services</div>" +
-          "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>" + (brief.servicesH1 || "What we offer") + "</h1>" +
-          "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0;line-height:1.65;'>" + (brief.servicesSubhead || "Our full range of services.") + "</p>" +
-        "</div></section>";
-      var body = "";
-      if (sp === "alternating-rows") {
-        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:1160px;margin:0 auto;'>" +
-          svcCards.map(function(pair, idx) {
-            var imgFirst = idx % 2 === 0;
-            return "<div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-bottom:48px;'>" +
-              (imgFirst ? "<div style='background:#e0ddd7;aspect-ratio:3/2;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Image</div>" : "") +
-              "<div><h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + pair[0] + "</h3><p style='font-size:16px;color:" + stone + ";line-height:1.7;margin:0;'>" + pair[1] + "</p></div>" +
-              (!imgFirst ? "<div style='background:#e0ddd7;aspect-ratio:3/2;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Image</div>" : "") +
-            "</div>";
-          }).join("") + "</div></section>";
-      } else if (sp === "numbered-features") {
-        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:900px;margin:0 auto;'>" +
-          svcCards.map(function(pair, idx) {
-            return "<div style='display:grid;grid-template-columns:60px 1fr;gap:24px;padding:28px 0;border-top:1px solid #E2DBCC;'>" +
-              "<div style='font-size:36px;font-weight:800;color:" + brass + ";'>0" + (idx+1) + "</div>" +
-              "<div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + pair[0] + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>" + pair[1] + "</p></div></div>";
-          }).join("") + "</div></section>";
-      } else {
-        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;max-width:1160px;margin:0 auto;'>" +
-          svcCards.map(function(pair) {
-            return "<div style='background:#fff;border:1px solid #E2DBCC;padding:32px;border-radius:4px;'><div style='width:40px;height:3px;background:" + brass + ";margin-bottom:20px;'></div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + pair[0] + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>" + pair[1] + "</p></div>";
-          }).join("") + "</div></section>";
-      }
-      return header + body;
-    })(),
-    about: (function() {
-      var ap = patterns.about;
-      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +
-        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>About</div>" +
-        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>" + (brief.aboutHeading || "Our story") + "</h1>" +
-      "</div></section>";
-      var body = "";
-      if (ap === "centered-narrative") {
-        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:720px;margin:0 auto;'>" +
-          "<p style='font-size:18px;color:" + text + ";line-height:1.8;margin:0 0 32px;'>" + (brief.aboutBody || "Your company story goes here.") + "</p>" +
-          "<div style='display:flex;gap:32px;flex-wrap:wrap;margin-top:40px;'>" +
-            ["Direct", "Useful", "Opinionated", "Human"].map(function(v) {
-              return "<div style='font-size:15px;font-weight:700;color:" + brass + ";'>" + v + "</div>";
-            }).join("") +
-          "</div></div></section>";
-      } else if (ap === "team-grid") {
-        body = "<section style='background:" + bone + ";padding:40px 40px 48px;'><div style='max-width:720px;margin:0 auto;'>" +
-          "<p style='font-size:17px;color:" + text + ";line-height:1.8;margin:0 0 48px;'>" + (brief.aboutBody || "Your company story.") + "</p></div></section>" +
-          "<section style='background:" + bone + ";padding:0 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px;max-width:1160px;margin:0 auto;text-align:center;'>" +
-            ["Founder", "Lead Designer", "Strategist", "Developer"].map(function(role) {
-              return "<div><div style='background:#e0ddd7;aspect-ratio:1;margin-bottom:16px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Photo</div><div style='font-weight:700;color:" + ink + ";'>[Name]</div><div style='font-size:13px;color:" + stone + ";margin-top:4px;'>" + role + "</div></div>";
-            }).join("") +
-          "</div></section>";
-      } else {
-        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1160px;margin:0 auto;'>" +
-          "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>About image</div>" +
-          "<div><p style='font-size:17px;color:" + text + ";line-height:1.8;margin:0;'>" + (brief.aboutBody || "Your company story.") + "</p></div>" +
-        "</div></section>";
-      }
-      return header + body;
-    })(),
-
-    process: (function() {
-      var pp = patterns.process || "numbered-vertical";
-      var steps = brief.processSteps || [["Discovery","We learn about your business and goals."],["Strategy","We create a plan tailored to you."],["Execute","We bring the plan to life."],["Deliver","You get the finished product, ready to use."]];
-      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +
-        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Process</div>" +
-        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>" + (brief.processH1 || "How it works") + "</h1>" +
-        "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0;line-height:1.65;'>Simple and calm, from first call to final files.</p>" +
-      "</div></section>";
-      var body = "";
-      if (pp === "icon-cards") {
-        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;max-width:1160px;margin:0 auto;'>" +
-          steps.map(function(s, i) {
-            return "<div style='background:#fff;border:1px solid #E2DBCC;padding:32px;border-radius:4px;text-align:center;'>" +
-              "<div style='font-size:32px;font-weight:800;color:" + brass + ";margin-bottom:16px;'>0" + (i+1) + "</div>" +
-              "<h3 style='font-size:17px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + s[0] + "</h3>" +
-              "<p style='font-size:14px;color:" + stone + ";line-height:1.6;margin:0;'>" + s[1] + "</p></div>";
-          }).join("") + "</div></section>";
-      } else if (pp === "horizontal-timeline") {
-        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:1160px;margin:0 auto;'>" +
-          "<div style='display:flex;gap:0;position:relative;'>" +
-            steps.map(function(s, i) {
-              return "<div style='flex:1;text-align:center;padding:0 16px;'>" +
-                "<div style='width:32px;height:32px;background:" + brass + ";border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;'>" + (i+1) + "</div>" +
-                "<h3 style='font-size:16px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + s[0] + "</h3>" +
-                "<p style='font-size:13px;color:" + stone + ";line-height:1.5;margin:0;'>" + s[1] + "</p></div>";
-            }).join("") +
-          "</div></div></section>";
-      } else {
-        body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:800px;margin:0 auto;'>" +
-          steps.map(function(s, i) {
-            return "<div style='display:grid;grid-template-columns:60px 1fr;gap:24px;padding:28px 0;" + (i < steps.length-1 ? "border-bottom:1px solid #E2DBCC;" : "") + "'>" +
-              "<div style='font-size:36px;font-weight:800;color:" + brass + ";line-height:1;'>0" + (i+1) + "</div>" +
-              "<div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + s[0] + "</h3><p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0;'>" + s[1] + "</p></div></div>";
-          }).join("") + "</div></section>";
-      }
-      return header + body;
-    })(),
-
-    contact: (function() {
-      var cp2 = patterns.contact || "split-form";
-      if (cp2 === "centered-minimal") {
-        return "<section style='background:" + bone + ";padding:100px 40px;text-align:center;'><div style='max-width:560px;margin:0 auto;'>" +
-          "<h1 style='font-weight:800;font-size:clamp(32px,5vw,48px);color:" + ink + ";margin:0 0 16px;'>" + (brief.contactH1 || "Get in touch") + "</h1>" +
-          "<p style='font-size:17px;color:" + text + ";margin:0 0 40px;line-height:1.7;'>" + (brief.contactSubhead || "We will get back to you within one business day.") + "</p>" +
-          "<div style='background:#fff;border:1px solid #E2DBCC;padding:32px;border-radius:8px;text-align:left;'>" +
-            ["Name", "Email", "Message"].map(function(f) {
-              return "<div style='margin-bottom:16px;'><div style='font-size:13px;font-weight:600;color:" + ink + ";margin-bottom:6px;'>" + f + "</div><div style='background:#f9f9f9;border:1px solid #E2DBCC;padding:12px;border-radius:4px;color:" + stone + ";font-size:14px;'>Enter " + f.toLowerCase() + "</div></div>";
-            }).join("") +
-            "<a style='display:block;padding:14px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;text-align:center;'>" + (brief.contactButton || "Send it over") + "</a>" +
-          "</div></div></section>";
-      } else {
-        return "<section style='background:" + bone + ";padding:88px 40px;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:60px;max-width:1160px;margin:0 auto;'>" +
-          "<div>" +
-            "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Contact</div>" +
-            "<h1 style='font-weight:800;font-size:clamp(32px,4vw,48px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>" + (brief.contactH1 || "Tell us about your project.") + "</h1>" +
-            "<p style='font-size:17px;color:" + text + ";margin:0 0 32px;line-height:1.7;'>" + (brief.contactSubhead || "A real reply, usually within one business day.") + "</p>" +
-            "<p style='font-size:15px;color:" + stone + ";'>" + (brief.contactReassurance || "No sales team. No automated funnel. Just one maker who will read it and write back.") + "</p>" +
-          "</div>" +
-          "<div style='background:#fff;border:1px solid #E2DBCC;padding:32px;border-radius:8px;'>" +
-            ["Name", "Email", "Company", "What do you need?", "Message"].map(function(f) {
-              return "<div style='margin-bottom:16px;'><div style='font-size:13px;font-weight:600;color:" + ink + ";margin-bottom:6px;'>" + f + "</div><div style='background:#f9f9f9;border:1px solid #E2DBCC;padding:12px;border-radius:4px;color:" + stone + ";font-size:14px;'></div></div>";
-            }).join("") +
-            "<a style='display:block;padding:14px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;text-align:center;'>" + (brief.contactButton || "Send it over") + "</a>" +
-          "</div>" +
-        "</div></section>";
-      }
-    })(),
-
-    landing: buildLandingPreview(brief, variant, inspoContext, { ink: ink, brass: brass, bone: bone, warmWhite: warmWhite, stone: stone, brassDp: brassDp, asphalt: asphalt, text: text }),
+    landing: buildLandingPreview(brief, variant, inspoContext, colorsObj),
 
     // ── TEAM ──
     team: (function() {
@@ -651,36 +322,7 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
       }
     })(),
 
-    pricing: (function() {
-      var pp2 = patterns.pricing || "three-tier";
-      var header = "<section style='background:" + bone + ";padding:88px 40px 40px;text-align:center;'><div style='max-width:800px;margin:0 auto;'>" +
-        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Pricing</div>" +
-        "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>Simple, transparent pricing</h1>" +
-        "<p style='font-size:17px;color:" + text + ";margin:0;'>No hidden fees. Pick what works.</p>" +
-      "</div></section>";
-      var tiers = [["Starter","$500","For small projects"],["Professional","$1,500","For growing businesses"],["Enterprise","Custom","For large-scale needs"]];
-      if (pp2 === "two-tier") {
-        return header + "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:900px;margin:0 auto;'>" +
-          tiers.slice(0,2).map(function(t, i) {
-            var featured = i === 1;
-            return "<div style='background:" + (featured ? asphalt : "#fff") + ";border:1px solid #E2DBCC;padding:48px 32px;text-align:center;border-radius:4px;'>" +
-              "<div style='font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + (featured ? brass : brassDp) + ";margin-bottom:16px;'>" + t[0] + "</div>" +
-              "<div style='font-size:clamp(36px,5vw,52px);font-weight:800;color:" + (featured ? warmWhite : ink) + ";margin-bottom:8px;'>" + t[1] + "</div>" +
-              "<p style='font-size:15px;color:" + stone + ";margin-bottom:32px;'>" + t[2] + "</p>" +
-              "<a style='display:inline-block;padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Get started</a></div>";
-          }).join("") + "</div></section>";
-      } else {
-        return header + "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;max-width:1000px;margin:0 auto;'>" +
-          tiers.map(function(t, i) {
-            var featured = i === 1;
-            return "<div style='background:" + (featured ? asphalt : "#fff") + ";border:1px solid #E2DBCC;padding:40px 32px;text-align:center;border-radius:4px;'>" +
-              "<div style='font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + (featured ? brass : brassDp) + ";margin-bottom:16px;'>" + t[0] + "</div>" +
-              "<div style='font-size:clamp(32px,4vw,48px);font-weight:800;color:" + (featured ? warmWhite : ink) + ";margin-bottom:8px;'>" + t[1] + "</div>" +
-              "<p style='font-size:14px;color:" + stone + ";margin-bottom:32px;'>" + t[2] + "</p>" +
-              "<a style='display:inline-block;padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;'>Get started</a></div>";
-          }).join("") + "</div></section>";
-      }
-    })(),
+    pricing: buildPricingPreview(brief, variant, inspoContext, colorsObj, patterns),
 
     testimonials: (function() {
       var tp = patterns.testimonials || "card-grid";
@@ -957,64 +599,10 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
     "</section>",
 
     // ── PORTFOLIO SINGLE ──
-    portfolio: (function() {
-      if (variant === "B") {
-        // Editorial: bone hero + single full-width image + case study narrative
-        return "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:800px;'>" +
-          "<div style='font-size:12px;color:" + brassDp + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;font-weight:600;'>Portfolio</div>" +
-          "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 16px;line-height:1.1;'>Project Title</h1>" +
-          "<p style='font-size:17px;color:" + text + ";margin:0;line-height:1.7;'>Client Name · Category · Year</p>" +
-        "</div></section>" +
-        "<section style='background:" + bone + ";padding:0 40px 40px;'><div style='background:#e0ddd7;aspect-ratio:16/7;max-width:1160px;margin:0 auto;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;'>Project hero image</div></section>" +
-        "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:1fr 2fr;gap:64px;max-width:1160px;margin:0 auto;'>" +
-          "<div>" +
-            "<div style='margin-bottom:32px;'><div style='font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:8px;'>Client</div><p style='font-size:15px;color:" + text + ";'>Client Name</p></div>" +
-            "<div style='margin-bottom:32px;'><div style='font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:8px;'>Category</div><p style='font-size:15px;color:" + text + ";'>Category</p></div>" +
-            "<div><div style='font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:8px;'>Year</div><p style='font-size:15px;color:" + text + ";'>2026</p></div>" +
-          "</div>" +
-          "<div><p style='font-size:17px;color:" + text + ";line-height:1.8;'>Full project description, approach, and results go here. This editorial layout gives the narrative room to breathe alongside the images.</p></div>" +
-        "</div></section>";
-      }
-      // Variant A — dark hero + image grid (current)
-      return "<section style='background:" + ink + ";padding:100px 40px;'>" +
-        "<div style='font-size:12px;color:" + brass + ";text-transform:uppercase;letter-spacing:2px;margin-bottom:24px;'>Portfolio</div>" +
-        "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + warmWhite + ";margin:0 0 16px;line-height:1.1;'>Project Title</h1>" +
-        "<p style='font-size:16px;color:" + warmWhite + ";opacity:.7;'>Client Name · Category · Year</p>" +
-      "</section>" +
-      "<section style='background:" + bone + ";padding:64px 40px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:16px;max-width:1160px;margin:0 auto;'>" +
-        "<div style='background:#e0ddd7;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Project image</div>" +
-        "<div style='background:#e0ddd7;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;color:" + stone + ";'>Project image</div>" +
-      "</div></section>" +
-      "<section style='background:" + bone + ";padding:48px 40px 96px;'><div style='max-width:760px;margin:0 auto;font-size:17px;color:" + text + ";line-height:1.8;'><p>Project description and details go here.</p></div></section>";
-    })(),
+    portfolio: buildPortfolioPreview(brief, variant, inspoContext, colorsObj, patterns),
 
     // ── LOCATION ──
-    location: (function() {
-      if (variant === "B") {
-        // Centered — address first, map below
-        return "<section style='background:" + bone + ";padding:88px 40px;text-align:center;'><div style='max-width:640px;margin:0 auto;'>" +
-          "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Location</div>" +
-          "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 24px;'>Visit us.</h1>" +
-          "<p style='font-size:18px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>123 Main Street, Suite 100</p>" +
-          "<p style='font-size:16px;color:" + stone + ";margin:0 0 32px;'>City, State 00000</p>" +
-          "<div style='display:flex;gap:32px;justify-content:center;flex-wrap:wrap;margin-bottom:48px;'>" +
-            "<div><div style='font-size:12px;font-weight:600;color:" + brassDp + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;'>Phone</div><div style='font-size:15px;color:" + text + ";'>(555) 000-0000</div></div>" +
-            "<div><div style='font-size:12px;font-weight:600;color:" + brassDp + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;'>Email</div><div style='font-size:15px;color:" + text + ";'>hello@brand.com</div></div>" +
-            "<div><div style='font-size:12px;font-weight:600;color:" + brassDp + ";text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;'>Hours</div><div style='font-size:15px;color:" + text + ";'>Mon–Fri 9am–5pm</div></div>" +
-          "</div>" +
-        "</div></section>" +
-        "<section style='background:#e0ddd7;padding:0;'><div style='aspect-ratio:21/9;max-height:360px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:14px;'>Map embed</div></section>";
-      }
-      // Variant A — map left, address right (current)
-      return "<section style='background:" + bone + ";padding:88px 40px;'>" +
-        "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Location</div>" +
-        "<h1 style='font-size:clamp(36px,5vw,56px);font-weight:800;color:" + ink + ";margin:0 0 48px;'>Visit us.</h1>" +
-        "<div style='display:grid;grid-template-columns:1fr 1fr;gap:48px;max-width:1000px;'>" +
-          "<div><div style='background:#e0ddd7;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;margin-bottom:16px;'>Map embed</div></div>" +
-          "<div><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin-bottom:16px;'>Address</h3><p style='font-size:16px;color:" + text + ";line-height:1.7;margin-bottom:24px;'>123 Main Street<br>Suite 100<br>City, State 00000</p><h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin-bottom:16px;'>Hours</h3><p style='font-size:16px;color:" + text + ";line-height:1.7;'>Monday – Friday: 9am – 5pm<br>Saturday – Sunday: Closed</p></div>" +
-        "</div>" +
-      "</section>";
-    })(),
+    location: buildLocationPreview(brief, variant, inspoContext, colorsObj, patterns),
     // ── EVENT SINGLE ──
     "event-single": (function() {
       if (variant === "B") {
