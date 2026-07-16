@@ -889,13 +889,17 @@ Rules:
       // counts, not general brand adjectives. One retry attempt is enough
       // here since it's a single value picked from a small fixed list, not
       // 4 hex values that need to work together.
+      let fontRetryFired = false;
+      let fontRetrySucceeded = false;
       const missingFont = text ? detectMissingRequestedFont(text, verifiedResult.headingFont) : null;
       if (missingFont) {
+        fontRetryFired = true;
         const correctedFont = await retryFontChoice(authHeaders, text, missingFont);
         if (briefRecReqRef.current !== reqId) return;
         if (correctedFont) {
           verifiedResult = { ...verifiedResult, headingFont: correctedFont };
         }
+        fontRetrySucceeded = correctedFont != null;
       }
       // Runs again regardless of whether a retry happened -- silently
       // passes through unchanged if the (possibly corrected) palette/font
@@ -927,7 +931,9 @@ Rules:
           lockedTpl ? false : !!verifiedResult.isCustom,
           lockedTpl ? lockedTpl.id : (verifiedResult.templateId || null),
           colorRetryFired,
-          colorRetrySucceeded
+          colorRetrySucceeded,
+          fontRetryFired,
+          fontRetrySucceeded
         );
       }
       setBriefRec(verifiedResult);
@@ -1984,7 +1990,6 @@ Rules:
                 .map(build => {
                   var colors = build.colors || {};
                   var ink = colors.ink || "#1C1A17";
-                  var brass = colors.brass || "#C2A35B";
                   return (
                     <div key={build.id} style={{ background: "#fff", border: "1px solid #dde0e6", borderRadius: "10px", overflow: "hidden" }}>
                       {/* Color swatch preview */}
@@ -1992,7 +1997,6 @@ Rules:
                         {Object.values(colors).slice(0, 6).map((hex, i) => (
                           <div key={i} title={hex} style={{ width: "20px", height: "20px", borderRadius: "50%", background: hex, border: "1px solid rgba(255,255,255,0.2)", flexShrink: 0 }} />
                         ))}
-                        {brass && <div style={{ width: "28px", height: "4px", background: brass, borderRadius: "2px", alignSelf: "center", marginLeft: "4px" }} />}
                       </div>
                       <div style={{ padding: "16px" }}>
                         <div style={{ fontSize: "15px", fontWeight: 700, color: "#09090b", marginBottom: "2px" }}>{build.client}</div>

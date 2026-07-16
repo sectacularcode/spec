@@ -823,7 +823,10 @@ export default function CustomBuild({ userId, role } = {}) {
   }
 
   async function saveBrandStyle() {
-    if (!brief || !brief.brandName || !brief.colors) return;
+    var hasColors = brief && brief.colors && Object.keys(brief.colors).length > 0;
+    var hasFonts = brief && Array.isArray(brief.fonts) && brief.fonts.some(function (f) { return f; });
+    var hasButtons = brief && Array.isArray(brief.buttons) && brief.buttons.length > 0;
+    if (!brief || !brief.brandName || !(hasColors || hasFonts || hasButtons)) return;
     setStylePanelStatus("Saving...");
     try {
       // brands is shared and keyed by id, not by name the way brand_styles
@@ -1860,7 +1863,9 @@ export default function CustomBuild({ userId, role } = {}) {
                   {brief.brandName && (
                     <div style={{ marginBottom: "14px", position: "relative" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                        {brief.colors && Object.keys(brief.colors).length > 0 && (
+                        {((brief.colors && Object.keys(brief.colors).length > 0)
+                          || (Array.isArray(brief.fonts) && brief.fonts.some(f => f))
+                          || (Array.isArray(brief.buttons) && brief.buttons.length > 0)) && (
                           <button
                             onClick={saveBrandStyle}
                             style={{ padding: "6px 12px", fontSize: "11px", fontWeight: 600, border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", cursor: "pointer" }}>

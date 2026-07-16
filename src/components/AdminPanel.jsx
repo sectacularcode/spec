@@ -634,7 +634,8 @@ export default function AdminPanel({ isAdmin }) {
                     {q.total_count} total
                     {q.custom_count > 0 && <> · {q.custom_count} custom</>}
                     {q.matched_count > 0 && <> · {q.matched_count} matched</>}
-                    {q.color_retry_fired_count > 0 && <> · retry {q.color_retry_succeeded_count}/{q.color_retry_fired_count}</>}
+                    {q.color_retry_fired_count > 0 && <> · color retry {q.color_retry_succeeded_count}/{q.color_retry_fired_count}</>}
+                    {q.font_retry_fired_count > 0 && <> · font retry {q.font_retry_succeeded_count}/{q.font_retry_fired_count}</>}
                     {" "}· {new Date(q.last_seen).toLocaleDateString()}
                   </div>
                 </div>
