@@ -1277,6 +1277,15 @@ export default function CustomBuild({ userId, role } = {}) {
         onConfirm={() => {
           setCustomPages(prev => prev.filter(cp => cp.id !== confirmPageRemoveId));
           setPages(prev => prev.filter(pid => pid !== confirmPageRemoveId));
+          // Also clear it from the live preview -- generated.pages is what the
+          // preview strip actually renders from, not selectedPages, so without
+          // this the removed page kept showing (and stayed clickable) until
+          // something unrelated happened to trigger a full regenerate.
+          if (generated) {
+            const remaining = generated.pages.filter(pg => pg.id !== confirmPageRemoveId);
+            setGenerated(prev => ({ ...prev, pages: remaining }));
+            if (previewPage === confirmPageRemoveId) setPreviewPage(remaining[0]?.id || "home");
+          }
           setConfirmPageRemoveId(null);
         }}
         onCancel={() => setConfirmPageRemoveId(null)}
@@ -2196,12 +2205,40 @@ export default function CustomBuild({ userId, role } = {}) {
               <span style={{ fontSize: "12px", color: "#6b7280", fontWeight: 600, marginRight: "4px" }}>PREVIEW</span>
               {generated.pages.map(p => {
                 const cleanLabel = (p.label || p.id).replace(/-\d{5,}$/, "").replace(/(^|-)(.)/g, (_, s, c) => (s ? " " : "") + c.toUpperCase());
+                const isActive = previewPage === p.id;
+                // Custom-page instances (added via Pages to Build's dropdown --
+                // id like "location-1718982345678") carry their own saved
+                // configuration in customPages, so removing one deletes real
+                // data and goes through the existing confirm dialog. Plain
+                // pages (bare id, no customPages entry) are just a selection
+                // toggle -- same as unchecking them in Pages to Build -- so
+                // they remove immediately, no confirmation needed, and can
+                // always be re-added via + Add Page.
+                const isCustomInstance = !!customPages.find(cp => cp.id === p.id);
+                const canRemove = generated.pages.length > 1;
                 return (
-                <button key={p.id}
-                  onClick={() => setPreviewPage(p.id)}
-                  style={{ padding: "6px 14px", fontSize: "13px", fontWeight: 500, cursor: "pointer", border: previewPage === p.id ? "1px solid #3f3f46" : "1px solid #dde0e6", borderRadius: "20px", background: previewPage === p.id ? "#3f3f46" : "#fff", color: previewPage === p.id ? "#fff" : "#09090b" }}>
-                  {cleanLabel}
-                </button>);
+                <div key={p.id} style={{ display: "flex", alignItems: "stretch", border: isActive ? "1px solid #3f3f46" : "1px solid #dde0e6", borderRadius: "20px", background: isActive ? "#3f3f46" : "#fff", overflow: "hidden" }}>
+                  <button
+                    onClick={() => setPreviewPage(p.id)}
+                    style={{ padding: canRemove ? "6px 4px 6px 14px" : "6px 14px", fontSize: "13px", fontWeight: 500, cursor: "pointer", border: "none", background: "transparent", color: isActive ? "#fff" : "#09090b" }}>
+                    {cleanLabel}
+                  </button>
+                  {canRemove && (
+                    <button
+                      onClick={e => {
+                        e.stopPropagation();
+                        if (isCustomInstance) { setConfirmPageRemoveId(p.id); return; }
+                        const remaining = generated.pages.filter(pg => pg.id !== p.id);
+                        setPages(prevSel => prevSel.filter(pid => pid !== p.id));
+                        setGenerated(prevGen => ({ ...prevGen, pages: remaining }));
+                        if (isActive) setPreviewPage(remaining[0]?.id || "home");
+                      }}
+                      title={isCustomInstance ? "Remove this page and its configuration" : "Remove from this build"}
+                      style={{ padding: "6px 12px 6px 4px", fontSize: "14px", lineHeight: 1, cursor: "pointer", border: "none", background: "transparent", color: isActive ? "rgba(255,255,255,0.65)" : "#9ca3af" }}>
+                      ×
+                    </button>
+                  )}
+                </div>);
               })}
               <div style={{ position: "relative" }}>
                 <button onClick={() => setShowAddPagePreview(!showAddPagePreview)} style={{ padding: "6px 14px", fontSize: "12px", fontWeight: 500, cursor: "pointer", border: "1px dashed #dde0e6", borderRadius: "20px", background: "#fff", color: "#6b7280" }}>+ Add Page</button>
