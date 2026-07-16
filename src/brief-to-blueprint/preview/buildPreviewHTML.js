@@ -29,9 +29,16 @@ import { buildDownloadsPreview } from "./pages/downloadsPreview.js";
 // The variant param ("A" or "B") controls which layout variant is shown.
 //
 // To add a new page preview:
-//   1. Add a section key to the sections object below
-//   2. Add a pattern override in the override block at the top
-//   3. If the page needs A/B, ensure generatePages.js returns hasVariants: true
+//   1. Create preview/pages/xPreview.js exporting buildXPreview(brief,
+//      variant, inspoContext, colors, patterns) -- follow any existing
+//      file in preview/pages/ for the pattern (colors is the resolved
+//      8-key palette object, not brief.colors directly).
+//   2. Import it above and add `x: function() { return buildXPreview(...); },`
+//      to the sections object below -- keep it wrapped in a function so it
+//      stays lazy (only the active page's builder actually runs per render).
+//   3. Add a pattern override in the override block above the sections
+//      object, if the page needs one.
+//   4. If the page needs A/B, ensure generatePages.js returns hasVariants: true.
 
 // he() is imported separately but re-exported for backward compat with any
 // callers that may import it from here
