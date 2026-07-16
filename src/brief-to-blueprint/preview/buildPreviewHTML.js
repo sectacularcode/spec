@@ -161,89 +161,89 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
   var colorsObj = { ink: ink, brass: brass, bone: bone, warmWhite: warmWhite, stone: stone, brassDp: brassDp, asphalt: asphalt, text: text };
 
   var sections = {
-    home: buildHomePreview(brief, variant, inspoContext, colorsObj, patterns),
+    home: function() { return buildHomePreview(brief, variant, inspoContext, colorsObj, patterns); },
 
-    work: buildWorkPreview(brief, variant, inspoContext, colorsObj, patterns),
+    work: function() { return buildWorkPreview(brief, variant, inspoContext, colorsObj, patterns); },
 
-    services: buildServicesPreview(brief, variant, inspoContext, colorsObj, patterns),
-    about: buildAboutPreview(brief, variant, inspoContext, colorsObj, patterns),
+    services: function() { return buildServicesPreview(brief, variant, inspoContext, colorsObj, patterns); },
+    about: function() { return buildAboutPreview(brief, variant, inspoContext, colorsObj, patterns); },
 
-    process: buildProcessPreview(brief, variant, inspoContext, colorsObj, patterns),
+    process: function() { return buildProcessPreview(brief, variant, inspoContext, colorsObj, patterns); },
 
-    contact: buildContactPreview(brief, variant, inspoContext, colorsObj, patterns),
+    contact: function() { return buildContactPreview(brief, variant, inspoContext, colorsObj, patterns); },
 
-    landing: buildLandingPreview(brief, variant, inspoContext, colorsObj),
+    landing: function() { return buildLandingPreview(brief, variant, inspoContext, colorsObj); },
 
     // ── TEAM ──
-    team: buildTeamPreview(brief, variant, inspoContext, colorsObj, patterns),
+    team: function() { return buildTeamPreview(brief, variant, inspoContext, colorsObj, patterns); },
 
     // ── BLOG ──
-    blog: buildBlogPreview(brief, variant, inspoContext, colorsObj, patterns),
+    blog: function() { return buildBlogPreview(brief, variant, inspoContext, colorsObj, patterns); },
 
-    "blog-post": buildBlogPostPreview(brief, variant, inspoContext, colorsObj, patterns),
+    "blog-post": function() { return buildBlogPostPreview(brief, variant, inspoContext, colorsObj, patterns); },
 
     // ── FAQ ──
-    faq: buildFaqPreview(brief, variant, inspoContext, colorsObj, patterns),
+    faq: function() { return buildFaqPreview(brief, variant, inspoContext, colorsObj, patterns); },
 
-    pricing: buildPricingPreview(brief, variant, inspoContext, colorsObj, patterns),
+    pricing: function() { return buildPricingPreview(brief, variant, inspoContext, colorsObj, patterns); },
 
-    testimonials: buildTestimonialsPreview(brief, variant, inspoContext, colorsObj, patterns),
+    testimonials: function() { return buildTestimonialsPreview(brief, variant, inspoContext, colorsObj, patterns); },
 
     // ── EVENTS ──
-    events: buildEventsPreview(brief, variant, inspoContext, colorsObj, patterns),
+    events: function() { return buildEventsPreview(brief, variant, inspoContext, colorsObj, patterns); },
 
     // ── CAREERS ──
-    careers: buildCareersPreview(brief, variant, inspoContext, colorsObj, patterns),
+    careers: function() { return buildCareersPreview(brief, variant, inspoContext, colorsObj, patterns); },
 
     // ── CASE STUDY ──
-    "case-study": buildCaseStudyPreview(brief, variant, inspoContext, colorsObj, patterns),
+    "case-study": function() { return buildCaseStudyPreview(brief, variant, inspoContext, colorsObj, patterns); },
 
     // ── THANK YOU ──
-    "thank-you": "<section style='background:" + bone + ";min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;'>" +
+    "thank-you": function() { return "<section style='background:" + bone + ";min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;'>" +
       "<div style='font-size:48px;margin-bottom:24px;'>✓</div>" +
       "<h1 style='font-size:clamp(32px,5vw,48px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>Thank you.</h1>" +
       "<p style='font-size:18px;color:" + text + ";max-width:480px;margin:0 auto 32px;line-height:1.7;'>Your message has been received. We will get back to you within one business day.</p>" +
       "<a href='/' style='font-size:14px;color:" + brassDp + ";text-decoration:underline;'>← Back to homepage</a>" +
-    "</section>",
+    "</section>"; },
 
     // ── PRIVACY / TERMS ──
-    privacy: "<section style='background:" + bone + ";padding:80px 40px;'><div style='max-width:760px;margin:0 auto;'>" +
+    privacy: function() { return "<section style='background:" + bone + ";padding:80px 40px;'><div style='max-width:760px;margin:0 auto;'>" +
       "<h1 style='font-size:clamp(28px,4vw,40px);font-weight:800;color:" + ink + ";margin:0 0 32px;'>Privacy Policy</h1>" +
       "<div style='font-size:16px;color:" + text + ";line-height:1.8;'><p style='margin-bottom:20px;'>Last updated: [Date]</p><h2 style='font-size:20px;font-weight:700;color:" + ink + ";margin:32px 0 12px;'>Information We Collect</h2><p style='margin-bottom:20px;'>Placeholder for your privacy policy content.</p><h2 style='font-size:20px;font-weight:700;color:" + ink + ";margin:32px 0 12px;'>How We Use Your Information</h2><p style='margin-bottom:20px;'>Placeholder for usage details.</p><h2 style='font-size:20px;font-weight:700;color:" + ink + ";margin:32px 0 12px;'>Contact</h2><p>For questions about this policy, contact us at [email].</p></div>" +
-    "</div></section>",
+    "</div></section>"; },
 
-    terms: "<section style='background:" + bone + ";padding:80px 40px;'><div style='max-width:760px;margin:0 auto;'>" +
+    terms: function() { return "<section style='background:" + bone + ";padding:80px 40px;'><div style='max-width:760px;margin:0 auto;'>" +
       "<h1 style='font-size:clamp(28px,4vw,40px);font-weight:800;color:" + ink + ";margin:0 0 32px;'>Terms of Service</h1>" +
       "<div style='font-size:16px;color:" + text + ";line-height:1.8;'><p style='margin-bottom:20px;'>Last updated: [Date]</p><h2 style='font-size:20px;font-weight:700;color:" + ink + ";margin:32px 0 12px;'>Agreement to Terms</h2><p style='margin-bottom:20px;'>By accessing this website, you agree to these terms.</p><h2 style='font-size:20px;font-weight:700;color:" + ink + ";margin:32px 0 12px;'>Services</h2><p style='margin-bottom:20px;'>Description of services provided.</p><h2 style='font-size:20px;font-weight:700;color:" + ink + ";margin:32px 0 12px;'>Limitation of Liability</h2><p>Standard limitation clause placeholder.</p></div>" +
-    "</div></section>",
+    "</div></section>"; },
 
     // ── PORTFOLIO SINGLE ──
-    portfolio: buildPortfolioPreview(brief, variant, inspoContext, colorsObj, patterns),
+    portfolio: function() { return buildPortfolioPreview(brief, variant, inspoContext, colorsObj, patterns); },
 
     // ── LOCATION ──
-    location: buildLocationPreview(brief, variant, inspoContext, colorsObj, patterns),
+    location: function() { return buildLocationPreview(brief, variant, inspoContext, colorsObj, patterns); },
     // ── EVENT SINGLE ──
-    "event-single": buildEventSinglePreview(brief, variant, inspoContext, colorsObj, patterns),
+    "event-single": function() { return buildEventSinglePreview(brief, variant, inspoContext, colorsObj, patterns); },
 
     // ── PRESS / MEDIA ──
-    press: buildPressPreview(brief, variant, inspoContext, colorsObj, patterns),
+    press: function() { return buildPressPreview(brief, variant, inspoContext, colorsObj, patterns); },
 
     // ── PARTNERS ──
-    partners: buildPartnersPreview(brief, variant, inspoContext, colorsObj, patterns),
+    partners: function() { return buildPartnersPreview(brief, variant, inspoContext, colorsObj, patterns); },
 
     // ── RESOURCES ──
-    resources: buildResourcesPreview(brief, variant, inspoContext, colorsObj, patterns),
+    resources: function() { return buildResourcesPreview(brief, variant, inspoContext, colorsObj, patterns); },
 
     // ── DOWNLOADS ──
-    downloads: buildDownloadsPreview(brief, variant, inspoContext, colorsObj, patterns),
+    downloads: function() { return buildDownloadsPreview(brief, variant, inspoContext, colorsObj, patterns); },
 
     // ── 404 ──
-    "404": "<section style='background:" + bone + ";min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;'>" +
+    "404": function() { return "<section style='background:" + bone + ";min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;'>" +
       "<div style='font-size:clamp(80px,15vw,160px);font-weight:800;color:" + brass + ";line-height:1;margin-bottom:16px;'>404</div>" +
       "<h1 style='font-size:clamp(24px,4vw,36px);font-weight:800;color:" + ink + ";margin:0 0 16px;'>Page not found</h1>" +
       "<p style='font-size:17px;color:" + text + ";max-width:400px;margin:0 auto 32px;line-height:1.7;'>The page you are looking for does not exist or has been moved.</p>" +
       "<a style='padding:14px 32px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>Back to homepage</a>" +
-    "</section>",
+    "</section>"; },
 
   };
 
@@ -254,11 +254,17 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
   // fallback attempt to sections.home, showing the wrong preview entirely
   // for what's now the default page type on every Manifest import.
   if (ap === "other" || ap.indexOf("other-") === 0) ap = "landing";
-  var body = sections[ap] 
+  // Lazy dispatch -- sections' values are all zero-arg functions now, not
+  // pre-built strings, so only the one page actually shown gets built
+  // (previously every section was built on every render, then 21+ of the
+  // 23 results were thrown away unused). Verified byte-for-byte identical
+  // output to the eager version before shipping.
+  var resolvedSection = sections[ap] 
     || sections[ap.replace(/-\d+$/, "")] 
     || sections[ap.split("-")[0]]
     || sections[ap.replace(/[^a-z]/g, "")]
     || sections.home;
+  var body = resolvedSection();
 
   var navItems = (brief.pages || ["Home","About","Services","Contact"]).map(function(p) { return typeof p === "string" ? p : (p.label || p.name || p); }).slice(0,6);
 
