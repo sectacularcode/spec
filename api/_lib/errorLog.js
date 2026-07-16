@@ -13,7 +13,7 @@
 // prod -- see api/brand-styles.js's history for exactly why that's not a
 // safe assumption to make.
 
-import { sql } from "@vercel/postgres";
+import { sql } from "./db.js";
 
 const MAX_MESSAGE_LEN = 2000; // hygiene cap -- a pathological error shouldn't grow this table unbounded
 

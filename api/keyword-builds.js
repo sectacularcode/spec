@@ -11,7 +11,7 @@ import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { validId, validText, validJsonSize } from "./_lib/validate.js";
 import { logError } from "./_lib/errorLog.js";
-import { sql } from "@vercel/postgres";
+import { sql } from "./_lib/db.js";
 
 const CAP = 50;
 

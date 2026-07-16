@@ -35,7 +35,7 @@ import {
   sanitizeColors, sanitizeFonts, sanitizeButtons, sanitizeSectionLayout,
 } from "./_lib/brandValidation.js";
 import { clerkGetUsers } from "./_lib/clerkUsers.js";
-import { sql } from "@vercel/postgres";
+import { sql } from "./_lib/db.js";
 
 // Resolves created_by/updated_by on a batch of rows to real display names
 // in one shot -- a single batched Clerk call regardless of how many rows

@@ -27,7 +27,7 @@
 // actually fixes it -- the exact gap color retry logging was built to
 // close, just left unclosed for the font version.
 
-import { sql } from "@vercel/postgres";
+import { sql } from "./db.js";
 
 const MAX_QUERY_LEN = 500; // matches validText()'s existing default cap elsewhere
 

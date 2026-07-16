@@ -11,7 +11,7 @@ import { requireAuth, getProfile, ensureProfilesTable } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { logError } from "./_lib/errorLog.js";
 import { clerkGetUsers } from "./_lib/clerkUsers.js";
-import { sql } from "@vercel/postgres";
+import { sql } from "./_lib/db.js";
 
 
 export default async function handler(req, res) {

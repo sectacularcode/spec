@@ -15,7 +15,7 @@ import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { validText, validId } from "./_lib/validate.js";
 import { logTemplateQuery, ensureTemplateQueryLogTable } from "./_lib/templateQueryLog.js";
 import { logError } from "./_lib/errorLog.js";
-import { sql } from "@vercel/postgres";
+import { sql } from "./_lib/db.js";
 
 const VALID_SOURCES = ["describe_site", "describe_site_locked", "keywords_modal"];
 

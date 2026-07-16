@@ -8,7 +8,7 @@
 import { requireAuth, getProfile } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { logError } from "./_lib/errorLog.js";
-import { sql } from "@vercel/postgres";
+import { sql } from "./_lib/db.js";
 
 // Self-healing, matching db/schema.sql's usage_limits definition exactly.
 // Exported so api/usage-summary.js (which reads this table without owning

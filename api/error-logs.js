@@ -8,7 +8,7 @@
 import { requireAuth, getProfile } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { ensureErrorLogTable } from "./_lib/errorLog.js";
-import { sql } from "@vercel/postgres";
+import { sql } from "./_lib/db.js";
 
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();

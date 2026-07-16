@@ -5,7 +5,7 @@
 // Reporting-only. Nothing here blocks a request — see api/usage-limits.js
 // and db/schema.sql for the enforcement note for when that's turned on.
 
-import { sql } from "@vercel/postgres";
+import { sql } from "./db.js";
 
 // $ per million tokens (input/output). Update here when Anthropic changes
 // pricing — cost_cents is computed and stored at write time, so historical

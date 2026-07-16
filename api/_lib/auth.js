@@ -3,7 +3,7 @@
 // Never trusts client-supplied user IDs.
 
 import { verifyToken } from "@clerk/backend";
-import { sql } from "@vercel/postgres";
+import { sql } from "./db.js";
 import { logError } from "./errorLog.js";
 
 // Returns the verified Clerk user ID, or null if the request is not authenticated.

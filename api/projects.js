@@ -21,7 +21,7 @@
 import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { logError } from "./_lib/errorLog.js";
-import { sql } from "@vercel/postgres";
+import { sql } from "./_lib/db.js";
 
 const MAX_ID_LENGTH = 64;
 const MAX_VALUE_BYTES = 1024 * 1024; // 1MB per project, matching api/storage.js

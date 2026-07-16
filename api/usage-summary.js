@@ -8,7 +8,7 @@ import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { logError } from "./_lib/errorLog.js";
 import { ensureApiUsageTable } from "./_lib/usage.js";
 import { ensureUsageLimitsTable } from "./usage-limits.js";
-import { sql } from "@vercel/postgres";
+import { sql } from "./_lib/db.js";
 
 const CLERK_SECRET = process.env.CLERK_SECRET_KEY;
 

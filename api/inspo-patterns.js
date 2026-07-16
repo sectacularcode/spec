@@ -15,7 +15,7 @@ import { requireAuth } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { validJsonSize } from "./_lib/validate.js";
 import { logError } from "./_lib/errorLog.js";
-import { sql } from "@vercel/postgres";
+import { sql } from "./_lib/db.js";
 
 // Self-healing, matching db/schema.sql's inspo_patterns definition exactly.
 async function ensureTable() {
@@ -49,14 +49,13 @@ export default async function handler(req, res) {
       if (typeof pool !== "string" || !validJsonSize({ pool })) {
         return res.status(400).json({ error: "Invalid pool" });
       }
-      // `pool` is a plain string, not an object — @vercel/postgres only
-      // auto-JSON-encodes objects for JSONB columns (confirmed in the
-      // installed driver source: strings take a raw .toString() path, not
-      // the JSON.stringify path), so a bare string here would fail
-      // Postgres's jsonb cast for any value that isn't already valid JSON
-      // syntax. Explicitly encode it so it round-trips as a JSON string
-      // scalar — the driver still auto-parses it back to a plain JS string
-      // on read, so the GET path needs no corresponding change.
+      // `pool` is a plain string, not an object — explicitly JSON-encode it
+      // with an explicit ::jsonb cast so it round-trips as a JSON string
+      // scalar regardless of driver-specific auto-encoding rules (this
+      // predates the Neon SDK migration and stays correct after it: the
+      // ::jsonb cast is SQL-level, and Neon's driver was verified to parse
+      // a jsonb string scalar back to a plain JS string on read, same as
+      // @vercel/postgres did — so the GET path needs no change).
       await sql`
         INSERT INTO inspo_patterns (user_id, pool, updated_at)
         VALUES (${userId}, ${JSON.stringify(pool)}::jsonb, now())
