@@ -13,8 +13,30 @@
 // the name as a static label instead of an editable input. Any button
 // beyond the first two stays fully free-form (name, add, remove) exactly
 // as before.
+//
+// Caption + outline preview (new): confirmed real gap -- Secondary never
+// renders as a filled button anywhere in the actual pages (landing.js/
+// landingPreview.js always draw it as an outline/transparent button, only
+// ever paired next to Primary, never alone), but this editor's preview
+// swatch showed it filled, same as Primary. Someone picking Secondary's
+// color saw something that didn't match what actually ships. Fixed by
+// rendering the real outline style specifically for the locked Secondary
+// slot, plus a one-line caption under both locked names saying where each
+// one actually shows up. Free-form buttons beyond the first two aren't
+// looked up by name anywhere yet (confirmed -- only "primary"/"secondary"
+// are read), so they keep the generic filled preview and no caption
+// rather than claiming a render behavior that doesn't exist yet.
+
+const LOCKED_CAPTIONS = {
+  primary: "Filled button — hero, forms, closing CTA",
+  secondary: "Outline button — always paired next to Primary",
+};
 
 export default function ButtonEditor({ button, onChange, onRemove, locked }) {
+  const roleKey = (button.name || "").trim().toLowerCase();
+  const isSecondary = locked && roleKey === "secondary";
+  const caption = locked ? LOCKED_CAPTIONS[roleKey] : null;
+
   return (
     <div style={{ position: "relative", border: "1px solid #DDE0E6", borderRadius: "8px", padding: "16px" }}>
       {!locked && (
@@ -36,7 +58,7 @@ export default function ButtonEditor({ button, onChange, onRemove, locked }) {
       {locked ? (
         <p style={{
           fontFamily: "'Be Vietnam Pro', sans-serif", fontSize: "11px", fontWeight: 600, textTransform: "uppercase",
-          letterSpacing: "0.05em", color: "#6B7280", margin: "0 0 14px", paddingBottom: "6px", borderBottom: "1px solid #DDE0E6",
+          letterSpacing: "0.05em", color: "#6B7280", margin: "0 0 2px", paddingBottom: caption ? "0" : "6px", borderBottom: caption ? "none" : "1px solid #DDE0E6",
         }}>
           {button.name}
         </p>
@@ -53,12 +75,32 @@ export default function ButtonEditor({ button, onChange, onRemove, locked }) {
         />
       )}
 
+      {caption && (
+        <p style={{
+          fontSize: "10px", color: "#9CA3AF", margin: "0 0 12px", paddingBottom: "6px",
+          borderBottom: "1px solid #DDE0E6", lineHeight: 1.4,
+        }}>
+          {caption}
+        </p>
+      )}
+
       <div style={{ display: "flex", justifyContent: "center", padding: "18px 12px", background: "#F5F5F5", borderRadius: "6px", marginBottom: "14px" }}>
-        <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: button.background || "#333" }}>
-          <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: "13px", color: button.textColor || "#fff", letterSpacing: "0.02em" }}>
-            Call to action
-          </span>
-        </div>
+        {isSecondary ? (
+          <div style={{
+            display: "inline-block", padding: "9px 20px", borderRadius: "4px", background: "transparent",
+            border: "2px solid " + (button.background || "#333"),
+          }}>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: "13px", color: button.background || "#333", letterSpacing: "0.02em" }}>
+              Call to action
+            </span>
+          </div>
+        ) : (
+          <div style={{ display: "inline-block", padding: "11px 22px", borderRadius: "4px", background: button.background || "#333" }}>
+            <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: "13px", color: button.textColor || "#fff", letterSpacing: "0.02em" }}>
+              Call to action
+            </span>
+          </div>
+        )}
       </div>
 
       <div style={{ display: "flex", gap: "10px" }}>
