@@ -31,9 +31,9 @@ export default function SocialTab({ ctx }) {
                   </div>
                 ))}
                 <div style={{ display: "grid", gap: "8px", marginTop: "10px" }}>
-                  <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInNav} onChange={e => updBrand("showSocialInNav", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Show icons in top navigation</label>
-                  <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInPage} onChange={e => updBrand("showSocialInPage", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Show as a section while scrolling (requires "Social" section enabled)</label>
-                  <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInFooter} onChange={e => updBrand("showSocialInFooter", e.target.checked)} style={{ accentColor: "#6b635c" }} /> Show in footer</label>
+                  <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInNav} onChange={e => updBrand("showSocialInNav", e.target.checked)} style={{ accentColor: "#b45309" }} /> Show icons in top navigation</label>
+                  <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInPage} onChange={e => updBrand("showSocialInPage", e.target.checked)} style={{ accentColor: "#b45309" }} /> Show as a section while scrolling (requires "Social" section enabled)</label>
+                  <label style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "13px", color: "#09090b" }}><input type="checkbox" checked={brand.showSocialInFooter} onChange={e => updBrand("showSocialInFooter", e.target.checked)} style={{ accentColor: "#b45309" }} /> Show in footer</label>
                 </div>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "16px", paddingLeft: "24px", borderLeft: "1px solid #dde0e6", marginTop: "-4px" }}>
