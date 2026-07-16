@@ -1948,7 +1948,7 @@ Rules:
 
         {/* Blueprint Library — builds saved from Brief to Blueprint */}
         {savedBuilds.length > 0 && (
-          <div style={{ marginTop: "40px" }}>
+          <div style={{ marginTop: "40px", marginBottom: "40px" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
               <div>
                 <div style={{ fontSize: "20px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>Blueprint Library</div>
@@ -2035,7 +2035,7 @@ Rules:
                                 }, i * 300);
                               });
                             }}
-                            style={{ flex: 1, padding: "9px 0", fontSize: "12px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", whiteSpace: "nowrap" }}>
+                            style={{ flex: 1, padding: "9px 12px", fontSize: "12px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", whiteSpace: "nowrap" }}>
                             Download
                           </button>
                           <button
