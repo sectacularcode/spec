@@ -627,18 +627,19 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     ], sectionBg, { padY: "80", center: true });
   }
 
-  // Optional FAQ section — accordion widget, staged with generic placeholder
-  // Q&As until real content lands in the brief (brief.faqItems: array of
-  // {question, answer}). Sits at the very bottom of the page, after the
-  // closing CTA.
+  // Optional FAQ section — accordion widget. Only renders with real content
+  // (brief.faqItems: array of {question, answer}) -- previously fell back to
+  // fabricated placeholder Q&As when empty, the same class of bug already
+  // fixed for trust stats and the services checklist. No real content here
+  // should mean the section doesn't render, not that it renders with
+  // invented filler. skipFaqSection is a manual override for hiding it even
+  // when real content exists, matching skipTrustStats/skipServicesChecklist.
   function makeFaqSection() {
-    var faqItems = Array.isArray(brief.faqItems) && brief.faqItems.length ? brief.faqItems : [
-      { question: "[FAQ question one]",   answer: "[Answer, in brand voice]" },
-      { question: "[FAQ question two]",   answer: "[Answer, in brand voice]" },
-      { question: "[FAQ question three]", answer: "[Answer, in brand voice]" },
-      { question: "[FAQ question four]",  answer: "[Answer, in brand voice]" },
-      { question: "[FAQ question five]",  answer: "[Answer, in brand voice]" },
-    ];
+    if (brief.skipFaqSection) return null;
+    var faqItems = Array.isArray(brief.faqItems)
+      ? brief.faqItems.filter(function (item) { return item && String(item.question || "").trim() && String(item.answer || "").trim(); })
+      : [];
+    if (!faqItems.length) return null;
     return mkContainer([
       mkHeading(brief.faqHeading || "Frequently Asked Questions", accent, "h2", { weight: 800, px: 36 }),
       mkSpacer(28),

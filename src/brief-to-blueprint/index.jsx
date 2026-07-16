@@ -626,7 +626,10 @@ export default function CustomBuild({ userId, role } = {}) {
     });
     for (var i = 0; i < featureCount; i++) { if (!seen[i]) valid = false; }
     if (valid) {
-      entries.sort(function(a, c) { return (a.indices[0] || 0) - (c.indices[0] || 0); });
+      entries.sort(function(a, c) {
+        if (a.postClosing !== c.postClosing) return a.postClosing ? 1 : -1;
+        return (a.indices[0] || 0) - (c.indices[0] || 0);
+      });
       return entries;
     }
     var rows = [];
@@ -701,7 +704,7 @@ export default function CustomBuild({ userId, role } = {}) {
       newRows = rows.slice(0, rowIdx)
         .concat(row.indices.map(function(i) { return { indices: [i], style: defaultRowStyle(i, hasVideo), header: "", postClosing: row.postClosing }; }))
         .concat(rows.slice(rowIdx + 1));
-    } else if (next && next.indices.length === 1) {
+    } else if (next && next.indices.length === 1 && next.postClosing === row.postClosing) {
       var merged = { indices: row.indices.concat(next.indices), style: "grouped-header", header: "", postClosing: row.postClosing };
       newRows = rows.slice(0, rowIdx).concat([merged]).concat(rows.slice(rowIdx + 2));
     } else {
@@ -718,6 +721,12 @@ export default function CustomBuild({ userId, role } = {}) {
 
   function toggleSkipTrustStats(checked) {
     var updatedBrief = { ...brief, skipTrustStats: checked };
+    setBrief(updatedBrief);
+    regenerateActivePage(updatedBrief);
+  }
+
+  function toggleSkipFaqSection(checked) {
+    var updatedBrief = { ...brief, skipFaqSection: checked };
     setBrief(updatedBrief);
     regenerateActivePage(updatedBrief);
   }
@@ -1549,10 +1558,14 @@ export default function CustomBuild({ userId, role } = {}) {
                   <input type="checkbox" checked={!!brief.skipTrustStats} onChange={e => toggleSkipTrustStats(e.target.checked)} style={{ cursor: "pointer" }} />
                   Hide the trust stats (years/projects/satisfaction)
                 </label>
+                <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
+                  <input type="checkbox" checked={!!brief.skipFaqSection} onChange={e => toggleSkipFaqSection(e.target.checked)} style={{ cursor: "pointer" }} />
+                  Hide the FAQ section
+                </label>
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   {rows.map((row, rowIdx) => {
                     const isGrouped = row.indices.length > 1;
-                    const canGroupNext = rowIdx < rows.length - 1 && rows[rowIdx + 1].indices.length === 1;
+                    const canGroupNext = rowIdx < rows.length - 1 && rows[rowIdx + 1].indices.length === 1 && rows[rowIdx + 1].postClosing === row.postClosing;
                     return (
                       <div key={rowIdx} style={{ padding: "10px 12px", borderRadius: "6px", border: "1px solid #dde0e6", background: "#ffffff", display: "flex", flexDirection: "column", gap: "8px" }}>
                         <div style={{ fontSize: "12px", fontWeight: 700, color: "#09090b" }}>

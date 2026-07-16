@@ -340,20 +340,17 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
       var whyUsIntro = brief.whyUsIntro || "Add 1–2 sentences on why this business is the right choice.";
       var wb1 = brief.benefit1 || "Key benefit one";
       var wb2 = brief.benefit2 || "Key benefit two";
-      var faqItemsList = Array.isArray(brief.faqItems) && brief.faqItems.length ? brief.faqItems : [
-        { question: "FAQ question one",   answer: "Answer, in brand voice." },
-        { question: "FAQ question two",   answer: "Answer, in brand voice." },
-        { question: "FAQ question three", answer: "Answer, in brand voice." },
-        { question: "FAQ question four",  answer: "Answer, in brand voice." },
-        { question: "FAQ question five",  answer: "Answer, in brand voice." },
-      ];
+      var faqItemsReal = Array.isArray(brief.faqItems)
+        ? brief.faqItems.filter(function(f) { return f && String(f.question || "").trim() && String(f.answer || "").trim(); })
+        : [];
       // Plain, dependency-free open/close: a checkbox-driven CSS accordion
       // (no JS needed for the preview) so the interaction is visible without
       // wiring up click handlers just for this static HTML preview.
-      var faqHTML = "<section style='background:#ffffff;padding:80px clamp(24px,6vw,80px);'>" +
+      var faqHTML = (brief.skipFaqSection || !faqItemsReal.length) ? "" : (
+        "<section style='background:#ffffff;padding:80px clamp(24px,6vw,80px);'>" +
           "<div style='max-width:1140px;margin:0 auto;'>" +
             "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + brass + ";margin:0 0 28px;'>" + (brief.faqHeading || "Frequently Asked Questions") + "</h2>" +
-            faqItemsList.map(function(f, i) {
+            faqItemsReal.map(function(f, i) {
               var cbId = "faq-cb-" + i;
               return "<div class='faq-item' style='border:1px solid #dde0e6;border-top:none;'>" +
                 "<input type='checkbox' id='" + cbId + "' class='faq-toggle' style='display:none;'" + (i === 0 ? " checked" : "") + "/>" +
@@ -365,7 +362,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             }).join("") +
             "<style>.faq-icon::before{content:'+';}.faq-toggle:checked ~ label .faq-icon::before{content:'\u2212';}.faq-toggle:checked ~ label{color:" + brass + " !important;}.faq-toggle:checked + label + .faq-answer{display:block !important;}.faq-item:first-child{border-top:1px solid #dde0e6;}</style>" +
           "</div>" +
-        "</section>";
+        "</section>"
+      );
       var svcs  = Array.isArray(brief.servicesList) ? brief.servicesList : ["Reduced overall cost", "Reduced downtime", "Proactive planning", "Expert team", "Fast response time", "Tailored reporting", "Direct billing", "Add more below..."];
       var b1    = brief.benefit1 || "Faster results with less hassle";
       var b2    = brief.benefit2 || "One team handles everything end to end";
