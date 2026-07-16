@@ -1540,7 +1540,7 @@ export default function CustomBuild({ userId, role } = {}) {
                   Hero Eyebrow
                 </div>
                 <div style={T.surface}>
-                  <div style={{ fontSize: "12px", color: "#9ca3af", marginBottom: "10px", lineHeight: 1.5 }}>
+                  <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "10px", lineHeight: 1.5 }}>
                     Small label above the hero headline. Leave blank to show the brand name (today's default).
                   </div>
                   <input
@@ -1576,12 +1576,12 @@ export default function CustomBuild({ userId, role } = {}) {
                   Location Details
                 </div>
                 <div style={T.surface}>
-                  <div style={{ fontSize: "12px", color: "#9ca3af", marginBottom: "10px", lineHeight: 1.5 }}>
+                  <div style={{ fontSize: "12px", color: "#b45309", marginBottom: "10px", lineHeight: 1.5 }}>
                     Only needed if Manifest didn't send an address for this page. Powers the map on Variant F (Location).
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                     <div>
-                      <label style={{ display: "block", fontSize: "12px", color: "#6b7280", marginBottom: "5px" }}>Address</label>
+                      <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#b45309", marginBottom: "5px" }}>Address</label>
                       <input
                         type="text"
                         value={brief.mapAddress || ""}
@@ -1592,7 +1592,7 @@ export default function CustomBuild({ userId, role } = {}) {
                       />
                     </div>
                     <div>
-                      <label style={{ display: "block", fontSize: "12px", color: "#6b7280", marginBottom: "5px" }}>City (for the page title, e.g. "Brand — City — Landing Page (Location)")</label>
+                      <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#b45309", marginBottom: "5px" }}>City (for the page title, e.g. "Brand — City — Landing Page (Location)")</label>
                       <input
                         type="text"
                         value={brief.mapCity || ""}
@@ -1624,78 +1624,80 @@ export default function CustomBuild({ userId, role } = {}) {
             };
             return (
               <div style={{ marginBottom: "32px" }}>
-                <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
+                <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>
                   Section Styles
                 </div>
-                <div style={{ fontSize: "12px", color: "#9ca3af", marginBottom: "10px", lineHeight: 1.5 }}>
-                  How each content section renders, regardless of which layout (A–E) is active. Untouched rows use the same automatic pattern as before.
-                </div>
-                <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
-                  <input type="checkbox" checked={!!brief.skipServicesChecklist} onChange={e => toggleSkipServicesChecklist(e.target.checked)} style={{ cursor: "pointer" }} />
-                  Hide the services checklist section
-                </label>
-                <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
-                  <input type="checkbox" checked={!!brief.skipTrustStats} onChange={e => toggleSkipTrustStats(e.target.checked)} style={{ cursor: "pointer" }} />
-                  Hide the trust stats (years/projects/satisfaction)
-                </label>
-                <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
-                  <input type="checkbox" checked={!!brief.skipFaqSection} onChange={e => toggleSkipFaqSection(e.target.checked)} style={{ cursor: "pointer" }} />
-                  Hide the FAQ section
-                </label>
-                <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
-                  <input type="checkbox" checked={!!brief.skipTestimonials} onChange={e => toggleSkipTestimonials(e.target.checked)} style={{ cursor: "pointer" }} />
-                  Hide the testimonials section
-                </label>
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  {rows.map((row, rowIdx) => {
-                    const isGrouped = row.indices.length > 1;
-                    const canGroupNext = rowIdx < rows.length - 1 && rows[rowIdx + 1].indices.length === 1 && rows[rowIdx + 1].postClosing === row.postClosing;
-                    return (
-                      <div key={rowIdx} style={{ padding: "16px 18px", borderRadius: "6px", border: "1px solid #dde0e6", background: "#ffffff", display: "flex", flexDirection: "column", gap: "10px" }}>
-                        <div style={{ fontSize: "14px", fontWeight: 700, color: "#09090b" }}>
-                          {isGrouped ? row.indices.map(featureLabel).join(" + ") : featureLabel(row.indices[0])}
-                        </div>
+                <div style={T.surface}>
+                  <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "10px", lineHeight: 1.5 }}>
+                    How each content section renders, regardless of which layout (A–E) is active. Untouched rows use the same automatic pattern as before.
+                  </div>
+                  <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
+                    <input type="checkbox" checked={!!brief.skipServicesChecklist} onChange={e => toggleSkipServicesChecklist(e.target.checked)} style={{ cursor: "pointer", accentColor: "#b45309" }} />
+                    Hide the services checklist section
+                  </label>
+                  <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
+                    <input type="checkbox" checked={!!brief.skipTrustStats} onChange={e => toggleSkipTrustStats(e.target.checked)} style={{ cursor: "pointer", accentColor: "#b45309" }} />
+                    Hide the trust stats (years/projects/satisfaction)
+                  </label>
+                  <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
+                    <input type="checkbox" checked={!!brief.skipFaqSection} onChange={e => toggleSkipFaqSection(e.target.checked)} style={{ cursor: "pointer", accentColor: "#b45309" }} />
+                    Hide the FAQ section
+                  </label>
+                  <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
+                    <input type="checkbox" checked={!!brief.skipTestimonials} onChange={e => toggleSkipTestimonials(e.target.checked)} style={{ cursor: "pointer", accentColor: "#b45309" }} />
+                    Hide the testimonials section
+                  </label>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    {rows.map((row, rowIdx) => {
+                      const isGrouped = row.indices.length > 1;
+                      const canGroupNext = rowIdx < rows.length - 1 && rows[rowIdx + 1].indices.length === 1 && rows[rowIdx + 1].postClosing === row.postClosing;
+                      return (
+                        <div key={rowIdx} style={{ padding: "16px 18px", borderRadius: "6px", border: "1px solid #dde0e6", background: "#ffffff", display: "flex", flexDirection: "column", gap: "10px" }}>
+                          <div style={{ fontSize: "14px", fontWeight: 700, color: "#09090b" }}>
+                            {isGrouped ? row.indices.map(featureLabel).join(" + ") : featureLabel(row.indices[0])}
+                          </div>
 
-                        {isGrouped ? (
-                          <input
-                            value={row.header}
-                            onChange={e => setSectionRowHeader(rows, rowIdx, e.target.value)}
-                            placeholder="Shared heading for this group…"
-                            style={{ padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
-                          />
-                        ) : (
-                          <select
-                            value={row.style}
-                            onChange={e => setSectionRowStyle(rows, rowIdx, e.target.value)}
-                            // Same custom SVG chevron pattern already
-                            // proven throughout Template Studio -- this
-                            // was relying on the browser's own native
-                            // select arrow with no room reserved for it,
-                            // which is exactly what looked disproportionate
-                            // and cramped against the border.
-                            style={{ padding: "10px 30px 10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", background: "#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%236b635c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\") no-repeat right 12px center", width: "100%", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none", boxSizing: "border-box" }}>
-                            {Object.entries(SECTION_STYLE_LABELS).map(([val, label]) => (
-                              (val === "video" && !brief.videoUrl) ? null :
-                              <option key={val} value={val}>{label}</option>
-                            ))}
-                          </select>
-                        )}
-
-                        <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-                          {(isGrouped || canGroupNext) && (
-                            <label style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", color: "#6b7280", cursor: "pointer" }}>
-                              <input type="checkbox" checked={isGrouped} onChange={() => toggleGroupWithNext(rows, rowIdx)} style={{ cursor: "pointer" }} />
-                              Group with next row
-                            </label>
+                          {isGrouped ? (
+                            <input
+                              value={row.header}
+                              onChange={e => setSectionRowHeader(rows, rowIdx, e.target.value)}
+                              placeholder="Shared heading for this group…"
+                              style={{ padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
+                            />
+                          ) : (
+                            <select
+                              value={row.style}
+                              onChange={e => setSectionRowStyle(rows, rowIdx, e.target.value)}
+                              // Same custom SVG chevron pattern already
+                              // proven throughout Template Studio -- this
+                              // was relying on the browser's own native
+                              // select arrow with no room reserved for it,
+                              // which is exactly what looked disproportionate
+                              // and cramped against the border.
+                              style={{ padding: "10px 30px 10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", background: "#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%236b635c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\") no-repeat right 12px center", width: "100%", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none", boxSizing: "border-box" }}>
+                              {Object.entries(SECTION_STYLE_LABELS).map(([val, label]) => (
+                                (val === "video" && !brief.videoUrl) ? null :
+                                <option key={val} value={val}>{label}</option>
+                              ))}
+                            </select>
                           )}
-                          <label style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", color: "#6b7280", cursor: "pointer" }}>
-                            <input type="checkbox" checked={row.postClosing} onChange={e => setSectionRowPostClosing(rows, rowIdx, e.target.checked)} style={{ cursor: "pointer" }} />
-                            Move after closing CTA
-                          </label>
+
+                          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                            {(isGrouped || canGroupNext) && (
+                              <label style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", color: "#6b7280", cursor: "pointer" }}>
+                                <input type="checkbox" checked={isGrouped} onChange={() => toggleGroupWithNext(rows, rowIdx)} style={{ cursor: "pointer", accentColor: "#b45309" }} />
+                                Group with next row
+                              </label>
+                            )}
+                            <label style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", color: "#6b7280", cursor: "pointer" }}>
+                              <input type="checkbox" checked={row.postClosing} onChange={e => setSectionRowPostClosing(rows, rowIdx, e.target.checked)} style={{ cursor: "pointer", accentColor: "#b45309" }} />
+                              Move after closing CTA
+                            </label>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             );
