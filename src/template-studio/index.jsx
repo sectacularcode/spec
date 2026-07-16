@@ -2016,7 +2016,7 @@ Rules:
                         {/* Pages */}
                         <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", marginBottom: "14px" }}>
                           {(build.pages || []).map(p => (
-                            <span key={p.id} style={{ fontSize: "11px", padding: "2px 8px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "3px", color: "#15803d" }}>{p.label || p.id}</span>
+                            <span key={p.id} style={{ fontSize: "11px", padding: "2px 8px", background: "#f4f4f5", border: "1px solid #dde0e6", borderRadius: "3px", color: "#09090b" }}>{p.label || p.id}</span>
                           ))}
                         </div>
                         {/* Actions */}
