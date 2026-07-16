@@ -964,12 +964,26 @@ export default function CustomBuild({ userId, role } = {}) {
         setStyleConflict({ savedStyle, briefColors: brief.colors, brandName: brief.brandName });
         return;
       }
-      if (savedStyle && savedStyle.colors && (!brief.colors || Object.keys(brief.colors).length === 0)) {
-        // No conflict, brief just has nothing of its own -- apply quietly.
-        brief.colors = savedStyle.colors;
-        if (savedStyle.fonts && (savedStyle.fonts.heading || savedStyle.fonts.body)) {
-          brief.fonts = [savedStyle.fonts.heading || savedStyle.fonts.body, savedStyle.fonts.body || savedStyle.fonts.heading];
+      if (savedStyle) {
+        // Colors/fonts: only fill in when the brief has nothing of its own
+        // -- unchanged from before. A brief with SOME colors already (even
+        // non-conflicting, partial ones) keeps exactly what it has rather
+        // than getting silently topped up from the saved style.
+        if (savedStyle.colors && (!brief.colors || Object.keys(brief.colors).length === 0)) {
+          brief.colors = savedStyle.colors;
+          if (savedStyle.fonts && (savedStyle.fonts.heading || savedStyle.fonts.body)) {
+            brief.fonts = [savedStyle.fonts.heading || savedStyle.fonts.body, savedStyle.fonts.body || savedStyle.fonts.heading];
+          }
         }
+        // Buttons: deliberately NOT gated on brief.colors being empty --
+        // confirmed real bug, July 2026. Nothing ever sets brief.buttons
+        // except a saved Style Guide/Component Library style (Manifest
+        // imports and the intake form never touch it), so requiring colors
+        // to ALSO be empty meant buttons silently never applied whenever
+        // the brief had any colors of its own that didn't conflict -- a
+        // very common case, not an edge case. Pulls whenever the saved
+        // style has real buttons and the brief doesn't already have its
+        // own, independent of the colors/fonts gate above.
         if (Array.isArray(savedStyle.buttons) && savedStyle.buttons.length > 0 && (!brief.buttons || brief.buttons.length === 0)) {
           brief.buttons = savedStyle.buttons;
         }
