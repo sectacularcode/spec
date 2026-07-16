@@ -215,6 +215,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   }
 
   function makeTrustStrip(bgColor) {
+    if (brief.skipTrustStats) return null;
     var items = [
       { stat: brief.trustStat1 || "10+",  label: brief.trustLabel1 || "Years in business" },
       { stat: brief.trustStat2 || "500+", label: brief.trustLabel2 || "Projects completed" },
@@ -736,7 +737,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       { quote: brief.testimonial3Quote || "[Third testimonial — reliability or speed]",        name: brief.testimonial3Name || "Client Name", title: brief.testimonial3Title || "Title, Company" },
     ];
     var testimonialsSectionE = mkContainer([
-      mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", accent, "h2", { weight: 800, px: 32, align: "center" }),
+      mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", warmWhite, "h2", { weight: 800, px: 32, align: "center" }),
       mkTestimonialCarousel(testimonialsE, { textColor: warmWhite, nameColor: warmWhite, jobColor: "rgba(255,255,255,0.7)" }),
     ], dark, { padY: "80", center: true });
 
@@ -892,7 +893,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // missing a section title; scoped to F only since that's what was
     // actually reviewed.
     var testimonialsSectionF = brief.testimonial1Name ? mkContainer([
-      mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", accent, "h2", { weight: 800, px: 32, align: "center" }),
+      mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", warmWhite, "h2", { weight: 800, px: 32, align: "center" }),
       mkTestimonialCarousel([
         { quote: brief.testimonial1Quote || "", name: brief.testimonial1Name || "", title: brief.testimonial1Title || "" },
         { quote: brief.testimonial2Quote || "", name: brief.testimonial2Name || "", title: brief.testimonial2Title || "" },
@@ -966,7 +967,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // same principle: no real content there should mean the section
     // doesn't render, not that it renders with invented placeholder quotes.
     var testimonialsSectionA = brief.testimonial1Name ? mkContainer([
-      mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", accent, "h2", { weight: 800, px: 32, align: "center" }),
+      mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", warmWhite, "h2", { weight: 800, px: 32, align: "center" }),
       mkTestimonialCarousel([
         { quote: brief.testimonial1Quote || "", name: brief.testimonial1Name || "", title: brief.testimonial1Title || "" },
         { quote: brief.testimonial2Quote || "", name: brief.testimonial2Name || "", title: brief.testimonial2Title || "" },
@@ -1045,15 +1046,17 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       brief.benefit1 || "[Key benefit one]",
       brief.benefit2 || "[Key benefit two]",
     ];
-    var trustLeftCol = mkContainer([
+    var trustLeftColChildren = [
       mkHeading("Why " + (brandName || "Us") + "?", ink, "h2", { weight: 700, px: 32 }),
       mkSpacer(14),
       mkText(he(whyUsIntro), text),
       mkSpacer(20),
       mkIconList(whyUsBenefits, accent, text, { fontSize: 19, iconSize: 19 }),
-      mkSpacer(26),
-      mkContainer(trustColsB, null, { isInner: true, direction: "row", padY: "0", padX: "0", gap: "24", full: true }),
-    ], null, { isInner: true, padY: "80", padX: "48", grow: "1" });
+    ];
+    if (!brief.skipTrustStats) {
+      trustLeftColChildren.push(mkSpacer(26), mkContainer(trustColsB, null, { isInner: true, direction: "row", padY: "0", padX: "0", gap: "24", full: true }));
+    }
+    var trustLeftCol = mkContainer(trustLeftColChildren, null, { isInner: true, padY: "80", padX: "48", grow: "1" });
     var formRightCol = mkContainer([formCard], null, { isInner: true, padY: "80", padX: "48", grow: "1" });
     var formSection  = mkContainer([trustLeftCol, formRightCol], bone, { direction: "row", padY: "0", padX: "0", gap: "0" });
 
@@ -1065,7 +1068,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       { quote: brief.testimonial3Quote || "[Third testimonial — reliability or speed]",        name: brief.testimonial3Name || "Client Name", title: brief.testimonial3Title || "Title, Company" },
     ];
     var testimonialsSection = mkContainer([
-      mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", accent, "h2", { weight: 800, px: 32, align: "center" }),
+      mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", warmWhite, "h2", { weight: 800, px: 32, align: "center" }),
       mkTestimonialCarousel(testimonials, { textColor: warmWhite, nameColor: warmWhite, jobColor: "rgba(255,255,255,0.7)" }),
     ], dark, { padY: "80", center: true });
 
@@ -1114,7 +1117,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   var benefitsSection = mkContainer(benefitCols, lightSectionBg, { direction: "row", padY: "0", padX: "0", gap: "0" });
 
   // Trust bar — compact stat row
-  var compactTrust = mkContainer([
+  var compactTrust = brief.skipTrustStats ? null : mkContainer([
     mkContainer([
       mkHeading((brief.trustStat1 || "10+") + "  " + (brief.trustLabel1 || "Years"), accent, "h6", { eyebrow: false, align: "center", weight: 700, px: 15 }),
     ], null, { isInner: true, padY: "0", padX: "24", grow: "1", center: true }),

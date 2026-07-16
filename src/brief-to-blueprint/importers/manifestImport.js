@@ -212,6 +212,18 @@ function legacyManifestToBrief(raw) {
     brief.skipServicesChecklist = true;
   }
 
+  // Same class of bug, same fix: the current page-document format has no
+  // trust_stats section type at all (confirmed against the real v1.5.0
+  // schema), so trustStat1-3 never get set for any current-format
+  // import -- every page defaulted to showing fabricated "10+ Years in
+  // business / 500+ Projects completed / 98% Client satisfaction," not
+  // real content. The legacy format DOES have a real trust_stats block it
+  // can parse (see the legacy dispatch above), so this only fires when no
+  // real value actually made it through either path.
+  if (!brief.trustStat1 && !brief.trustStat2 && !brief.trustStat3) {
+    brief.skipTrustStats = true;
+  }
+
   return brief;
 }
 
@@ -659,6 +671,18 @@ function manifestPageDocumentToBrief(raw) {
   // doesn't render, not that it renders with invented placeholder text.
   if (!Array.isArray(brief.servicesList) || brief.servicesList.length === 0) {
     brief.skipServicesChecklist = true;
+  }
+
+  // Same class of bug, same fix: the current page-document format has no
+  // trust_stats section type at all (confirmed against the real v1.5.0
+  // schema), so trustStat1-3 never get set for any current-format
+  // import -- every page defaulted to showing fabricated "10+ Years in
+  // business / 500+ Projects completed / 98% Client satisfaction," not
+  // real content. The legacy format DOES have a real trust_stats block it
+  // can parse (see the legacy dispatch above), so this only fires when no
+  // real value actually made it through either path.
+  if (!brief.trustStat1 && !brief.trustStat2 && !brief.trustStat3) {
+    brief.skipTrustStats = true;
   }
 
   return brief;

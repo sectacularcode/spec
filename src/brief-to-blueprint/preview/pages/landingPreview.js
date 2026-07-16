@@ -462,11 +462,12 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
                     return "<div style='display:flex;align-items:center;gap:10px;'><span style='color:" + brass + ";font-weight:700;flex-shrink:0;'>&#10003;</span><span style='font-size:14px;color:" + text + ";'>" + b + "</span></div>";
                   }).join("") +
                 "</div>" +
+                (brief.skipTrustStats ? "" :
                 "<div style='display:flex;flex-direction:row;gap:24px;'>" +
                   [{ s: s1, l: l1 }, { s: s2, l: l2 }, { s: s3, l: l3 }].map(function(t) {
                     return "<div><div style='font-size:36px;font-weight:800;color:" + brass + ";line-height:1;margin-bottom:4px;'>" + t.s + "</div><div style='font-size:13px;color:" + stone + ";font-weight:500;'>" + t.l + "</div></div>";
                   }).join("") +
-                "</div>" +
+                "</div>") +
               "</div>" +
               "<div style='background:#ffffff;border:1px solid #dde0e6;border-radius:8px;padding:40px;'>" +
                 "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + formH + "</h3>" +
@@ -480,7 +481,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             "</div>" +
           "</section>" +
           "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
-            "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + brass + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
+            "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
             "<div style='max-width:640px;margin:0 auto;'>" +
               "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
               "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
@@ -604,18 +605,19 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "</div>" +
             "</div></div>" +
           "</section>" +
+          (brief.skipTrustStats ? "" :
           "<section class='va-trust' style='background:#ffffff;padding:0;border-bottom:1px solid #f0f0f0;'>" +
             "<div style='display:grid;grid-template-columns:repeat(3,1fr);'>" +
               [{ s:s1,l:l1 },{ s:s2,l:l2 },{ s:s3,l:l3 }].map(function(t,i) {
                 return "<div class='grid-cell' style='padding:40px 32px;text-align:center;" + (i<2?"border-right:1px solid #f0f0f0;":"") + "'><div style='font-size:42px;font-weight:800;color:" + brass + ";line-height:1;margin-bottom:6px;'>" + t.s + "</div><div style='font-size:14px;color:" + stone + ";font-weight:500;letter-spacing:0.02em;'>" + t.l + "</div></div>";
               }).join("") +
             "</div>" +
-          "</section>" +
+          "</section>") +
           // Social proof moved up here, right after the trust strip --
           // the actual structural difference from Awareness, not just a
           // different color cycle.
           "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
-            "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + brass + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
+            "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
             "<div style='max-width:640px;margin:0 auto;'>" +
               "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
               "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
@@ -692,7 +694,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           "</section>" +
           (brief.testimonial1Name ? (
             "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
-              "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + brass + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
+              "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
               "<div style='max-width:640px;margin:0 auto;'>" +
                 "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
                 "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
@@ -767,16 +769,17 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             "</div>" +
           "</div></div>" +
         "</section>" +
+        (brief.skipTrustStats ? "" :
         "<section class='va-trust' style='background:#ffffff;padding:0;border-bottom:1px solid #f0f0f0;'>" +
           "<div style='display:grid;grid-template-columns:repeat(3,1fr);'>" +
             [{ s:s1,l:l1 },{ s:s2,l:l2 },{ s:s3,l:l3 }].map(function(t,i) {
               return "<div class='grid-cell' style='padding:40px 32px;text-align:center;" + (i<2?"border-right:1px solid #f0f0f0;":"") + "'><div style='font-size:42px;font-weight:800;color:" + brass + ";line-height:1;margin-bottom:6px;'>" + t.s + "</div><div style='font-size:14px;color:" + stone + ";font-weight:500;letter-spacing:0.02em;'>" + t.l + "</div></div>";
             }).join("") +
           "</div>" +
-        "</section>" +
+        "</section>") +
         (brief.testimonial1Name ? (
           "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
-            "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + brass + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
+            "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
             "<div style='max-width:640px;margin:0 auto;'>" +
               "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
               "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
