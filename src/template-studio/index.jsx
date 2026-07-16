@@ -2035,8 +2035,8 @@ Rules:
                                 }, i * 300);
                               });
                             }}
-                            style={{ flex: 1, padding: "9px 0", fontSize: "12px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
-                            Download Pages
+                            style={{ flex: 1, padding: "9px 0", fontSize: "12px", fontWeight: 600, background: "#09090b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", whiteSpace: "nowrap" }}>
+                            Download
                           </button>
                           <button
                             disabled={usingBuildId === build.id}
