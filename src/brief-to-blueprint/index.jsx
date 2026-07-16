@@ -1584,7 +1584,7 @@ export default function CustomBuild({ userId, role } = {}) {
                       value={brief.mapAddress || ""}
                       onChange={e => updateMapAddress(e.target.value)}
                       onBlur={commitBriefFieldEdit}
-                      placeholder="16070 OH-170, East Liverpool, OH 43920"
+                      placeholder="123 Main St, Your City, ST 00000"
                       style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", color: "#09090b", boxSizing: "border-box" }}
                     />
                   </div>
@@ -1595,7 +1595,7 @@ export default function CustomBuild({ userId, role } = {}) {
                       value={brief.mapCity || ""}
                       onChange={e => updateMapCity(e.target.value)}
                       onBlur={commitBriefFieldEdit}
-                      placeholder="East Liverpool"
+                      placeholder="Your City"
                       style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", color: "#09090b", boxSizing: "border-box" }}
                     />
                   </div>
