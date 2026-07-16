@@ -2020,7 +2020,7 @@ Rules:
                           ))}
                         </div>
                         {/* Actions */}
-                        <div style={{ display: "flex", gap: "8px" }}>
+                        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                           <button
                             onClick={() => {
                               // Download all pages from this saved build
@@ -2072,7 +2072,7 @@ Rules:
                               setUsingBuildId(null);
                             }}
                             style={{ padding: "9px 12px", fontSize: "12px", fontWeight: 600, background: usingBuildId === build.id ? "#dde0e6" : "#fff", color: usingBuildId === build.id ? "#9ca3af" : "#b45309", border: "1px solid " + (usingBuildId === build.id ? "#dde0e6" : "#b45309"), borderRadius: "6px", cursor: usingBuildId === build.id ? "default" : "pointer", whiteSpace: "nowrap" }}>
-                            {usingBuildId === build.id ? "Creating…" : "Use as New Template"}
+                            {usingBuildId === build.id ? "Creating…" : "Use Style"}
                           </button>
                           <button
                             onClick={async () => {
