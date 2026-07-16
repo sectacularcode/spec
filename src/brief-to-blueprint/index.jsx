@@ -1488,11 +1488,11 @@ export default function CustomBuild({ userId, role } = {}) {
               : { A: "Primary layout for this page type.", B: "Alternate layout with a different section structure." };
             const current = layoutVariants[previewPage] || activePreviewPage.recommended || "A";
             return (
-              <div style={{ marginBottom: "28px" }}>
-                <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>
+              <div style={{ marginBottom: "32px" }}>
+                <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
                   Layout — {(activePreviewPage.label || previewPage).replace(/-\d+$/, "")}
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   {variants.map(v => {
                     const active = current === v;
                     const isRec  = !!activePreviewPage.recommendedReasoned && v === (activePreviewPage.recommended || "A");
@@ -1501,17 +1501,17 @@ export default function CustomBuild({ userId, role } = {}) {
                         key={v}
                         onClick={() => setLayoutVariants(prev => ({ ...prev, [previewPage]: v }))}
                         style={{
-                          padding: "10px 14px", borderRadius: "6px", cursor: "pointer",
-                          border: active ? "1px solid #b45309" : "1px solid #dde0e6",
+                          padding: "16px 18px", borderRadius: "6px", cursor: "pointer",
+                          border: active ? "2px solid #b45309" : "1px solid #dde0e6",
                           background: active ? "rgba(180,83,9,0.04)" : "#ffffff",
-                          display: "flex", flexDirection: "column", gap: "3px",
+                          display: "flex", flexDirection: "column", gap: "4px",
                         }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                          <span style={{ fontSize: "12px", fontWeight: 700, color: active ? "#b45309" : "#09090b" }}>{labels[v]}</span>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <span style={{ fontSize: "15px", fontWeight: 700, color: active ? "#b45309" : "#09090b" }}>{labels[v]}</span>
                           {isRec && <span style={{ fontSize: "9px", fontWeight: 700, background: "#b45309", color: "#fff", borderRadius: "3px", padding: "1px 5px", letterSpacing: "0.04em" }}>RECOMMENDED</span>}
-                          {active && <span style={{ marginLeft: "auto", fontSize: "11px", color: "#b45309" }}>✓ Active</span>}
+                          {active && <span style={{ marginLeft: "auto", fontSize: "12px", fontWeight: 600, color: "#b45309" }}>✓ Active</span>}
                         </div>
-                        <span style={{ fontSize: "11px", color: "#6b7280", lineHeight: 1.45 }}>{descs[v]}</span>
+                        <span style={{ fontSize: "12px", color: active ? "#a3673a" : "#6b7280", lineHeight: 1.5 }}>{descs[v]}</span>
                       </div>
                     );
                   })}
@@ -1535,11 +1535,11 @@ export default function CustomBuild({ userId, role } = {}) {
             const eyebrowPage = activePreviewPage;
             if (!eyebrowPage || !/^(landing|other)(-\d+)?$/.test(eyebrowPage.id)) return null;
             return (
-              <div style={{ marginBottom: "28px" }}>
-                <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>
+              <div style={{ marginBottom: "32px" }}>
+                <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
                   Hero Eyebrow
                 </div>
-                <div style={{ fontSize: "11px", color: "#9ca3af", marginBottom: "10px", lineHeight: 1.5 }}>
+                <div style={{ fontSize: "12px", color: "#9ca3af", marginBottom: "10px", lineHeight: 1.5 }}>
                   Small label above the hero headline. Leave blank to show the brand name (today's default).
                 </div>
                 <input
@@ -1548,7 +1548,7 @@ export default function CustomBuild({ userId, role } = {}) {
                   onChange={e => updateHeroEyebrow(e.target.value)}
                   onBlur={commitBriefFieldEdit}
                   placeholder={brief.brandName || "e.g. Federal DOT Inspections"}
-                  style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", color: "#09090b", boxSizing: "border-box" }}
+                  style={{ width: "100%", padding: "12px 14px", fontSize: "14px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", color: "#09090b", boxSizing: "border-box" }}
                 />
               </div>
             );
@@ -1569,34 +1569,34 @@ export default function CustomBuild({ userId, role } = {}) {
             const locPage = activePreviewPage;
             if (!locPage || !/^(landing|other)(-\d+)?$/.test(locPage.id)) return null;
             return (
-              <div style={{ marginBottom: "28px" }}>
-                <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>
+              <div style={{ marginBottom: "32px" }}>
+                <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
                   Location Details
                 </div>
-                <div style={{ fontSize: "11px", color: "#9ca3af", marginBottom: "10px", lineHeight: 1.5 }}>
+                <div style={{ fontSize: "12px", color: "#9ca3af", marginBottom: "10px", lineHeight: 1.5 }}>
                   Only needed if Manifest didn't send an address for this page. Powers the map on Variant F (Location).
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                   <div>
-                    <label style={{ display: "block", fontSize: "11px", color: "#6b7280", marginBottom: "4px" }}>Address</label>
+                    <label style={{ display: "block", fontSize: "12px", color: "#6b7280", marginBottom: "5px" }}>Address</label>
                     <input
                       type="text"
                       value={brief.mapAddress || ""}
                       onChange={e => updateMapAddress(e.target.value)}
                       onBlur={commitBriefFieldEdit}
                       placeholder="123 Main St, Your City, ST 00000"
-                      style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", color: "#09090b", boxSizing: "border-box" }}
+                      style={{ width: "100%", padding: "12px 14px", fontSize: "14px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", color: "#09090b", boxSizing: "border-box" }}
                     />
                   </div>
                   <div>
-                    <label style={{ display: "block", fontSize: "11px", color: "#6b7280", marginBottom: "4px" }}>City (for the page title, e.g. "Brand — City — Landing Page (Location)")</label>
+                    <label style={{ display: "block", fontSize: "12px", color: "#6b7280", marginBottom: "5px" }}>City (for the page title, e.g. "Brand — City — Landing Page (Location)")</label>
                     <input
                       type="text"
                       value={brief.mapCity || ""}
                       onChange={e => updateMapCity(e.target.value)}
                       onBlur={commitBriefFieldEdit}
                       placeholder="Your City"
-                      style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", color: "#09090b", boxSizing: "border-box" }}
+                      style={{ width: "100%", padding: "12px 14px", fontSize: "14px", border: "1px solid #dde0e6", borderRadius: "6px", background: "#ffffff", color: "#09090b", boxSizing: "border-box" }}
                     />
                   </div>
                 </div>
@@ -1619,36 +1619,36 @@ export default function CustomBuild({ userId, role } = {}) {
               return brief[key] || "(untitled)";
             };
             return (
-              <div style={{ marginBottom: "28px" }}>
-                <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>
+              <div style={{ marginBottom: "32px" }}>
+                <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
                   Section Styles
                 </div>
-                <div style={{ fontSize: "11px", color: "#9ca3af", marginBottom: "10px", lineHeight: 1.5 }}>
+                <div style={{ fontSize: "12px", color: "#9ca3af", marginBottom: "10px", lineHeight: 1.5 }}>
                   How each content section renders, regardless of which layout (A–E) is active. Untouched rows use the same automatic pattern as before.
                 </div>
-                <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
                   <input type="checkbox" checked={!!brief.skipServicesChecklist} onChange={e => toggleSkipServicesChecklist(e.target.checked)} style={{ cursor: "pointer" }} />
                   Hide the services checklist section
                 </label>
-                <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
                   <input type="checkbox" checked={!!brief.skipTrustStats} onChange={e => toggleSkipTrustStats(e.target.checked)} style={{ cursor: "pointer" }} />
                   Hide the trust stats (years/projects/satisfaction)
                 </label>
-                <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
                   <input type="checkbox" checked={!!brief.skipFaqSection} onChange={e => toggleSkipFaqSection(e.target.checked)} style={{ cursor: "pointer" }} />
                   Hide the FAQ section
                 </label>
-                <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
                   <input type="checkbox" checked={!!brief.skipTestimonials} onChange={e => toggleSkipTestimonials(e.target.checked)} style={{ cursor: "pointer" }} />
                   Hide the testimonials section
                 </label>
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   {rows.map((row, rowIdx) => {
                     const isGrouped = row.indices.length > 1;
                     const canGroupNext = rowIdx < rows.length - 1 && rows[rowIdx + 1].indices.length === 1 && rows[rowIdx + 1].postClosing === row.postClosing;
                     return (
-                      <div key={rowIdx} style={{ padding: "10px 12px", borderRadius: "6px", border: "1px solid #dde0e6", background: "#ffffff", display: "flex", flexDirection: "column", gap: "8px" }}>
-                        <div style={{ fontSize: "12px", fontWeight: 700, color: "#09090b" }}>
+                      <div key={rowIdx} style={{ padding: "16px 18px", borderRadius: "6px", border: "1px solid #dde0e6", background: "#ffffff", display: "flex", flexDirection: "column", gap: "10px" }}>
+                        <div style={{ fontSize: "14px", fontWeight: 700, color: "#09090b" }}>
                           {isGrouped ? row.indices.map(featureLabel).join(" + ") : featureLabel(row.indices[0])}
                         </div>
 
@@ -1657,7 +1657,7 @@ export default function CustomBuild({ userId, role } = {}) {
                             value={row.header}
                             onChange={e => setSectionRowHeader(rows, rowIdx, e.target.value)}
                             placeholder="Shared heading for this group…"
-                            style={{ padding: "6px 8px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
+                            style={{ padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
                           />
                         ) : (
                           <select
@@ -1669,7 +1669,7 @@ export default function CustomBuild({ userId, role } = {}) {
                             // select arrow with no room reserved for it,
                             // which is exactly what looked disproportionate
                             // and cramped against the border.
-                            style={{ padding: "6px 26px 6px 8px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", color: "#09090b", background: "#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%236b635c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\") no-repeat right 9px center", width: "100%", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none", boxSizing: "border-box" }}>
+                            style={{ padding: "10px 30px 10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", background: "#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%236b635c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\") no-repeat right 12px center", width: "100%", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none", boxSizing: "border-box" }}>
                             {Object.entries(SECTION_STYLE_LABELS).map(([val, label]) => (
                               (val === "video" && !brief.videoUrl) ? null :
                               <option key={val} value={val}>{label}</option>
@@ -1679,12 +1679,12 @@ export default function CustomBuild({ userId, role } = {}) {
 
                         <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
                           {(isGrouped || canGroupNext) && (
-                            <label style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "11px", color: "#6b7280", cursor: "pointer" }}>
+                            <label style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", color: "#6b7280", cursor: "pointer" }}>
                               <input type="checkbox" checked={isGrouped} onChange={() => toggleGroupWithNext(rows, rowIdx)} style={{ cursor: "pointer" }} />
                               Group with next row
                             </label>
                           )}
-                          <label style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "11px", color: "#6b7280", cursor: "pointer" }}>
+                          <label style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", color: "#6b7280", cursor: "pointer" }}>
                             <input type="checkbox" checked={row.postClosing} onChange={e => setSectionRowPostClosing(rows, rowIdx, e.target.checked)} style={{ cursor: "pointer" }} />
                             Move after closing CTA
                           </label>
@@ -1798,45 +1798,48 @@ export default function CustomBuild({ userId, role } = {}) {
                       {brief._manifestMetaDescription && <div><span style={{ fontWeight: 600 }}>Meta:</span> {brief._manifestMetaDescription}</div>}
                     </div>
                   )}
-                  <div style={{ marginBottom: "14px" }}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <div style={{ marginBottom: "32px" }}>
+                    <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
+                      Colors
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                       {COLOR_FIELDS.map(f => (
-                        <div key={f.key} style={{ display: "grid", gridTemplateColumns: "84px 30px 1fr", gap: "6px", alignItems: "center" }}>
-                          <span style={{ fontSize: "11px", color: "#6b7280" }}>{f.label}</span>
+                        <div key={f.key} style={{ display: "grid", gridTemplateColumns: "90px 34px 1fr", gap: "8px", alignItems: "center" }}>
+                          <span style={{ fontSize: "13px", color: "#6b7280" }}>{f.label}</span>
                           <input
                             type="color"
                             value={(brief.colors && brief.colors[f.key]) || "#ffffff"}
                             onChange={e => setBriefColor(f.key, e.target.value)}
-                            style={{ width: "30px", height: "30px", border: "1px solid #dde0e6", borderRadius: "4px", cursor: "pointer", padding: "2px" }}
+                            style={{ width: "34px", height: "34px", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", padding: "2px" }}
                           />
                           <input
                             value={(brief.colors && brief.colors[f.key]) || ""}
                             onChange={e => setBriefColor(f.key, e.target.value)}
                             placeholder="#000000"
-                            style={{ padding: "6px 8px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", fontFamily: "monospace", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
+                            style={{ padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", fontFamily: "monospace", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
                           />
                         </div>
                       ))}
                     </div>
-                    <div style={{ display: "grid", gridTemplateColumns: "84px 1fr", gap: "6px", alignItems: "center", marginTop: "10px" }}>
-                      <span style={{ fontSize: "11px", color: "#6b7280" }}>Heading font</span>
+                    <div style={{ display: "grid", gridTemplateColumns: "90px 1fr", gap: "8px", alignItems: "center", marginTop: "12px" }}>
+                      <span style={{ fontSize: "13px", color: "#6b7280" }}>Heading font</span>
                       <input
                         value={(brief.fonts && brief.fonts[0]) || ""}
                         onChange={e => setBriefFont(0, e.target.value)}
                         placeholder="e.g. Inter"
-                        style={{ padding: "6px 8px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
+                        style={{ padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
                       />
-                      <span style={{ fontSize: "11px", color: "#6b7280" }}>Body font</span>
+                      <span style={{ fontSize: "13px", color: "#6b7280" }}>Body font</span>
                       <input
                         value={(brief.fonts && brief.fonts[1]) || ""}
                         onChange={e => setBriefFont(1, e.target.value)}
                         placeholder="e.g. Inter"
-                        style={{ padding: "6px 8px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
+                        style={{ padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
                       />
                     </div>
                   </div>
-                  <div style={{ marginBottom: "14px" }}>
-                    <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>
+                  <div style={{ marginBottom: "32px" }}>
+                    <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
                       Buttons
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -1861,7 +1864,7 @@ export default function CustomBuild({ userId, role } = {}) {
                     </div>
                   </div>
                   {brief.brandName && (
-                    <div style={{ marginBottom: "14px", position: "relative" }}>
+                    <div style={{ marginBottom: "32px", position: "relative" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                         {((brief.colors && Object.keys(brief.colors).length > 0)
                           || (Array.isArray(brief.fonts) && brief.fonts.some(f => f))
