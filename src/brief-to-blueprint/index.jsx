@@ -1398,37 +1398,37 @@ export default function CustomBuild({ userId, role } = {}) {
 
       {!draftsView && (
       <>
-      {/* Floating tab to restore panel when collapsed */}
-      {panelCollapsed && generated && (
-        <button
-          onClick={() => setPanelCollapsed(false)}
-          title="Show panel"
-          style={{
-            position: "fixed", top: "50%", left: 0, transform: "translateY(-50%)",
-            zIndex: 200, background: "#3f3f46", color: "#fff", border: "none",
-            borderRadius: "0 6px 6px 0", padding: "12px 6px", cursor: "pointer",
-            fontSize: "13px", fontWeight: 600, writingMode: "vertical-rl",
-            textOrientation: "mixed", letterSpacing: "0.05em", boxShadow: "2px 0 8px rgba(0,0,0,0.15)",
-            display: "flex", alignItems: "center", gap: "6px"
-          }}>
-          ▶ Panel
-        </button>
-      )}
-      <div style={{ display: "grid", gridTemplateColumns: generated ? (panelCollapsed ? "0px 1fr" : "520px 1fr") : "1fr", gap: "0", height: "calc(100vh - 57px)", overflow: "hidden", transition: "grid-template-columns 0.2s ease" }}>
+      <div style={{ position: "relative", display: "grid", gridTemplateColumns: generated ? (panelCollapsed ? "0px 1fr" : "520px 1fr") : "1fr", gap: "0", height: "calc(100vh - 57px)", overflow: "hidden", transition: "grid-template-columns 0.2s ease" }}>
+
+        {/* Single panel-collapse tab, attached to the panel's own right
+            edge -- rides the same 0.2s transition as the grid's own
+            column width, so it slides from the panel's edge (520px) down
+            to the screen's left edge (0px) as the panel collapses,
+            becoming the reopen control in the same motion, rather than
+            being two separate controls in two different places (the old
+            toolbar button only reachable when scrolled to the top, plus a
+            second fixed-position tab that only existed for reopening). */}
+        {generated && (
+          <button
+            onClick={() => setPanelCollapsed(c => !c)}
+            aria-label={panelCollapsed ? "Show panel" : "Hide panel"}
+            title={panelCollapsed ? "Show panel" : "Hide panel"}
+            style={{
+              position: "absolute", top: "50%", left: panelCollapsed ? "0px" : "520px", transform: "translateY(-50%)",
+              zIndex: 200, background: "#b45309", color: "#fff", border: "none",
+              borderRadius: "0 6px 6px 0", padding: "12px 6px", cursor: "pointer",
+              fontSize: "13px", fontWeight: 600, boxShadow: "2px 0 8px rgba(0,0,0,0.15)",
+              display: "flex", alignItems: "center", transition: "left 0.2s ease"
+            }}>
+            {panelCollapsed ? "▶" : "◀"}
+          </button>
+        )}
 
         <div style={{ padding: "clamp(20px,3vw,40px) clamp(16px,3vw,40px)", borderRight: generated ? "1px solid #dde0e6" : "none", overflowY: panelCollapsed ? "hidden" : "auto", overflowX: "hidden", flexShrink: 0, background: "#eeedf1", height: "100%", boxSizing: "border-box" }}>
           <div style={{ maxWidth: generated ? "100%" : "1100px", margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
             <button onClick={() => setDraftsView(true)} style={{ padding: "5px 10px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "5px", fontWeight: 500, display: "inline-flex", alignItems: "center", lineHeight: 1, gap: "4px", fontSize: "12px", cursor: "pointer" }}>← Builds</button>
             <button onClick={() => setShowBulkLocation(true)} style={{ padding: "5px 10px", background: "#ffffff", color: "#3f3f46", border: "1px solid #dde0e6", borderRadius: "5px", fontWeight: 500, fontSize: "12px", cursor: "pointer", display: "inline-flex", alignItems: "center", lineHeight: 1 }}>Bulk Locations</button>
-            {generated && (
-              <button
-                onClick={() => setPanelCollapsed(c => !c)}
-                title={panelCollapsed ? "Show panel" : "Hide panel"}
-                style={{ padding: "5px 10px", fontSize: "12px", fontWeight: 500, cursor: "pointer", border: "1px solid #dde0e6", borderRadius: "5px", background: panelCollapsed ? "#3f3f46" : "#ffffff", color: panelCollapsed ? "#fff" : "#6b7280", display: "inline-flex", alignItems: "center", lineHeight: 1, gap: "4px" }}>
-                {panelCollapsed ? "▶ Show panel" : "◀ Hide panel"}
-              </button>
-            )}
 
             {(brief || generated) && (
               <button
