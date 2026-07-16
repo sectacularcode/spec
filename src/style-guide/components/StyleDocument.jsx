@@ -36,14 +36,14 @@ export default function StyleDocument({ brandName, sourceUrl, colors, fonts, but
   // on at the source -- a light heading pulled from a dark hero section
   // renders as invisible text the moment it's placed on this document's
   // white page. Falling back through "Body text" (Spec's own role for
-  // "copy on light") then "Dark panel"/"Muted" before a hardcoded
+  // "copy on light") then "Dark panel"/"Secondary text" before a hardcoded
   // near-black means the sheet always uses something dark enough to read,
   // while still preferring an on-brand color over generic black wherever
   // one actually works.
   const rawHeadingHex = mainColors.find(c => c.role === "Heading")?.hex;
   const bodyTextHex = mainColors.find(c => c.role === "Body text")?.hex;
   const darkPanelHex = mainColors.find(c => c.role === "Dark panel")?.hex;
-  const mutedHex = mainColors.find(c => c.role === "Muted")?.hex;
+  const mutedHex = mainColors.find(c => c.role === "Secondary text")?.hex;
   const readableHeadingColor = pickReadableColor(
     "#FFFFFF",
     [rawHeadingHex, bodyTextHex, darkPanelHex, mutedHex],

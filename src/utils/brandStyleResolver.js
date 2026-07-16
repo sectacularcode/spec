@@ -34,7 +34,7 @@ export function resolveBrandStyle({ colors = {}, fonts = {}, buttons = [] } = {}
   const brassDeep = colors["brass-deep"]; // Accent -- hover
   const bone = colors.bone;               // Background
   const asphalt = colors.asphalt;         // Dark panel
-  const stone = colors.stone;             // Muted
+  const stone = colors.stone;             // Secondary text
   const warmWhite = colors["warm-white"]; // Text on dark
 
   // Readable heading-weight text for a GIVEN background -- the caller

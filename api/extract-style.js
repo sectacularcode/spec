@@ -260,7 +260,7 @@ export function buildColorSet(css) {
   const bgOk = tryConfirmed("Background", [stock.secondary, bgProp]);
 
   const mutedProp = findRootProp(rootProps, ["muted", "stone", "secondary-text", "gray", "grey"]);
-  const mutedOk = tryConfirmed("Muted", [mutedProp]);
+  const mutedOk = tryConfirmed("Secondary text", [mutedProp]);
 
   // Second pass -- only now does anything reach for the frequency-ranked
   // guess, and only for roles that came up empty above.
@@ -307,7 +307,7 @@ export function buildColorSet(css) {
     result.push({ role: "Background", hex: "#FFFFFF", confidence: "derived", custom: false });
     used.add("#FFFFFF");
   }
-  if (!mutedOk) { const c = nextRanked(); if (c) add("Muted", c, "estimated"); }
+  if (!mutedOk) { const c = nextRanked(); if (c) add("Secondary text", c, "estimated"); }
 
   // Derived roles, computed only after Accent and Heading have their
   // final values from both passes above.
@@ -510,7 +510,7 @@ export default async function handler(req, res) {
     const bodyColorConfirmed = colors.some(c => c.role === "Body text" && c.confidence === "confirmed");
     const backgroundConfirmed = colors.some(c => c.role === "Background" && c.confidence === "confirmed");
     const accentConfirmed = colors.some(c => c.role === "Accent" && c.confidence === "confirmed");
-    const mutedConfirmed = colors.some(c => c.role === "Muted" && c.confidence === "confirmed");
+    const mutedConfirmed = colors.some(c => c.role === "Secondary text" && c.confidence === "confirmed");
     const needsComputedPass = !headingFontConfirmed || !bodyFontConfirmed
       || !headingColorConfirmed || !bodyColorConfirmed || !backgroundConfirmed || !accentConfirmed || !mutedConfirmed;
 
@@ -553,7 +553,7 @@ export default async function handler(req, res) {
         // color role here: Heading/Body text/Background map onto one
         // unambiguous DOM target (h1, body, body background) same as
         // fonts, so computed always wins once it's available. Accent and
-        // Muted are heuristic reads (first meaningfully-styled link,
+        // Secondary text are heuristic reads (first meaningfully-styled link,
         // footer text) -- a real, deliberately-named --accent/--brand CSS
         // variable is a stronger, more intentional signal than a
         // heuristic guess, so those only fill in a missing/estimated role
@@ -569,7 +569,7 @@ export default async function handler(req, res) {
         upsertColor("Body text", computed.bodyColor, true);
         upsertColor("Background", computed.backgroundColor, true);
         upsertColor("Accent", computed.accentColor, false);
-        upsertColor("Muted", computed.mutedColor, false);
+        upsertColor("Secondary text", computed.mutedColor, false);
       }
     }
 

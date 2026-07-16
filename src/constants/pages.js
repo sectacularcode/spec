@@ -10,7 +10,7 @@ export const DEFAULT_COLORS = [
   { name: "Accent Deep",hex: "", use: "Links, hover states" },
   { name: "Background", hex: "", use: "Primary surface, default background" },
   { name: "Dark Panel", hex: "", use: "Dark panels, cards, pricing tiers" },
-  { name: "Muted",      hex: "", use: "Muted labels, captions" },
+  { name: "Secondary text", hex: "", use: "Secondary/muted labels, captions" },
   { name: "Warm White", hex: "", use: "Clean surface, text on dark" },
   { name: "Text",       hex: "", use: "Body copy on light backgrounds" },
 ];

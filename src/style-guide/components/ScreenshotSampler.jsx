@@ -17,11 +17,9 @@
 
 import { useRef, useState, useCallback } from "react";
 import { authHeaders } from "../../utils/api.js";
+import { ROLE_TO_KEY } from "../../utils/colorRoles.js";
 
-const TEMPLATE_ROLES = [
-  "Heading", "Body text", "Accent", "Accent — hover",
-  "Background", "Dark panel", "Muted", "Text on dark",
-];
+const TEMPLATE_ROLES = Object.keys(ROLE_TO_KEY);
 
 const MAX_DISPLAY_WIDTH = 900; // caps the image's BUFFER size on load, not
                                  // its on-screen size -- keeps memory/canvas

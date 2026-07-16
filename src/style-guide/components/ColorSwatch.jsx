@@ -1,13 +1,15 @@
 // One color swatch card. Two modes:
-// - Template role (color.custom is false): one of Spec's 8 fixed roles
-//   (Heading, Body text, Accent, Accent — hover, Background, Dark panel,
-//   Muted, Text on dark), shown with a Confirmed/Derived/Estimated/Sampled
-//   badge reflecting how the value was actually produced -- never invented.
+// - Template role (color.custom is false): one of Spec's 8 fixed roles,
+//   defined once in src/utils/colorRoles.js and reused here, shown with a
+//   Confirmed/Derived/Estimated/Sampled badge reflecting how the value was
+//   actually produced -- never invented.
 // - Custom (color.custom is true): a color that doesn't map to any of the
 //   8 roles. Free-text name AND usage note, both optional, both editable
 //   by the person -- never constrained to a fixed dropdown, since a real
 //   brand's extra colors ("sale badge red", "success green") don't fit a
 //   short fixed list.
+
+import { ROLE_TO_KEY } from "../../utils/colorRoles.js";
 
 const CONFIDENCE_STYLES = {
   confirmed: { background: "#E8F3E9", color: "#2F6E3E" },
@@ -21,15 +23,12 @@ const CONFIDENCE_STYLES = {
   sampled:   { background: "#E3F2FA", color: "#1D6FA5" },
   // Also distinct from "sampled" -- this is a headless browser reading the
   // real getComputedStyle() value automatically (Heading/Body text/
-  // Background), or a filtered heuristic read (Accent/Muted, from a
-  // styled link or footer), not a person confirming a pixel by eye.
+  // Background), or a filtered heuristic read (Accent/Secondary text, from
+  // a styled link or footer), not a person confirming a pixel by eye.
   computed:  { background: "#E0F5F1", color: "#0D7862" },
 };
 
-const TEMPLATE_ROLES = [
-  "Heading", "Body text", "Accent", "Accent — hover",
-  "Background", "Dark panel", "Muted", "Text on dark",
-];
+const TEMPLATE_ROLES = Object.keys(ROLE_TO_KEY);
 
 export default function ColorSwatch({ color, onChange, onRemove }) {
   const confidenceStyle = CONFIDENCE_STYLES[color.confidence] || CONFIDENCE_STYLES.estimated;

@@ -9,17 +9,11 @@ import StyleDocument from "./components/StyleDocument.jsx";
 import { parseStyleGuideHtml } from "./utils/export.js";
 import { ConfirmDialog } from "../components/ConfirmDialog.jsx";
 import { bestTextColor } from "../utils/contrast.js";
+import { ROLE_TO_KEY, KEY_TO_ROLE } from "../utils/colorRoles.js";
 
-// Spec's 8 template color roles <-> the fixed keys brands actually
-// stores (see api/_lib/brandValidation.js's COLOR_KEYS). Custom/"Additional"
-// colors are NOT part of this map on purpose -- see the note above
-// saveToLibrary() below for why they don't persist to the library yet.
-const ROLE_TO_KEY = {
-  "Heading": "ink", "Body text": "text", "Accent": "brass", "Accent — hover": "brass-deep",
-  "Background": "bone", "Dark panel": "asphalt", "Muted": "stone", "Text on dark": "warm-white",
-};
-const KEY_TO_ROLE = Object.fromEntries(Object.entries(ROLE_TO_KEY).map(([role, key]) => [key, role]));
-
+// Custom/"Additional" colors are NOT part of ROLE_TO_KEY on purpose -- see
+// the note above saveToLibrary() below for why they don't persist to the
+// library yet.
 function colorsToKeyedObject(colors) {
   const out = {};
   for (const c of colors) {
@@ -104,7 +98,7 @@ export default function StyleGuide({ role }) {
   // cases. The raw reason still gets appended (truncated) after the label
   // so a real code is always visible, per that being the actual ask. Covers
   // both fonts and colors now -- same underlying Browserless pass reads
-  // Heading/Body/Background/Accent/Muted colors alongside heading/body
+  // Heading/Body/Background/Accent/Secondary text colors alongside heading/body
   // fonts, so a single note covers whichever of those actually ran.
   function describeFontExtraction(debug) {
     if (!debug || !debug.attempted) return "";
@@ -332,7 +326,7 @@ export default function StyleGuide({ role }) {
   function isNamed(b, role) { return (b.name || "").trim().toLowerCase() === role; }
   function defaultButton(role, colorList) {
     const accentHex = (colorList || []).find(c => c.role === "Accent")?.hex;
-    const inkHex = (colorList || []).find(c => c.role === "Ink")?.hex;
+    const inkHex = (colorList || []).find(c => c.role === "Heading")?.hex;
     if (role === "primary") {
       const background = accentHex || "#3F3F46";
       return { name: "Primary", background, textColor: bestTextColor(background, "#1a1a1a") };

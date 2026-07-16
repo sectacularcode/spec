@@ -29,21 +29,14 @@ import AdminPanel from "../components/AdminPanel.jsx";
 import { authHeaders, formatErrorMessage } from "../utils/api.js";
 import { estimateGenerationCost } from "./utils/estimateCost.js";
 import { manifestToBrief, ManifestImportError } from "./importers/manifestImport.js";
+import { COLOR_FIELDS } from "../utils/colorRoles.js";
 
 // Fixed 8-slot color model used everywhere else in Brief to Blueprint (see
 // COLOR_KEYS in api/_lib/brandValidation.js and colorNames in IntakeForm.jsx) --
 // keys are canonical and not user-renameable, only the hex values are
-// editable here.
-const COLOR_FIELDS = [
-  { key: "ink",        label: "Heading" },
-  { key: "brass",      label: "Accent" },
-  { key: "brass-deep", label: "Accent — hover" },
-  { key: "bone",       label: "Background" },
-  { key: "asphalt",    label: "Dark panel" },
-  { key: "stone",      label: "Muted" },
-  { key: "warm-white", label: "Text on dark" },
-  { key: "text",       label: "Body text" },
-];
+// editable here. Labels come from src/utils/colorRoles.js, the single
+// source shared with Style Guide and Component Library -- this used to be
+// an 8th independent hardcoded copy of the exact same mapping.
 
 export default function CustomBuild({ userId, role } = {}) {
   const [brief, setBrief]               = useState(null);

@@ -17,7 +17,7 @@ import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { logError } from "./_lib/errorLog.js";
 import { callAnthropic, extractJSON } from "./_lib/anthropic.js";
 
-const TEMPLATE_ROLES = ["Heading", "Body text", "Accent", "Accent — hover", "Background", "Dark panel", "Muted", "Text on dark"];
+const TEMPLATE_ROLES = ["Heading", "Body text", "Accent", "Accent — hover", "Background", "Dark panel", "Secondary text", "Text on dark"];
 const HEX_RE = /^#[0-9A-Fa-f]{3}$|^#[0-9A-Fa-f]{6}$/;
 const MAX_IMAGE_B64_CHARS = 6 * 1024 * 1024; // ~4.5MB decoded, safely under Vercel's request body limit
 const MAX_COLORS = 20; // matches the practical ceiling on the Colors grid -- a sanity cap, not a real constraint

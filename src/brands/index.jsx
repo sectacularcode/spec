@@ -2,28 +2,15 @@ import { useState, useEffect } from "react";
 import { authHeaders } from "../utils/api.js";
 import ButtonEditor from "../style-guide/components/ButtonEditor.jsx";
 import { ConfirmDialog } from "../components/ConfirmDialog.jsx";
+import { COLOR_FIELDS } from "../utils/colorRoles.js";
 
 // The keys (ink, brass, brass-deep, etc.) match COLOR_KEYS in
 // api/_lib/brandValidation.js exactly and must stay as-is -- they're
 // Manifest's fixed export schema ("field names must match exactly", per
 // the integration requirements), not meant to be read by a person. The
-// labels are a different story: these are literally one early example
-// client's (Mile Marker Films) own evocative color names, generalized
-// into a universal schema -- "Brass" means nothing on a coffee roaster's
-// or a law firm's brand. Reusing Style Guide's exact ROLE_TO_KEY label
-// text here (same file, different vocabulary would just be a second
-// inconsistency) so both tools describe the same underlying key the same
-// way.
-const COLOR_FIELDS = [
-  { key: "ink", label: "Heading" },
-  { key: "brass", label: "Accent" },
-  { key: "brass-deep", label: "Accent — hover" },
-  { key: "bone", label: "Background" },
-  { key: "asphalt", label: "Dark panel" },
-  { key: "stone", label: "Muted" },
-  { key: "warm-white", label: "Text on dark" },
-  { key: "text", label: "Body text" },
-];
+// labels are shared with Style Guide via src/utils/colorRoles.js -- both
+// tools used to define this exact 8-pair mapping independently, which is
+// exactly the kind of drift the gold-color-default bug came from.
 
 function emptyBrand() {
   return {
