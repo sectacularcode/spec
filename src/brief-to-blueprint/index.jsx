@@ -30,6 +30,8 @@ import { authHeaders, formatErrorMessage } from "../utils/api.js";
 import { estimateGenerationCost } from "./utils/estimateCost.js";
 import { manifestToBrief, ManifestImportError } from "./importers/manifestImport.js";
 import { COLOR_FIELDS } from "../utils/colorRoles.js";
+import ButtonEditor from "../style-guide/components/ButtonEditor.jsx";
+import { bestTextColor } from "../utils/contrast.js";
 
 // Fixed 8-slot color model used everywhere else in Brief to Blueprint (see
 // COLOR_KEYS in api/_lib/brandValidation.js and colorNames in IntakeForm.jsx) --
@@ -573,6 +575,64 @@ export default function CustomBuild({ userId, role } = {}) {
     var fonts = Array.isArray(brief.fonts) ? [...brief.fonts] : ["", ""];
     fonts[index] = value;
     var updatedBrief = { ...brief, fonts: fonts };
+    setBrief(updatedBrief);
+    regenerateAllPages(updatedBrief);
+  }
+
+  // ── Buttons (Primary/Secondary + free-form extras) ───────────────────
+  // Same locked-slot pattern as Style Guide/Component Library's Buttons
+  // card, reusing the same ButtonEditor component -- every builder across
+  // Brief to Blueprint looks a button up BY NAME ("primary"/"secondary",
+  // case-insensitive, see landing.js/home.js/services.js/generic.js/
+  // about.js), not by array position, so those two names have to actually
+  // exist. Buttons apply brand-wide (not scoped to one page type), same as
+  // colors/fonts -- regenerateAllPages(), not regenerateActivePage().
+  //
+  // Previously the ONLY way to set brief.buttons at all was pulling a
+  // saved Style Guide/Component Library style by exact brand-name match --
+  // real gap for a genuinely custom, one-off build with no saved style to
+  // pull from. This lets B2B edit buttons directly, the same way it
+  // already edits colors directly.
+  function isNamedButton(b, role) { return (b.name || "").trim().toLowerCase() === role; }
+
+  function defaultBriefButton(role) {
+    var accentHex = (brief.colors && brief.colors.brass) || "#3F3F46";
+    var inkHex = (brief.colors && brief.colors.ink) || "#18181B";
+    if (role === "primary") {
+      return { name: "Primary", background: accentHex, textColor: bestTextColor(accentHex, "#1a1a1a") };
+    }
+    return { name: "Secondary", background: inkHex, textColor: "#FFFFFF" };
+  }
+
+  function setBriefButtonByName(role, updated) {
+    var current = Array.isArray(brief.buttons) ? brief.buttons : [];
+    var idx = current.findIndex(function (b) { return isNamedButton(b, role); });
+    var named = { ...updated, name: role === "primary" ? "Primary" : "Secondary" };
+    var newButtons = idx >= 0 ? current.map(function (b, i) { return i === idx ? named : b; }) : current.concat([named]);
+    var updatedBrief = { ...brief, buttons: newButtons };
+    setBrief(updatedBrief);
+    regenerateAllPages(updatedBrief);
+  }
+
+  function addBriefButton() {
+    var accentHex = (brief.colors && brief.colors.brass) || "#B45309";
+    var textColor = bestTextColor(accentHex, (brief.colors && brief.colors.text) || "#1a1a1a");
+    var current = Array.isArray(brief.buttons) ? brief.buttons : [];
+    var updatedBrief = { ...brief, buttons: current.concat([{ name: "", background: accentHex, textColor: textColor }]) };
+    setBrief(updatedBrief);
+    regenerateAllPages(updatedBrief);
+  }
+
+  function updateBriefButton(index, updated) {
+    var current = Array.isArray(brief.buttons) ? brief.buttons : [];
+    var updatedBrief = { ...brief, buttons: current.map(function (b, i) { return i === index ? updated : b; }) };
+    setBrief(updatedBrief);
+    regenerateAllPages(updatedBrief);
+  }
+
+  function removeBriefButton(index) {
+    var current = Array.isArray(brief.buttons) ? brief.buttons : [];
+    var updatedBrief = { ...brief, buttons: current.filter(function (_, i) { return i !== index; }) };
     setBrief(updatedBrief);
     regenerateAllPages(updatedBrief);
   }
@@ -1770,6 +1830,31 @@ export default function CustomBuild({ userId, role } = {}) {
                         placeholder="e.g. Inter"
                         style={{ padding: "6px 8px", border: "1px solid #dde0e6", borderRadius: "4px", fontSize: "12px", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
                       />
+                    </div>
+                  </div>
+                  <div style={{ marginBottom: "14px" }}>
+                    <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>
+                      Buttons
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                      <ButtonEditor
+                        locked
+                        button={(brief.buttons || []).find(b => isNamedButton(b, "primary")) || defaultBriefButton("primary")}
+                        onChange={updated => setBriefButtonByName("primary", updated)}
+                      />
+                      <ButtonEditor
+                        locked
+                        button={(brief.buttons || []).find(b => isNamedButton(b, "secondary")) || defaultBriefButton("secondary")}
+                        onChange={updated => setBriefButtonByName("secondary", updated)}
+                      />
+                      {(brief.buttons || []).map((b, i) => (isNamedButton(b, "primary") || isNamedButton(b, "secondary")) ? null : (
+                        <ButtonEditor key={i} button={b} onChange={updated => updateBriefButton(i, updated)} onRemove={() => removeBriefButton(i)} />
+                      ))}
+                      <button
+                        onClick={addBriefButton}
+                        style={{ padding: "8px", fontSize: "11px", fontWeight: 600, border: "1px dashed #dde0e6", borderRadius: "6px", background: "#fff", color: "#6b7280", cursor: "pointer" }}>
+                        + Add button
+                      </button>
                     </div>
                   </div>
                   {brief.brandName && (
