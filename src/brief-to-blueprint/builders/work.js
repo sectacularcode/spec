@@ -6,7 +6,7 @@ import { bestTextColor } from "../../utils/contrast.js";
 export function buildWorkPage(C, brief, inspoHint) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
       stone = C.stone || "#8A8170",
-      brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
+      brassDp = C["brass-deep"] || "#3F3F46", text = C.text;
   // Real button colors for genuine CTAs ("Start a project", "View
   // project") -- NOT applied to the filter-tab pills below, which use
   // mkButton as a rendering primitive for category tabs, not a call to

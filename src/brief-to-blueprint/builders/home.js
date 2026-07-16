@@ -5,7 +5,7 @@ import { bestTextColor } from "../../utils/contrast.js";
 export function buildHomePage(C, brief, inspoHint, patterns) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7", stone = C.stone || "#8A8170",
-      brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
+      brassDp = C["brass-deep"] || "#3F3F46", text = C.text;
   // Real button colors from the Style Guide's Buttons section when the
   // brand has one defined. Falls back to exactly the same brassDp fill
   // this always used when it doesn't -- only the TEXT color changes, from

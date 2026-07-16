@@ -28,9 +28,9 @@ export function generatePages(brief, selectedPages, inspoContext, aiRecs, custom
   // exported palette silently drifted from the preview's whenever any color
   // key was missing. Falsy values ("" / null) also fall back per key.
   var colorDefaults = {
-    ink: "#1C1A17", brass: "#C2A35B", "brass-deep": "#9C7E3A",
-    bone: "#EDE7DB", asphalt: "#2B2823", stone: "#8A8170",
-    "warm-white": "#FBFAF7", text: "#2A2722"
+    ink: "#18181B", brass: "#52525B", "brass-deep": "#3F3F46",
+    bone: "#F4F4F5", asphalt: "#27272A", stone: "#71717A",
+    "warm-white": "#FAFAFA", text: "#3F3F46"
   };
   var providedColors = brief.colors || {};
   var colors = Object.assign({}, colorDefaults);

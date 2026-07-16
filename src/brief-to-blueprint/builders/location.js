@@ -19,8 +19,8 @@ function getColors(colors) {
   return {
     ink:       colors.ink        || "#1C1A17",
     bone:      colors.bone       || "#EDE7DB",
-    brass:     colors.brass      || "#C2A35B",
-    brassDp:   colors["brass-deep"] || "#9C7E3A",
+    brass:     colors.brass      || "#52525B",
+    brassDp:   colors["brass-deep"] || "#3F3F46",
     warmWhite: colors["warm-white"] || "#FBFAF7",
     // See landing.js note: warm-white is a text-on-dark slot, not a section
     // background. A brand with green in that slot (Push & Pull) would paint

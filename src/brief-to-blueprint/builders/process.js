@@ -5,7 +5,7 @@ import { bestTextColor } from "../../utils/contrast.js";
 export function buildProcessPage(C, brief, inspoHint, patterns) {
   var ink = C.ink, brass = C.brass, bone = C.bone,
       warmWhite = C["warm-white"] || "#FBFAF7",
-      brassDp = C["brass-deep"] || "#9C7E3A", text = C.text;
+      brassDp = C["brass-deep"] || "#3F3F46", text = C.text;
   var definedBtn = brief.buttons && brief.buttons[0];
   var btnBg = (definedBtn && definedBtn.background) || brassDp;
   var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, text || "#1a1a1a");

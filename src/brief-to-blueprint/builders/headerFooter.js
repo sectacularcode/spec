@@ -7,8 +7,8 @@ import { bestTextColor } from "../../utils/contrast.js";
 
 export function buildHeaderJSON(C, brief, inspoContext) {
   var ink = C.ink || "#1C1A17";
-  var brass = C.brass || "#C2A35B";
-  var brassDp = C["brass-deep"] || "#9C7E3A";
+  var brass = C.brass || "#52525B";
+  var brassDp = C["brass-deep"] || "#3F3F46";
   var warmWhite = C["warm-white"] || "#FBFAF7";
   var definedBtn = brief.buttons && brief.buttons[0];
   var btnBg = (definedBtn && definedBtn.background) || brassDp;
@@ -106,7 +106,7 @@ export function buildHeaderJSON(C, brief, inspoContext) {
 // ─── Footer builder ───────────────────────────────────────────────────────────
 export function buildFooterJSON(C, brief, inspoContext) {
   var ink = C.ink || "#1C1A17";
-  var brass = C.brass || "#C2A35B";
+  var brass = C.brass || "#52525B";
   var bone = C.bone || "#EDE7DB";
   var warmWhite = C["warm-white"] || "#FBFAF7";
   var stone = C.stone || "#8A8170";

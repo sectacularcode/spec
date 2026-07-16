@@ -2131,7 +2131,7 @@ export default function CustomBuild({ userId, role } = {}) {
                     .map((s, i) => {
                       var colors = s.colors || {};
                       var ink = colors.ink || "#1C1A17";
-                      var brass = colors.brass || "#C2A35B";
+                      var brass = colors.brass || "#52525B";
                       var bone = colors.bone || "#EDE7DB";
                       return (
                         <div key={s.id || i}

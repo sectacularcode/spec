@@ -465,7 +465,7 @@ export function mkMapSection(address, mapUrl, colors, opts) {
   colors = colors || {};
   var mode = opts.mode === "service_area" ? "service_area" : "pin";
   var ink = colors.ink || colors.text || "#1A1A1A";
-  var accent = colors.brass || colors.accent || "#C2A35B";
+  var accent = colors.brass || colors.accent || "#52525B";
   var bone = colors.bone || colors.background || "#F2F2F2";
   var stone = colors.stone || colors.muted || "#666666";
   // Optional real button colors from the caller (a defined Style Guide

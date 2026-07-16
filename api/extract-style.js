@@ -277,7 +277,7 @@ export function buildColorSet(css) {
       // Leaving Accent absent here used to mean brief.colors.brass came
       // back undefined everywhere downstream (landing.js,
       // buildPreviewHTML.js), which silently falls back to Spec's own
-      // stock gold (#C2A35B) -- a color with zero relationship to the
+      // stock default accent color -- a color with zero relationship to the
       // actual brand, with no indication to the user that anything was
       // inferred rather than extracted. Reusing Heading's color as
       // Accent is a deliberate choice, not a guess: for a monochrome

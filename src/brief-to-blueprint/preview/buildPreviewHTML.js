@@ -123,9 +123,9 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
   // structure at all. Every other color here already had its own
   // fallback and was fine; only these three were missing it.
   var colorDefaults = {
-    ink: "#1C1A17", brass: "#C2A35B", "brass-deep": "#9C7E3A",
-    bone: "#EDE7DB", asphalt: "#2B2823", stone: "#8A8170",
-    "warm-white": "#FBFAF7", text: "#2A2722"
+    ink: "#18181B", brass: "#52525B", "brass-deep": "#3F3F46",
+    bone: "#F4F4F5", asphalt: "#27272A", stone: "#71717A",
+    "warm-white": "#FAFAFA", text: "#3F3F46"
   };
   var C = brief.colors || {};
   var ink = C.ink || colorDefaults.ink,

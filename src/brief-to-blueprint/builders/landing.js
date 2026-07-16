@@ -100,7 +100,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // placeholder boxes import in the same tint they were approved in.
   // (Assigned after `accent` is resolved below.)
   var ink      = colors.ink           || "#1A1A1A";
-  var accent   = colors.brass         || colors.accent || "#C2A35B";
+  var accent   = colors.brass         || colors.accent || "#52525B";
   var bone     = colors.bone          || colors.background || "#F2F2F2";
   var warmWhite= colors["warm-white"] || "#FFFFFF";
   // lightSectionBg is ALWAYS literal white -- the preview's alternating
