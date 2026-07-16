@@ -2205,20 +2205,33 @@ export default function CustomBuild({ userId, role } = {}) {
               })}
               <div style={{ position: "relative" }}>
                 <button onClick={() => setShowAddPagePreview(!showAddPagePreview)} style={{ padding: "6px 14px", fontSize: "12px", fontWeight: 500, cursor: "pointer", border: "1px dashed #dde0e6", borderRadius: "20px", background: "#fff", color: "#6b7280" }}>+ Add Page</button>
-                {showAddPagePreview && (
+                {showAddPagePreview && (() => {
+                  // Core page types (home/work/services/about/process/contact/landing/other)
+                  // plus the additional types, so a build that doesn't already have every
+                  // core page -- e.g. a Manifest import, which starts with only its one
+                  // suggested page -- can still add Home (or any other core type) here.
+                  // Both the list and the "all pages added" check now share this one
+                  // filter, so they can't drift out of sync with each other.
+                  const addablePages = ALL_PAGES.concat(ADDITIONAL_PAGE_TYPES).filter(p =>
+                    !selectedPages.includes(p.id) &&
+                    !selectedPages.some(sid => sid.startsWith(p.id + "-")) &&
+                    !customPages.find(cp => cp.id === p.id || cp.id.startsWith(p.id + "-"))
+                  );
+                  return (
                   <div style={{ position: "absolute", top: "100%", left: 0, width: "280px", marginTop: "4px", background: "#fff", border: "1px solid #dde0e6", borderRadius: "8px", boxShadow: "0 8px 32px rgba(0,0,0,0.15)", zIndex: 9999, maxHeight: "320px", overflowY: "auto" }}>
-                    {ADDITIONAL_PAGE_TYPES.filter(p => !selectedPages.includes(p.id) && !selectedPages.some(sid => sid.startsWith(p.id + "-")) && !customPages.find(cp => cp.id === p.id || cp.id.startsWith(p.id + "-"))).map(p => (
+                    {addablePages.map(p => (
                       <button key={p.id} onClick={() => { setPages(prev => [...prev, p.id]); setShowAddPagePreview(false); if (generated) { try { const ic = generated.inspoContext || ''; const allIds = [...selectedPages, p.id]; const newPages = generatePages(brief, allIds, ic, generated.aiRecs, customPages); setGenerated(prev => ({ ...prev, pages: newPages })); setPreviewPage(p.id); } catch(e) { console.error('Add page error:', e); } } }} style={{ display: "block", width: "100%", padding: "10px 16px", background: "none", border: "none", borderBottom: "1px solid #f0f0f0", cursor: "pointer", textAlign: "left", fontSize: "13px", color: "#09090b" }}
                         onMouseOver={e => e.currentTarget.style.background = "#f5f5f7"}
                         onMouseOut={e => e.currentTarget.style.background = "none"}>
                         {p.label}
                       </button>
                     ))}
-                    {ADDITIONAL_PAGE_TYPES.filter(p => !selectedPages.includes(p.id) && !customPages.find(cp => cp.id === p.id)).length === 0 && (
+                    {addablePages.length === 0 && (
                       <div style={{ padding: "16px", textAlign: "center", color: "#6b7280", fontSize: "13px" }}>All pages added</div>
                     )}
                   </div>
-                )}
+                  );
+                })()}
               </div>
 
               {/* Desktop / Mobile toggle — pushed to far right */}
