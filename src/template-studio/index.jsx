@@ -1990,11 +1990,17 @@ Rules:
                 .map(build => {
                   var colors = build.colors || {};
                   var ink = colors.ink || "#1C1A17";
+                  // ink is already the bar's own background (below), so
+                  // including it again in the swatch row draws an
+                  // ink-colored circle on an ink-colored background --
+                  // invisible, and a wasted slot in the 6-swatch cap.
+                  // Everything else about this card is unchanged.
+                  var swatchColors = Object.entries(colors).filter(([k]) => k !== "ink").map(([, v]) => v).filter(Boolean).slice(0, 6);
                   return (
                     <div key={build.id} style={{ background: "#fff", border: "1px solid #dde0e6", borderRadius: "10px", overflow: "hidden" }}>
                       {/* Color swatch preview */}
                       <div style={{ height: "80px", background: ink, display: "flex", alignItems: "flex-end", padding: "12px 16px", gap: "6px" }}>
-                        {Object.values(colors).slice(0, 6).map((hex, i) => (
+                        {swatchColors.map((hex, i) => (
                           <div key={i} title={hex} style={{ width: "20px", height: "20px", borderRadius: "50%", background: hex, border: "1px solid rgba(255,255,255,0.2)", flexShrink: 0 }} />
                         ))}
                       </div>
