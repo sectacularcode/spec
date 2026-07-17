@@ -12,6 +12,7 @@ import { buildInspoContext } from "./utils/inspo.js";
 import { saveToLibrary } from "./utils/library.js";
 import { he } from "./utils/htmlEscape.js";
 import { extractBrief } from "./utils/extractBrief.js";
+import { downloadPreviewPdf } from "./utils/exportPdf.js";
 
 // Builders
 import { buildHeaderJSON, buildFooterJSON } from "./builders/headerFooter.js";
@@ -104,6 +105,7 @@ export default function CustomBuild({ userId, role } = {}) {
   const [swapFilter, setSwapFilter]         = useState(""); // filter by page type
   const [pageOverrides, setPageOverrides]   = useState({}); // {pageId: {sectionIndex: sectionData}}
   const [mobilePreview, setMobilePreview]   = useState(false); // desktop vs mobile preview toggle
+  const [pdfDownloading, setPdfDownloading] = useState(false);
   const [panelCollapsed, setPanelCollapsed] = useState(false); // collapse left panel for full-width preview
   const fileRef = useRef();
   const [parsing, setParsing]           = useState(false);
@@ -2434,6 +2436,34 @@ export default function CustomBuild({ userId, role } = {}) {
                   );
                 })()}
               </div>
+
+              {/* Download PDF -- captures the exact same HTML already
+                  shown in the preview iframe below (same buildPreviewHTML
+                  call, same brief/page/variant/inspoContext args), so the
+                  PDF always matches what's on screen. Renders it into a
+                  second, temporary off-screen iframe first since the
+                  visible one is sandboxed without allow-same-origin and
+                  html2canvas can't read into it directly -- see
+                  exportPdf.js for the full reasoning. */}
+              <button
+                onClick={async () => {
+                  if (pdfDownloading) return;
+                  setPdfDownloading(true);
+                  try {
+                    var pdfVariant = layoutVariants[previewPage] || activePreviewPage?.recommended || "A";
+                    var pdfHtml = buildPreviewHTML(brief, previewPage, pdfVariant, generated?.inspoContext || "");
+                    await downloadPreviewPdf(pdfHtml, [brief?.brandName, activePreviewPage?.label || previewPage, pdfVariant]);
+                  } catch (err) {
+                    console.error("PDF export failed:", err);
+                  } finally {
+                    setPdfDownloading(false);
+                  }
+                }}
+                disabled={pdfDownloading}
+                title="Download this page as a PDF"
+                style={{ padding: "6px 14px", fontSize: "12px", fontWeight: 600, cursor: pdfDownloading ? "default" : "pointer", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: pdfDownloading ? "#9ca3af" : "#09090b" }}>
+                {pdfDownloading ? "Preparing…" : "Download PDF"}
+              </button>
 
               {/* Desktop / Mobile toggle — pushed to far right */}
               <div style={{ marginLeft: "auto", display: "flex", border: "1px solid #dde0e6", borderRadius: "6px", overflow: "hidden" }}>
