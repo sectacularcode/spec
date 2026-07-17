@@ -840,6 +840,82 @@ export default function CustomBuild({ userId, role } = {}) {
     regenerateActivePage(brief);
   }
 
+  // Manual per-feature button override -- landing.js's featureButton(f) and
+  // landingPreview.js's featureButtonHtml() already read
+  // f.buttonLabel/f.buttonUrl/f.buttonPlacement generically off each
+  // brief.features[idx] entry, whether it came from a Manifest import
+  // (manifestImport.js's text_section handler) or was typed in here -- no
+  // builder changes needed, this only adds a place to set those same
+  // fields by hand. A grouped row (two features sharing one heading)
+  // attaches its button to the first index in the group, same as the
+  // shared header itself already does. Legacy manual briefs with no
+  // brief.features array yet (feature1Heading/feature2Heading/
+  // feature3Heading fields instead) get converted into a real features
+  // array on first use here, since that legacy path has no button slot at
+  // all for landing.js to read -- see buildFeaturesArray()'s fallback
+  // branch in landing.js, heading/body only.
+  function featuresArrayFrom(b, featureCount) {
+    if (Array.isArray(b.features) && b.features.length > 0) return b.features.slice();
+    var legacyImageLeft = [false, true, false];
+    var arr = [];
+    for (var i = 0; i < featureCount; i++) {
+      var n = i + 1;
+      arr.push({
+        heading: b["feature" + n + "Heading"] || "",
+        body: b["feature" + n + "Body"] || "",
+        imgCaption: "[Photo placeholder]",
+        imageLeft: i < legacyImageLeft.length ? legacyImageLeft[i] : (i % 2 === 1),
+        buttonLabel: "",
+        buttonUrl: "",
+        buttonPlacement: "",
+      });
+    }
+    return arr;
+  }
+
+  function updateFeatureButtonField(idx, field, value, featureCount) {
+    setBrief(b => {
+      var features = featuresArrayFrom(b, featureCount);
+      if (!features[idx]) return b;
+      features[idx] = { ...features[idx], [field]: value };
+      return { ...b, features: features };
+    });
+  }
+
+  // Manifest-imported button URLs already pass through manifestImport.js's
+  // sanitizeUrl (blocks javascript:/data: URIs etc, keeps only http(s)/tel/
+  // mailto/relative/anchor) -- a manually-typed URL here has no such filter
+  // unless applied separately, since sanitizeUrl isn't exported (its own
+  // file keeps it dependency-free on purpose). Same pattern, applied on
+  // blur rather than per keystroke so typing "https://…" doesn't get its
+  // in-progress value stripped before the scheme is complete.
+  var FEATURE_BUTTON_URL_PATTERN = /^(https?:|tel:|mailto:|#|\/(?!\/))/i;
+  function commitFeatureButtonEdit(idx) {
+    var features = Array.isArray(brief.features) ? brief.features.slice() : [];
+    var f = features[idx];
+    if (f && f.buttonUrl) {
+      var trimmed = f.buttonUrl.trim();
+      var safe = FEATURE_BUTTON_URL_PATTERN.test(trimmed) ? trimmed : "";
+      if (safe !== f.buttonUrl) {
+        features[idx] = { ...f, buttonUrl: safe };
+        var updatedBrief = { ...brief, features: features };
+        setBrief(updatedBrief);
+        regenerateActivePage(updatedBrief);
+        return;
+      }
+    }
+    regenerateActivePage(brief);
+  }
+
+  function setFeatureButtonPlacement(idx, placement, featureCount) {
+    var features = featuresArrayFrom(brief, featureCount);
+    if (!features[idx]) return;
+    features[idx] = { ...features[idx], buttonPlacement: placement };
+    var updatedBrief = { ...brief, features: features };
+    setBrief(updatedBrief);
+    regenerateActivePage(updatedBrief);
+  }
+
   async function saveBrandStyle() {
     var hasColors = brief && brief.colors && Object.keys(brief.colors).length > 0;
     var hasFonts = brief && Array.isArray(brief.fonts) && brief.fonts.some(function (f) { return f; });
@@ -1739,6 +1815,51 @@ export default function CustomBuild({ userId, role } = {}) {
                             </label>
                             <button onClick={() => insertMidCta(rows, rowIdx)} style={{ padding: "4px 10px", fontSize: "12px", background: "#fff", color: "#b45309", border: "1px solid #b45309", borderRadius: "5px", cursor: "pointer" }}>+ Insert CTA after this row</button>
                           </div>
+
+                          {/* Manual button override -- attaches to the first
+                              feature index in the row (the same index a
+                              grouped row's shared header already applies
+                              to). Reads/writes brief.features[idx].buttonLabel/
+                              buttonUrl/buttonPlacement directly; landing.js
+                              and landingPreview.js already render whatever's
+                              there, Manifest-imported or typed in here. */}
+                          {(() => {
+                            const btnIdx = row.indices[0];
+                            const btnFeature = (Array.isArray(brief.features) && brief.features[btnIdx]) || {};
+                            return (
+                              <div style={{ borderTop: "1px solid #eee", paddingTop: "10px" }}>
+                                <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", marginBottom: "8px" }}>
+                                  Button (optional)
+                                </div>
+                                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                                  <input
+                                    type="text"
+                                    value={btnFeature.buttonLabel || ""}
+                                    onChange={e => updateFeatureButtonField(btnIdx, "buttonLabel", e.target.value, featureCount)}
+                                    onBlur={() => commitFeatureButtonEdit(btnIdx)}
+                                    placeholder="Button label"
+                                    style={{ padding: "10px 12px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", color: "#09090b", boxSizing: "border-box" }}
+                                  />
+                                  <input
+                                    type="text"
+                                    value={btnFeature.buttonUrl || ""}
+                                    onChange={e => updateFeatureButtonField(btnIdx, "buttonUrl", e.target.value, featureCount)}
+                                    onBlur={() => commitFeatureButtonEdit(btnIdx)}
+                                    placeholder="https://…"
+                                    style={{ padding: "10px 12px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", color: "#09090b", boxSizing: "border-box" }}
+                                  />
+                                  <select
+                                    value={btnFeature.buttonPlacement === "secondary" ? "secondary" : "primary"}
+                                    onChange={e => setFeatureButtonPlacement(btnIdx, e.target.value, featureCount)}
+                                    style={{ padding: "10px 30px 10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", background: "#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%236b635c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\") no-repeat right 12px center", width: "100%", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none", boxSizing: "border-box" }}
+                                  >
+                                    <option value="primary">Primary (filled)</option>
+                                    <option value="secondary">Secondary (outline)</option>
+                                  </select>
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </div>
                       );
                     })}
