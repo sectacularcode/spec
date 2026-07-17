@@ -80,7 +80,7 @@ function renderOffscreen(html) {
 // other small utility duplicated across this codebase: keeps each feature
 // area free of a cross-cutting dependency on the other's file).
 function canvasToPdf(canvas) {
-  const pdf = new jsPDF({ unit: "pt", format: "letter" });
+  const pdf = new jsPDF({ unit: "pt", format: "letter", orientation: "landscape" });
   const marginPt = 36; // 0.5in
   const usableWidthPt = pdf.internal.pageSize.getWidth() - marginPt * 2;
   const usableHeightPt = pdf.internal.pageSize.getHeight() - marginPt * 2;
