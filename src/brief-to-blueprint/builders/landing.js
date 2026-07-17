@@ -1090,6 +1090,15 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // ── VARIANT C — Minimal Retargeting layout ────────────────────────────────
   // Tight hero → 3 outcome bullets → single testimonial → single CTA
   // No nav distractions, no checklist, no feature rows. Just the essentials.
+  // Rebuilt to actually match landingPreview.js's C branch (July 2026) --
+  // this previously diverged in four places: hero used `dark` instead of
+  // the preview's brass/accent background; the benefit section was a
+  // centered 3-column grid instead of the preview's divided single-column
+  // rows (big checkmark beside bold text, left-aligned); a trust-stats bar
+  // was rendered here that doesn't exist anywhere in the preview's C; and
+  // the testimonial was a plain centered quote instead of the preview's
+  // distinctive 50/50 image-split layout. Closing CTA already matched the
+  // preview (brass bg, single button, reassurance line) and is unchanged.
   var heroC = mkContainer([
     mkHeading(heroEyebrowText, warmWhite, "h6", { eyebrow: true, align: "center" }),
     mkSpacer(12),
@@ -1097,42 +1106,48 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     mkSpacer(16),
     mkText("<p style='text-align:center'>" + he(heroSub) + "</p>", "rgba(255,255,255,0.85)"),
     mkSpacer(32),
-    makeDualBtnRow(phoneCta, contactCta, brief.heroPrimaryUrl, brief.heroSecondaryUrl),
-  ], dark, { padY: "80", center: true });
+    makeDualBtnRow(phoneCta, contactCta, brief.heroPrimaryUrl, brief.heroSecondaryUrl, accent),
+  ], accent, { padY: "80", center: true });
 
-  // 3 outcome-focused benefit bullets
+  // 3 outcome-focused benefit bullets -- divided rows, not a grid. Each
+  // row is a big checkmark beside a bold statement, left-aligned, with a
+  // hairline dividing consecutive rows -- matches the preview's
+  // benefit-row treatment exactly (padding/border/font-size all mirror
+  // the preview's inline styles).
   var benefits = [
     brief.benefit1 || "Faster results with less hassle",
     brief.benefit2 || "One team handles everything end to end",
     brief.benefit3 || "Decades of proven experience",
   ];
-  var benefitCols = benefits.map(function(b) {
-    return mkContainer([
-      mkHeading("✓", accent, "h2", { weight: 800, px: 40, align: "center" }),
-      mkSpacer(12),
-      mkText("<p style='text-align:center;font-size:18px;font-weight:600;line-height:1.4'>" + he(b) + "</p>", ink),
-    ], warmWhite, { isInner: true, padY: "48", padX: "32", center: true, grow: "1" });
+  var benefitRows = benefits.map(function(b, i) {
+    var row = mkContainer([
+      mkContainer([mkHeading("✓", accent, "h3", { weight: 800, px: 32 })], null, { isInner: true, padY: "0", padX: "0" }),
+      mkContainer([mkText("<p style='font-weight:600;font-size:20px;line-height:1.25'>" + he(b) + "</p>", ink)], null, { isInner: true, padY: "0", padX: "0", grow: "1" }),
+    ], null, { isInner: true, direction: "row", padY: "28", padX: "0", gap: "24" });
+    if (i < benefits.length - 1) {
+      row.settings.border_border = "solid";
+      row.settings.border_width  = { unit: "px", top: "0", right: "0", bottom: "1", left: "0", isLinked: false };
+      row.settings.border_color  = "#E2E2E2";
+    }
+    return row;
   });
-  var benefitsSection = mkContainer(benefitCols, lightSectionBg, { direction: "row", padY: "0", padX: "0", gap: "0" });
+  var benefitsSection = mkContainer([mkContainer(benefitRows, null, { isInner: true, padY: "0", padX: "0" })], lightSectionBg, { padY: "72", full: true });
 
-  // Trust bar — compact stat row
-  var compactTrust = brief.skipTrustStats ? null : mkContainer([
-    mkContainer([
-      mkHeading((brief.trustStat1 || "10+") + "  " + (brief.trustLabel1 || "Years"), accent, "h6", { eyebrow: false, align: "center", weight: 700, px: 15 }),
-    ], null, { isInner: true, padY: "0", padX: "24", grow: "1", center: true }),
-    mkContainer([
-      mkHeading((brief.trustStat2 || "500+") + "  " + (brief.trustLabel2 || "Projects"), accent, "h6", { eyebrow: false, align: "center", weight: 700, px: 15 }),
-    ], null, { isInner: true, padY: "0", padX: "24", grow: "1", center: true }),
-    mkContainer([
-      mkHeading((brief.trustStat3 || "98%") + "  " + (brief.trustLabel3 || "Satisfaction"), accent, "h6", { eyebrow: false, align: "center", weight: 700, px: 15 }),
-    ], null, { isInner: true, padY: "0", padX: "24", grow: "1", center: true }),
-  ], bone, { direction: "row", padY: "20", padX: "40", gap: "0" });
-
-  // Single testimonial
+  // Single testimonial -- 50/50 image split, matching the preview exactly
+  // (image placeholder left, quote/name/title right on a bone bg). Only
+  // renders with real testimonial content, same guard as every other
+  // testimonial section in this file.
   var singleTestimonial = (String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? mkContainer([
-    mkText("<p style='font-size:22px;font-style:italic;line-height:1.6;text-align:center;margin:0 0 24px'>\"" + he(brief.testimonial1Quote || "") + "\"</p>", ink),
-    mkText("<p style='text-align:center;font-weight:600'>" + he(brief.testimonial1Name) + (brief.testimonial1Title ? " · " + he(brief.testimonial1Title) : "") + "</p>", stone),
-  ], bone, { padY: "80", center: true }) : null;
+    mkImageBg(brief.feature1Heading || "[Photo placeholder]", { width: 50, bg: accentTint, minHeight: 420 }),
+    mkContainer([
+      mkText("<p style='font-size:20px;font-style:italic;line-height:1.65'>" + he(brief.testimonial1Quote || "") + "</p>", ink),
+      mkSpacer(14),
+      mkDivider(accent),
+      mkSpacer(14),
+      mkText("<p style='font-weight:600;margin:0'>" + he(brief.testimonial1Name) + "</p>", ink),
+      ...(brief.testimonial1Title ? [mkText("<p style='font-size:13px'>" + he(brief.testimonial1Title) + "</p>", stone)] : []),
+    ], null, { isInner: true, width: 50, padY: "64", padX: "56", full: true }),
+  ], bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true }) : null;
 
   // Single strong CTA
   var singleCtaBg = accent;
@@ -1147,6 +1162,6 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
   return {
     version: "0.4", title: he(brandName || "Site") + " — Landing Page (Minimal)", type: "page", page_settings: {},
-    content: [heroC, benefitsSection, compactTrust, singleTestimonial, makeMapSection(), singleCtaSection].filter(Boolean),
+    content: [heroC, benefitsSection, singleTestimonial, makeMapSection(), singleCtaSection].filter(Boolean),
   };
 }
