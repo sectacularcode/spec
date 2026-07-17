@@ -593,6 +593,25 @@ function manifestPageDocumentToBrief(raw) {
     if (section.type === "cta") {
       brief.closingCta = headingText;
       brief.closingBody = flattenRichText(section.body);
+      // Confirmed real bug, July 2026: this only ever read heading/body,
+      // never section.buttons -- KC's real export has a cta section with
+      // a genuine button ("Book My Inspection") and NO heading/body at
+      // all, so both above come back empty and the button was silently
+      // dropped entirely (not tracked as a placeholder either, since
+      // that only happens for text_section/hero -- a real content-loss
+      // bug, not just a missing default). Captured separately from
+      // phoneCta/heroPrimaryUrl (the hero's own button) since a cta
+      // section's button is frequently different real copy, not a
+      // repeat of the hero's -- confirmed exactly that case here
+      // ("Book My Inspection" vs the hero's "Schedule Your DOT
+      // Inspection in Kansas City").
+      var ctaBtns = section.buttons || [];
+      var ctaBtn = ctaBtns.filter(function (b) { return b && b.placement === "primary"; })[0] || ctaBtns[0];
+      if (ctaBtn) {
+        brief.closingCtaButtonLabel = ctaBtn.label || "";
+        brief.closingCtaButtonUrl = pageDocumentButtonUrl(ctaBtn);
+        trackPlaceholderButton(brief.closingCtaButtonLabel, brief.closingCtaButtonUrl, "Closing CTA");
+      }
       contentOrder.push({ type: "cta" });
       return;
     }

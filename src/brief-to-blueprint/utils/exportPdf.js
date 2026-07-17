@@ -111,6 +111,14 @@ function renderOffscreen(html) {
         // that dependency rather than trusting the media query here.
         const mobileNav = doc.getElementById("mobile-nav");
         if (mobileNav) mobileNav.style.display = "none";
+        // The live preview's FAQ accordion is checkbox-driven and only
+        // shows the first answer expanded by default (real user
+        // interaction opens the rest) -- meaningless for a static PDF,
+        // where nothing can be clicked. Expand every answer and check
+        // every toggle so the "−" icon matches the now-expanded state
+        // instead of showing "+" on everything but the first.
+        doc.querySelectorAll(".faq-answer").forEach((el) => { el.style.display = "block"; });
+        doc.querySelectorAll(".faq-toggle").forEach((el) => { el.checked = true; });
         resolve({ iframe, body: doc.body });
       } catch (err) {
         reject(err);

@@ -532,15 +532,22 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
       // brass to match variant A/E/F's own treatment; pass "dark" for
       // variant B's own darker closing section.
       function closingCtaHTML(bg) {
-        if (!brief.closingCta && !brief.closingBody) return "";
+        // closingCtaButtonLabel added -- confirmed real case, Kansas
+        // City's export: a cta section can carry ONLY a real button (no
+        // heading/body at all), which still means real content exists.
+        // Mirrors landing.js's makeClosingCta() exactly.
+        if (!brief.closingCta && !brief.closingBody && !brief.closingCtaButtonLabel) return "";
         var sectionBg = bg || brass;
+        // A cta section's own button is real, page-specific copy,
+        // distinct from the hero's -- prefer it as a single filled
+        // button over always duplicating the hero's cta1/cta2 pair.
+        var buttonsHtml = brief.closingCtaButtonLabel
+          ? "<a class='cta-btn' style='display:inline-block;padding:14px 32px;background:#ffffff;color:" + sectionBg + ";font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:3px;'>" + he(brief.closingCtaButtonLabel) + "</a>"
+          : "<a class='cta-btn' style='" + btnStyle + "'>" + cta1 + "</a><a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>";
         return "<section class='va-cta' style='background:" + sectionBg + ";padding:80px 40px;text-align:center;'>" +
           "<h2 style='font-size:clamp(26px,4vw,42px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
           "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:540px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
-          "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
-            "<a class='cta-btn' style='" + btnStyle + "'>" + cta1 + "</a>" +
-            "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
-          "</div>" +
+          "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" + buttonsHtml + "</div>" +
         "</section>";
       }
 

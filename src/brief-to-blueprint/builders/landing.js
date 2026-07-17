@@ -792,17 +792,32 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // or a manual brief field someone actually typed into) -- never from
     // the fallback default itself, so checking them directly (not
     // closingLine/closingBody) is the correct "is this real" test.
-    if (!brief.closingCta && !brief.closingBody) return null;
+    // closingCtaButtonLabel added to the check -- confirmed real case,
+    // Kansas City's export: a cta section can carry ONLY a real button
+    // (no heading/body at all), which still means real content exists
+    // and this section should render, just with default heading/body
+    // text filling the gap Manifest didn't supply for THIS specific
+    // piece -- not "nothing here is real, suppress the whole section."
+    if (!brief.closingCta && !brief.closingBody && !brief.closingCtaButtonLabel) return null;
     // Background follows the variant's own preview: brass/accent for
     // A/D/E/F (the preview's va-cta section), dark only for B. The export
     // used to hardcode dark for every variant, so the approved green
     // closing section imported as a near-black one.
     var sectionBg = bg || accent;
     var textOnBg = lightTextOn(sectionBg);
+    // A cta section's own button (e.g. Kansas City's "Book My
+    // Inspection") is real, page-specific copy, distinct from the hero's
+    // -- prefer it as a single filled button over always duplicating the
+    // hero's phoneCta/contactCta pair, which is frequently different
+    // wording for the same action and, worse, can point at an empty
+    // heroSecondaryUrl when the hero itself only has one button.
+    var ctaButtonRow = brief.closingCtaButtonLabel
+      ? mkButton(brief.closingCtaButtonLabel, textOnBg, sectionBg, brief.closingCtaButtonUrl)
+      : makeDualBtnRow(phoneCta, contactCta, brief.heroPrimaryUrl, brief.heroSecondaryUrl, sectionBg);
     return mkContainer([
       mkHeading(closingLine, textOnBg, "h2", { weight: 700, px: 40, align: "center" }),
       mkText("<p style='text-align:center'>" + (brief.closingBodyIsHtml ? styleInlineLinks(closingBody, null) : he(closingBody)) + "</p>", textOnBg === "#FFFFFF" ? "rgba(255,255,255,0.8)" : textOnBg),
-      makeDualBtnRow(phoneCta, contactCta, brief.heroPrimaryUrl, brief.heroSecondaryUrl, sectionBg),
+      ctaButtonRow,
     ], sectionBg, { padY: "80", center: true });
   }
 
