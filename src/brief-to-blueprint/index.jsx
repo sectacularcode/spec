@@ -1713,6 +1713,58 @@ export default function CustomBuild({ userId, role } = {}) {
             );
           })()}
 
+          {/* Manifest section order readout -- read-only, shows exactly
+              what Manifest's export called for (hero always first,
+              followed by brief.contentOrder in the real sequence
+              manifestImport.js recorded) so there's a clear answer to
+              "what should the top-to-bottom layout be" before deciding
+              whether to keep it or rearrange it. Only meaningful for a
+              Manifest-imported brief -- brief.contentOrder doesn't exist
+              for legacy/manual briefs, so this stays hidden rather than
+              showing a confusing empty list. */}
+          {generated && Array.isArray(brief.contentOrder) && brief.contentOrder.length > 0 && (() => {
+            const ordPage = activePreviewPage;
+            if (!ordPage || !/^(landing|other)(-\d+)?$/.test(ordPage.id)) return null;
+            const blockLabel = (block) => {
+              if (block.type === "feature") {
+                const f = Array.isArray(brief.features) ? brief.features[block.index] : null;
+                return f && f.heading ? f.heading : "(untitled feature)";
+              }
+              if (block.type === "faq") {
+                const count = Array.isArray(brief.faqItems) ? brief.faqItems.length : 0;
+                return "FAQ" + (count ? " (" + count + " question" + (count === 1 ? "" : "s") + ")" : "");
+              }
+              if (block.type === "form") return "Form" + (brief.formHeading ? " — " + brief.formHeading : "");
+              if (block.type === "map") return "Map / Location";
+              if (block.type === "cta") return brief.closingCtaButtonLabel ? "Closing CTA — \"" + brief.closingCtaButtonLabel + "\"" : "Closing CTA";
+              return block.type;
+            };
+            return (
+              <div style={{ marginBottom: "32px" }}>
+                <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>
+                  Manifest Section Order
+                </div>
+                <div style={T.surface}>
+                  <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px", lineHeight: 1.5 }}>
+                    The real top-to-bottom order Manifest sent for this page. This is what the build follows by default.
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 10px", background: "#f5f4f2", borderRadius: "5px" }}>
+                      <div style={{ fontSize: "11px", fontWeight: 700, color: "#b45309", minWidth: "18px" }}>1</div>
+                      <div style={{ fontSize: "13px", color: "#09090b" }}>Hero{brief.heroHeadline ? " — " + brief.heroHeadline : ""}</div>
+                    </div>
+                    {brief.contentOrder.map((block, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 10px", background: "#f5f4f2", borderRadius: "5px" }}>
+                        <div style={{ fontSize: "11px", fontWeight: 700, color: "#b45309", minWidth: "18px" }}>{i + 2}</div>
+                        <div style={{ fontSize: "13px", color: "#09090b" }}>{blockLabel(block)}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
           {/* Section styles picker — landing/other pages only, matches
               where brief.featureLayout actually applies. Replaces the old
               AFS-only hardcoded layout with a real per-brief UI over the
