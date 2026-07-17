@@ -50,12 +50,22 @@ export default async function handler(req, res) {
     await ensureTable();
 
     if (req.method === "GET") {
+      // client/entry_date/source live in their own columns (see POST below
+      // and the table definition above) -- data only holds what's left
+      // after those three are split out. This SELECT was previously
+      // `id, data` only, so client/date/source were silently dropped on
+      // every load: every card showed a blank brand name and a dangling
+      // "style ·" with no date after it, and anything reading build.client
+      // (the download filename, "Use Style"'s project name) silently fell
+      // back to its generic default instead. Nothing was ever lost --
+      // the columns were always written correctly by POST -- this was a
+      // read-side bug only.
       const { rows } = await sql`
-        SELECT id, data FROM template_library_entries
+        SELECT id, client, entry_date, source, data FROM template_library_entries
         WHERE user_id = ${userId}
         ORDER BY created_at DESC, id DESC
       `;
-      return res.status(200).json({ entries: rows.map(r => ({ id: r.id, ...r.data })) });
+      return res.status(200).json({ entries: rows.map(r => ({ id: r.id, ...r.data, client: r.client, date: r.entry_date, source: r.source })) });
     }
 
     if (req.method === "POST") {
