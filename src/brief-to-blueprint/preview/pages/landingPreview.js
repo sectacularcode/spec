@@ -207,7 +207,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<section style='background:" + bg + ";padding:56px clamp(24px,6vw,64px);text-align:center;'>" +
                 "<h3 style='font-size:clamp(18px,2.2vw,24px);font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + he(f.heading || "") + "</h3>" +
                 "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0 auto 20px;max-width:640px;'>" + he(f.body || "") + "</p>" +
-                "<a class='row-btn' style='" + btnDark + "display:inline-block;'>" + cta2 + "</a>" +
+                "<a class='row-btn' style='" + btnDark + "display:inline-block;'>" + he(f.buttonLabel || cta2) + "</a>" +
               "</section>"
             );
             return;
@@ -259,12 +259,12 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
 
           if (entry.style === "split-right" || entry.style === "split-left" || entry.style === "split-cta-right" || entry.style === "split-cta-left") {
             var imgLeft = entry.style === "split-left" || entry.style === "split-cta-left";
-            var withBtn = entry.style === "split-cta-right" || entry.style === "split-cta-left";
+            var withBtn = entry.style === "split-cta-right" || entry.style === "split-cta-left" || !!f.buttonLabel;
             var img = makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg);
             var textBlock = "<div style='padding:56px 48px;display:flex;flex-direction:column;justify-content:center;'>" +
               "<h2 style='font-size:clamp(20px,2.5vw,28px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + he(f.heading || "") + "</h2>" +
               "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0" + (withBtn ? " 0 20px" : "") + ";'>" + he(f.body || "") + "</p>" +
-              (withBtn ? "<a class='row-btn' style='" + btnDark + "'>" + cta2 + "</a>" : "") +
+              (withBtn ? "<a class='row-btn' style='" + btnDark + "'>" + he(f.buttonLabel || cta2) + "</a>" : "") +
             "</div>";
             var imgBlock = "<div class='landing-img' style='min-height:320px;height:100%;overflow:hidden;'><img src=\"" + img + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:320px;'/></div>";
             htmlParts.push(
@@ -286,6 +286,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
                     return "<div style='display:flex;align-items:flex-start;gap:10px;'><span style='font-size:19px;color:" + brass + ";font-weight:700;flex-shrink:0;margin-top:2px;'>&#10003;</span><span style='font-size:19px;color:" + text + ";line-height:1.5;'>" + he(c) + "</span></div>";
                   }).join("") +
                 "</div>" +
+                (f.buttonLabel ? "<div style='margin-top:20px;'><a class='row-btn' style='" + btnDark + "'>" + he(f.buttonLabel) + "</a></div>" : "") +
               "</section>"
             );
             return;
@@ -306,7 +307,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<section style='background:" + bg + ";display:grid;grid-template-columns:1fr 1fr;'>" +
                 "<div style='padding:44px 48px;display:flex;flex-direction:column;justify-content:center;'>" +
                   "<h3 style='font-size:clamp(17px,2vw,22px);font-weight:700;color:" + ink + ";margin:0 0 10px;'>" + he(f.heading || "") + "</h3>" +
-                  "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0;'>" + he(f.body || "") + "</p>" +
+                  "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0" + (f.buttonLabel ? " 0 16px" : "") + ";'>" + he(f.body || "") + "</p>" +
+                  (f.buttonLabel ? "<a class='row-btn' style='" + btnDark + "'>" + he(f.buttonLabel) + "</a>" : "") +
                 "</div>" +
                 "<div style='min-height:280px;height:100%;overflow:hidden;'><iframe src=\"" + he(embedSrc) + "\" style='border:0;width:100%;height:100%;min-height:280px;display:block;' loading='lazy' allowfullscreen></iframe></div>" +
               "</section>"
@@ -319,6 +321,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             "<section style='background:" + bg + ";padding:44px clamp(24px,6vw,64px);'>" +
               "<h3 style='font-size:clamp(17px,2vw,22px);font-weight:700;color:" + ink + ";margin:0 0 10px;'>" + he(f.heading || "") + "</h3>" +
               "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0;'>" + he(f.body || "") + "</p>" +
+              (f.buttonLabel ? "<div style='margin-top:20px;'><a class='row-btn' style='" + btnDark + "'>" + he(f.buttonLabel) + "</a></div>" : "") +
             "</section>"
           );
         });

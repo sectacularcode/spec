@@ -624,7 +624,23 @@ function manifestPageDocumentToBrief(raw) {
         brief.closingBody = flattenTextSectionBody(section.items);
         return;
       }
-      featurePairs.push({ heading: headingText, body: flattenTextSectionBody(section.items) });
+      // Capture the section's own button (label + resolved URL) so a real,
+      // page-specific CTA (e.g. "See how our mobile and on-site fleet
+      // service works.") survives into the built page instead of being
+      // silently dropped -- confirmed real gap, July 2026: this only ever
+      // fed heading/body into featurePairs, so every text_section button
+      // except the page's final closing CTA had nowhere to render at all.
+      // Only the first button is kept, matching the single-button-per-row
+      // capacity every landing.js row style has; a second real button on
+      // the same section still gets its normal placeholder-tracking pass
+      // below, same as before.
+      var secBtn = section.buttons && section.buttons[0];
+      featurePairs.push({
+        heading: headingText,
+        body: flattenTextSectionBody(section.items),
+        buttonLabel: secBtn ? secBtn.label || "" : "",
+        buttonUrl: secBtn ? pageDocumentButtonUrl(secBtn) : "",
+      });
       return;
     }
 

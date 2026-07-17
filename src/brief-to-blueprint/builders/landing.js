@@ -245,6 +245,8 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
             body: f.body || "",
             imgCaption: f.imgCaption || "[Photo placeholder]",
             imageLeft: i % 2 === 1,
+            buttonLabel: f.buttonLabel || "",
+            buttonUrl: f.buttonUrl || "",
           };
         })
       : [
@@ -325,6 +327,10 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
           mkSpacer(10),
           mkText(he(f.body), text),
         ];
+        if (f.buttonUrl) {
+          children.push(mkSpacer(16));
+          children.push(mkButton(f.buttonLabel || contactCta, lightCtxBtnBg, lightCtxBtnText, f.buttonUrl));
+        }
         return mkContainer(children, i % 2 === 0 ? lightSectionBg : bone, { padY: "56", padX: "48", full: true });
       });
     }
@@ -341,11 +347,16 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
           mkHeading(String(i + 1) + ".", accent, "h4", { weight: 700, px: 22 }),
         ], null, { isInner: true, padY: "0", padX: "0" });
 
-        var textCol = mkContainer([
+        var textColChildren = [
           mkHeading(f.heading, ink, "h4", { weight: 700, px: 18 }),
           mkSpacer(6),
           mkText(he(f.body), text),
-        ], null, { isInner: true, padY: "0", padX: "0", grow: "1" });
+        ];
+        if (f.buttonUrl) {
+          textColChildren.push(mkSpacer(12));
+          textColChildren.push(mkButton(f.buttonLabel || contactCta, lightCtxBtnBg, lightCtxBtnText, f.buttonUrl));
+        }
+        var textCol = mkContainer(textColChildren, null, { isInner: true, padY: "0", padX: "0", grow: "1" });
 
         var row = mkContainer([numberCol, textCol], null, { direction: "row", padY: "28", padX: "32", gap: "20", full: true });
         row.settings.flex_align_items = "flex-start";
@@ -363,7 +374,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         mkSpacer(16),
         mkText(he(f.body), text),
         mkSpacer(24),
-        mkButton(contactCta, lightCtxBtnBg, lightCtxBtnText, brief.heroSecondaryUrl),
+        mkButton(f.buttonLabel || contactCta, lightCtxBtnBg, lightCtxBtnText, f.buttonUrl || brief.heroSecondaryUrl),
       ];
       // Always-on: content lives inside an inner box with min_height 508px,
       // matching CS Repair's confirmed production template. This is what
@@ -452,9 +463,9 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkSpacer(14),
       mkText(he(f.body), text),
     ];
-    if (withButton) {
+    if (withButton || f.buttonUrl) {
       innerChildren.push(mkSpacer(20));
-      innerChildren.push(mkButton(contactCta, lightCtxBtnBg, lightCtxBtnText, brief.heroSecondaryUrl));
+      innerChildren.push(mkButton(f.buttonLabel || contactCta, lightCtxBtnBg, lightCtxBtnText, f.buttonUrl || brief.heroSecondaryUrl));
     }
     var innerBox = mkContainer(innerChildren, null, { isInner: true, padY: "30", padX: "30", full: true });
     innerBox.settings.min_height = { unit: "px", size: 420 };
@@ -475,7 +486,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     return mkContainer([
       mkHeading(f.heading, ink, "h3", { weight: 700, px: 32, align: "center" }),
       body,
-      mkButton(contactCta, lightCtxBtnBg, lightCtxBtnText, brief.heroSecondaryUrl),
+      mkButton(f.buttonLabel || contactCta, lightCtxBtnBg, lightCtxBtnText, f.buttonUrl || brief.heroSecondaryUrl),
     ], rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "72", center: true });
   }
 
@@ -561,11 +572,16 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // uniform styles would otherwise handle fine, kept as-is inside a
   // curated layout.
   function renderPlainRow(f, rowIdx) {
-    return mkContainer([
+    var children = [
       mkHeading(f.heading, ink, "h3", { weight: 700, px: 30 }),
       mkSpacer(10),
       mkText(he(f.body), text),
-    ], rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "56", padX: "48" });
+    ];
+    if (f.buttonUrl) {
+      children.push(mkSpacer(20));
+      children.push(mkButton(f.buttonLabel || contactCta, lightCtxBtnBg, lightCtxBtnText, f.buttonUrl));
+    }
+    return mkContainer(children, rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "56", padX: "48" });
   }
 
   // A heading with a short checkmark list beneath it — real native
@@ -578,11 +594,16 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   function renderChecklistRow(f, rowIdx) {
     var clauses = (f.body || "").split(/\.\s+/).map(function (s) { return s.trim().replace(/\.$/, ""); }).filter(function (s) { return s.length > 0; });
     if (clauses.length === 0) clauses = [f.body || ""];
-    return mkContainer([
+    var checklistChildren = [
       mkHeading(f.heading, ink, "h3", { weight: 700, px: 30 }),
       mkSpacer(16),
       mkIconList(clauses, accent, text, { fontSize: 19, iconSize: 19 }),
-    ], rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "56", padX: "48" });
+    ];
+    if (f.buttonUrl) {
+      checklistChildren.push(mkSpacer(20));
+      checklistChildren.push(mkButton(f.buttonLabel || contactCta, lightCtxBtnBg, lightCtxBtnText, f.buttonUrl));
+    }
+    return mkContainer(checklistChildren, rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "56", padX: "48" });
   }
 
   // A real native Elementor Video widget — UNVERIFIED against an actual
@@ -604,11 +625,16 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       settings: { video_type: "youtube", youtube_url: safeVideoUrl },
       elements: [],
     };
-    var textCol = mkContainer([
+    var videoTextChildren = [
       mkHeading(f.heading, ink, "h3", { weight: 700, px: 22 }),
       mkSpacer(10),
       mkText(he(f.body), text),
-    ], null, { isInner: true, padY: "30", padX: "30", width: 50, full: true });
+    ];
+    if (f.buttonUrl) {
+      videoTextChildren.push(mkSpacer(16));
+      videoTextChildren.push(mkButton(f.buttonLabel || contactCta, lightCtxBtnBg, lightCtxBtnText, f.buttonUrl));
+    }
+    var textCol = mkContainer(videoTextChildren, null, { isInner: true, padY: "30", padX: "30", width: 50, full: true });
     var videoCol = mkContainer([videoWidget], null, { isInner: true, padY: "0", padX: "0", width: 50, full: true });
     return mkContainer([textCol, videoCol], rowIdx % 2 === 0 ? lightSectionBg : bone, { direction: "row", padY: "0", padX: "0", gap: "0", full: true });
   }
