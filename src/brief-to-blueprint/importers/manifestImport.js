@@ -281,27 +281,35 @@ function richTextToSafeHtml(arr) {
   }).join("").trim();
 }
 
-// Flattens a text_section's `items` into a plain string. Handles both
-// documented item kinds: "paragraph" (a rich_text run) and "list" (ordered
-// or unordered entries, each its own RichText) -- the list case was missing
-// entirely before, silently dropping any list content.
-function flattenTextSectionBody(items) {
+// HTML-preserving counterpart to the old plain-text body flatten -- same
+// item-kind handling ("paragraph" rich_text runs, "list" ordered/unordered
+// entries), but runs each RichText through richTextToSafeHtml instead of
+// flattenRichText, so contextual internal links Manifest weaves into body
+// copy (its 1.5.x link-and-button-roles change: link runs now arrive
+// inside ordinary paragraph/list RichText, not just FAQ answers) survive
+// as real <a> tags instead of being silently dropped. Paragraphs join on
+// "<br><br>" and list entries on "<br>" (not "\n"/"\n\n" like the plain
+// version) since this string is inserted directly into an already-escaped
+// HTML context downstream -- raw newlines wouldn't render as breaks there.
+// Callers must treat the result as pre-escaped HTML, same contract as
+// richTextToSafeHtml itself: never run it through he()/escapeHtml again.
+function flattenTextSectionBodyHtml(items) {
   if (!Array.isArray(items)) return "";
   return items
     .map(function (item) {
       if (!item) return "";
       if (item.kind === "paragraph" && Array.isArray(item.rich_text)) {
-        return flattenRichText(item.rich_text);
+        return richTextToSafeHtml(item.rich_text);
       }
       if (item.kind === "list" && Array.isArray(item.entries)) {
         return item.entries
-          .map(function (entry, i) { return (item.ordered ? (i + 1) + ". " : "\u2022 ") + flattenRichText(entry); })
-          .join("\n");
+          .map(function (entry, i) { return (item.ordered ? (i + 1) + ". " : "\u2022 ") + richTextToSafeHtml(entry); })
+          .join("<br>");
       }
       return "";
     })
     .filter(Boolean)
-    .join("\n\n");
+    .join("<br><br>");
 }
 
 // A button's real destination, or "" if it's explicitly a placeholder.
@@ -499,11 +507,26 @@ function manifestPageDocumentToBrief(raw) {
       var heroButtons = section.buttons || [];
       brief.heroHeadline = headingText;
       brief.heroSubhead = flattenRichText(section.subheading);
-      brief.phoneCta = heroButtons[0] ? heroButtons[0].label || "" : "";
-      brief.heroPrimaryUrl = pageDocumentButtonUrl(heroButtons[0]);
+      // Prefer Manifest's explicit button.placement ("primary"/"secondary")
+      // over raw array position -- Manifest's link-and-button-roles change
+      // makes placement deliberate rather than inferred. Falls back to
+      // buttons[0]/buttons[1] only when NOTHING in the array declares a
+      // placement at all (older, pre-1.5.x exports) -- mixing the two
+      // strategies (e.g. treating a lone placement:"secondary" button as
+      // primary via a position fallback) would misclassify a real single-
+      // secondary-button hero, which position-only logic can't happen.
+      var heroHasPlacement = heroButtons.some(function (b) { return b && (b.placement === "primary" || b.placement === "secondary"); });
+      var heroPrimaryBtn = heroHasPlacement
+        ? heroButtons.filter(function (b) { return b && b.placement === "primary"; })[0]
+        : heroButtons[0];
+      var heroSecondaryBtn = heroHasPlacement
+        ? heroButtons.filter(function (b) { return b && b.placement === "secondary"; })[0]
+        : heroButtons[1];
+      brief.phoneCta = heroPrimaryBtn ? heroPrimaryBtn.label || "" : "";
+      brief.heroPrimaryUrl = pageDocumentButtonUrl(heroPrimaryBtn);
       trackPlaceholderButton(brief.phoneCta, brief.heroPrimaryUrl, "Hero");
-      brief.contactCta = heroButtons[1] ? heroButtons[1].label || "" : "";
-      brief.heroSecondaryUrl = pageDocumentButtonUrl(heroButtons[1]);
+      brief.contactCta = heroSecondaryBtn ? heroSecondaryBtn.label || "" : "";
+      brief.heroSecondaryUrl = pageDocumentButtonUrl(heroSecondaryBtn);
       trackPlaceholderButton(brief.contactCta, brief.heroSecondaryUrl, "Hero");
       return;
     }
@@ -621,25 +644,70 @@ function manifestPageDocumentToBrief(raw) {
     if (section.type === "text_section") {
       if (!hasCtaType && isLast && section.buttons && section.buttons.length) {
         brief.closingCta = headingText;
-        brief.closingBody = flattenTextSectionBody(section.items);
+        // richTextToSafeHtml-based flatten so contextual links Manifest
+        // weaves into the closing section's own copy (link-and-button-
+        // roles change) still render as real <a> tags -- see
+        // flattenTextSectionBodyHtml. closingBodyIsHtml tells the builder
+        // this string is pre-escaped and must not be run through he()
+        // again.
+        brief.closingBody = flattenTextSectionBodyHtml(section.items);
+        brief.closingBodyIsHtml = true;
         return;
       }
-      // Capture the section's own button (label + resolved URL) so a real,
-      // page-specific CTA (e.g. "See how our mobile and on-site fleet
-      // service works.") survives into the built page instead of being
-      // silently dropped -- confirmed real gap, July 2026: this only ever
-      // fed heading/body into featurePairs, so every text_section button
-      // except the page's final closing CTA had nowhere to render at all.
-      // Only the first button is kept, matching the single-button-per-row
-      // capacity every landing.js row style has; a second real button on
-      // the same section still gets its normal placeholder-tracking pass
-      // below, same as before.
-      var secBtn = section.buttons && section.buttons[0];
+      // Capture the section's own button (label + resolved URL + placement)
+      // so a real, page-specific CTA (e.g. "See how our mobile and on-site
+      // fleet service works.") survives into the built page instead of
+      // being silently dropped -- confirmed real gap, July 2026: this only
+      // ever fed heading/body into featurePairs, so every text_section
+      // button except the page's final closing CTA had nowhere to render
+      // at all. When the section carries an explicit primary/secondary
+      // pair (Manifest's link-and-button-roles change), the primary is
+      // preferred as "the" button every row style has a slot for; a
+      // second real button on the same section still gets its normal
+      // placeholder-tracking pass below, same as before. Only the first
+      // button is kept on older exports with no placement field, matching
+      // prior behavior exactly.
+      var secBtns = section.buttons || [];
+      // Manifest is retiring the standalone placement:"inline" text-link
+      // role (link-and-button-roles change) -- contextual links move into
+      // the copy itself, and genuine CTAs become primary/secondary
+      // buttons. Per Manifest's own migration note, any residual
+      // placement:"inline" button should be treated as a plain text link,
+      // not styled as a CTA button -- folded onto the end of the body
+      // copy as a real <a> instead. Confirmed real case: this exact MESO
+      // export still has one ("See how our mobile and on-site fleet
+      // service works.", placement:"inline") that would otherwise render
+      // as a solid primary-style button, which it was never meant to be.
+      // Unresolved ones (no real URL) are left for the generic
+      // placeholder-tracking pass below, which already loops every
+      // section's buttons regardless of placement -- not duplicated here.
+      var inlineBtns = secBtns.filter(function (b) { return b && b.placement === "inline"; });
+      var realBtns = secBtns.filter(function (b) { return !b || b.placement !== "inline"; });
+      var bodyHtml = flattenTextSectionBodyHtml(section.items);
+      inlineBtns.forEach(function (b) {
+        var inlineUrl = pageDocumentButtonUrl(b);
+        if (b.label && inlineUrl) {
+          bodyHtml += (bodyHtml ? " " : "") + '<a href="' + escapeHtml(inlineUrl) + '">' + escapeHtml(b.label) + "</a>";
+        }
+      });
+      var realBtnsHavePlacement = realBtns.some(function (b) { return b && (b.placement === "primary" || b.placement === "secondary"); });
+      var secBtn = realBtnsHavePlacement
+        ? (realBtns.filter(function (b) { return b.placement === "primary"; })[0] || realBtns.filter(function (b) { return b.placement === "secondary"; })[0])
+        : realBtns[0];
       featurePairs.push({
         heading: headingText,
-        body: flattenTextSectionBody(section.items),
+        // richTextToSafeHtml-based flatten preserves inline link runs as
+        // real <a> tags (Manifest's link-and-button-roles change moves
+        // contextual internal links into ordinary body copy, not just FAQ
+        // answers), with any retired inline-placement button folded on as
+        // a trailing text link too (see above) -- bodyIsHtml tells the
+        // builder this string is pre-escaped and must not be run through
+        // he() again.
+        body: bodyHtml,
+        bodyIsHtml: true,
         buttonLabel: secBtn ? secBtn.label || "" : "",
         buttonUrl: secBtn ? pageDocumentButtonUrl(secBtn) : "",
+        buttonPlacement: secBtn ? secBtn.placement || "" : "",
       });
       return;
     }

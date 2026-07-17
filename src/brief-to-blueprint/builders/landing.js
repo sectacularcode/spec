@@ -192,6 +192,30 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     return btn;
   }
 
+  // f.body from a Manifest text_section is pre-escaped HTML when
+  // f.bodyIsHtml is set (manifestImport.js's flattenTextSectionBodyHtml,
+  // which preserves contextual <a> link runs woven into the copy) --
+  // running it through he() again would escape those real anchor tags
+  // into visible text instead of rendering as links. Manually-entered
+  // brief.features (no bodyIsHtml flag) still get escaped exactly as
+  // before.
+  function featureBodyHtml(f) {
+    return f.bodyIsHtml ? (f.body || "") : he(f.body);
+  }
+
+  // Real per-feature button, styled by Manifest's explicit placement
+  // (link-and-button-roles change: primary = filled/Style A, secondary =
+  // outline/Style B) instead of every feature-row button rendering
+  // identically regardless of role. Falls back to the generic hero
+  // contact CTA (filled) when there's no real per-feature button at all,
+  // matching prior behavior exactly.
+  function featureButton(f, fallbackUrl) {
+    var label = f.buttonLabel || contactCta;
+    var url = f.buttonUrl || fallbackUrl;
+    if (f.buttonPlacement === "secondary") return makeOutlineBtn(label, url, lightCtxBtnBg);
+    return mkButton(label, lightCtxBtnBg, lightCtxBtnText, url);
+  }
+
   function makeDualBtnRow(primaryLabel, secondaryLabel, primaryUrl, secondaryUrl, sectionBg) {
     // Outline button color follows the section bg it's sitting on when no
     // Secondary style has been saved -- when one has, it wins outright,
@@ -243,10 +267,12 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
           return {
             heading: f.heading || "",
             body: f.body || "",
+            bodyIsHtml: !!f.bodyIsHtml,
             imgCaption: f.imgCaption || "[Photo placeholder]",
             imageLeft: i % 2 === 1,
             buttonLabel: f.buttonLabel || "",
             buttonUrl: f.buttonUrl || "",
+            buttonPlacement: f.buttonPlacement || "",
           };
         })
       : [
@@ -325,11 +351,11 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
           mkSpacer(14),
           mkHeading(f.heading, ink, "h3", { weight: 700, px: 24 }),
           mkSpacer(10),
-          mkText(he(f.body), text),
+          mkText(featureBodyHtml(f), text),
         ];
         if (f.buttonUrl) {
           children.push(mkSpacer(16));
-          children.push(mkButton(f.buttonLabel || contactCta, lightCtxBtnBg, lightCtxBtnText, f.buttonUrl));
+          children.push(featureButton(f));
         }
         return mkContainer(children, i % 2 === 0 ? lightSectionBg : bone, { padY: "56", padX: "48", full: true });
       });
@@ -350,11 +376,11 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         var textColChildren = [
           mkHeading(f.heading, ink, "h4", { weight: 700, px: 18 }),
           mkSpacer(6),
-          mkText(he(f.body), text),
+          mkText(featureBodyHtml(f), text),
         ];
         if (f.buttonUrl) {
           textColChildren.push(mkSpacer(12));
-          textColChildren.push(mkButton(f.buttonLabel || contactCta, lightCtxBtnBg, lightCtxBtnText, f.buttonUrl));
+          textColChildren.push(featureButton(f));
         }
         var textCol = mkContainer(textColChildren, null, { isInner: true, padY: "0", padX: "0", grow: "1" });
 
@@ -372,9 +398,9 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       var innerChildren = [
         mkHeading(f.heading, accent, "h2", { weight: 700, px: 34 }),
         mkSpacer(16),
-        mkText(he(f.body), text),
+        mkText(featureBodyHtml(f), text),
         mkSpacer(24),
-        mkButton(f.buttonLabel || contactCta, lightCtxBtnBg, lightCtxBtnText, f.buttonUrl || brief.heroSecondaryUrl),
+        featureButton(f, brief.heroSecondaryUrl),
       ];
       // Always-on: content lives inside an inner box with min_height 508px,
       // matching CS Repair's confirmed production template. This is what
@@ -461,11 +487,11 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var innerChildren = [
       mkHeading(f.heading, accent, "h2", { weight: 700, px: 30 }),
       mkSpacer(14),
-      mkText(he(f.body), text),
+      mkText(featureBodyHtml(f), text),
     ];
     if (withButton || f.buttonUrl) {
       innerChildren.push(mkSpacer(20));
-      innerChildren.push(mkButton(f.buttonLabel || contactCta, lightCtxBtnBg, lightCtxBtnText, f.buttonUrl || brief.heroSecondaryUrl));
+      innerChildren.push(featureButton(f, brief.heroSecondaryUrl));
     }
     var innerBox = mkContainer(innerChildren, null, { isInner: true, padY: "30", padX: "30", full: true });
     innerBox.settings.min_height = { unit: "px", size: 420 };
@@ -482,11 +508,11 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // making a point rather than describing a service, where a photo or a
   // service-list treatment doesn't fit as naturally.
   function renderCenteredCta(f, rowIdx) {
-    var body = mkText("<p style='text-align:center'>" + he(f.body) + "</p>", text);
+    var body = mkText("<p style='text-align:center'>" + featureBodyHtml(f) + "</p>", text);
     return mkContainer([
       mkHeading(f.heading, ink, "h3", { weight: 700, px: 32, align: "center" }),
       body,
-      mkButton(f.buttonLabel || contactCta, lightCtxBtnBg, lightCtxBtnText, f.buttonUrl || brief.heroSecondaryUrl),
+      featureButton(f, brief.heroSecondaryUrl),
     ], rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "72", center: true });
   }
 
@@ -551,7 +577,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var innerChildren = [
       mkHeading(f.heading, accent, "h2", { weight: 700, px: 30 }),
       mkSpacer(14),
-      mkText(he(f.body), text),
+      mkText(featureBodyHtml(f), text),
     ];
     var innerBox = mkContainer(innerChildren, null, { isInner: true, padY: "30", padX: "30", full: true });
     innerBox.settings.flex_justify_content = "center";
@@ -575,11 +601,11 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var children = [
       mkHeading(f.heading, ink, "h3", { weight: 700, px: 30 }),
       mkSpacer(10),
-      mkText(he(f.body), text),
+      mkText(featureBodyHtml(f), text),
     ];
     if (f.buttonUrl) {
       children.push(mkSpacer(20));
-      children.push(mkButton(f.buttonLabel || contactCta, lightCtxBtnBg, lightCtxBtnText, f.buttonUrl));
+      children.push(featureButton(f));
     }
     return mkContainer(children, rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "56", padX: "48" });
   }
@@ -592,8 +618,16 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // draw from — this is a real limitation for very short or single-clause
   // bodies, which will show as a one-item list.
   function renderChecklistRow(f, rowIdx) {
-    var clauses = (f.body || "").split(/\.\s+/).map(function (s) { return s.trim().replace(/\.$/, ""); }).filter(function (s) { return s.length > 0; });
-    if (clauses.length === 0) clauses = [f.body || ""];
+    // mkIconList escapes each clause itself (he()), so feeding it real <a>
+    // tags from an HTML-safe body would show broken markup as visible
+    // text, and splitting on ". " could cut mid-tag. Strip tags first --
+    // a checklist row shows short plain clauses, not inline links; any
+    // link in this feature's body is a real content loss only for this
+    // specific row style, same tradeoff already accepted for the other
+    // list-style renderers in this file.
+    var checklistSourceText = f.bodyIsHtml ? (f.body || "").replace(/<[^>]+>/g, "") : (f.body || "");
+    var clauses = checklistSourceText.split(/\.\s+/).map(function (s) { return s.trim().replace(/\.$/, ""); }).filter(function (s) { return s.length > 0; });
+    if (clauses.length === 0) clauses = [checklistSourceText];
     var checklistChildren = [
       mkHeading(f.heading, ink, "h3", { weight: 700, px: 30 }),
       mkSpacer(16),
@@ -601,7 +635,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     ];
     if (f.buttonUrl) {
       checklistChildren.push(mkSpacer(20));
-      checklistChildren.push(mkButton(f.buttonLabel || contactCta, lightCtxBtnBg, lightCtxBtnText, f.buttonUrl));
+      checklistChildren.push(featureButton(f));
     }
     return mkContainer(checklistChildren, rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "56", padX: "48" });
   }
@@ -628,11 +662,11 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var videoTextChildren = [
       mkHeading(f.heading, ink, "h3", { weight: 700, px: 22 }),
       mkSpacer(10),
-      mkText(he(f.body), text),
+      mkText(featureBodyHtml(f), text),
     ];
     if (f.buttonUrl) {
       videoTextChildren.push(mkSpacer(16));
-      videoTextChildren.push(mkButton(f.buttonLabel || contactCta, lightCtxBtnBg, lightCtxBtnText, f.buttonUrl));
+      videoTextChildren.push(featureButton(f));
     }
     var textCol = mkContainer(videoTextChildren, null, { isInner: true, padY: "30", padX: "30", width: 50, full: true });
     var videoCol = mkContainer([videoWidget], null, { isInner: true, padY: "0", padX: "0", width: 50, full: true });
@@ -648,7 +682,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var textOnBg = lightTextOn(sectionBg);
     return mkContainer([
       mkHeading(closingLine, textOnBg, "h2", { weight: 700, px: 40, align: "center" }),
-      mkText("<p style='text-align:center'>" + he(closingBody) + "</p>", textOnBg === "#FFFFFF" ? "rgba(255,255,255,0.8)" : textOnBg),
+      mkText("<p style='text-align:center'>" + (brief.closingBodyIsHtml ? closingBody : he(closingBody)) + "</p>", textOnBg === "#FFFFFF" ? "rgba(255,255,255,0.8)" : textOnBg),
       makeDualBtnRow(phoneCta, contactCta, brief.heroPrimaryUrl, brief.heroSecondaryUrl, sectionBg),
     ], sectionBg, { padY: "80", center: true });
   }

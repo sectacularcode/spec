@@ -132,12 +132,12 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
       // set, so every existing brief keeps previewing exactly as before.
       var featureRowsData = (Array.isArray(brief.features) && brief.features.length > 0)
         ? brief.features.map(function (f) {
-            return [he(f.heading || ""), he(f.body || ""), makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg)];
+            return [he(f.heading || ""), featureBodyHtml(f), makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg)];
           })
         : [[f1h, f1b, img1], [f2h, f2b, img2], [f3h, f3b, img3]];
       var featureRowsDataB = (Array.isArray(brief.features) && brief.features.length > 0)
         ? brief.features.map(function (f, i) {
-            return [he(f.heading || ""), he(f.body || ""), makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg), i % 2 === 1];
+            return [he(f.heading || ""), featureBodyHtml(f), makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg), i % 2 === 1];
           })
         : [[f1h, f1b, img1, false], [f2h, f2b, img2, true], [f3h, f3b, img3, false]];
       var featureRowStyle = selectFeatureRowStyle(inspoContext, featureRowsData.length);
@@ -206,8 +206,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             htmlParts.push(
               "<section style='background:" + bg + ";padding:56px clamp(24px,6vw,64px);text-align:center;'>" +
                 "<h3 style='font-size:clamp(18px,2.2vw,24px);font-weight:700;color:" + ink + ";margin:0 0 12px;'>" + he(f.heading || "") + "</h3>" +
-                "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0 auto 20px;max-width:640px;'>" + he(f.body || "") + "</p>" +
-                "<a class='row-btn' style='" + btnDark + "display:inline-block;'>" + he(f.buttonLabel || cta2) + "</a>" +
+                "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0 auto 20px;max-width:640px;'>" + featureBodyHtml(f) + "</p>" +
+                featureButtonHtml(f) +
               "</section>"
             );
             return;
@@ -249,7 +249,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<section style='background:" + bg + ";display:grid;grid-template-columns:1fr 1fr;'>" +
                 "<div style='padding:56px 48px;display:flex;flex-direction:column;justify-content:center;'>" +
                   "<h2 style='font-size:clamp(20px,2.5vw,28px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + he(f.heading || "") + "</h2>" +
-                  "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0;'>" + he(f.body || "") + "</p>" +
+                  "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0;'>" + featureBodyHtml(f) + "</p>" +
                 "</div>" +
                 "<div style='min-height:320px;height:100%;overflow:hidden;'>" + mapEmbed + "</div>" +
               "</section>"
@@ -263,8 +263,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             var img = makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg);
             var textBlock = "<div style='padding:56px 48px;display:flex;flex-direction:column;justify-content:center;'>" +
               "<h2 style='font-size:clamp(20px,2.5vw,28px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + he(f.heading || "") + "</h2>" +
-              "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0" + (withBtn ? " 0 20px" : "") + ";'>" + he(f.body || "") + "</p>" +
-              (withBtn ? "<a class='row-btn' style='" + btnDark + "'>" + he(f.buttonLabel || cta2) + "</a>" : "") +
+              "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0" + (withBtn ? " 0 20px" : "") + ";'>" + featureBodyHtml(f) + "</p>" +
+              (withBtn ? featureButtonHtml(f) : "") +
             "</div>";
             var imgBlock = "<div class='landing-img' style='min-height:320px;height:100%;overflow:hidden;'><img src=\"" + img + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:320px;'/></div>";
             htmlParts.push(
@@ -276,8 +276,9 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           }
 
           if (entry.style === "checklist") {
-            var clauses = (f.body || "").split(/\.\s+/).map(function (s) { return s.trim().replace(/\.$/, ""); }).filter(function (s) { return s.length > 0; });
-            if (clauses.length === 0) clauses = [f.body || ""];
+            var checklistSourceText = f.bodyIsHtml ? (f.body || "").replace(/<[^>]+>/g, "") : (f.body || "");
+            var clauses = checklistSourceText.split(/\.\s+/).map(function (s) { return s.trim().replace(/\.$/, ""); }).filter(function (s) { return s.length > 0; });
+            if (clauses.length === 0) clauses = [checklistSourceText];
             htmlParts.push(
               "<section style='background:" + bg + ";padding:44px clamp(24px,6vw,64px);'>" +
                 "<h3 style='font-size:clamp(17px,2vw,22px);font-weight:700;color:" + ink + ";margin:0 0 16px;'>" + he(f.heading || "") + "</h3>" +
@@ -286,7 +287,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
                     return "<div style='display:flex;align-items:flex-start;gap:10px;'><span style='font-size:19px;color:" + brass + ";font-weight:700;flex-shrink:0;margin-top:2px;'>&#10003;</span><span style='font-size:19px;color:" + text + ";line-height:1.5;'>" + he(c) + "</span></div>";
                   }).join("") +
                 "</div>" +
-                (f.buttonLabel ? "<div style='margin-top:20px;'><a class='row-btn' style='" + btnDark + "'>" + he(f.buttonLabel) + "</a></div>" : "") +
+                (f.buttonLabel ? "<div style='margin-top:20px;'>" + featureButtonHtml(f) + "</div>" : "") +
               "</section>"
             );
             return;
@@ -307,8 +308,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<section style='background:" + bg + ";display:grid;grid-template-columns:1fr 1fr;'>" +
                 "<div style='padding:44px 48px;display:flex;flex-direction:column;justify-content:center;'>" +
                   "<h3 style='font-size:clamp(17px,2vw,22px);font-weight:700;color:" + ink + ";margin:0 0 10px;'>" + he(f.heading || "") + "</h3>" +
-                  "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0" + (f.buttonLabel ? " 0 16px" : "") + ";'>" + he(f.body || "") + "</p>" +
-                  (f.buttonLabel ? "<a class='row-btn' style='" + btnDark + "'>" + he(f.buttonLabel) + "</a>" : "") +
+                  "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0" + (f.buttonLabel ? " 0 16px" : "") + ";'>" + featureBodyHtml(f) + "</p>" +
+                  (f.buttonLabel ? featureButtonHtml(f) : "") +
                 "</div>" +
                 "<div style='min-height:280px;height:100%;overflow:hidden;'><iframe src=\"" + he(embedSrc) + "\" style='border:0;width:100%;height:100%;min-height:280px;display:block;' loading='lazy' allowfullscreen></iframe></div>" +
               "</section>"
@@ -320,8 +321,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           htmlParts.push(
             "<section style='background:" + bg + ";padding:44px clamp(24px,6vw,64px);'>" +
               "<h3 style='font-size:clamp(17px,2vw,22px);font-weight:700;color:" + ink + ";margin:0 0 10px;'>" + he(f.heading || "") + "</h3>" +
-              "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0;'>" + he(f.body || "") + "</p>" +
-              (f.buttonLabel ? "<div style='margin-top:20px;'><a class='row-btn' style='" + btnDark + "'>" + he(f.buttonLabel) + "</a></div>" : "") +
+              "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0;'>" + featureBodyHtml(f) + "</p>" +
+              (f.buttonLabel ? "<div style='margin-top:20px;'>" + featureButtonHtml(f) + "</div>" : "") +
             "</section>"
           );
         });
@@ -398,6 +399,30 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
       // fallback for briefs with none saved, unchanged from before.
       var secondaryColor = (secondaryBtn && secondaryBtn.background) || brass;
       var btnDark = "display:inline-block;padding:10px 24px;background:transparent;color:" + ink + ";font-weight:600;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border:2px solid " + secondaryColor + ";border-radius:3px;align-self:flex-start;width:fit-content;";
+      // Filled/primary counterpart to btnDark (which is actually an
+      // outline style, despite the name) -- feature-row buttons previously
+      // had only one visual treatment regardless of Manifest's real
+      // placement ("primary"/"secondary", link-and-button-roles change).
+      // Mirrors landing.js's featureButton(): primary = filled Style A,
+      // secondary = outline Style B (btnDark).
+      var btnFilledLight = "display:inline-block;padding:11px 26px;background:" + lightCtxBtnBg + ";color:" + lightCtxBtnText + ";font-weight:700;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border-radius:3px;align-self:flex-start;width:fit-content;";
+      // f.body from a Manifest text_section is pre-escaped HTML when
+      // f.bodyIsHtml is set (manifestImport.js's flattenTextSectionBodyHtml,
+      // preserving contextual <a> link runs woven into the copy) --
+      // running it through he() again would escape those real anchor tags
+      // into visible text instead of rendering as links.
+      function featureBodyHtml(f) {
+        return f.bodyIsHtml ? (f.body || "") : he(f.body || "");
+      }
+      // Real per-feature button label + style, styled by Manifest's
+      // explicit placement instead of every feature-row button rendering
+      // identically. No href here -- this preview's row buttons are
+      // already decorative (no anchor destinations anywhere in this file).
+      function featureButtonHtml(f, fallbackLabel) {
+        var label = he(f.buttonLabel || fallbackLabel || cta2);
+        var style = f.buttonPlacement === "secondary" ? btnDark : btnFilledLight;
+        return "<a class='row-btn' style='" + style + "'>" + label + "</a>";
+      }
 
       // Standalone map section — mirrors the real export's mkMapSection
       // (helpers.js): heading, an address/phone/hours info strip when
