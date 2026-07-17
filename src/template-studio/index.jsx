@@ -2001,7 +2001,7 @@ Rules:
                       {/* Color swatch preview */}
                       <div style={{ height: "80px", background: ink, display: "flex", alignItems: "flex-end", padding: "12px 16px", gap: "6px" }}>
                         {swatchColors.map((hex, i) => (
-                          <div key={i} title={hex} style={{ width: "20px", height: "20px", borderRadius: "50%", background: hex, border: "1px solid rgba(255,255,255,0.2)", flexShrink: 0 }} />
+                          <div key={i} title={hex} style={{ width: "20px", height: "20px", borderRadius: "50%", background: hex, border: "2px solid rgba(255,255,255,0.9)", boxShadow: "0 1px 3px rgba(0,0,0,0.25)", flexShrink: 0 }} />
                         ))}
                       </div>
                       <div style={{ padding: "16px" }}>
