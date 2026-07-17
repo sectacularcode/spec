@@ -569,11 +569,21 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
       // (already handles a single-feature synthetic layout entry, same
       // way landing.js reuses renderFeatureLayout) so feature blocks get
       // whatever curated style the Section Styles panel assigned, falling
-      // back to "plain" when nothing was curated. Returns "" when
-      // brief.contentOrder doesn't exist -- every variant below falls
+      // back to the SAME per-row auto-cycle the panel itself displays when
+      // nothing was curated yet (defaultOrderedRowStyle -- mirrors
+      // index.jsx's own defaultRowStyle exactly; see landing.js's version
+      // of this fix for the real case it closes: panel showing "Split
+      // image, right" selected while the page rendered plain). Returns ""
+      // when brief.contentOrder doesn't exist -- every variant below falls
       // back to its original fixed-order assembly, unchanged, for
       // legacy/manual briefs and any Manifest import parsed before this
       // fix.
+      function defaultOrderedRowStyle(i, hasVideo) {
+        var cycle = hasVideo
+          ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
+          : ["split-right", "centered-cta", "checklist", "split-left", "split-cta-right", "plain"];
+        return cycle[i % cycle.length];
+      }
       function renderOrderedContentHTML(opts) {
         opts = opts || {};
         if (!Array.isArray(brief.contentOrder) || !brief.contentOrder.length) return "";
@@ -582,7 +592,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             var curated = Array.isArray(brief.featureLayout)
               ? brief.featureLayout.filter(function (e) { return e.indices && e.indices.length === 1 && e.indices[0] === block.index; })[0]
               : null;
-            var style = curated ? curated.style : "plain";
+            var style = curated ? curated.style : defaultOrderedRowStyle(block.index, !!brief.videoUrl);
             return renderCuratedFeatureLayoutHTML([{ style: style, indices: [block.index] }]);
           } else if (block.type === "faq") {
             return faqHTML;

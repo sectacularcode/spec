@@ -565,6 +565,25 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // variant-specific styling rather than through one shared function the
   // way faq/form/map/cta already are, so real reordering there needs
   // that extracted first (flagged, not silently mishandled).
+  // Confirmed real bug, July 2026: this fell back to "plain" whenever no
+  // curated style existed yet, but the Section Styles panel (index.jsx)
+  // *displays* a per-row auto-cycled default in that exact case (its own
+  // defaultRowStyle()) -- split-right, centered-cta, checklist,
+  // split-left, split-cta-right, plain, repeating -- and shows that as
+  // the row's selected value, even though nothing gets written to
+  // brief.featureLayout until a real edit happens. Confirmed real case:
+  // the panel showed "Split image, right" selected for row 0 while the
+  // page rendered it plain, full-width, no image at all -- two different
+  // defaults, silently out of sync. Duplicated here (not imported from
+  // index.jsx, which isn't a module this file can depend on) so the
+  // fallback this uses is the exact same one the panel already promises.
+  function defaultOrderedRowStyle(i, hasVideo) {
+    var cycle = hasVideo
+      ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
+      : ["split-right", "centered-cta", "checklist", "split-left", "split-cta-right", "plain"];
+    return cycle[i % cycle.length];
+  }
+
   function renderOrderedContent(opts) {
     opts = opts || {};
     if (!Array.isArray(brief.contentOrder) || !brief.contentOrder.length) return null;
@@ -577,7 +596,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         var curated = Array.isArray(brief.featureLayout)
           ? brief.featureLayout.filter(function (e) { return e.indices && e.indices.length === 1 && e.indices[0] === block.index; })[0]
           : null;
-        var style = curated ? curated.style : "plain";
+        var style = curated ? curated.style : defaultOrderedRowStyle(block.index, !!brief.videoUrl);
         rendered = rendered.concat(renderFeatureLayout([{ style: style, indices: [block.index] }], features));
       } else if (block.type === "faq") {
         var faqEl = makeFaqSection();
