@@ -766,6 +766,24 @@ export default function CustomBuild({ userId, role } = {}) {
     updateSectionLayout(newRows);
   }
 
+  // Mid-page CTA rows own no feature index -- they're a standalone insert,
+  // the one style renderFeatureLayout() already supports (landing.js,
+  // checked first per entry regardless of position) that this picker had
+  // no way to place, since every other row is built around claiming at
+  // least one feature index. getSectionRows()'s validity check only
+  // requires every index 0..featureCount-1 covered exactly once -- a
+  // zero-index row never touches that, so inserting/removing one here
+  // never trips the "stale data, fall back to defaults" guard.
+  function insertMidCta(rows, rowIdx) {
+    var row = rows[rowIdx];
+    var midCtaRow = { indices: [], style: "midcta", header: "", postClosing: row.postClosing };
+    updateSectionLayout(rows.slice(0, rowIdx + 1).concat([midCtaRow]).concat(rows.slice(rowIdx + 1)));
+  }
+
+  function removeMidCta(rows, rowIdx) {
+    updateSectionLayout(rows.slice(0, rowIdx).concat(rows.slice(rowIdx + 1)));
+  }
+
   function toggleSkipServicesChecklist(checked) {
     var updatedBrief = { ...brief, skipServicesChecklist: checked };
     setBrief(updatedBrief);
@@ -1659,7 +1677,24 @@ export default function CustomBuild({ userId, role } = {}) {
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                     {rows.map((row, rowIdx) => {
                       const isGrouped = row.indices.length > 1;
+                      const isMidCta = row.style === "midcta";
                       const canGroupNext = rowIdx < rows.length - 1 && rows[rowIdx + 1].indices.length === 1 && rows[rowIdx + 1].postClosing === row.postClosing;
+
+                      if (isMidCta) {
+                        return (
+                          <div key={rowIdx} style={{ padding: "14px 18px", borderRadius: "6px", border: "1px dashed #b45309", background: "#fffaf3", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
+                            <div style={{ fontSize: "13px", fontWeight: 600, color: "#b45309" }}>Mid-page CTA</div>
+                            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                              <label style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", color: "#6b7280", cursor: "pointer" }}>
+                                <input type="checkbox" checked={row.postClosing} onChange={e => setSectionRowPostClosing(rows, rowIdx, e.target.checked)} style={{ cursor: "pointer", accentColor: "#b45309" }} />
+                                Move after closing CTA
+                              </label>
+                              <button onClick={() => removeMidCta(rows, rowIdx)} style={{ padding: "4px 10px", fontSize: "12px", background: "#fff", color: "#6b7280", border: "1px solid #dde0e6", borderRadius: "5px", cursor: "pointer" }}>Remove</button>
+                            </div>
+                          </div>
+                        );
+                      }
+
                       return (
                         <div key={rowIdx} style={{ padding: "16px 18px", borderRadius: "6px", border: "1px solid #dde0e6", background: "#ffffff", display: "flex", flexDirection: "column", gap: "10px" }}>
                           <div style={{ fontSize: "14px", fontWeight: 700, color: "#09090b" }}>
@@ -1691,7 +1726,7 @@ export default function CustomBuild({ userId, role } = {}) {
                             </select>
                           )}
 
-                          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
                             {(isGrouped || canGroupNext) && (
                               <label style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", color: "#6b7280", cursor: "pointer" }}>
                                 <input type="checkbox" checked={isGrouped} onChange={() => toggleGroupWithNext(rows, rowIdx)} style={{ cursor: "pointer", accentColor: "#b45309" }} />
@@ -1702,6 +1737,7 @@ export default function CustomBuild({ userId, role } = {}) {
                               <input type="checkbox" checked={row.postClosing} onChange={e => setSectionRowPostClosing(rows, rowIdx, e.target.checked)} style={{ cursor: "pointer", accentColor: "#b45309" }} />
                               Move after closing CTA
                             </label>
+                            <button onClick={() => insertMidCta(rows, rowIdx)} style={{ padding: "4px 10px", fontSize: "12px", background: "#fff", color: "#b45309", border: "1px solid #b45309", borderRadius: "5px", cursor: "pointer" }}>+ Insert CTA after this row</button>
                           </div>
                         </div>
                       );
