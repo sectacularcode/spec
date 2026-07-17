@@ -584,6 +584,20 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           : ["split-right", "centered-cta", "checklist", "split-left", "split-cta-right", "plain"];
         return cycle[i % cycle.length];
       }
+      // Mirrors landing.js's safeOrderedRowStyle exactly -- see that file
+      // for the real case this fixes (auto-cycle assigning a
+      // button-forcing style to a feature with no real button, which
+      // fabricates a "Contact Us" pointing nowhere).
+      function safeOrderedRowStyle(i, hasVideo) {
+        var style = defaultOrderedRowStyle(i, hasVideo);
+        var f = Array.isArray(brief.features) ? brief.features[i] : null;
+        var hasRealButton = !!(f && f.buttonUrl && f.buttonPlacement !== "none");
+        if (hasRealButton) return style;
+        if (style === "centered-cta") return "plain";
+        if (style === "split-cta-right") return "split-right";
+        if (style === "split-cta-left") return "split-left";
+        return style;
+      }
       function renderOrderedContentHTML(opts) {
         opts = opts || {};
         if (!Array.isArray(brief.contentOrder) || !brief.contentOrder.length) return "";
@@ -592,7 +606,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             var curated = Array.isArray(brief.featureLayout)
               ? brief.featureLayout.filter(function (e) { return e.indices && e.indices.length === 1 && e.indices[0] === block.index; })[0]
               : null;
-            var style = curated ? curated.style : defaultOrderedRowStyle(block.index, !!brief.videoUrl);
+            var style = curated ? curated.style : safeOrderedRowStyle(block.index, !!brief.videoUrl);
             return renderCuratedFeatureLayoutHTML([{ style: style, indices: [block.index] }]);
           } else if (block.type === "faq") {
             return faqHTML;

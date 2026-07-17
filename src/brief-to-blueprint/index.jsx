@@ -659,6 +659,26 @@ export default function CustomBuild({ userId, role } = {}) {
     return cycle[i % cycle.length];
   }
 
+  // centered-cta/split-cta-right/split-cta-left force a button slot by
+  // design in the actual builders -- confirmed real case, July 2026: the
+  // auto-cycle assigned "split-cta-right" to a feature with zero buttons
+  // in its own source section, and the render fabricated a generic
+  // "Contact Us" button pointing nowhere. Substitutes the non-forcing
+  // equivalent whenever the feature at this index has no real button of
+  // its own, so the panel's displayed "selected" style always matches
+  // what the render actually does (mirrors landing.js's/landingPreview.
+  // js's safeOrderedRowStyle exactly).
+  function safeRowStyle(i, hasVideo, b) {
+    var style = defaultRowStyle(i, hasVideo);
+    var f = Array.isArray(b.features) ? b.features[i] : null;
+    var hasRealButton = !!(f && f.buttonUrl && f.buttonPlacement !== "none");
+    if (hasRealButton) return style;
+    if (style === "centered-cta") return "plain";
+    if (style === "split-cta-right") return "split-right";
+    if (style === "split-cta-left") return "split-left";
+    return style;
+  }
+
   // Reads the current per-row customization back out of the brief, or
   // computes sensible defaults (matching the existing auto-cycle) if
   // nothing valid is set yet. "Valid" means every feature index 0..N-1 is
@@ -689,7 +709,7 @@ export default function CustomBuild({ userId, role } = {}) {
     }
     var rows = [];
     for (var j = 0; j < featureCount; j++) {
-      rows.push({ indices: [j], style: defaultRowStyle(j, hasVideo), header: "", postClosing: false });
+      rows.push({ indices: [j], style: safeRowStyle(j, hasVideo, b), header: "", postClosing: false });
     }
     return rows;
   }

@@ -584,6 +584,31 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     return cycle[i % cycle.length];
   }
 
+  // centered-cta/split-cta-right/split-cta-left force a button slot by
+  // design (that's the whole point of the style) -- renderCenteredCta and
+  // renderSplitImage's withButton path both call featureButton()
+  // unconditionally when one of these is active, and featureButton()
+  // falls back to a fabricated "Contact Us" pointing at brief.
+  // heroSecondaryUrl (often empty) whenever the feature has no real
+  // button of its own. Confirmed real case: the auto-cycle assigned
+  // "split-cta-right" to a feature with zero buttons in its source
+  // section, and it fabricated one -- the exact "no real content, don't
+  // invent it" bug already fixed elsewhere, reintroduced through the
+  // cycle itself. Substitutes the non-forcing equivalent (plain/
+  // split-right/split-left) whenever the feature at this index has no
+  // real buttonUrl, so the cycle only ever assigns a cta-style variant
+  // to a feature that actually has real button data to show.
+  function safeOrderedRowStyle(i, hasVideo, features) {
+    var style = defaultOrderedRowStyle(i, hasVideo);
+    var f = features[i];
+    var hasRealButton = !!(f && f.buttonUrl && f.buttonPlacement !== "none");
+    if (hasRealButton) return style;
+    if (style === "centered-cta") return "plain";
+    if (style === "split-cta-right") return "split-right";
+    if (style === "split-cta-left") return "split-left";
+    return style;
+  }
+
   function renderOrderedContent(opts) {
     opts = opts || {};
     if (!Array.isArray(brief.contentOrder) || !brief.contentOrder.length) return null;
@@ -596,7 +621,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         var curated = Array.isArray(brief.featureLayout)
           ? brief.featureLayout.filter(function (e) { return e.indices && e.indices.length === 1 && e.indices[0] === block.index; })[0]
           : null;
-        var style = curated ? curated.style : defaultOrderedRowStyle(block.index, !!brief.videoUrl);
+        var style = curated ? curated.style : safeOrderedRowStyle(block.index, !!brief.videoUrl, features);
         rendered = rendered.concat(renderFeatureLayout([{ style: style, indices: [block.index] }], features));
       } else if (block.type === "faq") {
         var faqEl = makeFaqSection();
