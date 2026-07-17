@@ -157,6 +157,19 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   var heroSub     = brief.heroSubhead  || brief.hookStatement || "[Specific, direct subheadline]";
   var phoneCta    = brief.phoneCta     || brief.heroCta1 || "Call Us Now";
   var contactCta  = brief.contactCta   || brief.heroCta2 || "Contact Us";
+  // Confirmed real bug, July 2026: every hero variant except B and F
+  // always rendered TWO buttons via makeDualBtnRow(phoneCta, contactCta,
+  // ...), regardless of whether Manifest's hero actually sent a second
+  // button. contactCta silently falls back to a fabricated "Contact Us"
+  // when brief.contactCta is empty -- confirmed against the real
+  // Atlanta export (the one already reviewed and matching real Manifest
+  // order): its hero has exactly ONE real button in the source JSON, but
+  // the built page shows two, the second pointing at an empty
+  // heroSecondaryUrl. Same "no real content, don't invent it" rule
+  // already applied to the closing CTA and FAQ/trust-stats/checklist --
+  // checked here BEFORE the "|| heroCta2 || 'Contact Us'" fallback masks
+  // whether a real one exists.
+  var hasRealSecondaryHeroBtn = !!(brief.contactCta || brief.heroCta2);
   var closingLine = brief.closingCta   || brief.tagline  || "Ready to get started?";
   // Same fallback sentence the preview uses (landingPreview.js) — the two
   // used to differ, so an approved preview showed real copy while the
@@ -266,6 +279,21 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     return mkContainer([mkButton(primaryLabel, primaryBg, primaryText, primaryUrl), makeOutlineBtn(secondaryLabel, secondaryUrl, outlineColor)], null, {
       isInner: true, direction: "row", buttonRow: true, gap: "16", padY: "0", padX: "0", center: true
     });
+  }
+
+  // Hero's own button row -- single button when Manifest (or a manual
+  // brief) only ever gave the hero one real button (hasRealSecondaryHeroBtn,
+  // computed once near phoneCta/contactCta above), dual when a real second
+  // one exists. Replaces every hero variant's previous unconditional
+  // makeDualBtnRow(phoneCta, contactCta, ...) call, which always fabricated
+  // a "Contact Us" button pointing at an empty heroSecondaryUrl whenever
+  // the hero only had one real button -- confirmed against Atlanta's real
+  // export, which has exactly this problem.
+  function heroButtonRow(sectionBg) {
+    if (hasRealSecondaryHeroBtn) return makeDualBtnRow(phoneCta, contactCta, brief.heroPrimaryUrl, brief.heroSecondaryUrl, sectionBg);
+    var bg = sectionBg ? lightTextOn(sectionBg) : warmWhite;
+    var textColor = sectionBg ? bestTextColor(bg, ink) : darkCtxBtnText;
+    return mkButton(phoneCta, bg, textColor, brief.heroPrimaryUrl);
   }
 
   function makeTrustStrip(bgColor) {
@@ -813,7 +841,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // heroSecondaryUrl when the hero itself only has one button.
     var ctaButtonRow = brief.closingCtaButtonLabel
       ? mkButton(brief.closingCtaButtonLabel, textOnBg, sectionBg, brief.closingCtaButtonUrl)
-      : makeDualBtnRow(phoneCta, contactCta, brief.heroPrimaryUrl, brief.heroSecondaryUrl, sectionBg);
+      : heroButtonRow(sectionBg);
     return mkContainer([
       mkHeading(closingLine, textOnBg, "h2", { weight: 700, px: 40, align: "center" }),
       mkText("<p style='text-align:center'>" + (brief.closingBodyIsHtml ? styleInlineLinks(closingBody, null) : he(closingBody)) + "</p>", textOnBg === "#FFFFFF" ? "rgba(255,255,255,0.8)" : textOnBg),
@@ -918,7 +946,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var heroSubElE   = mkText("<p style='text-align:center'>" + he(heroSub) + "</p>", "rgba(255,255,255,0.85)");
     heroSubElE.settings.text_align = heroSubElE.settings.text_align_tablet = heroSubElE.settings.text_align_mobile = "center";
     var heroE = mkContainer(
-      [heroEyebrowE, mkSpacer(16), heroH1ElE, mkSpacer(20), heroSubElE, mkSpacer(32), makeDualBtnRow(phoneCta, contactCta, brief.heroPrimaryUrl, brief.heroSecondaryUrl)],
+      [heroEyebrowE, mkSpacer(16), heroH1ElE, mkSpacer(20), heroSubElE, mkSpacer(32), heroButtonRow(dark)],
       dark, { padY: "100", center: true }
     );
 
@@ -1130,7 +1158,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     heroSubEl.settings.text_align = heroSubEl.settings.text_align_tablet = heroSubEl.settings.text_align_mobile = "center";
 
     var heroA = mkContainer(
-      [heroEyebrow, mkSpacer(16), heroH1El, mkSpacer(20), heroSubEl, mkSpacer(32), makeDualBtnRow(phoneCta, contactCta, brief.heroPrimaryUrl, brief.heroSecondaryUrl)],
+      [heroEyebrow, mkSpacer(16), heroH1El, mkSpacer(20), heroSubEl, mkSpacer(32), heroButtonRow(dark)],
       dark, { padY: "100", center: true }
     );
 
@@ -1300,7 +1328,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     mkSpacer(16),
     mkText("<p style='text-align:center'>" + he(heroSub) + "</p>", "rgba(255,255,255,0.85)"),
     mkSpacer(32),
-    makeDualBtnRow(phoneCta, contactCta, brief.heroPrimaryUrl, brief.heroSecondaryUrl, accent),
+    heroButtonRow(accent),
   ], accent, { padY: "80", center: true });
 
   // 3 outcome-focused benefit bullets -- divided rows, not a grid. Each

@@ -113,6 +113,17 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
       var hook  = brief.hookStatement || "";
       var cta1  = brief.phoneCta      || brief.heroCta1 || "Call Us Now";
       var cta2  = brief.contactCta    || brief.heroCta2 || "Contact Us";
+      // Mirrors landing.js's hasRealSecondaryHeroBtn/heroButtonRow exactly
+      // -- see that file for the real Atlanta-export case this fixes.
+      var hasRealSecondaryHeroBtn = !!(brief.contactCta || brief.heroCta2);
+      function heroButtonRowHtml(extraStyle) {
+        var style = extraStyle || "";
+        if (hasRealSecondaryHeroBtn) {
+          return "<a class='cta-btn' style='" + btnStyle + style + "'>" + cta1 + "</a>" +
+                 "<a class='cta-btn' style='" + btnOutline + style + "'>" + cta2 + "</a>";
+        }
+        return "<a class='cta-btn' style='" + btnStyle + style + "'>" + cta1 + "</a>";
+      }
       var close = brief.closingCta    || brief.tagline  || "Ready to get started?";
       // Previously always raw-concatenated with no he() escaping and no
       // closingBodyIsHtml check at all -- a real gap now that Manifest's
@@ -702,8 +713,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<h1 style='font-weight:800;font-size:clamp(36px,6vw,72px);color:#ffffff;margin:0 0 20px;line-height:1.05;'>" + h1 + "</h1>" +
               "<p style='font-size:clamp(14px,1.5vw,18px);color:rgba(255,255,255,0.85);margin:0 0 32px;line-height:1.55;max-width:520px;margin-left:auto;margin-right:auto;'>" + sub + "</p>" +
               "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
-                "<a class='cta-btn' style='" + btnStyle + "'>" + cta1 + "</a>" +
-                "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
+                heroButtonRowHtml() +
               "</div>" +
             "</div>" +
           "</section>" +
@@ -751,8 +761,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               (hook ? "<p style='font-size:18px;color:rgba(255,255,255,0.9);margin:0 0 12px;line-height:1.6;font-style:italic;'>" + hook + "</p>" : "") +
               "<p style='font-size:clamp(13px,3.5vw,16px);color:rgba(255,255,255,0.82);margin:0 0 28px;line-height:1.55;max-width:560px;'>" + sub + "</p>" +
               "<div style='display:flex;gap:16px;flex-wrap:wrap;align-items:center;'>" +
-                "<a class='cta-btn' style='" + btnStyle + "display:inline-block;'>" + cta1 + "</a>" +
-                "<a class='cta-btn' style='" + btnOutline + "display:inline-block;'>" + cta2 + "</a>" +
+                heroButtonRowHtml("display:inline-block;") +
               "</div>" +
             "</div></div>" +
           "</section>" +
@@ -898,15 +907,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
                 "</div>" +
               "</section>";
           })()) +
-          (brief.contentOrder ? "" :
-          "<section class='va-cta' style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
-            "<h2 style='font-size:clamp(26px,4vw,42px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
-            "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:540px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
-            "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
-              "<a class='cta-btn' style='" + btnStyle + "'>" + cta1 + "</a>" +
-              "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
-            "</div>" +
-          "</section>") +
+          (brief.contentOrder ? "" : closingCtaHTML()) +
           (Array.isArray(brief.postClosingLayout) && brief.postClosingLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.postClosingLayout) : "") +
           (brief.contentOrder ? "" : faqHTML);
       }
@@ -922,8 +923,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             (hook ? "<p style='font-size:18px;color:rgba(255,255,255,0.9);margin:0 0 12px;line-height:1.6;font-style:italic;'>" + hook + "</p>" : "") +
             "<p style='font-size:clamp(13px,3.5vw,16px);color:rgba(255,255,255,0.82);margin:0 0 28px;line-height:1.55;max-width:560px;'>" + sub + "</p>" +
             "<div style='display:flex;gap:16px;flex-wrap:wrap;align-items:center;'>" +
-              "<a class='cta-btn' style='" + btnStyle + "display:inline-block;'>" + cta1 + "</a>" +
-              "<a class='cta-btn' style='" + btnOutline + "display:inline-block;'>" + cta2 + "</a>" +
+              heroButtonRowHtml("display:inline-block;") +
             "</div>" +
           "</div></div>" +
         "</section>" +
