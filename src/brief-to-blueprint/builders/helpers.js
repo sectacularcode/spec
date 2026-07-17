@@ -341,6 +341,21 @@ export function mkForm(fields, ctaLabel, opts) {
 // the WordPress theme's defaults and stopped matching the preview's FAQ.
 export function mkAccordion(items, opts) {
   opts = opts || {};
+  // Colors and bolds real inline <a> tags manifestImport.js's
+  // richTextToSafeHtml weaves into a FAQ answer -- those tags ship with no
+  // style attribute of their own, so a plain string-prepend is safe.
+  // Duplicated locally rather than imported, same reasoning as every other
+  // small string utility in this codebase (sanitizeUrl, escapeHtml):
+  // keeps each file dependency-free. The accordion's tab_content sits on
+  // whatever light background makeFaqSection() gives it, so opts.activeColor
+  // (the brand accent, already passed by every real caller) is always
+  // safely readable here -- unlike the closing CTA section, which sits on
+  // the accent color itself.
+  function styleInlineLinks(html, color) {
+    if (!html) return html;
+    var style = color ? "color:" + color + ";font-weight:700" : "font-weight:700";
+    return html.replace(/<a href="/g, '<a style="' + style + '" href="');
+  }
   var s = {
     tabs: items.map(function(item) {
       return {
@@ -354,7 +369,7 @@ export function mkAccordion(items, opts) {
         // no such flag and keeps the original escape-on-the-way-in
         // behavior, unchanged.
         tab_title: he(item.question),
-        tab_content: item.answerIsHtml ? item.answer : he(item.answer),
+        tab_content: item.answerIsHtml ? styleInlineLinks(item.answer, opts.activeColor) : he(item.answer),
       };
     }),
     selected_icon: { value: "fas fa-plus", library: "fa-solid" },

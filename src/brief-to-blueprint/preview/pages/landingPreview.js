@@ -114,7 +114,17 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
       var cta1  = brief.phoneCta      || brief.heroCta1 || "Call Us Now";
       var cta2  = brief.contactCta    || brief.heroCta2 || "Contact Us";
       var close = brief.closingCta    || brief.tagline  || "Ready to get started?";
-      var closeBody = brief.closingBody || "Reach out today and we'll get back to you within one business day.";
+      // Previously always raw-concatenated with no he() escaping and no
+      // closingBodyIsHtml check at all -- a real gap now that Manifest's
+      // link-and-button-roles change can weave a real <a> link into a
+      // closing-CTA paragraph (flattenTextSectionBodyHtml covers
+      // brief.closingBody too, not just feature bodies). Bold-only, no
+      // color override, matching landing.js's makeClosingCta -- this
+      // section sits on the accent color itself, so an accent-colored
+      // link would disappear against its own background.
+      var closeBody = brief.closingBodyIsHtml
+        ? styleInlineLinks(brief.closingBody || "Reach out today and we'll get back to you within one business day.", null)
+        : he(brief.closingBody || "Reach out today and we'll get back to you within one business day.");
       var f1h   = brief.feature1Heading || "What We Do Best";
       var f1b   = brief.feature1Body    || "Detail the primary service or capability that sets you apart.";
       var f2h   = brief.feature2Heading || "Built for Your Needs";
@@ -132,12 +142,19 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
       // set, so every existing brief keeps previewing exactly as before.
       var featureRowsData = (Array.isArray(brief.features) && brief.features.length > 0)
         ? brief.features.map(function (f) {
-            return [he(f.heading || ""), featureBodyHtml(f), makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg)];
+            // 4th slot carries buttonPlacement -- needed below (the
+            // uniform split-image block) to respect an explicit "none"
+            // suppression the same way landing.js's featureButton() now
+            // does. undefined for the legacy 3-field fallback, which
+            // never sets this, so that path's behavior is unchanged.
+            return [he(f.heading || ""), featureBodyHtml(f), makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg), f.buttonPlacement];
           })
         : [[f1h, f1b, img1], [f2h, f2b, img2], [f3h, f3b, img3]];
       var featureRowsDataB = (Array.isArray(brief.features) && brief.features.length > 0)
         ? brief.features.map(function (f, i) {
-            return [he(f.heading || ""), featureBodyHtml(f), makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg), i % 2 === 1];
+            // 5th slot carries buttonPlacement (4th is already imageLeft) --
+            // same reasoning as featureRowsData above.
+            return [he(f.heading || ""), featureBodyHtml(f), makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg), i % 2 === 1, f.buttonPlacement];
           })
         : [[f1h, f1b, img1, false], [f2h, f2b, img2, true], [f3h, f3b, img3, false]];
       var featureRowStyle = selectFeatureRowStyle(inspoContext, featureRowsData.length);
@@ -259,7 +276,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
 
           if (entry.style === "split-right" || entry.style === "split-left" || entry.style === "split-cta-right" || entry.style === "split-cta-left") {
             var imgLeft = entry.style === "split-left" || entry.style === "split-cta-left";
-            var withBtn = entry.style === "split-cta-right" || entry.style === "split-cta-left" || !!f.buttonLabel;
+            var withBtn = (entry.style === "split-cta-right" || entry.style === "split-cta-left" || !!f.buttonLabel) && f.buttonPlacement !== "none";
             var img = makeSvgPh(800, 600, industryMeta.label, f.heading || "Feature image", phBg);
             var textBlock = "<div style='padding:56px 48px;display:flex;flex-direction:column;justify-content:center;'>" +
               "<h2 style='font-size:clamp(20px,2.5vw,28px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + he(f.heading || "") + "</h2>" +
@@ -287,7 +304,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
                     return "<div style='display:flex;align-items:flex-start;gap:10px;'><span style='font-size:19px;color:" + brass + ";font-weight:700;flex-shrink:0;margin-top:2px;'>&#10003;</span><span style='font-size:19px;color:" + text + ";line-height:1.5;'>" + he(c) + "</span></div>";
                   }).join("") +
                 "</div>" +
-                (f.buttonLabel ? "<div style='margin-top:20px;'>" + featureButtonHtml(f) + "</div>" : "") +
+                ((f.buttonLabel && f.buttonPlacement !== "none") ? "<div style='margin-top:20px;'>" + featureButtonHtml(f) + "</div>" : "") +
               "</section>"
             );
             return;
@@ -308,8 +325,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<section style='background:" + bg + ";display:grid;grid-template-columns:1fr 1fr;'>" +
                 "<div style='padding:44px 48px;display:flex;flex-direction:column;justify-content:center;'>" +
                   "<h3 style='font-size:clamp(17px,2vw,22px);font-weight:700;color:" + ink + ";margin:0 0 10px;'>" + he(f.heading || "") + "</h3>" +
-                  "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0" + (f.buttonLabel ? " 0 16px" : "") + ";'>" + featureBodyHtml(f) + "</p>" +
-                  (f.buttonLabel ? featureButtonHtml(f) : "") +
+                  "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0" + ((f.buttonLabel && f.buttonPlacement !== "none") ? " 0 16px" : "") + ";'>" + featureBodyHtml(f) + "</p>" +
+                  ((f.buttonLabel && f.buttonPlacement !== "none") ? featureButtonHtml(f) : "") +
                 "</div>" +
                 "<div style='min-height:280px;height:100%;overflow:hidden;'><iframe src=\"" + he(embedSrc) + "\" style='border:0;width:100%;height:100%;min-height:280px;display:block;' loading='lazy' allowfullscreen></iframe></div>" +
               "</section>"
@@ -322,7 +339,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             "<section style='background:" + bg + ";padding:44px clamp(24px,6vw,64px);'>" +
               "<h3 style='font-size:clamp(17px,2vw,22px);font-weight:700;color:" + ink + ";margin:0 0 10px;'>" + he(f.heading || "") + "</h3>" +
               "<p style='font-size:14px;color:" + text + ";line-height:1.7;margin:0;'>" + featureBodyHtml(f) + "</p>" +
-              (f.buttonLabel ? "<div style='margin-top:20px;'>" + featureButtonHtml(f) + "</div>" : "") +
+              ((f.buttonLabel && f.buttonPlacement !== "none") ? "<div style='margin-top:20px;'>" + featureButtonHtml(f) + "</div>" : "") +
             "</section>"
           );
         });
@@ -361,7 +378,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
                 "<label for='" + cbId + "' style='display:flex;align-items:center;gap:10px;padding:18px 20px;cursor:pointer;font-weight:700;font-size:15px;color:#1a1a1a;'>" +
                   "<span class='faq-icon' style='font-size:16px;color:" + brass + ";width:14px;'></span>" + he(f.question) +
                 "</label>" +
-                "<div class='faq-answer' style='display:none;padding:0 20px 20px 44px;font-size:14px;color:" + stone + ";line-height:1.6;'>" + he(f.answer) + "</div>" +
+                "<div class='faq-answer' style='display:none;padding:0 20px 20px 44px;font-size:14px;color:" + stone + ";line-height:1.6;'>" + (f.answerIsHtml ? styleInlineLinks(f.answer, brass) : he(f.answer)) + "</div>" +
               "</div>";
             }).join("") +
             "<style>.faq-icon::before{content:'+';}.faq-toggle:checked ~ label .faq-icon::before{content:'\u2212';}.faq-toggle:checked ~ label{color:" + brass + " !important;}.faq-toggle:checked + label + .faq-answer{display:block !important;}.faq-item:first-child{border-top:1px solid #dde0e6;}</style>" +
@@ -411,14 +428,30 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
       // preserving contextual <a> link runs woven into the copy) --
       // running it through he() again would escape those real anchor tags
       // into visible text instead of rendering as links.
+      // Colors and bolds those same <a> tags with the brand's real accent
+      // color -- mirrors landing.js's styleInlineLinks() exactly (see that
+      // file for the contrast reasoning on when color is omitted). This
+      // row-style family sits on light backgrounds, so accent is always
+      // safely readable here.
+      function styleInlineLinks(html, color) {
+        if (!html) return html;
+        var style = color ? "color:" + color + ";font-weight:700" : "font-weight:700";
+        return html.replace(/<a href="/g, '<a style="' + style + '" href="');
+      }
       function featureBodyHtml(f) {
-        return f.bodyIsHtml ? (f.body || "") : he(f.body || "");
+        return f.bodyIsHtml ? styleInlineLinks(f.body || "", brass) : he(f.body || "");
       }
       // Real per-feature button label + style, styled by Manifest's
       // explicit placement instead of every feature-row button rendering
       // identically. No href here -- this preview's row buttons are
       // already decorative (no anchor destinations anywhere in this file).
       function featureButtonHtml(f, fallbackLabel) {
+        // Mirrors landing.js's featureButton() suppression -- see that
+        // file's comment for the real MESO case this fixes. Preview
+        // builds raw HTML strings rather than an Elementor element array,
+        // so "" is the equivalent of a null return there: safe to
+        // concatenate, renders nothing.
+        if (f.buttonPlacement === "none") return "";
         var label = he(f.buttonLabel || fallbackLabel || cta2);
         var style = f.buttonPlacement === "secondary" ? btnDark : btnFilledLight;
         return "<a class='row-btn' style='" + style + "'>" + label + "</a>";
@@ -550,7 +583,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             var cols = imgLeft
               ? "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div><div style='padding:72px 64px;display:flex;flex-direction:column;justify-content:center;'>"
               : "<div style='padding:72px 64px;display:flex;flex-direction:column;justify-content:center;'>";
-            var textContent = "<h2 style='font-size:clamp(22px,3vw,34px);font-weight:700;color:" + brass + ";margin:0 0 16px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p><a class='row-btn' style='" + btnDark + "'>" + cta2 + "</a></div>";
+            var textContent = "<h2 style='font-size:clamp(22px,3vw,34px);font-weight:700;color:" + brass + ";margin:0 0 16px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p>" + (f[3] === "none" ? "" : "<a class='row-btn' style='" + btnDark + "'>" + cta2 + "</a>") + "</div>";
             var imgRight = !imgLeft ? "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>" : "";
             return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + cols + textContent + imgRight + "</section>";
           }).join("")) +
@@ -848,7 +881,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<div><h4 style='font-size:15px;font-weight:700;color:" + ink + ";margin:0 0 5px;'>" + f[0] + "</h4><p style='font-size:13px;color:" + text + ";line-height:1.6;margin:0;'>" + f[1] + "</p></div>" +
             "</div>";
           }
-          var textDiv = "<div class='feature-text' style='padding:72px 64px;display:flex;flex-direction:column;justify-content:center;'><h2 style='font-size:clamp(20px,2.5vw,32px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p><a class='row-btn' style='" + btnDark + "'>" + cta2 + "</a></div>";
+          var textDiv = "<div class='feature-text' style='padding:72px 64px;display:flex;flex-direction:column;justify-content:center;'><h2 style='font-size:clamp(20px,2.5vw,32px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p>" + (f[4] === "none" ? "" : "<a class='row-btn' style='" + btnDark + "'>" + cta2 + "</a>") + "</div>";
           var imgDiv  = "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>";
           return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + (f[3] ? imgDiv+textDiv : textDiv+imgDiv) + "</section>";
         }).join("")) +

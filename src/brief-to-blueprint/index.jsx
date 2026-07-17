@@ -1849,12 +1849,13 @@ export default function CustomBuild({ userId, role } = {}) {
                                     style={{ padding: "10px 12px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", color: "#09090b", boxSizing: "border-box" }}
                                   />
                                   <select
-                                    value={btnFeature.buttonPlacement === "secondary" ? "secondary" : "primary"}
+                                    value={btnFeature.buttonPlacement === "secondary" || btnFeature.buttonPlacement === "none" ? btnFeature.buttonPlacement : "primary"}
                                     onChange={e => setFeatureButtonPlacement(btnIdx, e.target.value, featureCount)}
                                     style={{ padding: "10px 30px 10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", color: "#09090b", background: "#fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%236b635c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\") no-repeat right 12px center", width: "100%", cursor: "pointer", outline: "none", appearance: "none", WebkitAppearance: "none", boxSizing: "border-box" }}
                                   >
                                     <option value="primary">Primary (filled)</option>
                                     <option value="secondary">Secondary (outline)</option>
+                                    <option value="none">No button</option>
                                   </select>
                                 </div>
                               </div>

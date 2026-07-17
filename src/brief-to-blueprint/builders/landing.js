@@ -192,15 +192,32 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     return btn;
   }
 
+  // Colors and bolds real inline <a> tags Manifest weaves into body copy
+  // (richTextToSafeHtml / flattenTextSectionBodyHtml in manifestImport.js)
+  // -- those tags ship with no style attribute of their own, confirmed
+  // against manifestImport.js's output, so a plain string-prepend is safe
+  // and won't clobber an existing style. Color is optional: omit it for
+  // any context sitting on the accent color itself (the closing CTA
+  // section's own background) where an accent-colored link would
+  // disappear against its own backdrop -- bold-only still distinguishes
+  // it there without a contrast failure.
+  function styleInlineLinks(html, color) {
+    if (!html) return html;
+    var style = color ? "color:" + color + ";font-weight:700" : "font-weight:700";
+    return html.replace(/<a href="/g, '<a style="' + style + '" href="');
+  }
+
   // f.body from a Manifest text_section is pre-escaped HTML when
   // f.bodyIsHtml is set (manifestImport.js's flattenTextSectionBodyHtml,
   // which preserves contextual <a> link runs woven into the copy) --
   // running it through he() again would escape those real anchor tags
   // into visible text instead of rendering as links. Manually-entered
   // brief.features (no bodyIsHtml flag) still get escaped exactly as
-  // before.
+  // before. Inline links get the brand's real accent color + bold here --
+  // this row style family sits on light backgrounds (lightSectionBg/bone),
+  // so accent is always safely readable.
   function featureBodyHtml(f) {
-    return f.bodyIsHtml ? (f.body || "") : he(f.body);
+    return f.bodyIsHtml ? styleInlineLinks(f.body || "", accent) : he(f.body);
   }
 
   // Real per-feature button, styled by Manifest's explicit placement
@@ -210,6 +227,19 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // contact CTA (filled) when there's no real per-feature button at all,
   // matching prior behavior exactly.
   function featureButton(f, fallbackUrl) {
+    // Explicit suppression -- a section with no real button of its own
+    // (e.g. only a retired placement:"inline" link that already got
+    // folded into the body copy) was always falling back to a generic
+    // Contact Us button here regardless, in the two callers that don't
+    // gate on f.buttonUrl (the uniform split-image style below, and
+    // renderCenteredCta). Confirmed real case: MESO's "How MESO gets
+    // your DOT inspection going right" section, whose only button is an
+    // inline link already rendered in the body -- the row still showed a
+    // second, redundant "Contact Us" button under it. buttonPlacement:
+    // "none" is a real, deliberate choice (set from the Section Styles
+    // panel), distinct from "" (no choice made yet, existing default
+    // fallback behavior for every other page unaffected).
+    if (f.buttonPlacement === "none") return null;
     var label = f.buttonLabel || contactCta;
     var url = f.buttonUrl || fallbackUrl;
     if (f.buttonPlacement === "secondary") return makeOutlineBtn(label, url, lightCtxBtnBg);
@@ -353,7 +383,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
           mkSpacer(10),
           mkText(featureBodyHtml(f), text),
         ];
-        if (f.buttonUrl) {
+        if (f.buttonUrl && f.buttonPlacement !== "none") {
           children.push(mkSpacer(16));
           children.push(featureButton(f));
         }
@@ -378,7 +408,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
           mkSpacer(6),
           mkText(featureBodyHtml(f), text),
         ];
-        if (f.buttonUrl) {
+        if (f.buttonUrl && f.buttonPlacement !== "none") {
           textColChildren.push(mkSpacer(12));
           textColChildren.push(featureButton(f));
         }
@@ -401,7 +431,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         mkText(featureBodyHtml(f), text),
         mkSpacer(24),
         featureButton(f, brief.heroSecondaryUrl),
-      ];
+      ].filter(Boolean);
       // Always-on: content lives inside an inner box with min_height 508px,
       // matching CS Repair's confirmed production template. This is what
       // makes rows come out uniform height regardless of how much or how
@@ -489,7 +519,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkSpacer(14),
       mkText(featureBodyHtml(f), text),
     ];
-    if (withButton || f.buttonUrl) {
+    if ((withButton || f.buttonUrl) && f.buttonPlacement !== "none") {
       innerChildren.push(mkSpacer(20));
       innerChildren.push(featureButton(f, brief.heroSecondaryUrl));
     }
@@ -513,7 +543,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkHeading(f.heading, ink, "h3", { weight: 700, px: 32, align: "center" }),
       body,
       featureButton(f, brief.heroSecondaryUrl),
-    ], rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "72", center: true });
+    ].filter(Boolean), rowIdx % 2 === 0 ? lightSectionBg : bone, { padY: "72", center: true });
   }
 
   // A secondary CTA woven mid-list -- needs no feature content of its own,
@@ -603,7 +633,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkSpacer(10),
       mkText(featureBodyHtml(f), text),
     ];
-    if (f.buttonUrl) {
+    if (f.buttonUrl && f.buttonPlacement !== "none") {
       children.push(mkSpacer(20));
       children.push(featureButton(f));
     }
@@ -633,7 +663,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkSpacer(16),
       mkIconList(clauses, accent, text, { fontSize: 19, iconSize: 19 }),
     ];
-    if (f.buttonUrl) {
+    if (f.buttonUrl && f.buttonPlacement !== "none") {
       checklistChildren.push(mkSpacer(20));
       checklistChildren.push(featureButton(f));
     }
@@ -664,7 +694,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       mkSpacer(10),
       mkText(featureBodyHtml(f), text),
     ];
-    if (f.buttonUrl) {
+    if (f.buttonUrl && f.buttonPlacement !== "none") {
       videoTextChildren.push(mkSpacer(16));
       videoTextChildren.push(featureButton(f));
     }
@@ -682,7 +712,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var textOnBg = lightTextOn(sectionBg);
     return mkContainer([
       mkHeading(closingLine, textOnBg, "h2", { weight: 700, px: 40, align: "center" }),
-      mkText("<p style='text-align:center'>" + (brief.closingBodyIsHtml ? closingBody : he(closingBody)) + "</p>", textOnBg === "#FFFFFF" ? "rgba(255,255,255,0.8)" : textOnBg),
+      mkText("<p style='text-align:center'>" + (brief.closingBodyIsHtml ? styleInlineLinks(closingBody, null) : he(closingBody)) + "</p>", textOnBg === "#FFFFFF" ? "rgba(255,255,255,0.8)" : textOnBg),
       makeDualBtnRow(phoneCta, contactCta, brief.heroPrimaryUrl, brief.heroSecondaryUrl, sectionBg),
     ], sectionBg, { padY: "80", center: true });
   }
