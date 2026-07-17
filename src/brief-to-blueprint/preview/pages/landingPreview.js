@@ -493,6 +493,99 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
         "</section>"
       ) : "";
 
+      // Generic reusable form section HTML -- mirrors landing.js's
+      // makeFormSection() output, used only in ordered mode (below) where
+      // there's no per-variant "formAlreadyPlaced" curated-layout check to
+      // thread through; ordered mode already knows exactly where the form
+      // belongs from contentOrder itself.
+      function genericFormHTML(anchorId) {
+        var hasForm = brief.formHeading || (Array.isArray(brief.formFields) && brief.formFields.length);
+        if (!hasForm) return "";
+        var ffHeading = brief.formHeading || "Get a Quote";
+        var ffSubhead = brief.formSubhead || "";
+        var ffFields  = (Array.isArray(brief.formFields) && brief.formFields.length) ? brief.formFields : ["Name", "Phone", "Message"];
+        var ffCta     = brief.formCta || "Request a Quote";
+        return "<section" + (anchorId ? " id='" + anchorId + "'" : "") + " style='background:" + bone + ";padding:56px clamp(24px,6vw,64px);'>" +
+            "<div style='max-width:560px;'>" +
+            "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + he(ffHeading) + "</h3>" +
+            (ffSubhead ? "<p style='font-size:14px;color:" + stone + ";margin:0 0 20px;'>" + he(ffSubhead) + "</p>" : "") +
+            ffFields.map(function (lbl) {
+              var safeLbl = he(String(lbl));
+              return "<div style='margin-bottom:12px;'><label style='display:block;font-size:12px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;'>" + safeLbl + "</label><div style='width:100%;padding:10px 14px;border:1px solid #dde0e6;border-radius:4px;background:#ffffff;font-size:14px;color:#bbb;box-sizing:border-box;'>" + safeLbl + "...</div></div>";
+            }).join("") +
+            "<button style='padding:12px 28px;background:" + lightCtxBtnBg + ";color:" + lightCtxBtnText + ";font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:6px;'>" + he(ffCta) + "</button>" +
+            "</div>" +
+          "</section>";
+      }
+
+      // Gated closing-CTA HTML -- mirrors landing.js's makeClosingCta()
+      // suppression exactly: previously every variant rendered this
+      // unconditionally with fabricated fallback text ("Ready to get
+      // started?") whenever Manifest sent no real closing content at all.
+      // Real case: MESO's Atlanta DOT page has no section that resolves
+      // to real closingCta/closingBody -- the whole section, including a
+      // second button duplicating the hero's own primary CTA pointed at
+      // an empty URL, was 100% invented. brief.closingCta/closingBody are
+      // only ever set from real source data, never from the fallback
+      // default itself (close/closeBody, defined earlier), so checking
+      // them directly is the correct "is this real" test. bg defaults to
+      // brass to match variant A/E/F's own treatment; pass "dark" for
+      // variant B's own darker closing section.
+      function closingCtaHTML(bg) {
+        if (!brief.closingCta && !brief.closingBody) return "";
+        var sectionBg = bg || brass;
+        return "<section class='va-cta' style='background:" + sectionBg + ";padding:80px 40px;text-align:center;'>" +
+          "<h2 style='font-size:clamp(26px,4vw,42px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
+          "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:540px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
+          "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
+            "<a class='cta-btn' style='" + btnStyle + "'>" + cta1 + "</a>" +
+            "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
+          "</div>" +
+        "</section>";
+      }
+
+      // Renders every Manifest-sourced content block (features, FAQ, form,
+      // map, closing CTA) in the exact sequence Manifest's export used --
+      // mirrors landing.js's renderOrderedContent() exactly, same
+      // reasoning documented there. Reuses renderCuratedFeatureLayoutHTML
+      // (already handles a single-feature synthetic layout entry, same
+      // way landing.js reuses renderFeatureLayout) so feature blocks get
+      // whatever curated style the Section Styles panel assigned, falling
+      // back to "plain" when nothing was curated. Returns "" when
+      // brief.contentOrder doesn't exist -- every variant below falls
+      // back to its original fixed-order assembly, unchanged, for
+      // legacy/manual briefs and any Manifest import parsed before this
+      // fix.
+      function renderOrderedContentHTML(opts) {
+        opts = opts || {};
+        if (!Array.isArray(brief.contentOrder) || !brief.contentOrder.length) return "";
+        return brief.contentOrder.map(function (block) {
+          if (block.type === "feature") {
+            var curated = Array.isArray(brief.featureLayout)
+              ? brief.featureLayout.filter(function (e) { return e.indices && e.indices.length === 1 && e.indices[0] === block.index; })[0]
+              : null;
+            var style = curated ? curated.style : "plain";
+            return renderCuratedFeatureLayoutHTML([{ style: style, indices: [block.index] }]);
+          } else if (block.type === "faq") {
+            return faqHTML;
+          } else if (block.type === "form") {
+            // Variant B always leads with its own two-column form+trust
+            // section, and Variant F folds the form into its hero-area
+            // layout separately -- opts.skipForm avoids a redundant
+            // second form further down the page in ordered mode.
+            if (opts.skipForm) return "";
+            return genericFormHTML(opts.formAnchorId);
+          } else if (block.type === "map") {
+            // Variant F's hero already includes the map.
+            if (opts.skipMap) return "";
+            return mapSectionHTML;
+          } else if (block.type === "cta") {
+            return closingCtaHTML(opts.closingBg);
+          }
+          return "";
+        }).join("");
+      }
+
       // ── VARIANT B — Lead Form ──────────────────────────────────────────────
       if (variant === "B") {
         var formFieldsB = Array.isArray(brief.formFields) ? brief.formFields : ["Name", "Company", "Phone", "What do you need?", "Message"];
@@ -548,6 +641,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             "</div>" +
           "</section>"
           ) : "") +
+          (brief.contentOrder ? renderOrderedContentHTML({ skipForm: true, closingBg: dark }) :
           (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.featureLayout) :
           (variant === "D" || variant === "B") ? renderCuratedFeatureLayoutHTML((Array.isArray(brief.features) ? brief.features : []).map(function (_, i) {
             // Mirrors landing.js's Variant D/B dispatch -- Variant B's
@@ -586,18 +680,11 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             var textContent = "<h2 style='font-size:clamp(22px,3vw,34px);font-weight:700;color:" + brass + ";margin:0 0 16px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p>" + (f[3] === "none" ? "" : "<a class='row-btn' style='" + btnDark + "'>" + cta2 + "</a>") + "</div>";
             var imgRight = !imgLeft ? "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>" : "";
             return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + cols + textContent + imgRight + "</section>";
-          }).join("")) +
-          mapSectionHTML +
-          "<section style='background:" + dark + ";padding:80px 40px;text-align:center;'>" +
-            "<h2 style='font-size:clamp(26px,4vw,40px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
-            "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:560px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
-            "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
-              "<a class='cta-btn' style='" + btnStyle + "'>" + cta1 + "</a>" +
-              "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
-            "</div>" +
-          "</section>" +
+          }).join(""))) +
+          (brief.contentOrder ? "" : mapSectionHTML) +
+          (brief.contentOrder ? "" : closingCtaHTML(dark)) +
           (Array.isArray(brief.postClosingLayout) && brief.postClosingLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.postClosingLayout) : "") +
-          faqHTML;
+          (brief.contentOrder ? "" : faqHTML);
       }
 
       // ── VARIANT C — Minimal Retargeting ────────────────────────────────────
@@ -683,6 +770,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             "</div>" +
           "</section>"
           ) : "") +
+          (brief.contentOrder ? renderOrderedContentHTML() :
           (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.featureLayout) :
           (function () {
             // The one variant missing this check entirely -- B/D/F all
@@ -704,7 +792,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               if ((i + 1) % 3 === 0 && i < featuresArr.length - 1) dynamicLayout.push({ style: "midcta", indices: [] });
             });
             return renderCuratedFeatureLayoutHTML(dynamicLayout);
-          })()) +
+          })())) +
           (brief.skipServicesChecklist ? "" :
           "<section style='background:" + bone + ";padding:80px clamp(24px,6vw,80px);border-top:1px solid rgba(0,0,0,0.08);'>" +
             "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 32px;'>" + (brief.servicesHeading||"What We Do") + "</h2>" +
@@ -714,16 +802,9 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               }).join("") +
             "</div>" +
           "</section>") +
-          mapSectionHTML +
-          "<section style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
-            "<h2 style='font-size:clamp(26px,4vw,42px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
-            "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:540px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
-            "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
-              "<a class='cta-btn' style='" + btnStyle + "'>" + cta1 + "</a>" +
-              "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
-            "</div>" +
-          "</section>" +
-          faqHTML;
+          (brief.contentOrder ? "" : mapSectionHTML) +
+          (brief.contentOrder ? "" : closingCtaHTML()) +
+          (brief.contentOrder ? "" : faqHTML);
       }
 
       // ── VARIANT F — Location: headline + address/hours/map combined into
@@ -770,6 +851,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "</div>" +
             "</section>"
           ) : "") +
+          (brief.contentOrder ? renderOrderedContentHTML({ skipMap: true, formAnchorId: "contact-form" }) :
           (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.featureLayout) :
           renderCuratedFeatureLayoutHTML((Array.isArray(brief.features) ? brief.features : []).map(function (_, i) {
             var hasVideo = !!brief.videoUrl;
@@ -777,7 +859,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
               : ["split-right", "centered-cta", "checklist", "split-left", "split-cta-right", "plain"];
             return { style: cyclePattern[i % cyclePattern.length], indices: [i] };
-          }))) +
+          })))) +
           (brief.skipServicesChecklist ? "" :
           "<section style='background:" + bone + ";padding:80px clamp(24px,6vw,80px);border-top:1px solid rgba(0,0,0,0.08);'>" +
             "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 32px;'>" + (brief.servicesHeading||"What We Do") + "</h2>" +
@@ -787,7 +869,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               }).join("") +
             "</div>" +
           "</section>") +
-          (function () {
+          (brief.contentOrder ? "" : (function () {
             var hasForm = brief.formHeading || (Array.isArray(brief.formFields) && brief.formFields.length);
             if (!hasForm) return "";
             var formAlreadyPlaced =
@@ -808,7 +890,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
                 "<button style='padding:12px 28px;background:" + lightCtxBtnBg + ";color:" + lightCtxBtnText + ";font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:6px;'>" + ffCta + "</button>" +
                 "</div>" +
               "</section>";
-          })() +
+          })()) +
+          (brief.contentOrder ? "" :
           "<section class='va-cta' style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
             "<h2 style='font-size:clamp(26px,4vw,42px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
             "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:540px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
@@ -816,9 +899,9 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<a class='cta-btn' style='" + btnStyle + "'>" + cta1 + "</a>" +
               "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
             "</div>" +
-          "</section>" +
+          "</section>") +
           (Array.isArray(brief.postClosingLayout) && brief.postClosingLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.postClosingLayout) : "") +
-          faqHTML;
+          (brief.contentOrder ? "" : faqHTML);
       }
 
       // ── VARIANT A — Awareness / Feature (default) ──────────────────────────
@@ -855,6 +938,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             "</div>" +
           "</section>"
         ) : "") +
+        (brief.contentOrder ? renderOrderedContentHTML() :
         (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.featureLayout) :
         variant === "D" ? renderCuratedFeatureLayoutHTML((Array.isArray(brief.features) ? brief.features : []).map(function (_, i) {
           // Mirrors landing.js's Variant D dispatch -- the same proven,
@@ -884,7 +968,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           var textDiv = "<div class='feature-text' style='padding:72px 64px;display:flex;flex-direction:column;justify-content:center;'><h2 style='font-size:clamp(20px,2.5vw,32px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p>" + (f[4] === "none" ? "" : "<a class='row-btn' style='" + btnDark + "'>" + cta2 + "</a>") + "</div>";
           var imgDiv  = "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>";
           return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + (f[3] ? imgDiv+textDiv : textDiv+imgDiv) + "</section>";
-        }).join("")) +
+        }).join(""))) +
         (brief.skipServicesChecklist ? "" :
         "<section style='background:" + bone + ";padding:80px clamp(24px,6vw,80px);border-top:1px solid rgba(0,0,0,0.08);'>" +
           "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 32px;'>" + (brief.servicesHeading||"What We Do") + "</h2>" +
@@ -894,7 +978,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             }).join("") +
           "</div>" +
         "</section>") +
-        (function () {
+        (brief.contentOrder ? "" : (function () {
           // Mirrors landing.js's makeFormSection() -- renders form content
           // (from a Manifest "form" section, or brief.formHeading/formFields
           // set directly) when no curated layout is already placing it
@@ -922,17 +1006,10 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<button style='padding:12px 28px;background:" + lightCtxBtnBg + ";color:" + lightCtxBtnText + ";font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:6px;'>" + ffCta + "</button>" +
               "</div>" +
             "</section>";
-        })() +
-        mapSectionHTML +
-        "<section class='va-cta' style='background:" + brass + ";padding:80px 40px;text-align:center;'>" +
-          "<h2 style='font-size:clamp(26px,4vw,42px);font-weight:700;color:#ffffff;margin:0 0 12px;'>" + close + "</h2>" +
-          "<p style='font-size:16px;color:rgba(255,255,255,0.8);margin:0 0 32px;max-width:540px;margin-left:auto;margin-right:auto;'>" + closeBody + "</p>" +
-          "<div style='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;'>" +
-            "<a class='cta-btn' style='" + btnStyle + "'>" + cta1 + "</a>" +
-            "<a class='cta-btn' style='" + btnOutline + "'>" + cta2 + "</a>" +
-          "</div>" +
-        "</section>" +
+        })()) +
+        (brief.contentOrder ? "" : mapSectionHTML) +
+        (brief.contentOrder ? "" : closingCtaHTML()) +
         (Array.isArray(brief.postClosingLayout) && brief.postClosingLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.postClosingLayout) : "") +
-        faqHTML;
+        (brief.contentOrder ? "" : faqHTML);
   })();
 }

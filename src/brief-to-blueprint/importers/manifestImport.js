@@ -498,6 +498,39 @@ function manifestPageDocumentToBrief(raw) {
   var featurePairs = [];
   var faqPairs = [];
   var hasCtaType = sections.some(function (s) { return s.type === "cta"; });
+  // Real position tracking -- confirmed real bug, July 2026: every section
+  // type below was being sorted into its own bucket (featurePairs/
+  // faqPairs/brief.formFields/etc) with the export's actual sequence
+  // discarded entirely. landing.js/landingPreview.js then always
+  // reassembled every page using one fixed template slot order per
+  // variant (hero, trust strip, testimonials, feature rows, checklist,
+  // form, map, closing CTA, FAQ -- always last), regardless of where
+  // Manifest actually placed each section. Confirmed real case: MESO's
+  // Atlanta DOT page has its FAQ section positioned right after the
+  // second text_section, well before the third -- Spec was always
+  // rendering it at the very bottom instead. contentOrder is the fix:
+  // one array recording each content block in the exact sequence
+  // encountered (hero excluded -- always structurally first), consumed
+  // by a new ordered-rendering path in landing.js/landingPreview.js.
+  // Only "feature" blocks carry an index (into featurePairs, since a
+  // single text_section/feature_cards item becomes one featurePairs
+  // entry) -- faq/form/map are each a single collective section under
+  // the current design (matching makeFaqSection()/makeFormSection()/
+  // makeMapSection(), which each render ALL accumulated content in one
+  // section, not per-source-section), so only the first occurrence of
+  // each records a position; later ones still contribute their content,
+  // just not a second position marker. Testimonials intentionally NOT
+  // included yet -- each variant still builds its testimonials block
+  // inline with variant-specific styling rather than through one shared
+  // function the way faq/form/map already are, so real reordering there
+  // needs that extracted first. Legacy/manual briefs and any Manifest
+  // export parsed before this fix have no contentOrder at all, and
+  // every variant's original fixed-order fallback path is unchanged for
+  // them -- zero regression risk for existing pages.
+  var contentOrder = [];
+  var faqOrderRecorded = false;
+  var formOrderRecorded = false;
+  var mapOrderRecorded = false;
 
   sections.forEach(function (section, idx) {
     var isLast = idx === sections.length - 1;
@@ -543,6 +576,7 @@ function manifestPageDocumentToBrief(raw) {
     if (section.type === "feature_cards") {
       (section.items || []).forEach(function (item) {
         featurePairs.push({ heading: item.title || "", body: flattenRichText(item.body) });
+        contentOrder.push({ type: "feature", index: featurePairs.length - 1 });
       });
       return;
     }
@@ -552,12 +586,14 @@ function manifestPageDocumentToBrief(raw) {
         faqPairs.push({ question: item.question || "", answer: richTextToSafeHtml(item.answer), answerIsHtml: true });
       });
       if (headingText && !brief.faqHeading) brief.faqHeading = headingText;
+      if (!faqOrderRecorded) { contentOrder.push({ type: "faq" }); faqOrderRecorded = true; }
       return;
     }
 
     if (section.type === "cta") {
       brief.closingCta = headingText;
       brief.closingBody = flattenRichText(section.body);
+      contentOrder.push({ type: "cta" });
       return;
     }
 
@@ -613,11 +649,13 @@ function manifestPageDocumentToBrief(raw) {
         // if brief.mapUrl itself came back empty, meaning nothing resolved.
         trackPlaceholderButton(section.button && section.button.label, brief.mapUrl, "Map");
         if (noteText) brief._manifestMapNote = noteText;
+        if (!mapOrderRecorded) { contentOrder.push({ type: "map" }); mapOrderRecorded = true; }
       } else if (noteText) {
         // No structured address to build the real map widget from -- the
         // content is still real, so it becomes a feature row instead of
         // silently disappearing. Never invents an address to fill the gap.
         featurePairs.push({ heading: headingText, body: noteText });
+        contentOrder.push({ type: "feature", index: featurePairs.length - 1 });
         // The section's own button (e.g. "Get Directions") has nowhere to
         // render without a real map, but it must still be tracked --
         // confirmed real bug, July 2026: this was the one place on the page
@@ -638,6 +676,7 @@ function manifestPageDocumentToBrief(raw) {
       brief.formHeading = headingText;
       brief.formSubhead = flattenRichText(section.body);
       brief.formFields = (section.fields || []).map(function (f) { return f.label || ""; }).filter(Boolean);
+      if (!formOrderRecorded) { contentOrder.push({ type: "form" }); formOrderRecorded = true; }
       return;
     }
 
@@ -652,6 +691,7 @@ function manifestPageDocumentToBrief(raw) {
         // again.
         brief.closingBody = flattenTextSectionBodyHtml(section.items);
         brief.closingBodyIsHtml = true;
+        contentOrder.push({ type: "cta" });
         return;
       }
       // Capture the section's own button (label + resolved URL + placement)
@@ -709,6 +749,7 @@ function manifestPageDocumentToBrief(raw) {
         buttonUrl: secBtn ? pageDocumentButtonUrl(secBtn) : "",
         buttonPlacement: secBtn ? secBtn.placement || "" : "",
       });
+      contentOrder.push({ type: "feature", index: featurePairs.length - 1 });
       return;
     }
 
@@ -737,6 +778,7 @@ function manifestPageDocumentToBrief(raw) {
 
   if (featurePairs.length) brief.features = featurePairs;
   if (faqPairs.length) brief.faqItems = faqPairs;
+  if (contentOrder.length) brief.contentOrder = contentOrder;
 
   // The one-off AFS_BRAND_ID curated layout that used to live here has
   // been removed -- brief.featureLayout/postClosingLayout are now set

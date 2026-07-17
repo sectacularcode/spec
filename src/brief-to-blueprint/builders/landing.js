@@ -510,6 +510,77 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     return rendered;
   }
 
+  // Renders the page's real Manifest-sourced content (feature rows, FAQ,
+  // form, map, closing CTA) in the exact sequence Manifest's export used,
+  // instead of Spec's old fixed per-variant template order. Confirmed
+  // real bug, July 2026: every section type was being reassembled into
+  // one hardcoded order regardless of where Manifest actually placed it
+  // -- real case, MESO's Atlanta DOT page has its FAQ positioned right
+  // after the second text_section, well before the third, but every
+  // variant always rendered FAQ dead last. Only replaces the
+  // Manifest-sourced blocks themselves; each variant's own synthesized
+  // flavor content (trust strip, testimonials, services checklist) stays
+  // in its existing fixed position at the call site below, since none of
+  // that corresponds to a real section Manifest sent a position for.
+  // Feature rows reuse whatever curated style the Section Styles panel
+  // already assigned to that feature index (brief.featureLayout), same
+  // lookup renderFeatureLayout's own callers already do -- falls back to
+  // the plain row style when nothing was curated, so an interleaved
+  // feature still reads as an intentional block rather than reusing
+  // split-image's two-column layout with no real second column to fill.
+  // Returns null when brief.contentOrder doesn't exist -- legacy/manual
+  // briefs, or any Manifest import parsed before this fix, have none;
+  // callers fall back to that variant's original fixed-order assembly
+  // untouched, zero regression risk for every page already built this
+  // way. Testimonials are intentionally NOT part of this yet -- each
+  // variant still builds its testimonials block inline with
+  // variant-specific styling rather than through one shared function the
+  // way faq/form/map/cta already are, so real reordering there needs
+  // that extracted first (flagged, not silently mishandled).
+  function renderOrderedContent(opts) {
+    opts = opts || {};
+    if (!Array.isArray(brief.contentOrder) || !brief.contentOrder.length) return null;
+    var features = buildFeaturesArray();
+    var rendered = [];
+    brief.contentOrder.forEach(function (block) {
+      if (block.type === "feature") {
+        var f = features[block.index];
+        if (!f) return;
+        var curated = Array.isArray(brief.featureLayout)
+          ? brief.featureLayout.filter(function (e) { return e.indices && e.indices.length === 1 && e.indices[0] === block.index; })[0]
+          : null;
+        var style = curated ? curated.style : "plain";
+        rendered = rendered.concat(renderFeatureLayout([{ style: style, indices: [block.index] }], features));
+      } else if (block.type === "faq") {
+        var faqEl = makeFaqSection();
+        if (faqEl) rendered.push(faqEl);
+      } else if (block.type === "form") {
+        // Variant B always leads with its own two-column form+trust
+        // section (right after the hero, unconditionally) rather than
+        // placing form content wherever Manifest's export had it --
+        // opts.skipForm avoids rendering a second, redundant form section
+        // further down the page in ordered mode.
+        if (opts.skipForm) return;
+        // Variant F builds its own form section separately (real anchor
+        // ID, #contact-form, for the hero's "Contact Us" to jump to) --
+        // opts.formOverride substitutes that instead of a second, plain
+        // one from makeFormSection().
+        var formEl = opts.formOverride !== undefined ? opts.formOverride : makeFormSection();
+        if (formEl) rendered.push(formEl);
+      } else if (block.type === "map") {
+        // Variant F's hero already includes the map -- opts.skipMap
+        // avoids rendering it a second time further down the page.
+        if (opts.skipMap) return;
+        var mapEl = makeMapSection();
+        if (mapEl) rendered.push(mapEl);
+      } else if (block.type === "cta") {
+        var ctaEl = makeClosingCta(opts.closingBg);
+        if (ctaEl) rendered.push(ctaEl);
+      }
+    });
+    return rendered;
+  }
+
   // Image-split row, explicit side (not alternating by index) and an
   // optional CTA button in the text column — used for split-right/
   // split-left/split-cta-right/split-cta-left in a curated featureLayout.
@@ -704,6 +775,24 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   }
 
   function makeClosingCta(bg) {
+    // Confirmed real bug, July 2026: this rendered unconditionally on
+    // every page regardless of whether Manifest sent any closing content
+    // at all -- closingLine/closingBody silently fall back to invented
+    // placeholder text ("Ready to get started?" / "Reach out today...")
+    // a few lines up, and this had no guard against that ever showing.
+    // Real case: MESO's Atlanta DOT page has no section that resolves to
+    // a real closingCta/closingBody (its last section is a form, not a
+    // cta-eligible text_section) -- the whole section was 100% fabricated,
+    // including a second button that duplicated the hero's own primary
+    // CTA and pointed at an empty heroSecondaryUrl (MESO's hero only has
+    // one button). Same "no real content, don't invent filler" rule
+    // already applied to FAQ/trust-stats/services-checklist, just never
+    // extended here. brief.closingCta/closingBody are only ever set from
+    // real source data (Manifest's cta/hijacked-last-text_section paths,
+    // or a manual brief field someone actually typed into) -- never from
+    // the fallback default itself, so checking them directly (not
+    // closingLine/closingBody) is the correct "is this real" test.
+    if (!brief.closingCta && !brief.closingBody) return null;
     // Background follows the variant's own preview: brass/accent for
     // A/D/E/F (the preview's va-cta section), dark only for B. The export
     // used to hardcode dark for every variant, so the approved green
@@ -864,7 +953,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     return {
       version: "0.4", title: he(brandName || "Site") + " — Landing Page (Narrative)", type: "page", page_settings: {},
-      content: [heroE, makeTrustStrip(), testimonialsSectionE, ...interleavedE, checklistSectionE, makeFormSection(), makeMapSection(), makeClosingCta(), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),
+      content: [heroE, makeTrustStrip(), testimonialsSectionE, ...(brief.contentOrder ? renderOrderedContent() : interleavedE), checklistSectionE, ...(brief.contentOrder ? [] : [makeFormSection(), makeMapSection(), makeClosingCta()]), ...makePostClosingRows(), ...(brief.contentOrder ? [] : [makeFaqSection()])].filter(Boolean),
     };
   }
 
@@ -1014,7 +1103,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       version: "0.4", title: he(brandName || "Site") + (brief.mapCity ? " — " + he(brief.mapCity) : "") + " — Landing Page (Location)", type: "page", page_settings: {},
       // No makeMapSection() here -- the map is already part of heroF, a
       // second one further down would just duplicate it.
-      content: [heroF, testimonialsSectionF, ...makeFeatureRows(), checklistSectionF, formSectionF, makeClosingCta(), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),
+      content: [heroF, testimonialsSectionF, ...(brief.contentOrder ? renderOrderedContent({ skipMap: true, formOverride: formSectionF }) : makeFeatureRows()), checklistSectionF, ...(brief.contentOrder ? [] : [formSectionF, makeClosingCta()]), ...makePostClosingRows(), ...(brief.contentOrder ? [] : [makeFaqSection()])].filter(Boolean),
     };
   }
 
@@ -1067,7 +1156,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     return {
       version: "0.4", title: he(brandName || "Site") + " — Landing Page", type: "page", page_settings: {},
-      content: [heroA, makeTrustStrip(), testimonialsSectionA, ...makeFeatureRows(), checklistSection, makeFormSection(), makeMapSection(), makeClosingCta(), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),
+      content: [heroA, makeTrustStrip(), testimonialsSectionA, ...(brief.contentOrder ? renderOrderedContent() : makeFeatureRows()), checklistSection, ...(brief.contentOrder ? [] : [makeFormSection(), makeMapSection(), makeClosingCta()]), ...makePostClosingRows(), ...(brief.contentOrder ? [] : [makeFaqSection()])].filter(Boolean),
     };
   }
 
@@ -1173,7 +1262,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     return {
       version: "0.4", title: he(brandName || "Site") + " — Landing Page (Form)", type: "page", page_settings: {},
-      content: [heroB, formSection, testimonialsSection, ...makeFeatureRows(), midCta, makeMapSection(), makeClosingCta(dark), ...makePostClosingRows(), makeFaqSection()].filter(Boolean),
+      content: [heroB, formSection, testimonialsSection, ...(brief.contentOrder ? renderOrderedContent({ skipForm: true, closingBg: dark }) : makeFeatureRows()), midCta, ...(brief.contentOrder ? [] : [makeMapSection(), makeClosingCta(dark)]), ...makePostClosingRows(), ...(brief.contentOrder ? [] : [makeFaqSection()])].filter(Boolean),
     };
   }
 
