@@ -42,12 +42,21 @@ export default async function handler(req, res) {
     await ensureTable();
 
     if (req.method === "GET") {
+      // keywords/build_date live in their own columns (see POST below) --
+      // data only holds what's left after those two are split out. This
+      // was previously `id, data` only, silently dropping both on every
+      // load: the Regenerate button was passing undefined as the brief
+      // text instead of the real keywords, and any entry without a
+      // themeName set would crash the whole card list on render (falling
+      // through to build.keywords.slice() on undefined). Nothing was ever
+      // lost -- POST always wrote these columns correctly -- read-side
+      // bug only, same class as api/template-library.js's GET.
       const { rows } = await sql`
-        SELECT id, data FROM keyword_builds
+        SELECT id, keywords, build_date, data FROM keyword_builds
         WHERE user_id = ${userId}
         ORDER BY created_at DESC, id DESC
       `;
-      return res.status(200).json({ entries: rows.map(r => ({ id: r.id, ...r.data })) });
+      return res.status(200).json({ entries: rows.map(r => ({ id: r.id, ...r.data, keywords: r.keywords, date: r.build_date })) });
     }
 
     if (req.method === "POST") {
