@@ -171,9 +171,18 @@ export default function FidelityCheck() {
           <div style={T.label}>Source sections</div>
           <div style={{ display: "flex", flexDirection: "column", gap: "6px", margin: "8px 0 16px" }}>
             {selected.report.sections.map((s, i) => (
-              <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", padding: "6px 10px", background: s.status === "mapped" ? "#f9fafb" : "#eff6ff", borderRadius: "6px" }}>
-                <span style={{ color: "#09090b" }}>{s.type}{s.heading ? " -- \"" + s.heading + "\"" : ""}</span>
-                <span style={{ color: s.status === "mapped" ? "#166534" : "#1e40af" }}>{s.status.replace("_", " ")}</span>
+              <div key={i} style={{ padding: "8px 10px", background: s.status === "mapped" ? "#f9fafb" : "#eff6ff", borderRadius: "6px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px" }}>
+                  <span style={{ color: "#09090b", fontWeight: 600 }}>{s.type}{s.heading ? " -- \"" + s.heading + "\"" : ""}</span>
+                  <span style={{ color: s.status === "mapped" ? "#166534" : "#1e40af" }}>{s.status.replace("_", " ")}</span>
+                </div>
+                {s.copy && s.copy.length > 0 && (
+                  <div style={{ marginTop: "6px", display: "flex", flexDirection: "column", gap: "3px" }}>
+                    {s.copy.map((line, j) => (
+                      <div key={j} style={{ fontSize: "12px", color: "#44403c", lineHeight: 1.5 }}>{line}</div>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>

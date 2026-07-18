@@ -62,6 +62,68 @@ const CONTENT_FIELDS = [
   ["closingCtaButtonLabel", "Closing CTA button label"],
 ];
 
+function flattenRichTextLocal(arr) {
+  if (!Array.isArray(arr)) return "";
+  return arr.map(run => (run && run.text) || "").join("");
+}
+
+// Pulls the real, readable copy out of a raw section -- shown directly in
+// the fidelity report so a section's mapped status can be checked against
+// its actual words, not just confirmed as "mapped" with no way to verify
+// what that copy actually says. Deliberately mirrors each type's real
+// shape rather than a generic string-flatten, so the output reads like
+// the section (heading, then body/items in order) instead of a jumble.
+function extractSectionCopy(section) {
+  const parts = [];
+  if (section.type === "hero") {
+    const sub = flattenRichTextLocal(section.subheading);
+    if (sub) parts.push(sub);
+    (section.buttons || []).forEach(b => { if (b && b.label) parts.push("[button] " + b.label); });
+  } else if (section.type === "text_section") {
+    (section.items || []).forEach(item => {
+      const t = flattenRichTextLocal(item && item.rich_text);
+      if (t) parts.push(t);
+    });
+    (section.buttons || []).forEach(b => { if (b && b.label) parts.push("[button] " + b.label); });
+  } else if (section.type === "map_location") {
+    const note = flattenRichTextLocal(section.note);
+    if (note) parts.push(note);
+    if (section.phone) parts.push("Phone: " + section.phone);
+    if (section.hours) parts.push("Hours: " + section.hours);
+    if (section.button && section.button.label) parts.push("[button] " + section.button.label);
+  } else if (section.type === "testimonials") {
+    (section.items || []).forEach(item => {
+      if (!item) return;
+      let line = "\"" + (item.quote || "") + "\"";
+      if (item.author) line += " -- " + item.author;
+      if (item.rating) line += " (" + item.rating + " stars)";
+      parts.push(line);
+    });
+  } else if (section.type === "faq") {
+    (section.items || []).forEach(item => {
+      if (!item) return;
+      parts.push("Q: " + (item.question || ""));
+      parts.push("A: " + flattenRichTextLocal(item.answer));
+    });
+  } else if (section.type === "cta") {
+    const body = flattenRichTextLocal(section.body);
+    if (body) parts.push(body);
+    (section.buttons || []).forEach(b => { if (b && b.label) parts.push("[button] " + b.label); });
+  } else if (section.type === "form") {
+    (section.fields || []).forEach(f => {
+      if (f && f.label) parts.push(f.label + (f.required ? " (required)" : "") + (f.field_type ? " -- " + f.field_type : ""));
+    });
+  } else if (section.type === "feature_cards") {
+    (section.items || []).forEach(item => {
+      if (!item) return;
+      if (item.title) parts.push(item.title);
+      const b = flattenRichTextLocal(item.body);
+      if (b) parts.push(b);
+    });
+  }
+  return parts;
+}
+
 export function checkFidelity(raw, brief) {
   const haystack = buildHaystack(raw);
   const slug = (raw.page && raw.page.slug) || "(unknown page)";
@@ -75,7 +137,7 @@ export function checkFidelity(raw, brief) {
     else if (unmapped.some(u => u.type === s.type && u.heading === heading)) status = "unmapped";
     else if (["hero", "testimonials", "faq", "map_location", "form", "cta", "text_section", "feature_cards"].includes(s.type)) status = "mapped";
     else status = "unmapped";
-    sections.push({ index: i, type: s.type, heading, status });
+    sections.push({ index: i, type: s.type, heading, status, copy: extractSectionCopy(s) });
   });
 
   const fields = CONTENT_FIELDS.map(([key, label]) => {
