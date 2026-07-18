@@ -645,6 +645,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     if (!Array.isArray(brief.contentOrder) || !brief.contentOrder.length) return null;
     var features = buildFeaturesArray();
     var rendered = [];
+    var testimonialsRendered = false;
     brief.contentOrder.forEach(function (block) {
       if (block.type === "feature") {
         var f = features[block.index];
@@ -679,8 +680,26 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       } else if (block.type === "cta") {
         var ctaEl = makeClosingCta(opts.closingBg);
         if (ctaEl) rendered.push(ctaEl);
+      } else if (block.type === "testimonials") {
+        testimonialsRendered = true;
+        if (opts.skipTestimonials) return;
+        var tEl = opts.testimonialsOverride !== undefined ? opts.testimonialsOverride : makeTestimonialSection();
+        if (tEl) rendered.push(tEl);
       }
     });
+    // Safety net for already-saved builds whose stored contentOrder
+    // predates testimonials being tracked (real risk, not hypothetical:
+    // any build saved before this fix shipped has real testimonial1Name
+    // data but no {type:"testimonials"} entry in its stored contentOrder
+    // — without this, re-rendering that saved build after this fix would
+    // silently drop the testimonial section entirely instead of just
+    // misplacing it). Appends at the end rather than guessing a fixed
+    // position, since "somewhere, once" beats a position that's provably
+    // wrong on 2 of 17 real pages on hand.
+    if (!testimonialsRendered && !opts.skipTestimonials) {
+      var fallbackT = opts.testimonialsOverride !== undefined ? opts.testimonialsOverride : makeTestimonialSection();
+      if (fallbackT) rendered.push(fallbackT);
+    }
     return rendered;
   }
 
@@ -973,6 +992,25 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     });
   }
 
+  // Optional testimonial-carousel section — centralizes what was 4
+  // separately-duplicated inline blocks (Variants A/D, B, E, F), confirmed
+  // byte-for-byte identical, July 2026: same heading, same
+  // mkTestimonialCarousel() call, same dark/warmWhite styling. Renders
+  // only when real testimonial content exists — no fabricated placeholder
+  // quotes. Returns null when there's nothing to show — callers must
+  // .filter(Boolean).
+  function makeTestimonialSection() {
+    if (!String(brief.testimonial1Name || "").trim() || brief.skipTestimonials) return null;
+    return mkContainer([
+      mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", warmWhite, "h2", { weight: 800, px: 32, align: "center" }),
+      mkTestimonialCarousel([
+        { quote: brief.testimonial1Quote || "", name: brief.testimonial1Name || "", title: brief.testimonial1Title || "" },
+        { quote: brief.testimonial2Quote || "", name: brief.testimonial2Name || "", title: brief.testimonial2Title || "" },
+        { quote: brief.testimonial3Quote || "", name: brief.testimonial3Name || "", title: brief.testimonial3Title || "" },
+      ].filter(function (t) { return t.quote || t.name; }), { textColor: warmWhite, nameColor: warmWhite, jobColor: "rgba(255,255,255,0.7)" }),
+    ], dark, { padY: "80", center: true });
+  }
+
   // Optional lead-capture form section — renders only when the brief
   // carries real form content (from a Manifest "form" section, or
   // brief.formHeading/formFields set directly) AND no curated layout is
@@ -1029,14 +1067,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // on awareness-stage pages consistently flags trust cues appearing
     // only near the bottom as a missed opportunity; cold traffic decides
     // whether to keep reading well before they'd ever scroll that far.
-    var testimonialsSectionE = (String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? mkContainer([
-      mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", warmWhite, "h2", { weight: 800, px: 32, align: "center" }),
-      mkTestimonialCarousel([
-        { quote: brief.testimonial1Quote || "", name: brief.testimonial1Name || "", title: brief.testimonial1Title || "" },
-        { quote: brief.testimonial2Quote || "", name: brief.testimonial2Name || "", title: brief.testimonial2Title || "" },
-        { quote: brief.testimonial3Quote || "", name: brief.testimonial3Name || "", title: brief.testimonial3Title || "" },
-      ].filter(function (t) { return t.quote || t.name; }), { textColor: warmWhite, nameColor: warmWhite, jobColor: "rgba(255,255,255,0.7)" }),
-    ], dark, { padY: "80", center: true }) : null;
+    var testimonialsSectionE = makeTestimonialSection();
 
     // A fresh element each call -- not a single reused block -- since
     // this gets interleaved more than once and every Elementor element
@@ -1071,7 +1102,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     return {
       version: "0.4", title: he(brandName || "Site") + (brief._manifestPageName ? " — " + he(brief._manifestPageName) : "") + " — Landing Page (Narrative)", type: "page", page_settings: {},
-      content: [heroE, makeTrustStrip(), testimonialsSectionE, ...(brief.contentOrder ? renderOrderedContent() : interleavedE), checklistSectionE, ...(brief.contentOrder ? [] : [makeFormSection(), makeMapSection(), makeClosingCta()]), ...makePostClosingRows(), ...(brief.contentOrder ? [] : [makeFaqSection()])].filter(Boolean),
+      content: [heroE, makeTrustStrip(), ...(brief.contentOrder ? renderOrderedContent({ testimonialsOverride: testimonialsSectionE }) : [testimonialsSectionE, ...interleavedE]), checklistSectionE, ...(brief.contentOrder ? [] : [makeFormSection(), makeMapSection(), makeClosingCta()]), ...makePostClosingRows(), ...(brief.contentOrder ? [] : [makeFaqSection()])].filter(Boolean),
     };
   }
 
@@ -1189,14 +1220,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // export, July 2026) -- every variant using mkTestimonialCarousel was
     // missing a section title; scoped to F only since that's what was
     // actually reviewed.
-    var testimonialsSectionF = (String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? mkContainer([
-      mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", warmWhite, "h2", { weight: 800, px: 32, align: "center" }),
-      mkTestimonialCarousel([
-        { quote: brief.testimonial1Quote || "", name: brief.testimonial1Name || "", title: brief.testimonial1Title || "" },
-        { quote: brief.testimonial2Quote || "", name: brief.testimonial2Name || "", title: brief.testimonial2Title || "" },
-        { quote: brief.testimonial3Quote || "", name: brief.testimonial3Name || "", title: brief.testimonial3Title || "" },
-      ].filter(function (t) { return t.quote || t.name; }), { textColor: warmWhite, nameColor: warmWhite, jobColor: "rgba(255,255,255,0.7)" }),
-    ], dark, { padY: "80", center: true }) : null;
+    var testimonialsSectionF = makeTestimonialSection();
 
     // Services checklist -- same pattern as Variant A/D, including the
     // skipServicesChecklist auto-hide for Manifest imports.
@@ -1221,7 +1245,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       version: "0.4", title: he(brandName || "Site") + (brief._manifestPageName ? " — " + he(brief._manifestPageName) : (brief.mapCity ? " — " + he(brief.mapCity) : "")) + " — Landing Page (Location)", type: "page", page_settings: {},
       // No makeMapSection() here -- the map is already part of heroF, a
       // second one further down would just duplicate it.
-      content: [heroF, testimonialsSectionF, ...(brief.contentOrder ? renderOrderedContent({ skipMap: true, formOverride: formSectionF }) : makeFeatureRows()), checklistSectionF, ...(brief.contentOrder ? [] : [formSectionF, makeClosingCta()]), ...makePostClosingRows(), ...(brief.contentOrder ? [] : [makeFaqSection()])].filter(Boolean),
+      content: [heroF, ...(brief.contentOrder ? renderOrderedContent({ skipMap: true, formOverride: formSectionF, testimonialsOverride: testimonialsSectionF }) : [testimonialsSectionF, ...makeFeatureRows()]), checklistSectionF, ...(brief.contentOrder ? [] : [formSectionF, makeClosingCta()]), ...makePostClosingRows(), ...(brief.contentOrder ? [] : [makeFaqSection()])].filter(Boolean),
     };
   }
 
@@ -1263,18 +1287,11 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // real testimonial content existing -- matches the checklist fix's
     // same principle: no real content there should mean the section
     // doesn't render, not that it renders with invented placeholder quotes.
-    var testimonialsSectionA = (String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? mkContainer([
-      mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", warmWhite, "h2", { weight: 800, px: 32, align: "center" }),
-      mkTestimonialCarousel([
-        { quote: brief.testimonial1Quote || "", name: brief.testimonial1Name || "", title: brief.testimonial1Title || "" },
-        { quote: brief.testimonial2Quote || "", name: brief.testimonial2Name || "", title: brief.testimonial2Title || "" },
-        { quote: brief.testimonial3Quote || "", name: brief.testimonial3Name || "", title: brief.testimonial3Title || "" },
-      ].filter(function (t) { return t.quote || t.name; }), { textColor: warmWhite, nameColor: warmWhite, jobColor: "rgba(255,255,255,0.7)" }),
-    ], dark, { padY: "80", center: true }) : null;
+    var testimonialsSectionA = makeTestimonialSection();
 
     return {
       version: "0.4", title: he(brandName || "Site") + (brief._manifestPageName ? " — " + he(brief._manifestPageName) : "") + " — Landing Page", type: "page", page_settings: {},
-      content: [heroA, makeTrustStrip(), testimonialsSectionA, ...(brief.contentOrder ? renderOrderedContent() : makeFeatureRows()), checklistSection, ...(brief.contentOrder ? [] : [makeFormSection(), makeMapSection(), makeClosingCta()]), ...makePostClosingRows(), ...(brief.contentOrder ? [] : [makeFaqSection()])].filter(Boolean),
+      content: [heroA, makeTrustStrip(), ...(brief.contentOrder ? renderOrderedContent({ testimonialsOverride: testimonialsSectionA }) : [testimonialsSectionA, ...makeFeatureRows()]), checklistSection, ...(brief.contentOrder ? [] : [makeFormSection(), makeMapSection(), makeClosingCta()]), ...makePostClosingRows(), ...(brief.contentOrder ? [] : [makeFaqSection()])].filter(Boolean),
     };
   }
 
@@ -1359,14 +1376,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     // Testimonials — Testimonial Carousel widget (single rotating quote)
     // instead of three stacked white cards, sitting on a dark panel.
-    var testimonialsSection = (String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? mkContainer([
-      mkHeading(brief.testimonialHeading || "What Our Customers Are Saying:", warmWhite, "h2", { weight: 800, px: 32, align: "center" }),
-      mkTestimonialCarousel([
-        { quote: brief.testimonial1Quote || "", name: brief.testimonial1Name || "", title: brief.testimonial1Title || "" },
-        { quote: brief.testimonial2Quote || "", name: brief.testimonial2Name || "", title: brief.testimonial2Title || "" },
-        { quote: brief.testimonial3Quote || "", name: brief.testimonial3Name || "", title: brief.testimonial3Title || "" },
-      ].filter(function (t) { return t.quote || t.name; }), { textColor: warmWhite, nameColor: warmWhite, jobColor: "rgba(255,255,255,0.7)" }),
-    ], dark, { padY: "80", center: true }) : null;
+    var testimonialsSection = makeTestimonialSection();
 
     // Mid-page CTA after feature rows
     var midCtaText = brief.midCtaText || "Or {link} and we'll get back to you within one business day.";
@@ -1380,7 +1390,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
 
     return {
       version: "0.4", title: he(brandName || "Site") + (brief._manifestPageName ? " — " + he(brief._manifestPageName) : "") + " — Landing Page (Form)", type: "page", page_settings: {},
-      content: [heroB, formSection, testimonialsSection, ...(brief.contentOrder ? renderOrderedContent({ skipForm: true, closingBg: dark }) : makeFeatureRows()), midCta, ...(brief.contentOrder ? [] : [makeMapSection(), makeClosingCta(dark)]), ...makePostClosingRows(), ...(brief.contentOrder ? [] : [makeFaqSection()])].filter(Boolean),
+      content: [heroB, formSection, ...(brief.contentOrder ? renderOrderedContent({ skipForm: true, closingBg: dark, testimonialsOverride: testimonialsSection }) : [testimonialsSection, ...makeFeatureRows()]), midCta, ...(brief.contentOrder ? [] : [makeMapSection(), makeClosingCta(dark)]), ...makePostClosingRows(), ...(brief.contentOrder ? [] : [makeFaqSection()])].filter(Boolean),
     };
   }
 

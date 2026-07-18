@@ -632,6 +632,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
       function renderOrderedContentHTML(opts) {
         opts = opts || {};
         if (!Array.isArray(brief.contentOrder) || !brief.contentOrder.length) return "";
+        var testimonialsRendered = false;
         return brief.contentOrder.map(function (block) {
           if (block.type === "feature") {
             var curated = Array.isArray(brief.featureLayout)
@@ -655,9 +656,19 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             return mapSectionHTML;
           } else if (block.type === "cta") {
             return closingCtaHTML(opts.closingBg);
+          } else if (block.type === "testimonials") {
+            testimonialsRendered = true;
+            if (opts.skipTestimonials) return "";
+            return opts.testimonialsOverride !== undefined ? opts.testimonialsOverride : "";
           }
           return "";
-        }).join("");
+        }).join("") + (
+          // Safety net for already-saved builds whose stored contentOrder
+          // predates testimonials being tracked -- mirrors landing.js's
+          // renderOrderedContent() exactly, same reasoning documented
+          // there. Appends at the end rather than guessing a position.
+          (!testimonialsRendered && !opts.skipTestimonials && opts.testimonialsOverride) ? opts.testimonialsOverride : ""
+        );
       }
 
       // ── VARIANT B — Lead Form ──────────────────────────────────────────────
@@ -701,22 +712,24 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "</div>" +
             "</div>" +
           "</section>" +
-          ((String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? (
-          "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
-            "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
-            "<div style='max-width:640px;margin:0 auto;'>" +
-              "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
-              "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
-              "<p style='font-size:14px;color:rgba(255,255,255,0.7);margin:0 0 22px;'>" + tn1 + (tt1 ? " &middot; " + tt1 : "") + "</p>" +
-              "<div style='display:flex;justify-content:center;gap:6px;'>" +
-                "<div style='width:6px;height:6px;border-radius:50%;background:" + brass + ";'></div>" +
-                "<div style='width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.25);'></div>" +
-                "<div style='width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.25);'></div>" +
-              "</div>" +
-            "</div>" +
-          "</section>"
-          ) : "") +
-          (brief.contentOrder ? renderOrderedContentHTML({ skipForm: true, closingBg: dark }) :
+          (function () {
+            var testimonialHTML = ((String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? (
+              "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
+                "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
+                "<div style='max-width:640px;margin:0 auto;'>" +
+                  "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
+                  "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
+                  "<p style='font-size:14px;color:rgba(255,255,255,0.7);margin:0 0 22px;'>" + tn1 + (tt1 ? " &middot; " + tt1 : "") + "</p>" +
+                  "<div style='display:flex;justify-content:center;gap:6px;'>" +
+                    "<div style='width:6px;height:6px;border-radius:50%;background:" + brass + ";'></div>" +
+                    "<div style='width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.25);'></div>" +
+                    "<div style='width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.25);'></div>" +
+                  "</div>" +
+                "</div>" +
+              "</section>"
+            ) : "");
+            return (brief.contentOrder ? "" : testimonialHTML) +
+              (brief.contentOrder ? renderOrderedContentHTML({ skipForm: true, closingBg: dark, testimonialsOverride: testimonialHTML }) :
           (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(safeFeatureLayout(brief.featureLayout)) :
           (variant === "D" || variant === "B") ? renderCuratedFeatureLayoutHTML((Array.isArray(brief.features) ? brief.features : []).map(function (_, i) {
             // Mirrors landing.js's Variant D/B dispatch -- Variant B's
@@ -755,7 +768,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             var textContent = "<h2 style='font-size:clamp(22px,3vw,34px);font-weight:700;color:" + brass + ";margin:0 0 16px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p>" + (f[3] === "none" ? "" : "<a class='row-btn' style='" + btnDark + "'>" + cta2 + "</a>") + "</div>";
             var imgRight = !imgLeft ? "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>" : "";
             return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + cols + textContent + imgRight + "</section>";
-          }).join(""))) +
+          }).join("")));
+          })() +
           (brief.contentOrder ? "" : mapSectionHTML) +
           (brief.contentOrder ? "" : closingCtaHTML(dark)) +
           (Array.isArray(brief.postClosingLayout) && brief.postClosingLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.postClosingLayout) : "") +
@@ -833,18 +847,20 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           // Social proof moved up here, right after the trust strip --
           // the actual structural difference from Awareness, not just a
           // different color cycle.
-          ((String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? (
-          "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
-            "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
-            "<div style='max-width:640px;margin:0 auto;'>" +
-              "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
-              "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
-              "<p style='font-size:14px;color:rgba(255,255,255,0.7);margin:0 0 22px;'>" + tn1 + (tt1 ? " &middot; " + tt1 : "") + "</p>" +
-            "</div>" +
-          "</section>"
-          ) : "") +
-          (brief.contentOrder ? renderOrderedContentHTML() :
-          (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(safeFeatureLayout(brief.featureLayout)) :
+          (function () {
+            var testimonialHTML = ((String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? (
+            "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
+              "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
+              "<div style='max-width:640px;margin:0 auto;'>" +
+                "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
+                "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
+                "<p style='font-size:14px;color:rgba(255,255,255,0.7);margin:0 0 22px;'>" + tn1 + (tt1 ? " &middot; " + tt1 : "") + "</p>" +
+              "</div>" +
+            "</section>"
+            ) : "");
+            return (brief.contentOrder ? "" : testimonialHTML) +
+            (brief.contentOrder ? renderOrderedContentHTML({ testimonialsOverride: testimonialHTML }) :
+            (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(safeFeatureLayout(brief.featureLayout)) :
           (function () {
             // The one variant missing this check entirely -- B/D/F all
             // correctly prioritize brief.featureLayout before falling
@@ -865,7 +881,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               if ((i + 1) % 3 === 0 && i < featuresArr.length - 1) dynamicLayout.push({ style: "midcta", indices: [] });
             });
             return renderCuratedFeatureLayoutHTML(dynamicLayout);
-          })())) +
+          })()));
+          })() +
           (brief.skipServicesChecklist ? "" :
           "<section style='background:" + bone + ";padding:80px clamp(24px,6vw,80px);border-top:1px solid rgba(0,0,0,0.08);'>" +
             "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 32px;'>" + (brief.servicesHeading||"What We Do") + "</h2>" +
@@ -914,17 +931,19 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<div style='min-height:340px;'>" + mapEmbedHTML + "</div>" +
             "</div>" +
           "</section>" +
-          ((String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? (
-            "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
-              "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
-              "<div style='max-width:640px;margin:0 auto;'>" +
-                "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
-                "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
-                "<p style='font-size:14px;color:rgba(255,255,255,0.7);margin:0;'>" + tn1 + (tt1 ? " &middot; " + tt1 : "") + "</p>" +
-              "</div>" +
-            "</section>"
-          ) : "") +
-          (brief.contentOrder ? renderOrderedContentHTML({ skipMap: true, formAnchorId: "contact-form" }) :
+          (function () {
+            var testimonialHTML = ((String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? (
+              "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
+                "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
+                "<div style='max-width:640px;margin:0 auto;'>" +
+                  "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
+                  "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
+                  "<p style='font-size:14px;color:rgba(255,255,255,0.7);margin:0;'>" + tn1 + (tt1 ? " &middot; " + tt1 : "") + "</p>" +
+                "</div>" +
+              "</section>"
+            ) : "");
+            return (brief.contentOrder ? "" : testimonialHTML) +
+              (brief.contentOrder ? renderOrderedContentHTML({ skipMap: true, formAnchorId: "contact-form", testimonialsOverride: testimonialHTML }) :
           (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(safeFeatureLayout(brief.featureLayout)) :
           renderCuratedFeatureLayoutHTML((Array.isArray(brief.features) ? brief.features : []).map(function (_, i) {
             var hasVideo = !!brief.videoUrl;
@@ -932,7 +951,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               ? ["split-right", "centered-cta", "video", "split-left", "split-cta-right", "plain"]
               : ["split-right", "centered-cta", "split-left", "split-cta-right", "plain"];
             return { style: cyclePattern[i % cyclePattern.length], indices: [i] };
-          })))) +
+          }))));
+          })() +
           (brief.skipServicesChecklist ? "" :
           "<section style='background:" + bone + ";padding:80px clamp(24px,6vw,80px);border-top:1px solid rgba(0,0,0,0.08);'>" +
             "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 32px;'>" + (brief.servicesHeading||"What We Do") + "</h2>" +
@@ -993,19 +1013,21 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             }).join("") +
           "</div>" +
         "</section>") +
-        ((String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? (
-          "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
-            "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
-            "<div style='max-width:640px;margin:0 auto;'>" +
-              "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
-              "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
-              "<p style='font-size:14px;color:rgba(255,255,255,0.7);margin:0;'>" + tn1 + (tt1 ? " &middot; " + tt1 : "") + "</p>" +
-            "</div>" +
-          "</section>"
-        ) : "") +
-        (brief.contentOrder ? renderOrderedContentHTML() :
-        (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(safeFeatureLayout(brief.featureLayout)) :
-        variant === "D" ? renderCuratedFeatureLayoutHTML((Array.isArray(brief.features) ? brief.features : []).map(function (_, i) {
+        (function () {
+          var testimonialHTML = ((String(brief.testimonial1Name || "").trim() && !brief.skipTestimonials) ? (
+            "<section style='background:" + dark + ";padding:70px clamp(24px,6vw,80px);text-align:center;'>" +
+              "<h2 style='font-size:clamp(24px,3vw,32px);font-weight:800;color:" + warmWhite + ";margin:0 0 24px;'>" + (brief.testimonialHeading || "What Our Customers Are Saying:") + "</h2>" +
+              "<div style='max-width:640px;margin:0 auto;'>" +
+                "<p style='font-size:21px;font-style:italic;color:#ffffff;line-height:1.5;margin:0 0 18px;'>&#8220;" + tq1 + "&#8221;</p>" +
+                "<div style='width:28px;height:2px;background:" + brass + ";margin:0 auto 14px;'></div>" +
+                "<p style='font-size:14px;color:rgba(255,255,255,0.7);margin:0;'>" + tn1 + (tt1 ? " &middot; " + tt1 : "") + "</p>" +
+              "</div>" +
+            "</section>"
+          ) : "");
+          return (brief.contentOrder ? "" : testimonialHTML) +
+          (brief.contentOrder ? renderOrderedContentHTML({ testimonialsOverride: testimonialHTML }) :
+          (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(safeFeatureLayout(brief.featureLayout)) :
+          variant === "D" ? renderCuratedFeatureLayoutHTML((Array.isArray(brief.features) ? brief.features : []).map(function (_, i) {
           // Mirrors landing.js's Variant D dispatch -- the same proven,
           // brand-agnostic visual-variety cycle, built dynamically here
           // since the preview has no equivalent of landing.js's
@@ -1033,7 +1055,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           var textDiv = "<div class='feature-text' style='padding:72px 64px;display:flex;flex-direction:column;justify-content:center;'><h2 style='font-size:clamp(20px,2.5vw,32px);font-weight:700;color:" + brass + ";margin:0 0 14px;'>" + f[0] + "</h2><p style='font-size:16px;color:" + text + ";line-height:1.75;margin:0 0 28px;'>" + f[1] + "</p>" + (f[4] === "none" ? "" : "<a class='row-btn' style='" + btnDark + "'>" + cta2 + "</a>") + "</div>";
           var imgDiv  = "<div class='landing-img' style='min-height:400px;height:100%;overflow:hidden;'><img src=\"" + f[2] + "\" alt='feature' style='width:100%;height:100%;object-fit:cover;display:block;min-height:400px;'/></div>";
           return "<section style='display:grid;grid-template-columns:1fr 1fr;background:" + (i%2===0?"#ffffff":bone) + ";'>" + (f[3] ? imgDiv+textDiv : textDiv+imgDiv) + "</section>";
-        }).join(""))) +
+        }).join("")));
+        })() +
         (brief.skipServicesChecklist ? "" :
         "<section style='background:" + bone + ";padding:80px clamp(24px,6vw,80px);border-top:1px solid rgba(0,0,0,0.08);'>" +
           "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 32px;'>" + (brief.servicesHeading||"What We Do") + "</h2>" +

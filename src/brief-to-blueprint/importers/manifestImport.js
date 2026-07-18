@@ -545,11 +545,11 @@ function manifestPageDocumentToBrief(raw) {
   // makeMapSection(), which each render ALL accumulated content in one
   // section, not per-source-section), so only the first occurrence of
   // each records a position; later ones still contribute their content,
-  // just not a second position marker. Testimonials intentionally NOT
-  // included yet -- each variant still builds its testimonials block
-  // inline with variant-specific styling rather than through one shared
-  // function the way faq/form/map already are, so real reordering there
-  // needs that extracted first. Legacy/manual briefs and any Manifest
+  // just not a second position marker. Testimonials now included the
+  // same way (July 2026) -- landing.js/landingPreview.js extracted their
+  // previously variant-duplicated inline testimonial block into a shared
+  // function/local var each, so real reordering could be wired through.
+  // Legacy/manual briefs and any Manifest
   // export parsed before this fix have no contentOrder at all, and
   // every variant's original fixed-order fallback path is unchanged for
   // them -- zero regression risk for existing pages.
@@ -557,6 +557,13 @@ function manifestPageDocumentToBrief(raw) {
   var faqOrderRecorded = false;
   var formOrderRecorded = false;
   var mapOrderRecorded = false;
+  // Guards the singleton testimonials slot the same way faqOrderRecorded/
+  // mapOrderRecorded do above -- no real page on hand has 2 "testimonials"
+  // sections yet, but the shape of that bug (later occurrence silently
+  // overwriting brief.testimonial1-3) is identical to the confirmed real
+  // map_location/cta overwrite bug, so guarded the same way now instead of
+  // waiting for a real case to surface it.
+  var testimonialsOrderRecorded = false;
   // Guards the singleton closing-CTA slot the same way mapOrderRecorded
   // guards the map slot below -- see the cta handler for the real bug
   // this fixes (2+ cta sections on one page overwriting each other).
@@ -595,11 +602,25 @@ function manifestPageDocumentToBrief(raw) {
     }
 
     if (section.type === "testimonials") {
-      (section.items || []).slice(0, 3).forEach(function (t, i) {
-        brief["testimonial" + (i + 1) + "Quote"] = t.quote || "";
-        brief["testimonial" + (i + 1) + "Name"] = t.author || "";
-        brief["testimonial" + (i + 1) + "Title"] = t.role || "";
-      });
+      // Real position confirmed across all 17 Freeway page-documents on
+      // hand, July 2026: testimonials has no fixed relationship to FAQ at
+      // all -- 15 of 17 pages have it somewhere before FAQ (sometimes
+      // immediately before, sometimes several sections earlier), and 2 of
+      // 17 (fleet-preventive-maintenance, mobile-dot-inspection) have it
+      // AFTER FAQ. A single collective section like faq/form/map (all
+      // items render together in one block), so only the first occurrence
+      // claims the contentOrder slot -- matching the same rule those
+      // three already follow, and guarding the same overwrite-bug shape
+      // fixed for map_location/cta.
+      if (!testimonialsOrderRecorded) {
+        (section.items || []).slice(0, 3).forEach(function (t, i) {
+          brief["testimonial" + (i + 1) + "Quote"] = t.quote || "";
+          brief["testimonial" + (i + 1) + "Name"] = t.author || "";
+          brief["testimonial" + (i + 1) + "Title"] = t.role || "";
+        });
+        contentOrder.push({ type: "testimonials" });
+        testimonialsOrderRecorded = true;
+      }
       return;
     }
 
