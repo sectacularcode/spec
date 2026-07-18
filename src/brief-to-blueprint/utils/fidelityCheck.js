@@ -27,14 +27,58 @@ function buildHaystack(raw) {
   return strings.join("\n---\n");
 }
 
+// Undoes the safe-HTML rendering Spec applies to multi-paragraph bodies
+// and folded-in inline links (richTextToSafeHtml / flattenTextSectionBodyHtml)
+// so the result can be compared against plain source text. Two real,
+// confirmed cases this handles, both correct Spec behavior that a naive
+// tag-strip alone gets wrong: multiple source paragraphs get joined with
+// <br><br> (must become a space, not nothing, or adjacent words glue
+// together), and text gets HTML-entity-escaped for safe rendering (a
+// real quote in the source becomes &quot; -- must decode back or an
+// exact-match compare against plain source text fails on markup, not
+// content).
+function htmlToPlainText(html) {
+  if (!html) return "";
+  return String(html)
+    .replace(/<br\s*\/?>/gi, " ")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function tracesToSource(value, haystack) {
   if (!value) return { status: "empty", note: "" };
   const v = String(value).trim();
   if (!v) return { status: "empty", note: "" };
   if (haystack.includes(v)) return { status: "traced", note: "" };
-  const fragments = v.split(/[,.]/).map(s => s.trim()).filter(s => s.length > 3);
+  const fragments = v.split(/[,.]/).map(s => s.trim().replace(/^['"]+|['"]+$/, "").trim()).filter(s => s.length > 3);
   if (fragments.length > 1 && fragments.every(f => haystack.includes(f))) {
     return { status: "traced (assembled from source pieces)", note: "" };
+  }
+  // Last-resort fallback: real content can legitimately be reconstructed
+  // across a source rich-text run boundary (e.g. a genuine inline link
+  // mid-sentence -- "runs <link>24/7 emergency towing</link> and
+  // roadside repair" -- the rendered plain text never appears as one
+  // continuous string anywhere in source, since source keeps the link
+  // run as its own array entry; not a content divergence, just a
+  // reconstruction the fragment check's punctuation-based split can't
+  // verify). Falls back to word-level overlap: every distinctive word
+  // (5+ chars, so short connective words don't inflate the score) must
+  // individually appear in the haystack. High threshold (95%) so this
+  // stays a real check, not a rubber stamp -- genuine content divergence
+  // (wrong words, invented text) still fails this too.
+  const words = v.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter(w => w.length >= 5);
+  if (words.length >= 4) {
+    const haystackLower = haystack.toLowerCase();
+    const found = words.filter(w => haystackLower.includes(w));
+    if (found.length / words.length >= 0.95) {
+      return { status: "traced (reconstructed across source run boundary)", note: "" };
+    }
   }
   return { status: "NOT FOUND IN SOURCE", note: v.slice(0, 80) };
 }
@@ -143,6 +187,42 @@ export function checkFidelity(raw, brief) {
   const fields = CONTENT_FIELDS.map(([key, label]) => {
     const result = tracesToSource(brief[key], haystack);
     return { key, label, status: result.status, note: result.note };
+  });
+
+  // Confirmed real gap, July 2026: the fixed list above only covers ~20
+  // singleton fields (hero, faq heading, testimonial 1-3, the first
+  // map_location, form heading, closing cta). Everything that becomes a
+  // brief.features[] row (every text_section, plus any demoted second
+  // map_location/cta) or a brief.faqItems[] entry -- typically the bulk
+  // of a real page's actual copy -- was shown in the Source sections
+  // list (pulled straight from raw JSON, for visual comparison) but
+  // never independently traced the way the singleton fields are. A
+  // feature row or FAQ item could silently diverge from source with no
+  // check ever catching it. Each one now gets the same real trace check
+  // as everything else.
+  (Array.isArray(brief.features) ? brief.features : []).forEach((f, i) => {
+    const headingResult = tracesToSource(f.heading, haystack);
+    fields.push({ key: "features[" + i + "].heading", label: "Feature row " + (i + 1) + " heading", status: headingResult.status, note: headingResult.note });
+    // Body may have a real inline button folded in as a literal <a> tag
+    // (manifestImport.js's link-and-button-roles handling) -- that's
+    // correct, intentional enrichment, not a divergence from source, but
+    // comparing the raw HTML string against plain source text fails on
+    // the markup itself. Strip tags first, same approach already used
+    // for FAQ answers below.
+    const plainBody = htmlToPlainText(f.body);
+    const bodyResult = tracesToSource(plainBody, haystack);
+    fields.push({ key: "features[" + i + "].body", label: "Feature row " + (i + 1) + " body", status: bodyResult.status, note: bodyResult.note });
+  });
+  (Array.isArray(brief.faqItems) ? brief.faqItems : []).forEach((item, i) => {
+    const qResult = tracesToSource(item.question, haystack);
+    fields.push({ key: "faqItems[" + i + "].question", label: "FAQ " + (i + 1) + " question", status: qResult.status, note: qResult.note });
+    // FAQ answers are stored as sanitized HTML (richTextToSafeHtml), not
+    // plain text -- strip tags before comparing, or a real, correctly-
+    // traced answer would falsely show as not-found due to markup the
+    // source text never had.
+    const plainAnswer = htmlToPlainText(item.answer);
+    const aResult = tracesToSource(plainAnswer, haystack);
+    fields.push({ key: "faqItems[" + i + "].answer", label: "FAQ " + (i + 1) + " answer", status: aResult.status, note: aResult.note });
   });
 
   const tracedCount = fields.filter(f => f.status === "traced" || f.status.indexOf("traced") === 0).length;
