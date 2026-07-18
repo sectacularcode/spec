@@ -491,6 +491,10 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
       // downloaded. Empty string when there's no real address, matching
       // makeMapSection()'s own early-exit.
       var mapHeadingText = brief.mapHeading || (brief.mapMode === "service_area" ? "Areas We Serve" : "Find Us");
+      // Mirrors helpers.js's mkMapSection() note fix exactly, same real
+      // gap: Manifest's map_location note text was captured on the brief
+      // but had no HTML to render into anywhere in this preview either.
+      var mapNoteHTML = brief.mapNote ? "<p style='font-size:15px;color:" + stone + ";line-height:1.6;margin:0 0 20px;'>" + he(brief.mapNote) + "</p>" : "";
       var mapEmbedHTML = brief.mapAddress
         ? "<iframe src=\"https://maps.google.com/maps?q=" + encodeURIComponent(brief.mapAddress) + "&output=embed\" style='border:0;width:100%;height:100%;min-height:320px;display:block;' loading='lazy'></iframe>"
         : "";
@@ -510,6 +514,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
       var mapSectionHTML = brief.mapAddress ? (
         "<section style='background:" + bone + ";padding:60px clamp(24px,6vw,80px);'>" +
           "<h2 style='font-size:clamp(22px,3vw,32px);font-weight:700;color:" + ink + ";margin:0 0 24px;'>" + he(mapHeadingText) + "</h2>" +
+          mapNoteHTML +
           "<div style='display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;' class='map-section-grid'>" +
             "<div>" + mapInfoStripHTML + mapButtonsHTML + "</div>" +
             "<div style='min-height:320px;border-radius:8px;overflow:hidden;'>" + mapEmbedHTML + "</div>" +

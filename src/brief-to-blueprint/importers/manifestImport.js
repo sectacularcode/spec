@@ -618,6 +618,13 @@ function manifestPageDocumentToBrief(raw) {
           brief["testimonial" + (i + 1) + "Name"] = t.author || "";
           brief["testimonial" + (i + 1) + "Title"] = t.role || "";
         });
+        // Confirmed real gap, July 2026: Manifest's testimonials section
+        // carries its own real heading (e.g. "Why fleet operators choose
+        // Freeway Fleet Services"), but this was never read anywhere --
+        // every page fell back to the generic "What Our Customers Are
+        // Saying:" default regardless of what Manifest actually sent.
+        // Matches the same pattern faqHeading already follows below.
+        if (headingText && !brief.testimonialHeading) brief.testimonialHeading = headingText;
         contentOrder.push({ type: "testimonials" });
         testimonialsOrderRecorded = true;
       }
@@ -766,7 +773,19 @@ function manifestPageDocumentToBrief(raw) {
         // button's own destination is a placeholder -- only flag this one
         // if brief.mapUrl itself came back empty, meaning nothing resolved.
         trackPlaceholderButton(section.button && section.button.label, brief.mapUrl, "Map");
-        if (noteText) brief._manifestMapNote = noteText;
+        // Confirmed real gap, July 2026: this real descriptive copy (e.g.
+        // "Yes. We are a mobile operation first. From our service base at
+        // 4733 East 10th Lane...") was being captured under an
+        // underscore-prefixed field (_manifestMapNote), the same naming
+        // convention used everywhere else in this file for internal
+        // admin-only metadata (_manifestWarnings, _unmappedBlocks,
+        // _placeholderButtons) that's never meant to reach the page. That
+        // meant it was captured but never rendered anywhere -- confirmed
+        // by tracing every read site in landing.js/helpers.js and finding
+        // none. Renamed to match the real-content-field convention
+        // (mapHeading, mapButtonLabel, etc.) and now wired through
+        // makeMapSection()/mkMapSection() below.
+        if (noteText) brief.mapNote = noteText;
         contentOrder.push({ type: "map" });
         mapOrderRecorded = true;
       } else if (noteText || headingText) {

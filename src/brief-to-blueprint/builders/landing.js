@@ -984,6 +984,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // Manifest copy when present) in one place instead of two.
     return mkMapSection(brief.mapAddress, brief.mapUrl, colors, {
       heading: brief.mapHeading,
+      note: brief.mapNote,
       buttonLabel: brief.mapButtonLabel,
       mode: brief.mapMode,
       phone: brief.mapPhone,

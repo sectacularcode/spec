@@ -520,6 +520,17 @@ export function mkMapSection(address, mapUrl, colors, opts) {
     mkHeading(heading, ink, "h2", { weight: 700, px: 32, align: opts.center ? "center" : "left" }),
     mkSpacer(16),
   ];
+  // Real descriptive copy from Manifest's map_location section.note --
+  // confirmed real gap, July 2026: this was captured on the brief but had
+  // nowhere to render at all, silently dropping real content (e.g. "Yes,
+  // we are a mobile operation first...") on every map section. Renders as
+  // a plain paragraph right under the heading, before the address/phone/
+  // hours strip -- optional, so callers with no note text get identical
+  // output to before this fix.
+  if (opts.note) {
+    children.push(mkText("<p" + (opts.center ? " style='text-align:center'" : "") + ">" + he(opts.note) + "</p>", stone));
+    children.push(mkSpacer(20));
+  }
   // Address/Phone/Hours info strip -- matches the pattern already proven in
   // location.js's mkInfoBlock. Built whenever real phone or hours copy is
   // available alongside the address; falls back to the original plain
