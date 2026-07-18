@@ -584,19 +584,37 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           : ["split-right", "centered-cta", "split-left", "split-cta-right", "plain"];
         return cycle[i % cycle.length];
       }
-      // Mirrors landing.js's safeOrderedRowStyle exactly -- see that file
-      // for the real case this fixes (auto-cycle assigning a
-      // button-forcing style to a feature with no real button, which
-      // fabricates a "Contact Us" pointing nowhere).
-      function safeOrderedRowStyle(i, hasVideo) {
-        var style = defaultOrderedRowStyle(i, hasVideo);
-        var f = Array.isArray(brief.features) ? brief.features[i] : null;
+      // Mirrors landing.js's safeStyleFor/safeOrderedRowStyle exactly --
+      // see that file for the real case this fixes (a button-forcing
+      // style, curated OR auto-assigned, landing on a feature with no
+      // real button, which fabricates a "Contact Us" pointing nowhere --
+      // including a style that was auto-assigned before this safety
+      // check existed and got frozen into brief.featureLayout by a since-
+      // unrelated panel edit, which is why this needs to run on curated
+      // styles too, not just the auto-cycle fallback).
+      function safeStyleFor(style, f) {
         var hasRealButton = !!(f && f.buttonUrl && f.buttonPlacement !== "none");
         if (hasRealButton) return style;
         if (style === "centered-cta") return "plain";
         if (style === "split-cta-right") return "split-right";
         if (style === "split-cta-left") return "split-left";
         return style;
+      }
+      function safeOrderedRowStyle(i, hasVideo) {
+        var f = Array.isArray(brief.features) ? brief.features[i] : null;
+        return safeStyleFor(defaultOrderedRowStyle(i, hasVideo), f);
+      }
+      // For the legacy curated-layout path (featureLayout set but no
+      // contentOrder) -- same substitution, applied per entry, using the
+      // first index's feature for a grouped row (matches how a grouped
+      // row's button already attaches to its first index everywhere
+      // else in this file).
+      function safeFeatureLayout(layout) {
+        return layout.map(function (e) {
+          var firstIdx = e.indices && e.indices[0];
+          var f = Array.isArray(brief.features) ? brief.features[firstIdx] : null;
+          return { style: safeStyleFor(e.style, f), indices: e.indices, header: e.header };
+        });
       }
       function renderOrderedContentHTML(opts) {
         opts = opts || {};
@@ -606,7 +624,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             var curated = Array.isArray(brief.featureLayout)
               ? brief.featureLayout.filter(function (e) { return e.indices && e.indices.length === 1 && e.indices[0] === block.index; })[0]
               : null;
-            var style = curated ? curated.style : safeOrderedRowStyle(block.index, !!brief.videoUrl);
+            var f = Array.isArray(brief.features) ? brief.features[block.index] : null;
+            var style = safeStyleFor(curated ? curated.style : defaultOrderedRowStyle(block.index, !!brief.videoUrl), f);
             return renderCuratedFeatureLayoutHTML([{ style: style, indices: [block.index] }]);
           } else if (block.type === "faq") {
             return faqHTML;
@@ -684,7 +703,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           "</section>"
           ) : "") +
           (brief.contentOrder ? renderOrderedContentHTML({ skipForm: true, closingBg: dark }) :
-          (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.featureLayout) :
+          (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(safeFeatureLayout(brief.featureLayout)) :
           (variant === "D" || variant === "B") ? renderCuratedFeatureLayoutHTML((Array.isArray(brief.features) ? brief.features : []).map(function (_, i) {
             // Mirrors landing.js's Variant D/B dispatch -- Variant B's
             // feature rows were falling straight through to the plain
@@ -811,7 +830,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           "</section>"
           ) : "") +
           (brief.contentOrder ? renderOrderedContentHTML() :
-          (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.featureLayout) :
+          (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(safeFeatureLayout(brief.featureLayout)) :
           (function () {
             // The one variant missing this check entirely -- B/D/F all
             // correctly prioritize brief.featureLayout before falling
@@ -892,7 +911,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             "</section>"
           ) : "") +
           (brief.contentOrder ? renderOrderedContentHTML({ skipMap: true, formAnchorId: "contact-form" }) :
-          (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.featureLayout) :
+          (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(safeFeatureLayout(brief.featureLayout)) :
           renderCuratedFeatureLayoutHTML((Array.isArray(brief.features) ? brief.features : []).map(function (_, i) {
             var hasVideo = !!brief.videoUrl;
             var cyclePattern = hasVideo
@@ -970,7 +989,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           "</section>"
         ) : "") +
         (brief.contentOrder ? renderOrderedContentHTML() :
-        (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(brief.featureLayout) :
+        (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0 ? renderCuratedFeatureLayoutHTML(safeFeatureLayout(brief.featureLayout)) :
         variant === "D" ? renderCuratedFeatureLayoutHTML((Array.isArray(brief.features) ? brief.features : []).map(function (_, i) {
           // Mirrors landing.js's Variant D dispatch -- the same proven,
           // brand-agnostic visual-variety cycle, built dynamically here

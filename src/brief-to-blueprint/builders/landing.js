@@ -354,7 +354,16 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // there. When present, this takes over entirely — the uniform
     // density/inspo style selection below is skipped.
     if (Array.isArray(brief.featureLayout) && brief.featureLayout.length > 0) {
-      return renderFeatureLayout(brief.featureLayout, features);
+      // Same safeStyleFor() substitution as the ordered-content path --
+      // this curated layout can carry the same stale button-forcing style
+      // (see safeStyleFor's comment for the real case). Button data lives
+      // on indices[0] for a grouped row, same as everywhere else in this
+      // file that attaches a row's button to its first index.
+      var safeLayout = brief.featureLayout.map(function (e) {
+        var firstIdx = e.indices && e.indices[0];
+        return { style: safeStyleFor(e.style, features[firstIdx]), indices: e.indices, header: e.header };
+      });
+      return renderFeatureLayout(safeLayout, features);
     }
 
     // Variant D — a real, reusable template distinct from the uniform
@@ -605,19 +614,30 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // "split-cta-right" to a feature with zero buttons in its source
   // section, and it fabricated one -- the exact "no real content, don't
   // invent it" bug already fixed elsewhere, reintroduced through the
-  // cycle itself. Substitutes the non-forcing equivalent (plain/
-  // split-right/split-left) whenever the feature at this index has no
-  // real buttonUrl, so the cycle only ever assigns a cta-style variant
-  // to a feature that actually has real button data to show.
-  function safeOrderedRowStyle(i, hasVideo, features) {
-    var style = defaultOrderedRowStyle(i, hasVideo);
-    var f = features[i];
+  // cycle itself.
+  //
+  // safeStyleFor() is the actual substitution -- pulled out on its own
+  // so it can run on a CURATED style too, not just a freshly-computed
+  // auto-cycle one. Confirmed real gap, July 2026: once any row in the
+  // Section Styles panel gets edited, every row's current style
+  // (including ones nobody touched) gets written into brief.featureLayout
+  // permanently. A style that was auto-assigned before this safety check
+  // existed -- back when the cycle had no awareness of button data at
+  // all -- gets frozen in as a "curated" choice and never re-validated,
+  // so the bad button kept fabricating even after the code that would
+  // have prevented it went live. The check has to apply everywhere a
+  // style gets used, not just the moment it's first computed.
+  function safeStyleFor(style, f) {
     var hasRealButton = !!(f && f.buttonUrl && f.buttonPlacement !== "none");
     if (hasRealButton) return style;
     if (style === "centered-cta") return "plain";
     if (style === "split-cta-right") return "split-right";
     if (style === "split-cta-left") return "split-left";
     return style;
+  }
+
+  function safeOrderedRowStyle(i, hasVideo, features) {
+    return safeStyleFor(defaultOrderedRowStyle(i, hasVideo), features[i]);
   }
 
   function renderOrderedContent(opts) {
@@ -632,7 +652,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         var curated = Array.isArray(brief.featureLayout)
           ? brief.featureLayout.filter(function (e) { return e.indices && e.indices.length === 1 && e.indices[0] === block.index; })[0]
           : null;
-        var style = curated ? curated.style : safeOrderedRowStyle(block.index, !!brief.videoUrl, features);
+        var style = safeStyleFor(curated ? curated.style : defaultOrderedRowStyle(block.index, !!brief.videoUrl), f);
         rendered = rendered.concat(renderFeatureLayout([{ style: style, indices: [block.index] }], features));
       } else if (block.type === "faq") {
         var faqEl = makeFaqSection();
