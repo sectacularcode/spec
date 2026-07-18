@@ -1294,7 +1294,19 @@ export default function CustomBuild({ userId, role } = {}) {
     const exportData = customName ? { ...pageData, title: he(customName) } : pageData;
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-    a.download = slugify(customName || clientName || brief?.brandName) + "-" + p.id + "-elementor.json";
+    // Real per-page identifier for the filename's trailing segment, not
+    // Spec's generic internal page-type slot id (p.id -- "landing"/
+    // "other"/etc, the same string for every Manifest import regardless
+    // of which real page it is). Only this suffix changes -- the
+    // customName/clientName/brandName fallback chain above it is
+    // untouched, so a manually-typed customName still behaves exactly as
+    // before (replaces the whole leading segment, brand omitted). Falls
+    // back to p.id unchanged for manual/non-Manifest briefs with no real
+    // page name to draw from. Confirmed real problem on a 17-page Freeway
+    // Fleet Services batch, where every download landed on the same
+    // "freeway-fleet-services-landing-elementor.json" filename.
+    const pageSuffix = brief?._manifestPageName ? slugify(brief._manifestPageName) : p.id;
+    a.download = slugify(customName || clientName || brief?.brandName) + "-" + pageSuffix + "-elementor.json";
     a.click(); URL.revokeObjectURL(a.href);
     // Auto-save this single page to the library
     if (brief && generated) {
@@ -1310,7 +1322,8 @@ export default function CustomBuild({ userId, role } = {}) {
       const exportData = customName ? { ...pageData, title: he(customName) } : pageData;
       const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
       const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-      a.download = slugify(customName || clientName || brief?.brandName) + "-" + p.id + "-elementor.json";
+      const pageSuffix = brief?._manifestPageName ? slugify(brief._manifestPageName) : p.id;
+      a.download = slugify(customName || clientName || brief?.brandName) + "-" + pageSuffix + "-elementor.json";
       a.click(); URL.revokeObjectURL(a.href);
     }, i * 300));
     // Auto-save full build to library

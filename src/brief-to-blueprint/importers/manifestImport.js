@@ -375,6 +375,24 @@ function validateManifestPageDocument(raw) {
 // - Anything outside this catalog is flagged in _unmappedBlocks, never
 //   dropped silently -- matches the spec's own "unknown section types must
 //   never crash" rule while still surfacing that something didn't land.
+
+// Derives a clean, human page name from Manifest's title_tag for use in
+// exported Elementor titles and download filenames -- confirmed real
+// title_tags all follow "[Page Name] | [Brand]" (e.g. "Federal DOT
+// Inspections Atlanta | MESO, Inc.", "Mobile Heavy Equipment Repair OKC,
+// On-Site | MESO") or occasionally an em-dash in place of the pipe.
+// Splitting on the first separator and keeping the page-specific half
+// gives a real per-page identifier for free. Deliberately NOT derived
+// from page.slug -- a slug like "federal-dot-inspections-atlanta-meso-inc"
+// title-cased naively turns "dot" into "Dot" instead of "DOT" and drags
+// the brand name along redundantly, where title_tag is already clean,
+// human copy Manifest wrote on purpose.
+function derivePageName(titleTag) {
+  if (!titleTag) return "";
+  var parts = titleTag.split(/\s[|\u2014]\s/); // " | " or " — "
+  return (parts[0] || titleTag).trim();
+}
+
 function manifestPageDocumentToBrief(raw) {
   validateManifestPageDocument(raw);
 
@@ -409,6 +427,14 @@ function manifestPageDocumentToBrief(raw) {
     _manifestBrandId: brand.id,
     _manifestPageId: page.id,
     _manifestTitleTag: page.title_tag || "",
+    // Real per-page identifier for Elementor export titles and download
+    // filenames -- see derivePageName() above. Every Manifest-routed
+    // import lands on the same "landing" pid/builder regardless of how
+    // many distinct real pages a brand has, so without this every one of
+    // them exports with the same generic "[Brand] — Landing Page" title
+    // and the same "[brand]-landing-elementor.json" filename -- confirmed
+    // real problem on a 17-page Freeway Fleet Services batch, July 2026.
+    _manifestPageName: derivePageName(page.title_tag || ""),
     _manifestMetaDescription: page.meta_description || "",
     faqItems: [],
     _unmappedBlocks: [],

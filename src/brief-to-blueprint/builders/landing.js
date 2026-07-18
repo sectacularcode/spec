@@ -1070,7 +1070,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     ], lightSectionBg, { padY: "80" });
 
     return {
-      version: "0.4", title: he(brandName || "Site") + " — Landing Page (Narrative)", type: "page", page_settings: {},
+      version: "0.4", title: he(brandName || "Site") + (brief._manifestPageName ? " — " + he(brief._manifestPageName) : "") + " — Landing Page (Narrative)", type: "page", page_settings: {},
       content: [heroE, makeTrustStrip(), testimonialsSectionE, ...(brief.contentOrder ? renderOrderedContent() : interleavedE), checklistSectionE, ...(brief.contentOrder ? [] : [makeFormSection(), makeMapSection(), makeClosingCta()]), ...makePostClosingRows(), ...(brief.contentOrder ? [] : [makeFaqSection()])].filter(Boolean),
     };
   }
@@ -1218,7 +1218,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     if (formSectionF) formSectionF.settings._element_id = "contact-form";
 
     return {
-      version: "0.4", title: he(brandName || "Site") + (brief.mapCity ? " — " + he(brief.mapCity) : "") + " — Landing Page (Location)", type: "page", page_settings: {},
+      version: "0.4", title: he(brandName || "Site") + (brief._manifestPageName ? " — " + he(brief._manifestPageName) : (brief.mapCity ? " — " + he(brief.mapCity) : "")) + " — Landing Page (Location)", type: "page", page_settings: {},
       // No makeMapSection() here -- the map is already part of heroF, a
       // second one further down would just duplicate it.
       content: [heroF, testimonialsSectionF, ...(brief.contentOrder ? renderOrderedContent({ skipMap: true, formOverride: formSectionF }) : makeFeatureRows()), checklistSectionF, ...(brief.contentOrder ? [] : [formSectionF, makeClosingCta()]), ...makePostClosingRows(), ...(brief.contentOrder ? [] : [makeFaqSection()])].filter(Boolean),
@@ -1273,7 +1273,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     ], dark, { padY: "80", center: true }) : null;
 
     return {
-      version: "0.4", title: he(brandName || "Site") + " — Landing Page", type: "page", page_settings: {},
+      version: "0.4", title: he(brandName || "Site") + (brief._manifestPageName ? " — " + he(brief._manifestPageName) : "") + " — Landing Page", type: "page", page_settings: {},
       content: [heroA, makeTrustStrip(), testimonialsSectionA, ...(brief.contentOrder ? renderOrderedContent() : makeFeatureRows()), checklistSection, ...(brief.contentOrder ? [] : [makeFormSection(), makeMapSection(), makeClosingCta()]), ...makePostClosingRows(), ...(brief.contentOrder ? [] : [makeFaqSection()])].filter(Boolean),
     };
   }
@@ -1379,7 +1379,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     ], lightSectionBg, { padY: "60", center: true });
 
     return {
-      version: "0.4", title: he(brandName || "Site") + " — Landing Page (Form)", type: "page", page_settings: {},
+      version: "0.4", title: he(brandName || "Site") + (brief._manifestPageName ? " — " + he(brief._manifestPageName) : "") + " — Landing Page (Form)", type: "page", page_settings: {},
       content: [heroB, formSection, testimonialsSection, ...(brief.contentOrder ? renderOrderedContent({ skipForm: true, closingBg: dark }) : makeFeatureRows()), midCta, ...(brief.contentOrder ? [] : [makeMapSection(), makeClosingCta(dark)]), ...makePostClosingRows(), ...(brief.contentOrder ? [] : [makeFaqSection()])].filter(Boolean),
     };
   }
@@ -1458,7 +1458,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   ], singleCtaBg, { padY: "100", center: true }); // brass closing, matching Variant C's preview
 
   return {
-    version: "0.4", title: he(brandName || "Site") + " — Landing Page (Minimal)", type: "page", page_settings: {},
+    version: "0.4", title: he(brandName || "Site") + (brief._manifestPageName ? " — " + he(brief._manifestPageName) : "") + " — Landing Page (Minimal)", type: "page", page_settings: {},
     content: [heroC, benefitsSection, singleTestimonial, makeMapSection(), singleCtaSection].filter(Boolean),
   };
 }
