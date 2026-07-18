@@ -240,6 +240,78 @@ function legacyManifestToBrief(raw) {
 
 const PAGE_DOCUMENT_FORMAT = "manifest.page-document/1";
 
+// Exactly which keys each section type actually reads today -- the source
+// of truth for detecting when Manifest sends something new. Built by
+// reading every handler below, not guessed: if a key isn't in this list
+// for its type, nothing in this file currently consumes it. "type",
+// "intent", "proposed", and "rationale" are global on every section
+// (Manifest's own categorization/status metadata, never rendered) so
+// they're excluded from every list rather than repeated in each one.
+// Confirmed real request, July 2026: Megan's reports of unexpected page
+// content kept surfacing gaps one at a time, reactively -- this makes the
+// next one visible proactively instead, the moment Manifest sends it,
+// rather than waiting for someone to notice the live page looks wrong.
+const GLOBAL_IGNORED_KEYS = ["type", "intent", "proposed", "rationale"];
+const KNOWN_KEYS_BY_TYPE = {
+  hero: ["heading", "subheading", "buttons"],
+  text_section: ["heading", "items", "buttons"],
+  // feature_cards' own section.heading is a known, real schema field --
+  // confirmed not yet wired to any output (only item.title/item.body are
+  // read). Listed here as known-but-unconsumed, not unknown -- no real
+  // page on hand uses feature_cards to confirm real-world impact, but
+  // it's a documented gap, not a surprise the next audit should rediscover.
+  feature_cards: ["heading", "items"],
+  map_location: ["heading", "location", "phone", "hours", "email", "note", "button", "mode", "directions_url", "maps_url"],
+  faq: ["heading", "items"],
+  cta: ["heading", "body", "buttons"],
+  // placement/provider are known, real fields -- status/routing metadata
+  // Manifest sends on every form section, intentionally not consumed as
+  // content (there's nothing to render from them).
+  form: ["heading", "body", "fields", "placement", "provider"],
+  testimonials: ["heading", "items"],
+};
+
+// Compares a section's actual keys against its type's known-keys list.
+// Returns the real, present, non-empty keys Spec doesn't currently read --
+// not a type mismatch (that's _unmappedBlocks' job), a field Manifest is
+// sending on an otherwise-understood section type that nothing consumes.
+function findUnknownFields(section) {
+  var known = KNOWN_KEYS_BY_TYPE[section.type];
+  if (!known) return []; // unrecognized type entirely -- handled separately
+  return Object.keys(section).filter(function (k) {
+    if (GLOBAL_IGNORED_KEYS.indexOf(k) !== -1) return false;
+    if (known.indexOf(k) !== -1) return false;
+    var v = section[k];
+    if (v === null || v === undefined || v === "") return false;
+    if (Array.isArray(v) && v.length === 0) return false;
+    return true;
+  });
+}
+
+// Flattens rich-text-shaped OR items-shaped content decent enough to
+// display as a generic feature row, for a section type Spec has no
+// dedicated handler for at all. Deliberately conservative: only produces
+// something when the shape is genuinely text-like (a real heading plus
+// either rich_text runs or items with question/answer or quote fields) --
+// returns null rather than guessing at a shape that isn't there, since a
+// wrong guess is worse than no fallback.
+function genericTextFallback(section) {
+  var heading = section.heading ? section.heading.text || "" : "";
+  var body = "";
+  if (Array.isArray(section.note)) body = flattenRichText(section.note);
+  else if (Array.isArray(section.body)) body = flattenRichText(section.body);
+  else if (Array.isArray(section.items)) {
+    body = section.items.map(function (item) {
+      if (item && item.quote) return item.quote + (item.author ? " -- " + item.author : "");
+      if (item && item.question) return item.question + (item.answer ? ": " + flattenRichText(item.answer) : "");
+      if (item && item.rich_text) return flattenRichText(item.rich_text);
+      return "";
+    }).filter(Boolean).join(" ");
+  }
+  if (!heading && !body) return null;
+  return { heading: heading, body: body };
+}
+
 // Flattens a rich-text array (e.g. hero.subheading: [{type:"text", text},
 // {type:"link", text, url}]) into a plain string. Every run type with a
 // .text field contributes its visible text -- including link runs, whose
@@ -459,6 +531,13 @@ function manifestPageDocumentToBrief(raw) {
     // Tracked here (not rendered) so a future review UI can surface
     // "Manifest suggested a form here" without silently adding it.
     _proposedBlocks: [],
+    // Fields present on a real, recognized section that nothing in this
+    // file currently reads -- see findUnknownFields() above. Populated
+    // per-section inside the main loop below. Surfaced in the editor the
+    // same way _proposedBlocks is, so a schema change on Manifest's side
+    // shows up the moment it's imported instead of waiting for someone
+    // to notice the live page is missing something.
+    _unknownFields: [],
     // Surfaces Manifest's own audit trail -- flagged claims needing a real
     // receipt, unverified technical claims pending expert review -- so a
     // human sees exactly what needs attention before this ships, instead
@@ -601,6 +680,21 @@ function manifestPageDocumentToBrief(raw) {
     if (section.proposed === true) {
       brief._proposedBlocks.push({ type: section.type, heading: headingText, rationale: section.rationale || "", section: section });
       return;
+    }
+
+    // Field-level check runs for every section regardless of type --
+    // including ones about to be flagged as an unrecognized type entirely
+    // (findUnknownFields returns [] for those, so this is a no-op there).
+    var unknownKeys = findUnknownFields(section);
+    if (unknownKeys.length) {
+      brief._unknownFields.push({
+        type: section.type,
+        heading: headingText,
+        keys: unknownKeys,
+        // Real values included (truncated) so the editor can show what
+        // Manifest actually sent, not just that something was sent.
+        preview: unknownKeys.map(function (k) { return k + ": " + JSON.stringify(section[k]).slice(0, 120); }),
+      });
     }
 
     if (section.type === "hero") {
@@ -984,6 +1078,25 @@ function manifestPageDocumentToBrief(raw) {
     // this must never crash. Flagged, not dropped: if there's readable
     // text on it, surface that too rather than losing it entirely.
     brief._unmappedBlocks.push({ elementType: section.type, reason: "no matching Spec widget yet", heading: headingText });
+    // Also offer it through the same "suggested, not auto-included" flow
+    // proposed:true sections use -- a genuinely new section type isn't
+    // Manifest asking for review the way proposed:true is, but Spec has
+    // no dedicated widget for it either, so the safest default is the
+    // same one: surface it, let a human decide, never silently drop or
+    // silently guess. genericTextFallback() only returns something when
+    // the shape is unambiguous (real heading and/or real text content);
+    // returns null and this is skipped entirely for a shape too unusual
+    // to safely represent as a plain text row.
+    var fallback = genericTextFallback(section);
+    if (fallback) {
+      brief._proposedBlocks.push({
+        type: "unknown:" + section.type,
+        heading: fallback.heading || headingText,
+        rationale: "Manifest sent a \"" + section.type + "\" section -- Spec doesn't have a dedicated widget for this type yet, so it's shown as a plain text block instead of its real intended design.",
+        section: section,
+        _fallbackBody: fallback.body,
+      });
+    }
   });
 
   // Second pass, deliberately separate from the type-dispatch loop above:
@@ -1072,6 +1185,21 @@ export function applyProposedBlock(brief, proposedBlock) {
           options: Array.isArray(f.options) ? f.options.filter(Boolean) : [],
         };
       });
+  } else if (typeof proposedBlock.type === "string" && proposedBlock.type.indexOf("unknown:") === 0) {
+    // Generic fallback for a section type Spec has no dedicated widget
+    // for -- adds it as a plain feature row (same shape a text_section
+    // becomes) at the end of the page, rather than in a guessed real
+    // position, since there's no established position convention for a
+    // type this file doesn't otherwise handle at all.
+    var features = Array.isArray(next.features) ? next.features.slice() : [];
+    features.push({
+      heading: proposedBlock.heading || "",
+      body: proposedBlock._fallbackBody || "",
+    });
+    next.features = features;
+    var contentOrder = Array.isArray(next.contentOrder) ? next.contentOrder.slice() : [];
+    contentOrder.push({ type: "feature", index: features.length - 1 });
+    next.contentOrder = contentOrder;
   }
   return next;
 }

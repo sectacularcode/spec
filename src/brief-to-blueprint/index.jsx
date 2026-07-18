@@ -67,6 +67,12 @@ export default function CustomBuild({ userId, role } = {}) {
   // silently included -- Spec's whole purpose is to output the brief
   // exactly, not embellish it.
   const [proposedBlocks, setProposedBlocks] = useState(null); // [{ type, heading, rationale, section }] | null
+  // Fields Manifest sent on a recognized section type that nothing reads
+  // yet -- see manifestImport.js's findUnknownFields(). Informational,
+  // not actionable the way proposedBlocks is (there's no single "add it"
+  // for a stray field) -- shown so it's visible the moment it appears
+  // instead of silently missing until someone notices the live page.
+  const [unknownFields, setUnknownFields] = useState(null); // [{ type, heading, keys, preview }] | null
   const [draftMsg, setDraftMsg]         = useState(""); // transient message for saved-drafts list actions
   const [clientName, setClientName]     = useState("");
   const [showIntake, setShowIntake]     = useState(false);
@@ -377,6 +383,8 @@ export default function CustomBuild({ userId, role } = {}) {
             setPlaceholderButtons(placeholderButtons.length > 0 ? placeholderButtons : null);
             const proposedBlocks = parsed._proposedBlocks || [];
             setProposedBlocks(proposedBlocks.length > 0 ? proposedBlocks : null);
+            const unknownFields = parsed._unknownFields || [];
+            setUnknownFields(unknownFields.length > 0 ? unknownFields : null);
             return;
           }
 
@@ -2081,17 +2089,21 @@ export default function CustomBuild({ userId, role } = {}) {
                   {proposedBlocks && proposedBlocks.map((block, i) => (
                     <div key={i} style={{ marginTop: "8px", padding: "10px 12px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "8px" }}>
                       <div style={{ fontSize: "12px", fontWeight: 600, color: "#1e40af", marginBottom: "6px" }}>
-                        Manifest suggested 1 more section (not included)
+                        {block.type.indexOf("unknown:") === 0
+                          ? "Manifest sent a section type Spec doesn't fully support yet"
+                          : "Manifest suggested 1 more section (not included)"}
                       </div>
                       <div style={{ fontSize: "12px", color: "#1e3a8a", marginBottom: "8px" }}>
-                        <span style={{ fontWeight: 600 }}>{block.heading || (block.type === "form" ? "Lead-capture form" : block.type)}</span>
+                        <span style={{ fontWeight: 600 }}>
+                          {block.heading || (block.type === "form" ? "Lead-capture form" : block.type.replace("unknown:", ""))}
+                        </span>
                         {block.rationale ? " — \"" + block.rationale + "\"" : ""}
                       </div>
                       <div style={{ display: "flex", gap: "8px" }}>
                         <button
                           onClick={() => handleAddProposedBlock(block)}
                           style={{ padding: "5px 12px", fontSize: "12px", fontWeight: 600, background: "#1e40af", border: "none", borderRadius: "6px", color: "#fff", cursor: "pointer" }}>
-                          Add it
+                          {block.type.indexOf("unknown:") === 0 ? "Add as plain text block" : "Add it"}
                         </button>
                         <button
                           onClick={() => handleDismissProposedBlock(block)}
@@ -2101,6 +2113,21 @@ export default function CustomBuild({ userId, role } = {}) {
                       </div>
                     </div>
                   ))}
+                  {unknownFields && (
+                    <div style={{ marginTop: "8px", padding: "10px 12px", background: "#f5f5f4", border: "1px solid #e7e5e4", borderRadius: "8px" }}>
+                      <div style={{ fontSize: "12px", fontWeight: 600, color: "#44403c", marginBottom: "6px" }}>
+                        Manifest sent {unknownFields.reduce((n, f) => n + f.keys.length, 0)} field{unknownFields.reduce((n, f) => n + f.keys.length, 0) !== 1 ? "s" : ""} Spec doesn't read yet
+                      </div>
+                      {unknownFields.map((f, i) => (
+                        <div key={i} style={{ fontSize: "12px", color: "#57534e", marginBottom: i < unknownFields.length - 1 ? "3px" : 0 }}>
+                          • {f.type}{f.heading ? " (\"" + f.heading + "\")" : ""}: {f.keys.join(", ")}
+                        </div>
+                      ))}
+                      <div style={{ fontSize: "11px", color: "#78716c", marginTop: "6px" }}>
+                        Not shown on the page. Flag for engineering if this should be added.
+                      </div>
+                    </div>
+                  )}
                   <div style={{ marginTop: "8px", fontSize: "12px", color: "#6b7280" }}>
                     Review all copy &amp; links on template before publishing.
                   </div>
