@@ -50,8 +50,18 @@ function selectFeatureRowStyle(inspoContext, featureCount) {
 // applied) -- passed through as one object rather than 8 separate
 // parameters, matching the shape already used elsewhere in this split.
 export function buildLandingPreview(brief, variant, inspoContext, colors) {
-  var ink = colors.ink, brass = colors.brass, bone = colors.bone, warmWhite = colors.warmWhite,
-      stone = colors.stone, brassDp = colors.brassDp, asphalt = colors.asphalt, text = colors.text;
+  // Confirmed real bug, July 2026, found while auditing brief fidelity:
+  // this read colors.warmWhite/colors.brassDp (camelCase), but the real
+  // color contract's keys are kebab-case ("warm-white", "brass-deep") --
+  // landing.js (the actual Elementor export builder) already reads them
+  // correctly via colors["warm-white"]/colors["brass-deep"]. Every
+  // testimonial heading and every other warmWhite/brassDp use in this
+  // preview has been silently rendering color:undefined since this file
+  // was written -- the export was never affected (different, correct
+  // code path), only what the editor shows before export. Fallback
+  // defaults added to match landing.js's own for the same values.
+  var ink = colors.ink || "#1A1A1A", brass = colors.brass || colors.accent || "#52525B", bone = colors.bone || colors.background || "#F2F2F2", warmWhite = colors["warm-white"] || "#FFFFFF",
+      stone = colors.stone || colors.muted || "#666666", brassDp = colors["brass-deep"] || "", asphalt = colors.asphalt || colors["dark-panel"] || "", text = colors.text || "#1A1A1A";
   // All three lead-form buttons in this file sit on light (bone/white)
   // backgrounds -- same "light context" as landing.js's Elementor-JSON
   // output. A real defined button applies here too; the fallback used to

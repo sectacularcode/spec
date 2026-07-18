@@ -102,12 +102,21 @@ function legacyManifestToBrief(raw) {
     _manifestPageId: page.id,
     faqItems: [],
     _unmappedBlocks: [],
+    _proposedBlocks: [],
   };
 
   var featureCount = 0;
   var testimonialCount = 0;
 
   (page.blocks || []).forEach(function (block) {
+    // Same fix as the page-document/1 path above -- see _proposedBlocks
+    // there for the real bug. This legacy schema predates Manifest's
+    // proposed flag and no real file uses it, but guarded the same way
+    // for consistency in case a future legacy-shaped export ever does.
+    if (block.proposed === true) {
+      brief._proposedBlocks.push({ type: block.elementType, heading: block.title || block.heading || "", rationale: block.rationale || "" });
+      return;
+    }
     switch (block.elementType) {
       case "hero":
         brief.heroHeadline = block.title || "";
@@ -438,6 +447,18 @@ function manifestPageDocumentToBrief(raw) {
     _manifestMetaDescription: page.meta_description || "",
     faqItems: [],
     _unmappedBlocks: [],
+    // Confirmed real bug, July 2026 (Megan/Manifest report: "buttons and
+    // sections were there that were not in her brief"): sections Manifest
+    // itself marks proposed:true -- a suggestion with a rationale
+    // explaining why, explicitly NOT confirmed content -- were being
+    // rendered onto the live page exactly like any other real section.
+    // Real case: 13 of 17 Freeway pages have a proposed:true form section
+    // ("The page converts primarily by phone, but the strategy calls for
+    // a low-friction path..."). A suggestion is not a decision; Spec's
+    // whole purpose is to output the brief exactly, not embellish it.
+    // Tracked here (not rendered) so a future review UI can surface
+    // "Manifest suggested a form here" without silently adding it.
+    _proposedBlocks: [],
     // Surfaces Manifest's own audit trail -- flagged claims needing a real
     // receipt, unverified technical claims pending expert review -- so a
     // human sees exactly what needs attention before this ships, instead
@@ -572,6 +593,15 @@ function manifestPageDocumentToBrief(raw) {
   sections.forEach(function (section, idx) {
     var isLast = idx === sections.length - 1;
     var headingText = section.heading ? section.heading.text || "" : "";
+
+    // A suggestion is not a decision -- see _proposedBlocks above for the
+    // real bug this fixes. Checked before any type-specific handler below
+    // so a proposed section never contributes to brief fields or
+    // contentOrder at all, regardless of its type.
+    if (section.proposed === true) {
+      brief._proposedBlocks.push({ type: section.type, heading: headingText, rationale: section.rationale || "" });
+      return;
+    }
 
     if (section.type === "hero") {
       var heroButtons = section.buttons || [];
