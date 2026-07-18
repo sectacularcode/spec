@@ -646,6 +646,9 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var features = buildFeaturesArray();
     var rendered = [];
     var testimonialsRendered = false;
+    var formRendered = false;
+    var mapRendered = false;
+    var ctaRendered = false;
     brief.contentOrder.forEach(function (block) {
       if (block.type === "feature") {
         var f = features[block.index];
@@ -664,22 +667,25 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         // placing form content wherever Manifest's export had it --
         // opts.skipForm avoids rendering a second, redundant form section
         // further down the page in ordered mode.
-        if (opts.skipForm) return;
+        if (opts.skipForm) { formRendered = true; return; }
         // Variant F builds its own form section separately (real anchor
         // ID, #contact-form, for the hero's "Contact Us" to jump to) --
         // opts.formOverride substitutes that instead of a second, plain
         // one from makeFormSection().
         var formEl = opts.formOverride !== undefined ? opts.formOverride : makeFormSection();
         if (formEl) rendered.push(formEl);
+        formRendered = true;
       } else if (block.type === "map") {
         // Variant F's hero already includes the map -- opts.skipMap
         // avoids rendering it a second time further down the page.
-        if (opts.skipMap) return;
+        if (opts.skipMap) { mapRendered = true; return; }
         var mapEl = makeMapSection();
         if (mapEl) rendered.push(mapEl);
+        mapRendered = true;
       } else if (block.type === "cta") {
         var ctaEl = makeClosingCta(opts.closingBg);
         if (ctaEl) rendered.push(ctaEl);
+        ctaRendered = true;
       } else if (block.type === "testimonials") {
         testimonialsRendered = true;
         if (opts.skipTestimonials) return;
@@ -699,6 +705,25 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     if (!testimonialsRendered && !opts.skipTestimonials) {
       var fallbackT = opts.testimonialsOverride !== undefined ? opts.testimonialsOverride : makeTestimonialSection();
       if (fallbackT) rendered.push(fallbackT);
+    }
+    // Same safety net, same reasoning, for form/map/cta -- not just for
+    // already-saved builds, but for the new "add it" flow on a proposed
+    // section (see manifestImport.js's applyProposedBlock): real content
+    // can now exist on the brief with no matching contentOrder marker,
+    // since the section was excluded from contentOrder entirely at
+    // import time (it was a suggestion, not confirmed) and only gets its
+    // real fields filled in later, after contentOrder was already built.
+    if (!formRendered && !opts.skipForm) {
+      var fallbackForm = opts.formOverride !== undefined ? opts.formOverride : makeFormSection();
+      if (fallbackForm) rendered.push(fallbackForm);
+    }
+    if (!mapRendered && !opts.skipMap) {
+      var fallbackMap = makeMapSection();
+      if (fallbackMap) rendered.push(fallbackMap);
+    }
+    if (!ctaRendered) {
+      var fallbackCta = makeClosingCta(opts.closingBg);
+      if (fallbackCta) rendered.push(fallbackCta);
     }
     return rendered;
   }

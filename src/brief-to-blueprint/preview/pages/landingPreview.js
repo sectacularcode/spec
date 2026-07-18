@@ -648,7 +648,10 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
         opts = opts || {};
         if (!Array.isArray(brief.contentOrder) || !brief.contentOrder.length) return "";
         var testimonialsRendered = false;
-        return brief.contentOrder.map(function (block) {
+        var formRendered = false;
+        var mapRendered = false;
+        var ctaRendered = false;
+        var body = brief.contentOrder.map(function (block) {
           if (block.type === "feature") {
             var curated = Array.isArray(brief.featureLayout)
               ? brief.featureLayout.filter(function (e) { return e.indices && e.indices.length === 1 && e.indices[0] === block.index; })[0]
@@ -663,13 +666,16 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             // section, and Variant F folds the form into its hero-area
             // layout separately -- opts.skipForm avoids a redundant
             // second form further down the page in ordered mode.
-            if (opts.skipForm) return "";
+            if (opts.skipForm) { formRendered = true; return ""; }
+            formRendered = true;
             return genericFormHTML(opts.formAnchorId);
           } else if (block.type === "map") {
             // Variant F's hero already includes the map.
-            if (opts.skipMap) return "";
+            if (opts.skipMap) { mapRendered = true; return ""; }
+            mapRendered = true;
             return mapSectionHTML;
           } else if (block.type === "cta") {
+            ctaRendered = true;
             return closingCtaHTML(opts.closingBg);
           } else if (block.type === "testimonials") {
             testimonialsRendered = true;
@@ -677,7 +683,17 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             return opts.testimonialsOverride !== undefined ? opts.testimonialsOverride : "";
           }
           return "";
-        }).join("") + (
+        }).join("");
+        // Same safety net, same reasoning, as landing.js's
+        // renderOrderedContent() -- covers real content added after
+        // contentOrder was built with no matching position marker (e.g.
+        // the "add it" flow on a proposed section, see manifestImport.js's
+        // applyProposedBlock). Each fallback call is self-guarding
+        // (returns "" with no real content), same as the normal path.
+        if (!formRendered && !opts.skipForm) body += genericFormHTML(opts.formAnchorId);
+        if (!mapRendered && !opts.skipMap) body += mapSectionHTML;
+        if (!ctaRendered) body += closingCtaHTML(opts.closingBg);
+        return body + (
           // Safety net for already-saved builds whose stored contentOrder
           // predates testimonials being tracked -- mirrors landing.js's
           // renderOrderedContent() exactly, same reasoning documented

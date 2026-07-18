@@ -599,7 +599,7 @@ function manifestPageDocumentToBrief(raw) {
     // so a proposed section never contributes to brief fields or
     // contentOrder at all, regardless of its type.
     if (section.proposed === true) {
-      brief._proposedBlocks.push({ type: section.type, heading: headingText, rationale: section.rationale || "" });
+      brief._proposedBlocks.push({ type: section.type, heading: headingText, rationale: section.rationale || "", section: section });
       return;
     }
 
@@ -1042,6 +1042,39 @@ function manifestPageDocumentToBrief(raw) {
 }
 
 // --- Public entry point -----------------------------------------------------
+
+// Applies a single proposed block (from brief._proposedBlocks) onto a
+// brief, using the exact same per-type transform as the real handler
+// above -- so "add it" in the editor produces identical output to what
+// this page would have gotten if Manifest had sent it as confirmed
+// content instead of a suggestion. Returns a new brief object (does not
+// mutate the one passed in). Only "form" is wired currently -- the only
+// real type Manifest proposes today, confirmed across all 17 Freeway
+// page-documents on hand -- but structured to add more types later
+// without changing the caller. Unsupported types are a no-op (return
+// the brief unchanged) rather than a crash, matching this file's own
+// additive-versioning philosophy.
+export function applyProposedBlock(brief, proposedBlock) {
+  var next = Object.assign({}, brief);
+  var section = proposedBlock && proposedBlock.section;
+  if (!section) return next;
+
+  if (section.type === "form") {
+    next.formHeading = section.heading ? section.heading.text || "" : "";
+    next.formSubhead = flattenRichText(section.body);
+    next.formFields = (section.fields || [])
+      .filter(function (f) { return f && f.label; })
+      .map(function (f) {
+        return {
+          label: f.label,
+          fieldType: f.field_type || "",
+          required: !!f.required,
+          options: Array.isArray(f.options) ? f.options.filter(Boolean) : [],
+        };
+      });
+  }
+  return next;
+}
 
 // Dispatches to the real page-document parser or the legacy schema parser
 // based on the export's own `format` marker. Throws ManifestImportError if

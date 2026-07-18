@@ -29,7 +29,7 @@ import { ConfirmDialog } from "../components/ConfirmDialog.jsx";
 import AdminPanel from "../components/AdminPanel.jsx";
 import { authHeaders, formatErrorMessage } from "../utils/api.js";
 import { estimateGenerationCost } from "./utils/estimateCost.js";
-import { manifestToBrief, ManifestImportError } from "./importers/manifestImport.js";
+import { manifestToBrief, applyProposedBlock, ManifestImportError } from "./importers/manifestImport.js";
 import { COLOR_FIELDS } from "../utils/colorRoles.js";
 import ButtonEditor from "../style-guide/components/ButtonEditor.jsx";
 import { bestTextColor } from "../utils/contrast.js";
@@ -60,6 +60,13 @@ export default function CustomBuild({ userId, role } = {}) {
   // wasn't catching anything new. This one stays because it's the only
   // thing that knows which buttons are actually broken in this build.
   const [placeholderButtons, setPlaceholderButtons] = useState(null); // [{ label, section }] | null
+  // Sections Manifest itself marked proposed:true (a suggestion, not
+  // confirmed content -- see manifestImport.js's _proposedBlocks for the
+  // real bug this fixes) but excluded from the built page entirely.
+  // Shown as a lightweight, dismissible "add it?" prompt rather than
+  // silently included -- Spec's whole purpose is to output the brief
+  // exactly, not embellish it.
+  const [proposedBlocks, setProposedBlocks] = useState(null); // [{ type, heading, rationale, section }] | null
   const [draftMsg, setDraftMsg]         = useState(""); // transient message for saved-drafts list actions
   const [clientName, setClientName]     = useState("");
   const [showIntake, setShowIntake]     = useState(false);
@@ -368,6 +375,8 @@ export default function CustomBuild({ userId, role } = {}) {
             // everything before publishing" reminder covers that ground now.
             const placeholderButtons = parsed._placeholderButtons || [];
             setPlaceholderButtons(placeholderButtons.length > 0 ? placeholderButtons : null);
+            const proposedBlocks = parsed._proposedBlocks || [];
+            setProposedBlocks(proposedBlocks.length > 0 ? proposedBlocks : null);
             return;
           }
 
@@ -457,6 +466,34 @@ export default function CustomBuild({ userId, role } = {}) {
     } else {
       setBriefError("Unsupported file type. Upload a PDF, JSON, DOCX, or TXT file.");
     }
+  }
+
+  // Applies one Manifest-suggested (proposed:true) section's real content
+  // onto whichever brief is currently active -- parsedBriefDraft while
+  // the review modal is still open, brief once it's been confirmed --
+  // same two-state pattern BriefReview's own onConfirm already follows.
+  // Removes it from the displayed suggestion list once applied; the
+  // brief itself is never touched by anything still showing after this.
+  function handleAddProposedBlock(block) {
+    if (parsedBriefDraft) {
+      setParsedBriefDraft(applyProposedBlock(parsedBriefDraft, block));
+    } else if (brief) {
+      setBrief(applyProposedBlock(brief, block));
+    }
+    setProposedBlocks(prev => {
+      const next = (prev || []).filter(b => b !== block);
+      return next.length ? next : null;
+    });
+  }
+
+  // Dismiss never touches brief content -- it only hides the prompt for
+  // this session. Manifest's suggestion itself isn't deleted or altered;
+  // reimporting the same export would surface it again.
+  function handleDismissProposedBlock(block) {
+    setProposedBlocks(prev => {
+      const next = (prev || []).filter(b => b !== block);
+      return next.length ? next : null;
+    });
   }
 
   function addUrl() { setInspoUrls(u => [...u, ""]); }
@@ -2041,6 +2078,29 @@ export default function CustomBuild({ userId, role } = {}) {
                       ))}
                     </div>
                   )}
+                  {proposedBlocks && proposedBlocks.map((block, i) => (
+                    <div key={i} style={{ marginTop: "8px", padding: "10px 12px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "8px" }}>
+                      <div style={{ fontSize: "12px", fontWeight: 600, color: "#1e40af", marginBottom: "6px" }}>
+                        Manifest suggested 1 more section (not included)
+                      </div>
+                      <div style={{ fontSize: "12px", color: "#1e3a8a", marginBottom: "8px" }}>
+                        <span style={{ fontWeight: 600 }}>{block.heading || (block.type === "form" ? "Lead-capture form" : block.type)}</span>
+                        {block.rationale ? " — \"" + block.rationale + "\"" : ""}
+                      </div>
+                      <div style={{ display: "flex", gap: "8px" }}>
+                        <button
+                          onClick={() => handleAddProposedBlock(block)}
+                          style={{ padding: "5px 12px", fontSize: "12px", fontWeight: 600, background: "#1e40af", border: "none", borderRadius: "6px", color: "#fff", cursor: "pointer" }}>
+                          Add it
+                        </button>
+                        <button
+                          onClick={() => handleDismissProposedBlock(block)}
+                          style={{ padding: "5px 12px", fontSize: "12px", fontWeight: 600, background: "transparent", border: "1px solid #bfdbfe", borderRadius: "6px", color: "#1e40af", cursor: "pointer" }}>
+                          Dismiss
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                   <div style={{ marginTop: "8px", fontSize: "12px", color: "#6b7280" }}>
                     Review all copy &amp; links on template before publishing.
                   </div>
