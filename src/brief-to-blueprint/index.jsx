@@ -112,6 +112,7 @@ export default function CustomBuild({ userId, role } = {}) {
   const [generated, setGenerated]       = useState(null);
   const [draftedFields, setDraftedFields] = useState(null); // pending AI drafts for approval
   const [previewPage, setPreviewPage]   = useState("home");
+  const [zipping, setZipping]           = useState(false); // true while the all-pages .zip is being assembled
   const [layoutVariants, setLayoutVariants] = useState({}); // {pageId: "A"|"B"}
   const [swapDrawer, setSwapDrawer]         = useState(null); // pageId of page being swapped, or null
   const [sectionLibrary, setSectionLibrary] = useState([]); // saved sections from past builds
@@ -1359,19 +1360,65 @@ export default function CustomBuild({ userId, role } = {}) {
     }
   }
 
-  function downloadAll() {
-    if (!generated) return;
-    generated.pages.forEach((p, i) => setTimeout(() => {
-      const customName = (pageDownloadNames[p.id] || "").trim();
-      const pageData = getPageData(p);
-      const exportData = customName ? { ...pageData, title: he(customName) } : pageData;
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
-      const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-      const pageSuffix = brief?._manifestPageName ? slugify(brief._manifestPageName) : p.id;
-      a.download = slugify(customName || clientName || brief?.brandName) + "-" + pageSuffix + "-elementor.json";
-      a.click(); URL.revokeObjectURL(a.href);
-    }, i * 300));
-    // Auto-save full build to library
+  // Builds every page's Elementor JSON and bundles them into a single
+  // .zip -- the format the rest of the Elementor template market uses to
+  // deliver multi-page kits (Elementor's own Export Kit produces a .zip),
+  // and far cleaner than the previous behavior, which fired one separate
+  // browser download per page 300ms apart and left N loose files in the
+  // person's Downloads folder. JSZip is dynamically imported (not a
+  // top-level import) so it only loads when someone actually clicks
+  // download, and any failure to load or zip is caught here and falls
+  // back to the old per-file downloads rather than silently doing nothing.
+  async function downloadAll() {
+    if (!generated || !generated.pages.length) return;
+    setZipping(true);
+    try {
+      const JSZip = (await import("jszip")).default;
+      const zip = new JSZip();
+      const usedNames = {};
+      generated.pages.forEach(p => {
+        const customName = (pageDownloadNames[p.id] || "").trim();
+        const pageData = getPageData(p);
+        const exportData = customName ? { ...pageData, title: he(customName) } : pageData;
+        const pageSuffix = brief?._manifestPageName ? slugify(brief._manifestPageName) : p.id;
+        var baseName = slugify(customName || clientName || brief?.brandName) + "-" + pageSuffix + "-elementor";
+        // Two pages can slugify to the same filename (e.g. two custom
+        // instances named the same) -- a plain zip would silently drop the
+        // earlier one, since a later same-named entry overwrites it. Dedup
+        // by appending -2, -3, ... so every page's JSON survives the zip.
+        var fileName = baseName + ".json";
+        if (usedNames[fileName]) {
+          usedNames[baseName] = (usedNames[baseName] || 1) + 1;
+          fileName = baseName + "-" + usedNames[baseName] + ".json";
+        }
+        usedNames[fileName] = true;
+        zip.file(fileName, JSON.stringify(exportData, null, 2));
+      });
+      const blob = await zip.generateAsync({ type: "blob" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = slugify(clientName || brief?.brandName) + "-pages-elementor.zip";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } catch (err) {
+      // Fallback: if JSZip fails to load or zipping errors, don't leave
+      // the person with nothing -- fall back to the previous one-file-at-
+      // a-time behavior so the download still works, just less tidily.
+      console.warn("zip download failed, falling back to individual files:", err && err.message);
+      generated.pages.forEach((p, i) => setTimeout(() => {
+        const customName = (pageDownloadNames[p.id] || "").trim();
+        const pageData = getPageData(p);
+        const exportData = customName ? { ...pageData, title: he(customName) } : pageData;
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+        const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+        const pageSuffix = brief?._manifestPageName ? slugify(brief._manifestPageName) : p.id;
+        a.download = slugify(customName || clientName || brief?.brandName) + "-" + pageSuffix + "-elementor.json";
+        a.click(); URL.revokeObjectURL(a.href);
+      }, i * 300));
+    } finally {
+      setZipping(false);
+    }
+    // Auto-save full build to library (unchanged from before).
     if (brief && generated) {
       saveToLibrary(brief, generated.pages, layoutVariants, layoutVariants);
     }
@@ -2502,7 +2549,7 @@ export default function CustomBuild({ userId, role } = {}) {
                   </div>
                 ))}
                 {generated.pages.length > 1 && (
-                  <button onClick={downloadAll} style={{ ...T.btnPrimary, justifyContent: "center", marginTop: "-6px", padding: "12px 16px", fontSize: "13px" }}>Download All Pages</button>
+                  <button onClick={downloadAll} disabled={zipping} style={{ ...T.btnPrimary, justifyContent: "center", marginTop: "-6px", padding: "12px 16px", fontSize: "13px", opacity: zipping ? 0.6 : 1, cursor: zipping ? "default" : "pointer" }}>{zipping ? "Preparing .zip…" : "Download All Pages (.zip)"}</button>
                 )}
                 <div style={{ height: "1px", background: "#dde0e6", margin: "10px 0" }} />
                 <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "12px" }}>Global Templates</div>
