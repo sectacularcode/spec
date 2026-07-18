@@ -2,7 +2,19 @@ import { useState, useRef, useEffect } from "react";
 import { T } from "../styles.js";
 import { authHeaders } from "../../utils/api.js";
 import { manifestToBrief } from "../importers/manifestImport.js";
-import { checkFidelity, summarizeForApproval, compareAgainstHistory } from "../utils/fidelityCheck.js";
+import { checkFidelity, summarizeForApproval, compareAgainstHistory, formatReportMarkdown, formatBatchMarkdown } from "../utils/fidelityCheck.js";
+
+function downloadText(filename, text) {
+  const blob = new Blob([text], { type: "text/markdown" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
 export default function FidelityCheck() {
   const [results, setResults] = useState([]);
@@ -123,7 +135,14 @@ export default function FidelityCheck() {
 
       {results.length > 0 && (
         <div style={{ marginBottom: "32px" }}>
-          <div style={T.label}>{"This batch (" + results.length + ")"}</div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={T.label}>{"This batch (" + results.length + ")"}</div>
+            <button
+              onClick={() => downloadText("fidelity-batch-" + Date.now() + ".md", formatBatchMarkdown(results))}
+              style={{ padding: "5px 12px", fontSize: "11px", fontWeight: 600, background: "#fff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
+              Download all
+            </button>
+          </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "1px", background: "#dde0e6", border: "1px solid #dde0e6", borderRadius: "8px", overflow: "hidden", marginTop: "8px" }}>
             {results.map((r, i) => (
               <div key={i} onClick={() => setSelectedIdx(i)}
@@ -154,7 +173,17 @@ export default function FidelityCheck() {
 
       {selected && !selected.error && (
         <div style={{ ...T.surface, marginBottom: "32px" }}>
-          <div style={{ fontSize: "14px", fontWeight: 700, color: "#09090b", marginBottom: "16px" }}>{selected.raw.page && selected.raw.page.slug}</div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+            <div style={{ fontSize: "14px", fontWeight: 700, color: "#09090b" }}>{selected.raw.page && selected.raw.page.slug}</div>
+            <button
+              onClick={() => {
+                const slug = (selected.raw.page && selected.raw.page.slug) || selected.fileName;
+                downloadText("fidelity-" + slug + ".md", formatReportMarkdown(slug, selected.report));
+              }}
+              style={{ padding: "5px 12px", fontSize: "11px", fontWeight: 600, background: "#fff", color: "#09090b", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer" }}>
+              Download
+            </button>
+          </div>
 
           {(selected.comparison.newTypes.length > 0 || selected.comparison.commonlyMissingTypes.length > 0) && (
             <div style={{ marginBottom: "16px", padding: "10px 12px", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "8px" }}>

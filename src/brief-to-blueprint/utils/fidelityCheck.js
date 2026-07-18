@@ -226,3 +226,84 @@ export function compareAgainstHistory(newSummary, pastApprovals) {
 
   return { isFirstForBrand: false, newTypes: neverSeenBefore, commonlyMissingTypes };
 }
+
+// Formats one page's report as clean markdown -- readable in any editor,
+// pasteable into Slack/email/a doc, no external viewer required. Mirrors
+// the tab's own display order exactly (sections + copy, provenance,
+// buttons, proposed) so what gets sent externally matches what's on
+// screen.
+export function formatReportMarkdown(pageSlug, report) {
+  const lines = [];
+  lines.push("# Fidelity report: " + pageSlug);
+  lines.push("");
+  lines.push(report.clean ? "**Status: Clean** -- every field traces to real source content." : "**Status: Needs review** -- see flagged items below.");
+  lines.push("");
+
+  lines.push("## Source sections");
+  lines.push("");
+  report.sections.forEach(s => {
+    const label = s.type + (s.heading ? ' -- "' + s.heading + '"' : "");
+    lines.push("**" + label + "** (" + s.status.replace("_", " ") + ")");
+    (s.copy || []).forEach(line => lines.push("- " + line));
+    lines.push("");
+  });
+
+  lines.push("## Content provenance");
+  lines.push("");
+  report.fields.filter(f => f.status !== "empty").forEach(f => {
+    const mark = f.status.indexOf("NOT FOUND") === 0 ? "[NOT TRACED]" : "[traced]";
+    lines.push("- " + mark + " " + f.label + (f.note ? ' -- "' + f.note + '..."' : ""));
+  });
+  lines.push("");
+
+  if (report.placeholders.length) {
+    lines.push("## Buttons needing a real destination");
+    lines.push("");
+    report.placeholders.forEach(p => lines.push('- "' + p.label + '" (' + p.section + ")"));
+    lines.push("");
+  }
+
+  if (report.proposed.length) {
+    lines.push("## Suggested by Manifest, not included");
+    lines.push("");
+    report.proposed.forEach(p => lines.push("- **" + p.type + "**: " + p.rationale));
+    lines.push("");
+  }
+
+  if (report.unknownFields && report.unknownFields.length) {
+    lines.push("## Fields Spec doesn't read yet");
+    lines.push("");
+    report.unknownFields.forEach(f => lines.push("- " + f.type + (f.heading ? ' ("' + f.heading + '")' : "") + ": " + f.keys.join(", ")));
+    lines.push("");
+  }
+
+  lines.push("---");
+  lines.push("");
+  lines.push("Summary: " + report.summary.mappedCount + " sections mapped, " + report.summary.excludedCount + " excluded (proposed), " +
+    report.summary.unmappedCount + " unmapped -- " + report.summary.tracedCount + " fields traced, " + report.summary.missingCount + " not traced -- " +
+    report.summary.placeholderCount + " placeholder button(s)");
+
+  return lines.join("\n");
+}
+
+// Combines multiple page reports into one document -- the batch case,
+// since checks normally run 15-20 files at once.
+export function formatBatchMarkdown(results) {
+  const lines = ["# Fidelity report batch", "", results.length + " page(s) checked", "", "---", ""];
+  results.forEach(r => {
+    if (r.error) {
+      lines.push("# " + r.fileName);
+      lines.push("");
+      lines.push("Error: " + r.error);
+      lines.push("");
+      lines.push("---");
+      lines.push("");
+      return;
+    }
+    lines.push(formatReportMarkdown((r.raw.page && r.raw.page.slug) || r.fileName, r.report));
+    lines.push("");
+    lines.push("---");
+    lines.push("");
+  });
+  return lines.join("\n");
+}
