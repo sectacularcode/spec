@@ -531,6 +531,10 @@ function manifestPageDocumentToBrief(raw) {
   var faqOrderRecorded = false;
   var formOrderRecorded = false;
   var mapOrderRecorded = false;
+  // Guards the singleton closing-CTA slot the same way mapOrderRecorded
+  // guards the map slot below -- see the cta handler for the real bug
+  // this fixes (2+ cta sections on one page overwriting each other).
+  var closingCtaClaimed = false;
 
   sections.forEach(function (section, idx) {
     var isLast = idx === sections.length - 1;
@@ -591,28 +595,58 @@ function manifestPageDocumentToBrief(raw) {
     }
 
     if (section.type === "cta") {
-      brief.closingCta = headingText;
-      brief.closingBody = flattenRichText(section.body);
-      // Confirmed real bug, July 2026: this only ever read heading/body,
-      // never section.buttons -- KC's real export has a cta section with
-      // a genuine button ("Book My Inspection") and NO heading/body at
-      // all, so both above come back empty and the button was silently
-      // dropped entirely (not tracked as a placeholder either, since
-      // that only happens for text_section/hero -- a real content-loss
-      // bug, not just a missing default). Captured separately from
-      // phoneCta/heroPrimaryUrl (the hero's own button) since a cta
-      // section's button is frequently different real copy, not a
-      // repeat of the hero's -- confirmed exactly that case here
-      // ("Book My Inspection" vs the hero's "Schedule Your DOT
-      // Inspection in Kansas City").
       var ctaBtns = section.buttons || [];
       var ctaBtn = ctaBtns.filter(function (b) { return b && b.placement === "primary"; })[0] || ctaBtns[0];
-      if (ctaBtn) {
-        brief.closingCtaButtonLabel = ctaBtn.label || "";
-        brief.closingCtaButtonUrl = pageDocumentButtonUrl(ctaBtn);
-        trackPlaceholderButton(brief.closingCtaButtonLabel, brief.closingCtaButtonUrl, "Closing CTA");
+      var ctaBodyText = flattenRichText(section.body);
+      // Confirmed real bug, July 2026: a page with 2+ explicit "cta"
+      // sections (real case: Freeway's mobile-heavy-equipment-repair-miami
+      // and truck-engine-repair-in-miami, each with two distinct
+      // button-only cta sections -- no heading/body on either, matching
+      // the KC DOT button-only pattern below) had brief.closingCta/
+      // closingCtaButtonLabel overwritten unconditionally on every
+      // occurrence AND pushed a fresh {type:"cta"} into contentOrder each
+      // time. Net effect: the page rendered the SAME (last) button text
+      // twice, at both real positions, while the first section's real,
+      // different button copy was silently discarded -- not just
+      // misplaced, gone. Only the first cta section now claims the
+      // singleton closing-CTA slot (closingCtaClaimed), matching the same
+      // "first occurrence wins" rule faqHeading and the map fix below
+      // already follow. A later cta section's real content still lands on
+      // the page -- it becomes an ordered feature row at its own real
+      // position instead of a second identical closing CTA.
+      if (!closingCtaClaimed) {
+        closingCtaClaimed = true;
+        brief.closingCta = headingText;
+        brief.closingBody = ctaBodyText;
+        // Confirmed real bug, July 2026: this only ever read heading/body,
+        // never section.buttons -- KC's real export has a cta section with
+        // a genuine button ("Book My Inspection") and NO heading/body at
+        // all, so both above come back empty and the button was silently
+        // dropped entirely (not tracked as a placeholder either, since
+        // that only happens for text_section/hero -- a real content-loss
+        // bug, not just a missing default). Captured separately from
+        // phoneCta/heroPrimaryUrl (the hero's own button) since a cta
+        // section's button is frequently different real copy, not a
+        // repeat of the hero's -- confirmed exactly that case here
+        // ("Book My Inspection" vs the hero's "Schedule Your DOT
+        // Inspection in Kansas City").
+        if (ctaBtn) {
+          brief.closingCtaButtonLabel = ctaBtn.label || "";
+          brief.closingCtaButtonUrl = pageDocumentButtonUrl(ctaBtn);
+          trackPlaceholderButton(brief.closingCtaButtonLabel, brief.closingCtaButtonUrl, "Closing CTA");
+        }
+        contentOrder.push({ type: "cta" });
+      } else {
+        featurePairs.push({
+          heading: headingText,
+          body: ctaBodyText,
+          buttonLabel: ctaBtn ? ctaBtn.label || "" : "",
+          buttonUrl: ctaBtn ? pageDocumentButtonUrl(ctaBtn) : "",
+          buttonPlacement: ctaBtn ? ctaBtn.placement || "" : "",
+        });
+        contentOrder.push({ type: "feature", index: featurePairs.length - 1 });
+        if (ctaBtn) trackPlaceholderButton(ctaBtn.label || "", pageDocumentButtonUrl(ctaBtn), "Body");
       }
-      contentOrder.push({ type: "cta" });
       return;
     }
 
@@ -625,7 +659,25 @@ function manifestPageDocumentToBrief(raw) {
       // destination to send someone to. Missing mode = pin, matching the
       // format spec's own stated default.
       var mode = section.mode === "service_area" ? "service_area" : "pin";
-      if (addressParts.length) {
+      // Confirmed real bug, July 2026: a page with 2+ map_location sections
+      // (real case: Freeway's about-us, mobile-fleet-repair-south-florida,
+      // truck-repair-shop-miami -- each pairs an early informational map
+      // section with a later closing-CTA-flavored one reusing the same
+      // address) had every field below overwritten unconditionally on
+      // each occurrence. The map rendered at the FIRST section's real
+      // position but with the LAST section's content -- on about-us, the
+      // entire "Do you really come to me?" trust section (heading, note,
+      // its own button) vanished with no trace, replaced by the closing
+      // section's copy misplaced up near the top of the page. Only the
+      // first map_location with a resolvable address now claims the
+      // actual map widget slot (gated on !mapOrderRecorded, same flag
+      // that already tracked its contentOrder position), matching the
+      // same "first occurrence wins the singleton slot" rule faqHeading
+      // already follows. A later map_location's real content is never
+      // dropped -- it becomes an ordered feature row at its own real
+      // position instead, the same fallback path already used just below
+      // for a map_location with no structured address at all.
+      if (addressParts.length && !mapOrderRecorded) {
         brief.mapAddress = addressParts.join(", ");
         brief.mapMode = mode;
         // Kept separately from the concatenated mapAddress string above --
@@ -668,12 +720,25 @@ function manifestPageDocumentToBrief(raw) {
         // if brief.mapUrl itself came back empty, meaning nothing resolved.
         trackPlaceholderButton(section.button && section.button.label, brief.mapUrl, "Map");
         if (noteText) brief._manifestMapNote = noteText;
-        if (!mapOrderRecorded) { contentOrder.push({ type: "map" }); mapOrderRecorded = true; }
-      } else if (noteText) {
-        // No structured address to build the real map widget from -- the
-        // content is still real, so it becomes a feature row instead of
-        // silently disappearing. Never invents an address to fill the gap.
-        featurePairs.push({ heading: headingText, body: noteText });
+        contentOrder.push({ type: "map" });
+        mapOrderRecorded = true;
+      } else if (noteText || headingText) {
+        // Either no structured address at all, or the primary map slot is
+        // already claimed by an earlier map_location section -- either
+        // way this section's real content still needs a real spot on the
+        // page rather than vanishing. Never invents an address to fill
+        // the gap; the section's own button (if any) rides along as this
+        // row's button, same shape featurePairs already expects from a
+        // text_section.
+        var mlBtn = section.button;
+        var mlBtnUrl = pageDocumentButtonUrl(mlBtn);
+        featurePairs.push({
+          heading: headingText,
+          body: noteText,
+          buttonLabel: mlBtn && mlBtn.label ? mlBtn.label : "",
+          buttonUrl: mlBtnUrl,
+          buttonPlacement: mlBtn ? mlBtn.placement || "" : "",
+        });
         contentOrder.push({ type: "feature", index: featurePairs.length - 1 });
         // The section's own button (e.g. "Get Directions") has nowhere to
         // render without a real map, but it must still be tracked --
@@ -686,7 +751,7 @@ function manifestPageDocumentToBrief(raw) {
         // logic that pass doesn't know about). This fallback needs its own
         // check so a button here gets the same "needs a real destination"
         // visibility as every other button on the page.
-        trackPlaceholderButton(section.button && section.button.label, pageDocumentButtonUrl(section.button), "Map");
+        trackPlaceholderButton(mlBtn && mlBtn.label, mlBtnUrl, "Map");
       }
       return;
     }
