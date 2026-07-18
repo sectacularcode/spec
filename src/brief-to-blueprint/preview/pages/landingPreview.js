@@ -2,6 +2,19 @@ import { he } from "../../utils/htmlEscape.js";
 import { parseInspoPatterns } from "../../utils/patterns.js";
 import { bestTextColor } from "../../../utils/contrast.js";
 
+// brief.formFields entries are either a bare label string (manual briefs,
+// every hardcoded fallback default in this file) or a real field object
+// from manifestImport.js (1.5.0+, {label, fieldType, required, options}) --
+// mirrors mkForm's own entry handling in helpers.js. This preview mockup
+// only ever needed the label text to display (it renders the same styled
+// placeholder box for every field regardless of type, never a real
+// select/textarea), so the label is the one thing every call site needs
+// from an entry -- without this, a real field object printed directly
+// would show "[object Object]" instead of the field's name.
+function fieldPreviewLabel(entry) {
+  return (entry && typeof entry === "object") ? (entry.label || "") : String(entry == null ? "" : entry);
+}
+
 // Extracted from buildPreviewHTML.js's single-file "sections" object (July
 // 2026) -- landing was the largest section by far (~650 lines, five
 // variants worth of branching in one block) and the exact code the July 10
@@ -251,8 +264,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
                 "<div style='max-width:560px;'>" +
                 "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + he(ffHeading) + "</h3>" +
                 (ffSubhead ? "<p style='font-size:14px;color:" + stone + ";margin:0 0 20px;'>" + he(ffSubhead) + "</p>" : "") +
-                ffFields.map(function (lbl) {
-                  var safeLbl = he(String(lbl));
+                ffFields.map(function (fieldEntry) {
+                  var safeLbl = he(fieldPreviewLabel(fieldEntry));
                   return "<div style='margin-bottom:12px;'><label style='display:block;font-size:12px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;'>" + safeLbl + "</label><div style='width:100%;padding:10px 14px;border:1px solid #dde0e6;border-radius:4px;background:#ffffff;font-size:14px;color:#bbb;box-sizing:border-box;'>" + safeLbl + "...</div></div>";
                 }).join("") +
                 "<button style='padding:12px 28px;background:" + lightCtxBtnBg + ";color:" + lightCtxBtnText + ";font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:6px;'>" + he(ffCta) + "</button>" +
@@ -520,8 +533,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             "<div style='max-width:560px;'>" +
             "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + he(ffHeading) + "</h3>" +
             (ffSubhead ? "<p style='font-size:14px;color:" + stone + ";margin:0 0 20px;'>" + he(ffSubhead) + "</p>" : "") +
-            ffFields.map(function (lbl) {
-              var safeLbl = he(String(lbl));
+            ffFields.map(function (fieldEntry) {
+              var safeLbl = he(fieldPreviewLabel(fieldEntry));
               return "<div style='margin-bottom:12px;'><label style='display:block;font-size:12px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;'>" + safeLbl + "</label><div style='width:100%;padding:10px 14px;border:1px solid #dde0e6;border-radius:4px;background:#ffffff;font-size:14px;color:#bbb;box-sizing:border-box;'>" + safeLbl + "...</div></div>";
             }).join("") +
             "<button style='padding:12px 28px;background:" + lightCtxBtnBg + ";color:" + lightCtxBtnText + ";font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:6px;'>" + he(ffCta) + "</button>" +
@@ -679,8 +692,9 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<div style='background:#ffffff;border:1px solid #dde0e6;border-radius:8px;padding:40px;'>" +
                 "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + formH + "</h3>" +
                 "<p style='font-size:14px;color:" + stone + ";margin:0 0 24px;'>" + formS + "</p>" +
-                formFieldsB.map(function(f) {
-                  return "<div style='margin-bottom:14px;'><label style='display:block;font-size:12px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;'>" + f + "</label><div style='width:100%;padding:10px 14px;border:1px solid #dde0e6;border-radius:4px;background:#f9f9f9;font-size:14px;color:#bbb;box-sizing:border-box;'>" + f + "...</div></div>";
+                formFieldsB.map(function(fieldEntry) {
+                  var safeLbl = he(fieldPreviewLabel(fieldEntry));
+                  return "<div style='margin-bottom:14px;'><label style='display:block;font-size:12px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;'>" + safeLbl + "</label><div style='width:100%;padding:10px 14px;border:1px solid #dde0e6;border-radius:4px;background:#f9f9f9;font-size:14px;color:#bbb;box-sizing:border-box;'>" + safeLbl + "...</div></div>";
                 }).join("") +
                 "<button style='width:100%;padding:14px;background:" + lightCtxBtnBg + ";color:" + lightCtxBtnText + ";font-weight:700;font-size:14px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:8px;'>" + formC + "</button>" +
                 "<p style='font-size:12px;color:" + stone + ";text-align:center;margin:10px 0 0;'>" + formR + "</p>" +
@@ -943,8 +957,9 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
                 "<div style='max-width:560px;'>" +
                 "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + ffHeading + "</h3>" +
                 (ffSubhead ? "<p style='font-size:14px;color:" + stone + ";margin:0 0 20px;'>" + ffSubhead + "</p>" : "") +
-                ffFields.map(function (lbl) {
-                  return "<div style='margin-bottom:12px;'><label style='display:block;font-size:12px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;'>" + lbl + "</label><div style='width:100%;padding:10px 14px;border:1px solid #dde0e6;border-radius:4px;background:#ffffff;font-size:14px;color:#bbb;box-sizing:border-box;'>" + lbl + "...</div></div>";
+                ffFields.map(function (fieldEntry) {
+                  var safeLbl = he(fieldPreviewLabel(fieldEntry));
+                  return "<div style='margin-bottom:12px;'><label style='display:block;font-size:12px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;'>" + safeLbl + "</label><div style='width:100%;padding:10px 14px;border:1px solid #dde0e6;border-radius:4px;background:#ffffff;font-size:14px;color:#bbb;box-sizing:border-box;'>" + safeLbl + "...</div></div>";
                 }).join("") +
                 "<button style='padding:12px 28px;background:" + lightCtxBtnBg + ";color:" + lightCtxBtnText + ";font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:6px;'>" + ffCta + "</button>" +
                 "</div>" +
@@ -1050,8 +1065,9 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
               "<div style='max-width:560px;'>" +
               "<h3 style='font-size:22px;font-weight:700;color:" + ink + ";margin:0 0 8px;'>" + ffHeading + "</h3>" +
               (ffSubhead ? "<p style='font-size:14px;color:" + stone + ";margin:0 0 20px;'>" + ffSubhead + "</p>" : "") +
-              ffFields.map(function (lbl) {
-                return "<div style='margin-bottom:12px;'><label style='display:block;font-size:12px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;'>" + lbl + "</label><div style='width:100%;padding:10px 14px;border:1px solid #dde0e6;border-radius:4px;background:#ffffff;font-size:14px;color:#bbb;box-sizing:border-box;'>" + lbl + "...</div></div>";
+              ffFields.map(function (fieldEntry) {
+                var safeLbl = he(fieldPreviewLabel(fieldEntry));
+                return "<div style='margin-bottom:12px;'><label style='display:block;font-size:12px;font-weight:600;color:" + stone + ";text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;'>" + safeLbl + "</label><div style='width:100%;padding:10px 14px;border:1px solid #dde0e6;border-radius:4px;background:#ffffff;font-size:14px;color:#bbb;box-sizing:border-box;'>" + safeLbl + "...</div></div>";
               }).join("") +
               "<button style='padding:12px 28px;background:" + lightCtxBtnBg + ";color:" + lightCtxBtnText + ";font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;margin-top:6px;'>" + ffCta + "</button>" +
               "</div>" +

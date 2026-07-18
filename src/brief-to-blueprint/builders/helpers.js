@@ -301,21 +301,46 @@ export function mkIconList(items, accent, textColor, opts) {
 // rather than us guessing which fields a given client wants to force.
 export function mkForm(fields, ctaLabel, opts) {
   opts = opts || {};
-  var formFields = fields.map(function(label, i) {
-    var lower = String(label).toLowerCase();
-    var type = "text";
-    if (lower.indexOf("email") !== -1) type = "email";
-    else if (lower.indexOf("phone") !== -1) type = "tel";
-    else if (lower.indexOf("message") !== -1 || lower.indexOf("comment") !== -1 || lower.indexOf("detail") !== -1) type = "textarea";
-    return {
+  var formFields = fields.map(function(entry, i) {
+    // Each entry is either a bare label string (every hardcoded fallback
+    // default across landing.js/landingPreview.js, and any manually-typed
+    // brief) or a real field object from manifestImport.js (1.5.0+):
+    // {label, fieldType, required, options}. The label-keyword guess below
+    // only runs for the bare-string shape -- when Manifest tells us the
+    // real type directly, that's authoritative and skips the guess
+    // entirely, so a field like "What do you need inspected?" (real
+    // field_type: "textarea", no textarea-ish word in the label) still
+    // builds correctly instead of silently downgrading to plain text.
+    var isRealField = entry && typeof entry === "object";
+    var label = isRealField ? (entry.label || "") : String(entry == null ? "" : entry);
+    var explicitType = isRealField ? entry.fieldType : "";
+    var type = explicitType || "text";
+    if (!explicitType) {
+      var lower = label.toLowerCase();
+      if (lower.indexOf("email") !== -1) type = "email";
+      else if (lower.indexOf("phone") !== -1) type = "tel";
+      else if (lower.indexOf("message") !== -1 || lower.indexOf("comment") !== -1 || lower.indexOf("detail") !== -1) type = "textarea";
+    }
+    // select needs a real options list to be usable -- field_options is
+    // Elementor's actual settings key for it, one option per line
+    // (confirmed against Elementor's own field-processing convention:
+    // options join on "\n", not a delimited string or sub-array). A
+    // select with no real options ships as an empty, unusable dropdown,
+    // so it falls back to a plain text field instead -- this never
+    // fabricates option text Manifest didn't send.
+    var options = (isRealField && Array.isArray(entry.options)) ? entry.options : [];
+    if (type === "select" && !options.length) type = "text";
+    var field = {
       _id: nid().slice(0, 7),
       field_type: type,
       field_label: he(label),
       placeholder: "",
-      required: "",
+      required: (isRealField && entry.required) ? "true" : "",
       width: "100",
       field_id: "field_" + i,
     };
+    if (type === "select") field.field_options = options.map(function (o) { return he(o); }).join("\n");
+    return field;
   });
   return {
     id: nid(), elType: "widget", widgetType: "form",

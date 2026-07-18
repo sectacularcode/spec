@@ -694,7 +694,32 @@ function manifestPageDocumentToBrief(raw) {
     if (section.type === "form") {
       brief.formHeading = headingText;
       brief.formSubhead = flattenRichText(section.body);
-      brief.formFields = (section.fields || []).map(function (f) { return f.label || ""; }).filter(Boolean);
+      // 1.5.0: each field carries its own field_type/options/required --
+      // previously only .label survived here, so mkForm() had to re-guess
+      // the type from the label text regardless of what Manifest actually
+      // sent. Confirmed real gap, July 2026, against 4 real exports: the
+      // label-keyword guess has no select case at all (every select field
+      // -- e.g. "Inspection location" -- lost its dropdown and options
+      // entirely), and the textarea guess (label contains "message"/
+      // "comment"/"detail") missed every real field_type:"textarea" field
+      // in those same exports, since none of the actual labels ("What do
+      // you need inspected?", "Tell us about your fleet and equipment")
+      // contain those keywords. Passing the real field through lets mkForm
+      // build exactly what Manifest specified instead of pattern-matching
+      // a label as a fallback proxy for data that was already there.
+      // Kept as an object (not flattened back to a string) so mkForm can
+      // tell a real Manifest field apart from a bare label -- see mkForm's
+      // own handling for why that distinction matters for backward compat.
+      brief.formFields = (section.fields || [])
+        .filter(function (f) { return f && f.label; })
+        .map(function (f) {
+          return {
+            label: f.label,
+            fieldType: f.field_type || "",
+            required: !!f.required,
+            options: Array.isArray(f.options) ? f.options.filter(Boolean) : [],
+          };
+        });
       if (!formOrderRecorded) { contentOrder.push({ type: "form" }); formOrderRecorded = true; }
       return;
     }
