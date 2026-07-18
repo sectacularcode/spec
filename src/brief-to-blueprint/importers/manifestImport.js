@@ -624,6 +624,30 @@ function manifestPageDocumentToBrief(raw) {
   var featurePairs = [];
   var faqPairs = [];
   var hasCtaType = sections.some(function (s) { return s.type === "cta"; });
+  // Confirmed real case, July 2026 (truck-engine-repair-in-miami): with
+  // 2+ real cta sections, "first occurrence wins the closing slot"
+  // (below) picked whichever came first in document order regardless of
+  // which one Manifest itself signals is the real primary action.
+  // Manifest already distinguishes this via button.placement -- "inline"
+  // is documented elsewhere in this file as being retired in favor of a
+  // real primary/secondary button, i.e. Manifest's own signal for "this
+  // is a contextual link, not a standalone CTA." Confirmed exact case:
+  // the first cta section's button was placement:"inline" (a soft "not
+  // sure? talk to us" nudge to a generic /contact page) while the
+  // second, positioned at the true end of the page, was placement:
+  // "primary" with a real tel: link -- document order alone picked the
+  // weaker one for the special closing treatment and demoted the real
+  // closing CTA to a plain feature row. The winning cta section is now
+  // whichever one has a real primary-placement button; only when NONE
+  // of them do (no signal either way) does this fall back to first-
+  // occurrence, preserving prior behavior for pages where the
+  // distinction doesn't apply.
+  var ctaSectionsInDoc = sections.filter(function (s) { return s.type === "cta"; });
+  var winningCtaSection = ctaSectionsInDoc.length
+    ? (ctaSectionsInDoc.filter(function (s) {
+        return (s.buttons || []).some(function (b) { return b && b.placement === "primary"; });
+      })[0] || ctaSectionsInDoc[0])
+    : null;
   // Real position tracking -- confirmed real bug, July 2026: every section
   // type below was being sorted into its own bucket (featurePairs/
   // faqPairs/brief.formFields/etc) with the export's actual sequence
@@ -786,13 +810,15 @@ function manifestPageDocumentToBrief(raw) {
       // time. Net effect: the page rendered the SAME (last) button text
       // twice, at both real positions, while the first section's real,
       // different button copy was silently discarded -- not just
-      // misplaced, gone. Only the first cta section now claims the
-      // singleton closing-CTA slot (closingCtaClaimed), matching the same
-      // "first occurrence wins" rule faqHeading and the map fix below
-      // already follow. A later cta section's real content still lands on
-      // the page -- it becomes an ordered feature row at its own real
+      // misplaced, gone.
+      // Only the section Manifest itself signals as primary (see
+      // winningCtaSection above) now claims the singleton closing-CTA
+      // slot, matching the same "first occurrence wins" rule faqHeading
+      // and the map fix below already follow when no such signal exists.
+      // A non-winning cta section's real content still lands on the
+      // page -- it becomes an ordered feature row at its own real
       // position instead of a second identical closing CTA.
-      if (!closingCtaClaimed) {
+      if (section === winningCtaSection) {
         closingCtaClaimed = true;
         brief.closingCta = headingText;
         brief.closingBody = ctaBodyText;
