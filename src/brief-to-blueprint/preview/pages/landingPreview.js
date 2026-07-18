@@ -580,8 +580,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
       // fix.
       function defaultOrderedRowStyle(i, hasVideo) {
         var cycle = hasVideo
-          ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
-          : ["split-right", "centered-cta", "checklist", "split-left", "split-cta-right", "plain"];
+          ? ["split-right", "centered-cta", "video", "split-left", "split-cta-right", "plain"]
+          : ["split-right", "centered-cta", "split-left", "split-cta-right", "plain"];
         return cycle[i % cycle.length];
       }
       // Mirrors landing.js's safeOrderedRowStyle exactly -- see that file
@@ -697,8 +697,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             // check too for consistency with the same pattern elsewhere.
             var hasVideo = !!brief.videoUrl;
             var cyclePattern = hasVideo
-              ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
-              : ["split-right", "centered-cta", "checklist", "split-left", "split-cta-right", "plain"];
+              ? ["split-right", "centered-cta", "video", "split-left", "split-cta-right", "plain"]
+              : ["split-right", "centered-cta", "split-left", "split-cta-right", "plain"];
             return { style: cyclePattern[i % cyclePattern.length], indices: [i] };
           })) :
           featureRowsData.map(function(f,i) {
@@ -826,8 +826,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             featuresArr.forEach(function (_, i) {
               var hasVideo = !!brief.videoUrl;
               var cyclePattern = hasVideo
-                ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
-                : ["split-right", "centered-cta", "checklist", "split-left", "split-cta-right", "plain"];
+                ? ["split-right", "centered-cta", "video", "split-left", "split-cta-right", "plain"]
+                : ["split-right", "centered-cta", "split-left", "split-cta-right", "plain"];
               dynamicLayout.push({ style: cyclePattern[i % cyclePattern.length], indices: [i] });
               if ((i + 1) % 3 === 0 && i < featuresArr.length - 1) dynamicLayout.push({ style: "midcta", indices: [] });
             });
@@ -896,8 +896,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           renderCuratedFeatureLayoutHTML((Array.isArray(brief.features) ? brief.features : []).map(function (_, i) {
             var hasVideo = !!brief.videoUrl;
             var cyclePattern = hasVideo
-              ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
-              : ["split-right", "centered-cta", "checklist", "split-left", "split-cta-right", "plain"];
+              ? ["split-right", "centered-cta", "video", "split-left", "split-cta-right", "plain"]
+              : ["split-right", "centered-cta", "split-left", "split-cta-right", "plain"];
             return { style: cyclePattern[i % cyclePattern.length], indices: [i] };
           })))) +
           (brief.skipServicesChecklist ? "" :
@@ -978,8 +978,8 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           // renderFeatureLayout dispatch table to reuse directly.
           var hasVideo = !!brief.videoUrl;
           var cyclePattern = hasVideo
-            ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
-            : ["split-right", "centered-cta", "checklist", "split-left", "split-cta-right", "plain"];
+            ? ["split-right", "centered-cta", "video", "split-left", "split-cta-right", "plain"]
+            : ["split-right", "centered-cta", "split-left", "split-cta-right", "plain"];
           return { style: cyclePattern[i % cyclePattern.length], indices: [i] };
         })) :
         featureRowsDataB.map(function(f,i) {

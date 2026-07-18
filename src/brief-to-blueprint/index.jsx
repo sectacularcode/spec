@@ -654,8 +654,8 @@ export default function CustomBuild({ userId, role } = {}) {
 
   function defaultRowStyle(i, hasVideo) {
     var cycle = hasVideo
-      ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
-      : ["split-right", "centered-cta", "checklist", "split-left", "split-cta-right", "plain"];
+      ? ["split-right", "centered-cta", "video", "split-left", "split-cta-right", "plain"]
+      : ["split-right", "centered-cta", "split-left", "split-cta-right", "plain"];
     return cycle[i % cycle.length];
   }
 

@@ -382,8 +382,8 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     if (variant === "D" || variant === "B" || variant === "E" || variant === "F") {
       var hasVideo = !!brief.videoUrl;
       var cyclePattern = hasVideo
-        ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
-        : ["split-right", "centered-cta", "checklist", "split-left", "split-cta-right", "plain"];
+        ? ["split-right", "centered-cta", "video", "split-left", "split-cta-right", "plain"]
+        : ["split-right", "centered-cta", "split-left", "split-cta-right", "plain"];
       return features.map(function (f, i) {
         var cycleStyle = cyclePattern[i % cyclePattern.length];
         if (cycleStyle === "centered-cta") return renderCenteredCta(f, i);
@@ -578,9 +578,20 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // index.jsx, which isn't a module this file can depend on) so the
   // fallback this uses is the exact same one the panel already promises.
   function defaultOrderedRowStyle(i, hasVideo) {
+    // "checklist" removed from the cycle, July 2026 (Megan's feedback) --
+    // it always clause-splits the body text into separate checkmarked
+    // bullet items (renderChecklistRow), which only reads right when the
+    // content was actually written as a list. Auto-cycling has no way to
+    // know whether a given feature's copy is list-shaped, so landing it
+    // on ordinary flowing prose (confirmed real case, Atlanta Heavy
+    // Equipment) turned a normal paragraph into disconnected checkmarked
+    // fragments and silently dropped any inline link in it. Every other
+    // style in this cycle is safe regardless of content shape; checklist
+    // is not, so it's manual-only now -- still choosable from the
+    // Section Styles panel, just never auto-assigned.
     var cycle = hasVideo
-      ? ["split-right", "centered-cta", "checklist", "video", "split-left", "split-cta-right", "plain"]
-      : ["split-right", "centered-cta", "checklist", "split-left", "split-cta-right", "plain"];
+      ? ["split-right", "centered-cta", "video", "split-left", "split-cta-right", "plain"]
+      : ["split-right", "centered-cta", "split-left", "split-cta-right", "plain"];
     return cycle[i % cycle.length];
   }
 

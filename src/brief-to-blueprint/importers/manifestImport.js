@@ -742,6 +742,23 @@ function manifestPageDocumentToBrief(raw) {
       // section's buttons regardless of placement -- not duplicated here.
       var inlineBtns = secBtns.filter(function (b) { return b && b.placement === "inline"; });
       var realBtns = secBtns.filter(function (b) { return !b || b.placement !== "inline"; });
+      // Megan's feedback, July 2026: two-plus inline links folded onto
+      // the end of the body copy back to back reads oddly -- confirmed
+      // real case, Atlanta Heavy Equipment's "What heavy equipment does
+      // MESO service in Atlanta?" section, which has exactly two
+      // (placement:"inline") and no button of its own. The last one
+      // becomes a real button instead when nothing else already claims
+      // that slot; any earlier inline links still fold into the body as
+      // plain text links, same as before. Doesn't apply when the section
+      // already has a real primary/secondary button -- that slot's
+      // taken, and featurePairs only holds one button per feature today
+      // (see the earlier two-button-support note elsewhere in this
+      // session).
+      var promotedInlineBtn = null;
+      if (inlineBtns.length >= 2 && realBtns.length === 0) {
+        promotedInlineBtn = inlineBtns[inlineBtns.length - 1];
+        inlineBtns = inlineBtns.slice(0, -1);
+      }
       var bodyHtml = flattenTextSectionBodyHtml(section.items);
       inlineBtns.forEach(function (b) {
         var inlineUrl = pageDocumentButtonUrl(b);
@@ -750,9 +767,14 @@ function manifestPageDocumentToBrief(raw) {
         }
       });
       var realBtnsHavePlacement = realBtns.some(function (b) { return b && (b.placement === "primary" || b.placement === "secondary"); });
-      var secBtn = realBtnsHavePlacement
+      var secBtn = promotedInlineBtn || (realBtnsHavePlacement
         ? (realBtns.filter(function (b) { return b.placement === "primary"; })[0] || realBtns.filter(function (b) { return b.placement === "secondary"; })[0])
-        : realBtns[0];
+        : realBtns[0]);
+      // A promoted inline link renders as a secondary (outline) button --
+      // it's a supplementary link being upgraded, not the section's main
+      // CTA, so it shouldn't compete visually with a real primary button
+      // elsewhere on the page.
+      var effectivePlacement = promotedInlineBtn ? "secondary" : (secBtn ? secBtn.placement || "" : "");
       featurePairs.push({
         heading: headingText,
         // richTextToSafeHtml-based flatten preserves inline link runs as
@@ -766,7 +788,7 @@ function manifestPageDocumentToBrief(raw) {
         bodyIsHtml: true,
         buttonLabel: secBtn ? secBtn.label || "" : "",
         buttonUrl: secBtn ? pageDocumentButtonUrl(secBtn) : "",
-        buttonPlacement: secBtn ? secBtn.placement || "" : "",
+        buttonPlacement: effectivePlacement,
       });
       contentOrder.push({ type: "feature", index: featurePairs.length - 1 });
       return;
