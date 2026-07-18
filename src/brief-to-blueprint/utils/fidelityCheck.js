@@ -108,7 +108,18 @@ const CONTENT_FIELDS = [
 
 function flattenRichTextLocal(arr) {
   if (!Array.isArray(arr)) return "";
-  return arr.map(run => (run && run.text) || "").join("");
+  // Confirmed real case, July 2026: a rich_text array can include a
+  // whitespace-only run (e.g. a literal "\n\n" separating the main
+  // answer from a trailing inline link) as its own array entry. Content-
+  // wise that's fine -- flattening still captures every real word -- but
+  // the embedded newline survives into the flattened string, and every
+  // caller of this function eventually renders one line per logical
+  // unit (a markdown bullet, a report row); an embedded blank line
+  // breaks that formatting, making real trailing content (like a real
+  // inline link) look like an orphaned floating line instead of the end
+  // of the same sentence. Collapsed to a single space so multi-run
+  // content always reads as one continuous line.
+  return arr.map(run => (run && run.text) || "").join("").replace(/\s+/g, " ").trim();
 }
 
 // Pulls the real, readable copy out of a raw section -- shown directly in
