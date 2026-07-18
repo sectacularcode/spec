@@ -201,7 +201,7 @@ export default function FidelityCheck() {
             <>
               <div style={T.label}>Suggested, not included</div>
               <div style={{ fontSize: "12px", color: "#1e3a8a", margin: "8px 0" }}>
-                {selected.report.proposed.map((p, i) => <div key={i}>{p.type}: {p.rationale.slice(0, 100)}...</div>)}
+                {selected.report.proposed.map((p, i) => <div key={i} style={{ marginBottom: i < selected.report.proposed.length - 1 ? "8px" : 0 }}>{p.type}: {p.rationale}</div>)}
               </div>
             </>
           )}
