@@ -116,7 +116,7 @@ export default function CustomBuild({ userId, role } = {}) {
   // clean overview -- especially important on bulk imports where Download is
   // one name-input + download button PER PAGE (20+ rows). Session-scoped
   // (resets on reload); a key absent from this object means collapsed.
-  const [openSections, setOpenSections] = useState({}); // { pagesToBuild?: true, download?: true }
+  const [openSections, setOpenSections] = useState({ pagesToBuild: true }); // pagesToBuild opens by default; download/htmlPreview absent = collapsed
   function toggleSection(key) {
     setOpenSections(s => ({ ...s, [key]: !s[key] }));
   }
@@ -2511,102 +2511,21 @@ export default function CustomBuild({ userId, role } = {}) {
                 <div style={{ width: "100%", boxSizing: "border-box", overflow: "hidden" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", marginBottom: "12px" }}>
                     <div style={{ fontSize: "13px", fontWeight: 600, color: "#09090b" }}>{brief.brandName || "Brand loaded"}</div>
-                    <button
-                      onClick={() => { resetBrief(); setBriefName(""); setClientName(""); setPlaceholderButtons(null); setPageDownloadNames({}); }}
-                      style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", background: "#fff", border: "1px solid #dde0e6", borderRadius: "6px", padding: "5px 12px", cursor: "pointer", flexShrink: 0 }}>
-                      Replace brief
-                    </button>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+                      {isAdmin && brief._manifestPageName && (
+                        <button
+                          onClick={() => setShowFidelityCheck(true)}
+                          style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", background: "#fff", border: "1px solid #dde0e6", borderRadius: "6px", padding: "5px 12px", cursor: "pointer" }}>
+                          Check fidelity report
+                        </button>
+                      )}
+                      <button
+                        onClick={() => { resetBrief(); setBriefName(""); setClientName(""); setPlaceholderButtons(null); setPageDownloadNames({}); }}
+                        style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", background: "#fff", border: "1px solid #dde0e6", borderRadius: "6px", padding: "5px 12px", cursor: "pointer" }}>
+                        Replace brief
+                      </button>
+                    </div>
                   </div>
-                  {(brief._manifestTitleTag || brief._manifestMetaDescription) && (
-                    <div style={{ marginBottom: "14px", padding: "10px 12px", background: "#eeedf1", borderRadius: "6px", fontSize: "11px", color: "#6b7280" }}>
-                      <div style={{ fontWeight: 600, color: "#09090b", marginBottom: "4px", fontSize: "11px" }}>For WordPress / Yoast — copy over after import</div>
-                      {brief._manifestTitleTag && <div style={{ marginBottom: "2px" }}><span style={{ fontWeight: 600 }}>Title:</span> {brief._manifestTitleTag}</div>}
-                      {brief._manifestMetaDescription && <div><span style={{ fontWeight: 600 }}>Meta:</span> {brief._manifestMetaDescription}</div>}
-                    </div>
-                  )}
-                  {isAdmin && brief._manifestPageName && (
-                    <button
-                      onClick={() => setShowFidelityCheck(true)}
-                      style={{ fontSize: "11px", color: "#6b7280", fontWeight: 600, background: "none", border: "none", cursor: "pointer", textDecoration: "underline", marginBottom: "14px", padding: 0 }}
-                    >
-                      Check a Manifest export's fidelity report
-                    </button>
-                  )}
-                  {/* Per-page review: placeholder buttons / proposed blocks /
-                      unknown fields, read straight off the active page's own
-                      brief (briefsByPage[previewPage] in bulk mode, the one
-                      shared brief otherwise) -- switches automatically when
-                      clicking a different pill in the preview strip. Same
-                      data manifestToBrief always attached, same visual style
-                      as the pre-confirm version of this above the upload
-                      dropzone, just actually reachable now that brief is
-                      loaded instead of only visible in the narrow pre-
-                      confirm window (which the modal fully covers anyway). */}
-                  {((brief._placeholderButtons && brief._placeholderButtons.length > 0) ||
-                    (brief._proposedBlocks && brief._proposedBlocks.length > 0) ||
-                    (brief._unknownFields && brief._unknownFields.length > 0)) && (
-                    <div style={{ marginBottom: "20px" }}>
-                      {bulkImportMode && (
-                        <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "6px" }}>
-                          For this page — {activePreviewPage?.label || previewPage}
-                        </div>
-                      )}
-                      {brief._placeholderButtons && brief._placeholderButtons.length > 0 && (
-                        <div style={{ padding: "10px 12px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: "8px", marginBottom: "8px" }}>
-                          <div style={{ fontSize: "12px", fontWeight: 600, color: "#991b1b", marginBottom: "6px" }}>
-                            {brief._placeholderButtons.length} button{brief._placeholderButtons.length !== 1 ? "s need" : " needs"} a real destination before publishing
-                          </div>
-                          {brief._placeholderButtons.map((b, i) => (
-                            <div key={i} style={{ fontSize: "12px", color: "#7f1d1d", marginBottom: i < brief._placeholderButtons.length - 1 ? "3px" : 0 }}>
-                              • "{b.label}" ({b.section}) — currently links nowhere
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {brief._proposedBlocks && brief._proposedBlocks.map((block, i) => (
-                        <div key={i} style={{ padding: "10px 12px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "8px", marginBottom: "8px" }}>
-                          <div style={{ fontSize: "12px", fontWeight: 600, color: "#1e40af", marginBottom: "6px" }}>
-                            {block.type.indexOf("unknown:") === 0
-                              ? "Manifest sent a section type Spec doesn't fully support yet"
-                              : "Manifest suggested 1 more section (not included)"}
-                          </div>
-                          <div style={{ fontSize: "12px", color: "#1e3a8a", marginBottom: "8px" }}>
-                            <span style={{ fontWeight: 600 }}>
-                              {block.heading || (block.type === "form" ? "Lead-capture form" : block.type.replace("unknown:", ""))}
-                            </span>
-                            {block.rationale ? " — \"" + block.rationale + "\"" : ""}
-                          </div>
-                          <div style={{ display: "flex", gap: "8px" }}>
-                            <button
-                              onClick={() => handleAddProposedBlock(block)}
-                              style={{ padding: "5px 12px", fontSize: "12px", fontWeight: 600, background: "#1e40af", border: "none", borderRadius: "6px", color: "#fff", cursor: "pointer" }}>
-                              {block.type.indexOf("unknown:") === 0 ? "Add as plain text block" : "Add it"}
-                            </button>
-                            <button
-                              onClick={() => handleDismissProposedBlock(block)}
-                              style={{ padding: "5px 12px", fontSize: "12px", fontWeight: 600, background: "transparent", border: "1px solid #bfdbfe", borderRadius: "6px", color: "#1e40af", cursor: "pointer" }}>
-                              Dismiss
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                      {brief._unknownFields && brief._unknownFields.length > 0 && (
-                        <div style={{ padding: "10px 12px", background: "#f5f5f4", border: "1px solid #e7e5e4", borderRadius: "8px" }}>
-                          <div style={{ fontSize: "12px", fontWeight: 600, color: "#44403c", marginBottom: "6px" }}>
-                            Manifest sent {brief._unknownFields.reduce((n, f) => n + f.keys.length, 0)} field{brief._unknownFields.reduce((n, f) => n + f.keys.length, 0) !== 1 ? "s" : ""} Spec doesn't read yet
-                          </div>
-                          {brief._unknownFields.map((f, i) => (
-                            <div key={i} style={{ fontSize: "12px", color: "#57534e", marginBottom: i < brief._unknownFields.length - 1 ? "3px" : 0 }}>
-                              • {f.type}{f.heading ? " (\"" + f.heading + "\")" : ""}: {f.keys.join(", ")}
-                            </div>
-                          ))}
-                          <div style={{ fontSize: "11px", color: "#78716c", marginTop: "6px" }}>
-                            Not shown on the page. Flag for engineering if this should be added.
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
                   <div style={{ height: "1px", background: "#f0eee9", margin: "16px 0" }} />
                   <div>
                     <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#9ca3af", marginBottom: "10px" }}>
@@ -2934,24 +2853,109 @@ export default function CustomBuild({ userId, role } = {}) {
           )}
           </div>
 
-          {/* Generate — primary action. Page generation is free; AI draft-copy
-              only runs when copyBriefOnly is off, which is opt-in via the
-              checkbox directly below (default off = verbatim brief copy, $0).
-              Even when on, drafts only fill BLANK fields and pause for review
-              in the approval panel before anything is applied. */}
+          {/* Before you publish — review callouts (Yoast meta to copy after
+              import, and any pre-publish warnings) pulled out of the Brand card
+              into their own card so they're seen at generate time, not buried.
+              Only renders when there is something to show. */}
+          {brief && ((brief._manifestTitleTag || brief._manifestMetaDescription) ||
+            (brief._placeholderButtons && brief._placeholderButtons.length > 0) ||
+            (brief._proposedBlocks && brief._proposedBlocks.length > 0) ||
+            (brief._unknownFields && brief._unknownFields.length > 0)) && (
+            <div style={{ marginBottom: "16px", ...T.surface }}>
+              <div style={{ fontSize: "14px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>Before you publish</div>
+              <div style={{ height: "1px", background: "#eae7e1", margin: "12px 0 16px" }} />
+              {(brief._manifestTitleTag || brief._manifestMetaDescription) && (
+                <div style={{ marginBottom: "12px", padding: "10px 12px", background: "#eeedf1", borderRadius: "6px", fontSize: "11px", color: "#6b7280" }}>
+                  <div style={{ fontWeight: 600, color: "#09090b", marginBottom: "4px", fontSize: "11px" }}>For WordPress / Yoast — copy over after import</div>
+                  {brief._manifestTitleTag && <div style={{ marginBottom: "2px" }}><span style={{ fontWeight: 600 }}>Title:</span> {brief._manifestTitleTag}</div>}
+                  {brief._manifestMetaDescription && <div><span style={{ fontWeight: 600 }}>Meta:</span> {brief._manifestMetaDescription}</div>}
+                </div>
+              )}
+              {((brief._placeholderButtons && brief._placeholderButtons.length > 0) ||
+                (brief._proposedBlocks && brief._proposedBlocks.length > 0) ||
+                (brief._unknownFields && brief._unknownFields.length > 0)) && (
+                <div>
+                  {bulkImportMode && (
+                    <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "6px" }}>
+                      For this page — {activePreviewPage?.label || previewPage}
+                    </div>
+                  )}
+                  {brief._placeholderButtons && brief._placeholderButtons.length > 0 && (
+                    <div style={{ padding: "10px 12px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: "8px", marginBottom: "8px" }}>
+                      <div style={{ fontSize: "12px", fontWeight: 600, color: "#991b1b", marginBottom: "6px" }}>
+                        {brief._placeholderButtons.length} button{brief._placeholderButtons.length !== 1 ? "s need" : " needs"} a real destination before publishing
+                      </div>
+                      {brief._placeholderButtons.map((b, i) => (
+                        <div key={i} style={{ fontSize: "12px", color: "#7f1d1d", marginBottom: i < brief._placeholderButtons.length - 1 ? "3px" : 0 }}>
+                          • "{b.label}" ({b.section}) — currently links nowhere
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {brief._proposedBlocks && brief._proposedBlocks.map((block, i) => (
+                    <div key={i} style={{ padding: "10px 12px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "8px", marginBottom: "8px" }}>
+                      <div style={{ fontSize: "12px", fontWeight: 600, color: "#1e40af", marginBottom: "6px" }}>
+                        {block.type.indexOf("unknown:") === 0
+                          ? "Manifest sent a section type Spec doesn't fully support yet"
+                          : "Manifest suggested 1 more section (not included)"}
+                      </div>
+                      <div style={{ fontSize: "12px", color: "#1e3a8a", marginBottom: "8px" }}>
+                        <span style={{ fontWeight: 600 }}>
+                          {block.heading || (block.type === "form" ? "Lead-capture form" : block.type.replace("unknown:", ""))}
+                        </span>
+                        {block.rationale ? " — \"" + block.rationale + "\"" : ""}
+                      </div>
+                      <div style={{ display: "flex", gap: "8px" }}>
+                        <button
+                          onClick={() => handleAddProposedBlock(block)}
+                          style={{ padding: "5px 12px", fontSize: "12px", fontWeight: 600, background: "#1e40af", border: "none", borderRadius: "6px", color: "#fff", cursor: "pointer" }}>
+                          {block.type.indexOf("unknown:") === 0 ? "Add as plain text block" : "Add it"}
+                        </button>
+                        <button
+                          onClick={() => handleDismissProposedBlock(block)}
+                          style={{ padding: "5px 12px", fontSize: "12px", fontWeight: 600, background: "transparent", border: "1px solid #bfdbfe", borderRadius: "6px", color: "#1e40af", cursor: "pointer" }}>
+                          Dismiss
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  {brief._unknownFields && brief._unknownFields.length > 0 && (
+                    <div style={{ padding: "10px 12px", background: "#f5f5f4", border: "1px solid #e7e5e4", borderRadius: "8px" }}>
+                      <div style={{ fontSize: "12px", fontWeight: 600, color: "#44403c", marginBottom: "6px" }}>
+                        Manifest sent {brief._unknownFields.reduce((n, f) => n + f.keys.length, 0)} field{brief._unknownFields.reduce((n, f) => n + f.keys.length, 0) !== 1 ? "s" : ""} Spec doesn't read yet
+                      </div>
+                      {brief._unknownFields.map((f, i) => (
+                        <div key={i} style={{ fontSize: "12px", color: "#57534e", marginBottom: i < brief._unknownFields.length - 1 ? "3px" : 0 }}>
+                          • {f.type}{f.heading ? " (\"" + f.heading + "\")" : ""}: {f.keys.join(", ")}
+                        </div>
+                      ))}
+                      <div style={{ fontSize: "11px", color: "#78716c", marginTop: "6px" }}>
+                        Not shown on the page. Flag for engineering if this should be added.
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* AI draft-copy opt-in, in its own card. Off by default; only fills
+              blank fields and pauses for approval before anything is applied. */}
           {brief && (
-            <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", marginTop: "4px", marginBottom: "12px", cursor: "pointer" }}>
-              <input
-                type="checkbox"
-                checked={!copyBriefOnly}
-                onChange={e => setCopy(!e.target.checked)}
-                style={{ accentColor: "#b45309", width: "15px", height: "15px", marginTop: "1px", flexShrink: 0 }}
-              />
-              <span style={{ fontSize: "12px", color: "#3f3f46", lineHeight: 1.5 }}>
-                Let AI draft blank fields
-                <span style={{ display: "block", fontSize: "11px", color: "#9ca3af" }}>Only fills empty fields, in your brand voice — you review and approve every draft before it's used. Off means brief copy is used exactly as written.</span>
-              </span>
-            </label>
+            <div style={{ marginBottom: "16px", ...T.surface }}>
+              <label style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={!copyBriefOnly}
+                  onChange={e => setCopy(!e.target.checked)}
+                  style={{ accentColor: "#b45309", width: "15px", height: "15px", marginTop: "1px", flexShrink: 0 }}
+                />
+                <span style={{ fontSize: "13px", color: "#3f3f46", lineHeight: 1.5 }}>
+                  Let AI draft blank fields
+                  <span style={{ display: "block", fontSize: "11px", color: "#9ca3af" }}>Only fills empty fields, in your brand voice — you review and approve every draft before it's used. Off means brief copy is used exactly as written.</span>
+                </span>
+              </label>
+            </div>
           )}
           <div style={{ display: "flex", justifyContent: "center", marginTop: "8px" }}>
           <button
