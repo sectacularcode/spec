@@ -32,10 +32,55 @@ const LOCKED_CAPTIONS = {
   secondary: "Outline button — always paired next to Primary",
 };
 
-export default function ButtonEditor({ button, onChange, onRemove, locked }) {
+export default function ButtonEditor({ button, onChange, onRemove, locked, rowLayout }) {
   const roleKey = (button.name || "").trim().toLowerCase();
   const isSecondary = locked && roleKey === "secondary";
   const caption = locked ? LOCKED_CAPTIONS[roleKey] : null;
+
+  // rowLayout (new): a compact variant that lays a button out like the
+  // Colors & Fonts rows in Brief to Blueprint -- name + a live preview pill
+  // on top, then Background and Text as swatch + hex rows using the exact
+  // same grid ("90px 34px 1fr") as the color fields there, so buttons read
+  // as part of the same system on the white Brand card. Only Brief to
+  // Blueprint passes this; Style Guide and Component Library omit it and get
+  // the original card layout below, unchanged.
+  if (rowLayout) {
+    return (
+      <div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px", gap: "10px" }}>
+          {locked ? (
+            <span style={{ fontSize: "13px", color: "#6b7280" }}>{button.name}</span>
+          ) : (
+            <input
+              value={button.name || ""}
+              onChange={e => onChange({ ...button, name: e.target.value })}
+              placeholder="Name (e.g. Primary)"
+              style={{ fontSize: "13px", color: "#6b7280", border: "none", borderBottom: "1px solid #dde0e6", padding: "0 0 4px", background: "transparent", width: "50%", fontFamily: "'Be Vietnam Pro', sans-serif" }}
+            />
+          )}
+          <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            {isSecondary ? (
+              <span style={{ display: "inline-block", padding: "6px 15px", borderRadius: "6px", background: "transparent", border: "2px solid " + (button.background || "#333") }}>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: "11px", color: button.background || "#333", letterSpacing: "0.02em" }}>Call to action</span>
+              </span>
+            ) : (
+              <span style={{ display: "inline-block", padding: "8px 17px", borderRadius: "6px", background: button.background || "#333" }}>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: "11px", color: button.textColor || "#fff", letterSpacing: "0.02em" }}>Call to action</span>
+              </span>
+            )}
+            {!locked && (
+              <button onClick={onRemove} title="Remove button" aria-label="Remove button"
+                style={{ width: "22px", height: "22px", borderRadius: "50%", background: "#fff", border: "1px solid #dde0e6", color: "#6b635c", fontSize: "13px", lineHeight: 1, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, flexShrink: 0 }}>×</button>
+            )}
+          </span>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <RowColorField label="Background" hex={button.background || ""} onChange={hex => onChange({ ...button, background: hex })} />
+          <RowColorField label="Text" hex={button.textColor || ""} onChange={hex => onChange({ ...button, textColor: hex })} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ position: "relative", border: "1px solid #DDE0E6", borderRadius: "8px", padding: "16px" }}>
@@ -135,6 +180,35 @@ function ColorField({ label, hex, onChange }) {
           }}
         />
       </div>
+    </div>
+  );
+}
+
+// Row-layout color field for the rowLayout variant. Matches the exact grid
+// and control styling of the Colors & Fonts rows in Brief to Blueprint
+// (index.jsx: "90px 34px 1fr", 13px #6b7280 label, 34px native color input,
+// monospace hex input) so a button's Background/Text rows are visually
+// indistinguishable from the color rows above them on the same card.
+function RowColorField({ label, hex, onChange }) {
+  const safe = /^#[0-9A-Fa-f]{6}$/.test(hex) ? hex : "#ffffff";
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "90px 34px 1fr", gap: "8px", alignItems: "center" }}>
+      <span style={{ fontSize: "13px", color: "#6b7280" }}>{label}</span>
+      <input
+        type="color"
+        value={safe}
+        onChange={e => onChange(e.target.value)}
+        style={{ width: "34px", height: "34px", border: "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", padding: "2px" }}
+      />
+      <input
+        value={hex}
+        onChange={e => {
+          const v = e.target.value;
+          if (/^#[0-9A-Fa-f]{0,6}$/.test(v)) onChange(v);
+        }}
+        placeholder="#000000"
+        style={{ padding: "10px 12px", border: "1px solid #dde0e6", borderRadius: "6px", fontSize: "13px", fontFamily: "monospace", color: "#09090b", outline: "none", width: "100%", boxSizing: "border-box" }}
+      />
     </div>
   );
 }

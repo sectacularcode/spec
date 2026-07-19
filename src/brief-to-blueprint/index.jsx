@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Fragment } from "react";
 import { T } from "./styles.js";
 
 // Constants
@@ -2753,19 +2753,25 @@ export default function CustomBuild({ userId, role } = {}) {
                       Buttons
                     </div>
                     <div>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
                         <ButtonEditor
+                          rowLayout
                           locked
                           button={(brief.buttons || []).find(b => isNamedButton(b, "primary")) || defaultBriefButton("primary")}
                           onChange={updated => setBriefButtonByName("primary", updated)}
                         />
+                        <div style={{ height: "1px", background: "#f0eee9" }} />
                         <ButtonEditor
+                          rowLayout
                           locked
                           button={(brief.buttons || []).find(b => isNamedButton(b, "secondary")) || defaultBriefButton("secondary")}
                           onChange={updated => setBriefButtonByName("secondary", updated)}
                         />
                         {(brief.buttons || []).map((b, i) => (isNamedButton(b, "primary") || isNamedButton(b, "secondary")) ? null : (
-                          <ButtonEditor key={i} button={b} onChange={updated => updateBriefButton(i, updated)} onRemove={() => removeBriefButton(i)} />
+                          <Fragment key={i}>
+                            <div style={{ height: "1px", background: "#f0eee9" }} />
+                            <ButtonEditor rowLayout button={b} onChange={updated => updateBriefButton(i, updated)} onRemove={() => removeBriefButton(i)} />
+                          </Fragment>
                         ))}
                         <button
                           onClick={addBriefButton}
