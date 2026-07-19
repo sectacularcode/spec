@@ -47,32 +47,40 @@ export default function ButtonEditor({ button, onChange, onRemove, locked, rowLa
   if (rowLayout) {
     return (
       <div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px", gap: "10px" }}>
-          {locked ? (
-            <span style={{ fontSize: "13px", color: "#6b7280" }}>{button.name}</span>
-          ) : (
-            <input
-              value={button.name || ""}
-              onChange={e => onChange({ ...button, name: e.target.value })}
-              placeholder="Name (e.g. Primary)"
-              style={{ fontSize: "13px", color: "#6b7280", border: "none", borderBottom: "1px solid #dde0e6", padding: "0 0 4px", background: "transparent", width: "50%", fontFamily: "'Be Vietnam Pro', sans-serif" }}
-            />
-          )}
-          <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            {isSecondary ? (
-              <span style={{ display: "inline-block", padding: "6px 15px", borderRadius: "6px", background: "transparent", border: "2px solid " + (button.background || "#333") }}>
-                <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: "11px", color: button.background || "#333", letterSpacing: "0.02em" }}>Call to action</span>
-              </span>
+        <div style={{ display: "flex", alignItems: "center", marginBottom: "12px", gap: "8px" }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {locked ? (
+              <span style={{ fontSize: "13px", color: "#6b7280" }}>{button.name}</span>
             ) : (
-              <span style={{ display: "inline-block", padding: "8px 17px", borderRadius: "6px", background: button.background || "#333" }}>
-                <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: "11px", color: button.textColor || "#fff", letterSpacing: "0.02em" }}>Call to action</span>
-              </span>
+              <input
+                value={button.name || ""}
+                onChange={e => onChange({ ...button, name: e.target.value })}
+                placeholder="Name (e.g. Primary)"
+                style={{ fontSize: "13px", color: "#6b7280", border: "none", borderBottom: "1px solid #dde0e6", padding: "0 0 4px", background: "transparent", width: "100%", fontFamily: "'Be Vietnam Pro', sans-serif" }}
+              />
             )}
+          </div>
+          {/* Fixed 132x34 pill (box-sizing border-box) so the filled Primary
+              and the 2px-outline Secondary render at the exact same size and
+              their right edges line up down the column. */}
+          {isSecondary ? (
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "132px", height: "34px", boxSizing: "border-box", flexShrink: 0, borderRadius: "6px", background: "transparent", border: "2px solid " + (button.background || "#333") }}>
+              <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: "11px", color: button.background || "#333", letterSpacing: "0.02em" }}>Call to action</span>
+            </span>
+          ) : (
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "132px", height: "34px", boxSizing: "border-box", flexShrink: 0, borderRadius: "6px", background: button.background || "#333" }}>
+              <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: "11px", color: button.textColor || "#fff", letterSpacing: "0.02em" }}>Call to action</span>
+            </span>
+          )}
+          {/* Reserved 22px slot for the remove button, always present (empty
+              for locked slots) so the pill above stays aligned whether or not
+              a × is shown. */}
+          <div style={{ width: "22px", flexShrink: 0, display: "flex", justifyContent: "center" }}>
             {!locked && (
               <button onClick={onRemove} title="Remove button" aria-label="Remove button"
                 style={{ width: "22px", height: "22px", borderRadius: "50%", background: "#fff", border: "1px solid #dde0e6", color: "#6b635c", fontSize: "13px", lineHeight: 1, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, flexShrink: 0 }}>×</button>
             )}
-          </span>
+          </div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           <RowColorField label="Background" hex={button.background || ""} onChange={hex => onChange({ ...button, background: hex })} />
