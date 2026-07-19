@@ -32,7 +32,7 @@
 
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { waitForDocumentFonts } from "../../utils/pdfFontReady.js";
+import { authHeaders } from "../../utils/api.js";
 
 const EXPORT_CAPTURE_WIDTH_PX = 1280;
 
@@ -91,15 +91,15 @@ function renderOffscreen(html) {
           reject(new Error("PDF export: offscreen preview failed to load"));
           return;
         }
-        // Confirmed still reproducing July 19 2026 with the previous
-        // version of this fix (a hardcoded Inter-weights preload) -- see
-        // waitForDocumentFonts' own comment for why. This call only
-        // settles fonts on THIS offscreen iframe's document, which warms
-        // the browser's font-file cache for the per-section loads below
-        // but does not, on its own, close the race -- see the onclone
-        // hook on the html2canvas() call in elementsToPdf() for the part
-        // that actually does.
-        await waitForDocumentFonts(doc);
+        if (doc.fonts && doc.fonts.ready) await doc.fonts.ready;
+        // NOTE: this html2canvas path is now the FALLBACK only -- the primary
+        // export renders server-side via Browserless (/api/export-pdf), which
+        // doesn't have html2canvas's word-gluing failure mode at all. Earlier
+        // attempts to fix the gluing here by preloading individual font
+        // weights were removed: the glue was never a font-timing problem (the
+        // live preview's own DOM has correct spacing), so those patches did
+        // nothing. This path is kept intact as a graceful fallback for when
+        // Browserless is unavailable, accepting its known limitations.
         // PDF pages don't scroll, so position:sticky/fixed (the real
         // nav, e.g.) serve no purpose in this capture and are a known
         // html2canvas rendering hazard -- html2canvas can misjudge a
@@ -207,12 +207,6 @@ async function elementsToPdf(elements) {
       useCORS: true,
       width: EXPORT_CAPTURE_WIDTH_PX,
       windowWidth: EXPORT_CAPTURE_WIDTH_PX,
-      // html2canvas's documented hook for acting on its OWN internal
-      // clone before it renders -- returning a promise blocks capture
-      // until it resolves. This is the actual document that gets
-      // measured and painted, and is what was still racing after the
-      // outer-iframe-only fix above (see waitForDocumentFonts' comment).
-      onclone: (clonedDoc) => waitForDocumentFonts(clonedDoc),
     });
     if (!canvas.width || !canvas.height) continue;
     // JPEG, not PNG -- confirmed real case, a single-page PDF export came
@@ -240,12 +234,63 @@ async function elementsToPdf(elements) {
   return pdf;
 }
 
-// html: the full standalone HTML string already generated for the visible
-// preview (buildPreviewHTML() output) -- callers pass the exact same
-// string, not a re-derived one, so the PDF always matches what's on
-// screen. fileNameParts: array of strings to join into the download
-// filename (e.g. [brandName, pageLabel, variant]).
+// Triggers a browser download of a PDF blob under the given filename.
+function saveBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  // Revoke on the next tick so the download has already started.
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+// PRIMARY export path: render the preview HTML to PDF server-side via
+// Browserless (a real headless Chrome), which does NOT have html2canvas's
+// word-gluing failure mode -- it prints with the browser's own text-layout
+// engine, the same one that renders the live preview correctly. Also renders
+// the Google Maps embed as a real map and loads webfonts properly. Throws on
+// any failure so the caller (downloadPreviewPdf) can fall back to the local
+// html2canvas path -- this function deliberately does NOT swallow errors.
+async function downloadPreviewPdfServer(html, fileNameParts) {
+  const res = await fetch("/api/export-pdf", {
+    method: "POST",
+    headers: await authHeaders(),
+    body: JSON.stringify({ html }),
+  });
+  if (!res.ok) {
+    let detail = "";
+    try { detail = (await res.json()).error || ""; } catch {}
+    throw new Error(`export-pdf ${res.status}${detail ? ": " + detail : ""}`);
+  }
+  const blob = await res.blob();
+  if (!blob || blob.size === 0) throw new Error("export-pdf returned empty PDF");
+  const base = fileNameParts.filter(Boolean).map(safeFileBase).join("-") || "page";
+  saveBlob(blob, `${base}.pdf`);
+}
+
+// Public entry point. Tries the server (Browserless) path first; on any
+// failure -- service down, over quota, timeout, network error -- silently
+// falls back to the local html2canvas capture so export never hard-fails.
+// The fallback has known limitations (see renderOffscreen's note) but always
+// produces *a* PDF.
 export async function downloadPreviewPdf(html, fileNameParts) {
+  if (!html) return;
+  try {
+    await downloadPreviewPdfServer(html, fileNameParts);
+    return;
+  } catch (serverErr) {
+    console.warn("Server PDF export failed, falling back to local capture:", serverErr.message);
+  }
+  await downloadPreviewPdfLocal(html, fileNameParts);
+}
+
+// FALLBACK export path: the original in-browser html2canvas + jsPDF capture.
+// Kept intact for when the server path is unavailable. Same signature/
+// behavior as before; only renamed from the old public downloadPreviewPdf.
+async function downloadPreviewPdfLocal(html, fileNameParts) {
   if (!html) return;
   let rendered;
   try {

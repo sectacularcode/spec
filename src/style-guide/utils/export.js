@@ -23,7 +23,6 @@
 
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { waitForDocumentFonts } from "../../utils/pdfFontReady.js";
 
 const DATA_MARKER_ID = "spec-style-data";
 
@@ -138,16 +137,7 @@ const EXPORT_CAPTURE_WIDTH_PX = 1100;
 const EXPORT_CAPTURE_PADDING = "64px 72px";
 
 async function captureCanvas(exportElement, scale) {
-  // Warms the browser's font-file cache for whatever this document's
-  // exportable content actually uses (Style Guide's font catalog is
-  // large and brand-dependent -- see index.html -- not a fixed known
-  // set). Doesn't close the race on its own -- see the onclone hook
-  // below, and waitForDocumentFonts' own comment for why both calls are
-  // needed. Same underlying bug class as Brief to Blueprint's PDF export
-  // font-gluing issue, confirmed July 2026 -- this export shares the
-  // exact same html2canvas clone-per-capture exposure, just not yet
-  // reported hit here.
-  await waitForDocumentFonts(document);
+  await document.fonts.ready;
   const prevWidth = exportElement.style.width;
   const prevMaxWidth = exportElement.style.maxWidth;
   const prevPadding = exportElement.style.padding;
@@ -160,14 +150,7 @@ async function captureCanvas(exportElement, scale) {
   // padding eating into it, rather than padding adding on top of 1100px.
   exportElement.style.boxSizing = "border-box";
   try {
-    return await html2canvas(exportElement, {
-      backgroundColor: "#ffffff",
-      scale,
-      // html2canvas's documented hook for acting on its OWN internal
-      // clone before it renders -- the actual document that gets
-      // measured and painted. See waitForDocumentFonts' comment.
-      onclone: (clonedDoc) => waitForDocumentFonts(clonedDoc),
-    });
+    return await html2canvas(exportElement, { backgroundColor: "#ffffff", scale });
   } finally {
     exportElement.style.width = prevWidth;
     exportElement.style.maxWidth = prevMaxWidth;
