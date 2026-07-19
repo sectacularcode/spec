@@ -25,6 +25,7 @@ import { buildPreviewHTML } from "./preview/buildPreviewHTML.js";
 import { IntakeForm } from "./components/IntakeForm.jsx";
 import { BriefReview } from "./components/BriefReview.jsx";
 import { BulkLocationModal } from "./components/BulkLocationModal.jsx";
+import FidelityCheck from "./fidelity/index.jsx";
 import { ConfirmDialog } from "../components/ConfirmDialog.jsx";
 import AdminPanel from "../components/AdminPanel.jsx";
 import { authHeaders, formatErrorMessage } from "../utils/api.js";
@@ -42,18 +43,57 @@ import { bestTextColor } from "../utils/contrast.js";
 // an 8th independent hardcoded copy of the exact same mapping.
 
 export default function CustomBuild({ userId, role } = {}) {
-  const [brief, setBrief]               = useState(null);
-  // Per-page brief map -- Phase 1 of the bulk-import state-model change.
-  // For today's single-brief build, this is a passive mirror of `brief`
-  // under every currently selected page id, kept in sync by the effect
-  // below -- nothing yet reads from this instead of `brief`, so every
-  // existing edit path (all setBrief call sites, every brief.xyz read)
-  // is completely untouched. The point of this phase is to prove out the
-  // map itself and its draft persistence shape before Phase 3 (bulk
-  // Manifest import) needs distinct per-page briefs -- at that point this
-  // stops mirroring and starts actually diverging per page.
+  // Moved up from its old declaration point further down this component --
+  // the derived `brief` const just below reads previewPage on every
+  // render, so it has to exist first (JS const/let are not hoisted the
+  // way function declarations are; referencing it before this line would
+  // throw a temporal-dead-zone ReferenceError).
+  const [previewPage, setPreviewPage]   = useState("home");
+  const [briefRaw, setBriefRaw]         = useState(null);
+  // Per-page brief map. In single-brief mode (bulkImportMode false, the
+  // default) this mirrors briefRaw across every selected page -- see the
+  // effect below. In bulk mode it's independently authoritative: each
+  // imported page gets its own distinct entry, written directly by the
+  // multi-file import handler, and briefRaw is left alone/ignored.
   const [briefsByPage, setBriefsByPage] = useState({});
-  const [styleConflict, setStyleConflict]     = useState(null); // { savedStyle, briefColors, brandName } when both exist and differ -- pauses generate() until resolved
+  // True once a multi-file Manifest import has happened for this build.
+  // Gates the mirror effect below (bulk pages must never get overwritten
+  // by a single shared brief) and disables the main Generate button
+  // (bulk pages are already built at import time, per page).
+  const [bulkImportMode, setBulkImportMode] = useState(false);
+  // Per-file progress text during a multi-file Manifest import ("Importing
+  // 4 of 17..."), shown in the same slot the single-file "Reading brief"
+  // message already uses -- see handleBulkManifestFiles below.
+  const [bulkImportProgress, setBulkImportProgress] = useState("");
+  // The "active brief" for every existing read/write in this file.
+  // Single-brief mode: briefRaw, exactly as before this refactor.
+  // Bulk mode: whichever page is currently being previewed/edited.
+  // setBrief() below is the matching wrapper -- together these mean
+  // every one of the ~26 existing setBrief(...) call sites and every
+  // brief.xyz read throughout this file automatically becomes correctly
+  // scoped to the active bulk page with zero changes to any of them.
+  const brief = bulkImportMode ? (briefsByPage[previewPage] || null) : briefRaw;
+  function setBrief(updater) {
+    if (bulkImportMode) {
+      setBriefsByPage(prev => {
+        var current = prev[previewPage] || null;
+        var nextBrief = typeof updater === "function" ? updater(current) : updater;
+        return { ...prev, [previewPage]: nextBrief };
+      });
+    } else {
+      setBriefRaw(updater);
+    }
+  }
+  // Full reset for "Start a build" / "Replace brief" -- setBrief(null)
+  // alone isn't enough once bulk import exists: in bulk mode it would
+  // only null out the currently active page's entry in briefsByPage,
+  // leaving bulkImportMode stuck on and every OTHER imported page's data
+  // still sitting in state. This exits bulk mode and clears everything.
+  function resetBrief() {
+    setBulkImportMode(false);
+    setBriefRaw(null);
+    setBriefsByPage({});
+  }
   const [stylePanelStatus, setStylePanelStatus] = useState(""); // brief save/load feedback text
   const [showStylePicker, setShowStylePicker] = useState(false); // "Load a saved style guide" dropdown open/closed
   const [savedStylesList, setSavedStylesList] = useState([]);    // all of this user's saved brand styles, for the picker
@@ -91,6 +131,10 @@ export default function CustomBuild({ userId, role } = {}) {
   const [confirmDraftDeleteId, setConfirmDraftDeleteId] = useState(null); // saved draft id pending delete confirmation
   const [confirmPageRemoveId, setConfirmPageRemoveId]   = useState(null); // custom page id pending removal confirmation
   const [showUserDrawer, setShowUserDrawer] = useState(false);
+  // Was its own top-level admin tab; moved here since fidelity-checking is
+  // specifically a Manifest-import concept -- makes more sense living next
+  // to the Manifest upload/bulk-import side than as a disconnected tool.
+  const [showFidelityCheck, setShowFidelityCheck] = useState(false);
   const downloadIntakeForm = () => {
     const b64 = "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";
     const bin = atob(b64);
@@ -121,7 +165,6 @@ export default function CustomBuild({ userId, role } = {}) {
   const [generatingStatus, setGeneratingStatus] = useState("");
   const [generated, setGenerated]       = useState(null);
   const [draftedFields, setDraftedFields] = useState(null); // pending AI drafts for approval
-  const [previewPage, setPreviewPage]   = useState("home");
   const [zipping, setZipping]           = useState(false); // true while the all-pages .zip is being assembled
   const [layoutVariants, setLayoutVariants] = useState({}); // {pageId: "A"|"B"}
   const [swapDrawer, setSwapDrawer]         = useState(null); // pageId of page being swapped, or null
@@ -134,7 +177,7 @@ export default function CustomBuild({ userId, role } = {}) {
   const fileRef = useRef();
   const [parsing, setParsing]           = useState(false);
   const [uploadSource, setUploadSource] = useState("standard"); // "standard" | "manifest" — which JSON parser handleFile routes through
-  const canGenerate = !!brief && selectedPages.length > 0;
+  const canGenerate = !!brief && selectedPages.length > 0 && !bulkImportMode;
   const isAdmin   = role === "admin";
   const isManager = role === "manager" || role === "admin";
 
@@ -155,6 +198,7 @@ export default function CustomBuild({ userId, role } = {}) {
         // the moment those are restored below, so no explicit fallback is
         // needed here the way a real migration would require.
         if (draft.briefsByPage)   setBriefsByPage(draft.briefsByPage);
+        if (draft.bulkImportMode) setBulkImportMode(true);
         if (draft.briefName)      setBriefName(draft.briefName);
         if (draft.clientName)     setClientName(draft.clientName);
         if (draft.inspoUrls)      setInspoUrls(draft.inspoUrls);
@@ -177,6 +221,7 @@ export default function CustomBuild({ userId, role } = {}) {
       const draft = {
         brief,
         briefsByPage,
+        bulkImportMode,
         briefName,
         clientName,
         inspoUrls,
@@ -212,19 +257,26 @@ export default function CustomBuild({ userId, role } = {}) {
       saveSessionDraft(draft);
     }, 800);
     return () => clearTimeout(timer);
-  }, [brief, briefsByPage, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants, previewPage, crawlResults, generated]);
+  }, [brief, briefsByPage, bulkImportMode, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants, previewPage, crawlResults, generated]);
 
-  // Keeps briefsByPage mirroring `brief` across every currently selected
-  // page. Full rebuild rather than a merge -- there's no bulk-imported
-  // divergent per-page data yet in this phase, so every selected page
-  // should point at the exact same brief object, and a page id that's no
-  // longer selected shouldn't linger with a stale entry either.
+  // Keeps briefsByPage mirroring briefRaw across every currently selected
+  // page -- single-brief mode only. Full rebuild rather than a merge --
+  // every selected page should point at the exact same brief object, and
+  // a page id that's no longer selected shouldn't linger with a stale
+  // entry either. Skipped entirely once bulkImportMode is true: at that
+  // point briefsByPage holds genuinely distinct per-page data written
+  // directly by the multi-file import handler, and this effect blowing
+  // that away with one shared brief would silently collapse every bulk-
+  // imported page's own content down to whichever page was last edited --
+  // a real, confirmed-in-design data-loss risk if this guard is ever
+  // removed, not a hypothetical one.
   useEffect(() => {
-    if (!brief) { setBriefsByPage({}); return; }
+    if (bulkImportMode) return;
+    if (!briefRaw) { setBriefsByPage({}); return; }
     var next = {};
-    selectedPages.forEach(function(pid) { next[pid] = brief; });
+    selectedPages.forEach(function(pid) { next[pid] = briefRaw; });
     setBriefsByPage(next);
-  }, [brief, selectedPages]);
+  }, [briefRaw, selectedPages, bulkImportMode]);
 
   // Load saved drafts list on mount
   useEffect(() => {
@@ -282,10 +334,12 @@ export default function CustomBuild({ userId, role } = {}) {
     const s = draft.state;
     if (s.brief) setBrief(s.brief);
     if (s.briefsByPage) setBriefsByPage(s.briefsByPage);
+    if (s.bulkImportMode) setBulkImportMode(true);
     if (s.briefName) setBriefName(s.briefName);
     if (s.clientName) setClientName(s.clientName);
     if (s.inspoUrls) setInspoUrls(s.inspoUrls);
     if (s.selectedPages) setPages(s.selectedPages);
+    if (s.customPages) setCustomPages(s.customPages);
     if (s.copyBriefOnly !== undefined) setCopy(s.copyBriefOnly);
     if (s.layoutVariants) setLayoutVariants(s.layoutVariants);
     if (s.generated) setGenerated(s.generated);
@@ -507,17 +561,177 @@ export default function CustomBuild({ userId, role } = {}) {
     }
   }
 
+  function readFileAsText(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => resolve(e.target.result);
+      reader.onerror = () => reject(new Error("Could not read " + file.name));
+      reader.readAsText(file);
+    });
+  }
+
+  // Multi-file Manifest import -- a whole site's worth of pages (the real
+  // case this was built for: Freeway Fleet Services' 17 separate page
+  // exports) dropped or selected at once, landing in one build, one
+  // preview strip, each page independently editable. Only reachable when
+  // uploadSource === "manifest" and more than one file is selected --
+  // handleFile above is completely untouched, a single file (any source)
+  // still goes through the exact same review-modal flow it always has.
+  //
+  // Deliberately skips the per-file BriefReview modal -- opening it 17
+  // times in a row would be unusable, and Manifest imports are
+  // deterministic/zero-token (copyBriefOnly by nature), so there's no AI
+  // parse to double-check the way there is for a PDF/DOCX brief. Builds
+  // sequentially, not Promise.all -- 17+ full page builds back to back
+  // can lock the browser; a small pause between each here keeps the tab
+  // responsive and lets the "Importing N of M..." status actually paint.
+  async function handleBulkManifestFiles(fileList) {
+    const files = Array.from(fileList || []);
+    if (!files.length) return;
+    setBriefError("");
+    setParsing(true);
+
+    const newBriefsByPage = {};
+    const newPages = [];
+    const newCustomPages = [];
+    const usedPids = new Set();
+    const failures = [];
+    const brandNamesSeen = new Set();
+    let firstBrandName = "";
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      setBulkImportProgress("Importing " + (i + 1) + " of " + files.length + "...");
+      if (file.size > 20 * 1024 * 1024) {
+        failures.push(file.name + ": file is too large (max 20MB)");
+        continue;
+      }
+      const ext = file.name.split(".").pop().toLowerCase();
+      if (ext !== "json") {
+        failures.push(file.name + ": only .json Manifest exports are supported in bulk import");
+        continue;
+      }
+      try {
+        const text = await readFileAsText(file);
+        const raw = JSON.parse(text);
+        const parsed = manifestToBrief(raw);
+
+        if (parsed.brandName) {
+          brandNamesSeen.add(parsed.brandName);
+          if (!firstBrandName) firstBrandName = parsed.brandName;
+        }
+
+        // Unique page id per file. Every one of Manifest's real exports on
+        // hand so far suggests the same _suggestedPid ("other"), so pid
+        // alone can't be this batch's uniqueness key the way it is for a
+        // single import -- derived from the real page name Manifest sent
+        // instead, same dedup pattern handleBulkLocationGenerate already
+        // uses for its own multi-item slug collisions.
+        var baseSuggested = parsed._suggestedPid || "other";
+        var baseSlugSource = parsed._manifestPageName || file.name.replace(/\.json$/i, "");
+        var baseSlug = baseSuggested + "-" + slugify(baseSlugSource);
+        var pid = baseSlug;
+        var n = 2;
+        while (usedPids.has(pid)) { pid = baseSlug + "-" + n; n++; }
+        usedPids.add(pid);
+
+        // A real pageDef, not just a bare pid -- without this, generatePages
+        // has no registered pageDef to find for a pid it doesn't recognize
+        // (ALL_PAGES/ADDITIONAL_PAGE_TYPES obviously don't have "other-
+        // about-freeway-fleet-services" in them) and falls back to auto-
+        // deriving a label from the pid string itself: title-cased with
+        // hyphens turned to spaces, "other-about-freeway-fleet-services" ->
+        // "Other About Freeway Fleet Services". Confirmed by actually
+        // running that exact fallback regex against real constructed pids
+        // before shipping this -- registering the real _manifestPageName
+        // here instead gives clean pill labels ("About Freeway Fleet
+        // Services") and matches the same customPages mechanism
+        // handleBulkLocationGenerate already uses for its own per-item
+        // labels.
+        var pageDef = { id: pid, label: parsed._manifestPageName || baseSlugSource, slug: "/" + slugify(baseSlugSource) };
+        newCustomPages.push(pageDef);
+
+        var built = generatePages(parsed, [pid], "", {}, [pageDef]);
+        if (!built.length) { failures.push(file.name + ": produced no page (unrecognized page type)"); continue; }
+
+        newBriefsByPage[pid] = parsed;
+        newPages.push(built[0]);
+        // Yield to the browser between files so a 17+ file batch doesn't
+        // lock up the tab -- each build itself has no AI call and is
+        // fast, but back-to-back with zero yield still reads as frozen.
+        await new Promise(r => setTimeout(r, 0));
+      } catch (err) {
+        var reason = err instanceof ManifestImportError
+          ? (err.issues.length + " issue" + (err.issues.length !== 1 ? "s" : "") + ": " + err.issues.join("; "))
+          : (err.message || "could not parse");
+        failures.push(file.name + ": " + reason);
+      }
+    }
+
+    setParsing(false);
+    setBulkImportProgress("");
+
+    if (!newPages.length) {
+      setBriefError("Bulk import failed for every file.\n" + failures.join("\n"));
+      return;
+    }
+
+    setBriefName(files.length + " Manifest files");
+    setClientName(firstBrandName);
+    setBriefsByPage(newBriefsByPage);
+    setBulkImportMode(true);
+    var pids = newPages.map(function(p) { return p.id; });
+    setPages(pids);
+    var variants = {};
+    newPages.forEach(function(p) { variants[p.id] = p.recommended || "A"; });
+    setLayoutVariants(variants);
+    setGenerated({ pages: newPages, inspoContext: "", aiRecs: {} });
+    setPreviewPage(pids[0]);
+    setCustomPages(newCustomPages);
+
+    // Only surface a message when something actually needs a look --
+    // brand mismatch (don't silently mix brands with different colors
+    // into one build) or a skipped file. A fully clean import of every
+    // file stays silent; the preview strip filling with N pages already
+    // says it worked.
+    if (brandNamesSeen.size > 1 || failures.length) {
+      var summary = "Imported " + newPages.length + " of " + files.length + " pages.";
+      if (brandNamesSeen.size > 1) {
+        summary += " These files aren't all the same brand (" + Array.from(brandNamesSeen).join(", ") + ") -- double check this is really meant to be one build before exporting.";
+      }
+      if (failures.length) {
+        summary += " Skipped " + failures.length + ": " + failures.join("; ");
+      }
+      setBriefError(summary);
+    }
+  }
+
   // Applies one Manifest-suggested (proposed:true) section's real content
   // onto whichever brief is currently active -- parsedBriefDraft while
   // the review modal is still open, brief once it's been confirmed --
   // same two-state pattern BriefReview's own onConfirm already follows.
-  // Removes it from the displayed suggestion list once applied; the
-  // brief itself is never touched by anything still showing after this.
+  // brief here is the active PAGE's brief (single-brief mode: the one
+  // shared brief; bulk mode: whichever page is in preview) -- setBrief's
+  // wrapper already scopes the write correctly either way.
+  //
+  // applyProposedBlock() merges the block's real content in but doesn't
+  // remove it from _proposedBlocks itself, so that's done here too --
+  // otherwise the same suggestion would keep reappearing after being
+  // applied. Also regenerates the active page's built JSON, not just the
+  // live brief -- generated.pages is a snapshot taken at import/generate
+  // time, so without this the preview would show the applied block but
+  // the actual downloadable/zipped JSON would silently stay without it,
+  // same class of bug already fixed for section-style edits.
   function handleAddProposedBlock(block) {
     if (parsedBriefDraft) {
-      setParsedBriefDraft(applyProposedBlock(parsedBriefDraft, block));
+      var appliedDraft = applyProposedBlock(parsedBriefDraft, block);
+      appliedDraft._proposedBlocks = (appliedDraft._proposedBlocks || []).filter(function(b) { return b !== block; });
+      setParsedBriefDraft(appliedDraft);
     } else if (brief) {
-      setBrief(applyProposedBlock(brief, block));
+      var updatedBrief = applyProposedBlock(brief, block);
+      updatedBrief._proposedBlocks = (updatedBrief._proposedBlocks || []).filter(function(b) { return b !== block; });
+      setBrief(updatedBrief);
+      regenerateActivePage(updatedBrief);
     }
     setProposedBlocks(prev => {
       const next = (prev || []).filter(b => b !== block);
@@ -525,10 +739,15 @@ export default function CustomBuild({ userId, role } = {}) {
     });
   }
 
-  // Dismiss never touches brief content -- it only hides the prompt for
-  // this session. Manifest's suggestion itself isn't deleted or altered;
-  // reimporting the same export would surface it again.
+  // Dismiss never touches brief content -- it only hides the prompt.
+  // Removes it from the active page's own brief._proposedBlocks (so it
+  // actually stays hidden for that page instead of only clearing a
+  // separate display-only flag) -- reimporting the same export would
+  // surface it again, same as before.
   function handleDismissProposedBlock(block) {
+    if (brief && Array.isArray(brief._proposedBlocks) && brief._proposedBlocks.length) {
+      setBrief({ ...brief, _proposedBlocks: brief._proposedBlocks.filter(function(b) { return b !== block; }) });
+    }
     setProposedBlocks(prev => {
       const next = (prev || []).filter(b => b !== block);
       return next.length ? next : null;
@@ -811,8 +1030,20 @@ export default function CustomBuild({ userId, role } = {}) {
   // brand-wide, so scoping the refresh to just previewPage would leave
   // every other selected page silently stale on download. Also costs
   // nothing (no AI call), same as regenerateActivePage().
+  //
+  // Bulk mode is the one case where "brand-wide" doesn't hold: each
+  // imported page has its OWN distinct brief, so applying updatedBrief
+  // (one page's edited brief) to every selectedPages entry would silently
+  // overwrite every other bulk-imported page's real content with
+  // whichever page was being edited. Falls back to the single-page
+  // regenerateActivePage() in that case -- a color/font/button edit while
+  // bulk-editing applies to the active page only, matching how every
+  // other per-page edit already works in that mode. A real "apply to
+  // every bulk page" action, if wanted later, needs its own explicit
+  // control -- not this function silently guessing that's the intent.
   function regenerateAllPages(updatedBrief) {
     if (!generated) return;
+    if (bulkImportMode) { regenerateActivePage(updatedBrief); return; }
     var freshPages = generatePages(updatedBrief, selectedPages, generated.inspoContext, generated.aiRecs, customPages);
     if (!freshPages.length) return;
     setGenerated(g => ({ ...g, pages: freshPages }));
@@ -1176,7 +1407,7 @@ export default function CustomBuild({ userId, role } = {}) {
       // alongside.
       var briefsByPageForSave = {};
       selectedPages.forEach(function(pid) { briefsByPageForSave[pid] = workingBrief; });
-      saveDraftToList({ brief: workingBrief, briefsByPage: briefsByPageForSave, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants: variants, generated: { pages, inspoContext, aiRecs }, previewPage: selectedPages[0] || "home", crawlResults });
+      saveDraftToList({ brief: workingBrief, briefsByPage: briefsByPageForSave, bulkImportMode, briefName, clientName, inspoUrls, selectedPages, customPages, copyBriefOnly, layoutVariants: variants, generated: { pages, inspoContext, aiRecs }, previewPage: selectedPages[0] || "home", crawlResults });
 
     } catch(genErr) {
       console.error("Generate error:", genErr);
@@ -1381,23 +1612,30 @@ export default function CustomBuild({ userId, role } = {}) {
     const exportData = customName ? { ...pageData, title: he(customName) } : pageData;
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-    // Real per-page identifier for the filename's trailing segment, not
-    // Spec's generic internal page-type slot id (p.id -- "landing"/
-    // "other"/etc, the same string for every Manifest import regardless
-    // of which real page it is). Only this suffix changes -- the
-    // customName/clientName/brandName fallback chain above it is
-    // untouched, so a manually-typed customName still behaves exactly as
-    // before (replaces the whole leading segment, brand omitted). Falls
-    // back to p.id unchanged for manual/non-Manifest briefs with no real
-    // page name to draw from. Confirmed real problem on a 17-page Freeway
-    // Fleet Services batch, where every download landed on the same
-    // "freeway-fleet-services-landing-elementor.json" filename.
-    const pageSuffix = brief?._manifestPageName ? slugify(brief._manifestPageName) : p.id;
-    a.download = slugify(customName || clientName || brief?.brandName) + "-" + pageSuffix + "-elementor.json";
+    // This page's own brief, not whichever brief happens to be globally
+    // active -- briefsByPage[p.id] resolves correctly in both modes: in
+    // single-brief mode every page's entry is the same mirrored brief
+    // (identical behavior to before), in bulk mode each page has its own
+    // real, distinct entry. Real per-page identifier for the filename's
+    // trailing segment, not Spec's generic internal page-type slot id
+    // (p.id -- "landing"/"other"/etc, the same string for every Manifest
+    // import regardless of which real page it is). Only this suffix
+    // changes -- the customName/clientName/brandName fallback chain above
+    // it is untouched, so a manually-typed customName still behaves
+    // exactly as before (replaces the whole leading segment, brand
+    // omitted). Falls back to p.id unchanged for manual/non-Manifest
+    // briefs with no real page name to draw from. Confirmed real problem
+    // on a 17-page Freeway Fleet Services batch, where every download
+    // landed on the same "freeway-fleet-services-landing-elementor.json"
+    // filename.
+    const pageBrief = briefsByPage[p.id] || brief;
+    const pageSuffix = pageBrief?._manifestPageName ? slugify(pageBrief._manifestPageName) : p.id;
+    a.download = slugify(customName || clientName || pageBrief?.brandName) + "-" + pageSuffix + "-elementor.json";
     a.click(); URL.revokeObjectURL(a.href);
-    // Auto-save this single page to the library
-    if (brief && generated) {
-      saveToLibrary(brief, [p], layoutVariants, layoutVariants);
+    // Auto-save this single page to the library, tagged from ITS own
+    // brief (colors/voice/industry), not whichever brief is active.
+    if (pageBrief && generated) {
+      saveToLibrary(pageBrief, [p], layoutVariants, layoutVariants);
     }
   }
 
@@ -1421,8 +1659,14 @@ export default function CustomBuild({ userId, role } = {}) {
         const customName = (pageDownloadNames[p.id] || "").trim();
         const pageData = getPageData(p);
         const exportData = customName ? { ...pageData, title: he(customName) } : pageData;
-        const pageSuffix = brief?._manifestPageName ? slugify(brief._manifestPageName) : p.id;
-        var baseName = slugify(customName || clientName || brief?.brandName) + "-" + pageSuffix + "-elementor";
+        // This page's own brief -- see downloadPage's comment. Matters
+        // for real here: a 17-page zip built from the single global brief
+        // would give every file the same page-name suffix, and the dedup
+        // logic below would paper over it with -2/-3 instead of the real
+        // per-page names.
+        const pageBrief = briefsByPage[p.id] || brief;
+        const pageSuffix = pageBrief?._manifestPageName ? slugify(pageBrief._manifestPageName) : p.id;
+        var baseName = slugify(customName || clientName || pageBrief?.brandName) + "-" + pageSuffix + "-elementor";
         // Two pages can slugify to the same filename (e.g. two custom
         // instances named the same) -- a plain zip would silently drop the
         // earlier one, since a later same-named entry overwrites it. Dedup
@@ -1452,16 +1696,33 @@ export default function CustomBuild({ userId, role } = {}) {
         const exportData = customName ? { ...pageData, title: he(customName) } : pageData;
         const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
         const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-        const pageSuffix = brief?._manifestPageName ? slugify(brief._manifestPageName) : p.id;
-        a.download = slugify(customName || clientName || brief?.brandName) + "-" + pageSuffix + "-elementor.json";
+        const pageBrief = briefsByPage[p.id] || brief;
+        const pageSuffix = pageBrief?._manifestPageName ? slugify(pageBrief._manifestPageName) : p.id;
+        a.download = slugify(customName || clientName || pageBrief?.brandName) + "-" + pageSuffix + "-elementor.json";
         a.click(); URL.revokeObjectURL(a.href);
       }, i * 300));
     } finally {
       setZipping(false);
     }
-    // Auto-save full build to library (unchanged from before).
-    if (brief && generated) {
-      saveToLibrary(brief, generated.pages, layoutVariants, layoutVariants);
+    // Auto-save full build to library, grouped by each page's real brief
+    // rather than one saveToLibrary(brief, generated.pages, ...) call for
+    // the whole build. In single-brief mode every page shares the exact
+    // same mirrored brief object, so this groups into one call, same as
+    // before -- zero behavior change there. In bulk mode, pages with
+    // genuinely different briefs get their own separate save, each
+    // correctly tagged from its own colors/voice/industry instead of
+    // every page's sections silently inheriting whichever brief happened
+    // to be active.
+    if (generated) {
+      var groups = [];
+      generated.pages.forEach(function(p) {
+        var pb = briefsByPage[p.id] || brief;
+        if (!pb) return;
+        var group = groups.filter(function(g) { return g.brief === pb; })[0];
+        if (!group) { group = { brief: pb, pages: [] }; groups.push(group); }
+        group.pages.push(p);
+      });
+      groups.forEach(function(g) { saveToLibrary(g.brief, g.pages, layoutVariants, layoutVariants); });
     }
   }
 
@@ -1508,6 +1769,30 @@ export default function CustomBuild({ userId, role } = {}) {
             </div>
             <div style={{ flex: 1, overflowY: "auto" }}>
               <AdminPanel isAdmin={isAdmin} />
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Fidelity Reports drawer -- moved here from its old spot as a
+          separate top-level admin tab (see App.jsx) since it's specifically
+          a Manifest-import concept: checking a raw Manifest export against
+          what Spec actually built from it. Reuses the exact same component/
+          logic unmodified, just mounted here instead. Wider than the user
+          drawer (which uses min(600px, 100vw)) to match the tool's own
+          natural ~900px content width rather than cramping it. */}
+      {isAdmin && (
+        <>
+          <div
+            onClick={() => setShowFidelityCheck(false)}
+            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)", zIndex: 1050, opacity: showFidelityCheck ? 1 : 0, pointerEvents: showFidelityCheck ? "auto" : "none", transition: "opacity 0.2s" }}
+          />
+          <div style={{ position: "fixed", top: 0, right: 0, width: "min(960px, 100vw)", height: "100vh", background: "#fff", borderLeft: "1px solid #dde0e6", zIndex: 1051, display: "flex", flexDirection: "column", boxShadow: "-4px 0 32px rgba(0,0,0,0.1)", transform: showFidelityCheck ? "translateX(0)" : "translateX(100%)", transition: "transform 0.25s cubic-bezier(0.4,0,0.2,1)" }}>
+            <div style={{ padding: "16px 24px", borderBottom: "1px solid #dde0e6", display: "flex", alignItems: "center", justifyContent: "flex-end", flexShrink: 0 }}>
+              <button onClick={() => setShowFidelityCheck(false)} style={{ background: "none", border: "none", fontSize: "20px", cursor: "pointer", color: "#6b7280", padding: "4px 8px", lineHeight: 1 }}>×</button>
+            </div>
+            <div style={{ flex: 1, overflowY: "auto" }}>
+              {showFidelityCheck && <FidelityCheck />}
             </div>
           </div>
         </>
@@ -1585,7 +1870,7 @@ export default function CustomBuild({ userId, role } = {}) {
                 ↓ Intake Form
               </button>
               <button
-                onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setPageDownloadNames({}); setDraftsView(false); setPlaceholderButtons(null); }}
+                onClick={() => { resetBrief(); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setPageDownloadNames({}); setDraftsView(false); setPlaceholderButtons(null); }}
                 style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>
                 + New build
               </button>
@@ -1602,7 +1887,7 @@ export default function CustomBuild({ userId, role } = {}) {
               <div style={{ fontSize: "15px", fontWeight: 600, color: "#09090b", marginBottom: "8px" }}>No saved builds yet</div>
               <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "24px" }}>Upload a brief or fill out the intake form to get started.</div>
               <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
-                <button onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setPageDownloadNames({}); setDraftsView(false); setPlaceholderButtons(null); }} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>Start a build</button>
+                <button onClick={() => { resetBrief(); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setPageDownloadNames({}); setDraftsView(false); setPlaceholderButtons(null); }} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}>Start a build</button>
                 <button onClick={() => { setShowIntake(true); setDraftsView(false); }} style={{ padding: "10px 20px", fontSize: "13px", fontWeight: 600, background: "#b45309", color: "#ffffff", border: "none", borderRadius: "6px", cursor: "pointer" }}>Fill out intake form</button>
               </div>
             </div>
@@ -1610,7 +1895,7 @@ export default function CustomBuild({ userId, role } = {}) {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px" }}>
               {/* New build card */}
               <div
-                onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setPageDownloadNames({}); setDraftsView(false); setPlaceholderButtons(null); }}
+                onClick={() => { resetBrief(); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({}); setCustomPages([]); setPageDownloadNames({}); setDraftsView(false); setPlaceholderButtons(null); }}
                 style={{ border: "2px dashed #dde0e6", borderRadius: "10px", padding: "24px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "8px" }}
                 onMouseOver={e => e.currentTarget.style.borderColor = "#b45309"}
                 onMouseOut={e => e.currentTarget.style.borderColor = "#dde0e6"}>
@@ -1713,7 +1998,7 @@ export default function CustomBuild({ userId, role } = {}) {
                   // back in. clearSessionDraft() also sets keepalive:true as
                   // a second layer of protection against exactly that.
                   await clearSessionDraft();
-                  setBrief(null); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setPlaceholderButtons(null);
+                  resetBrief(); setBriefName(""); setClientName(""); setInspoUrls([""]); setPages(["home"]); setPlaceholderButtons(null);
                   setCopy(true); setGenerated(null); setLayoutVariants({}); setCrawlResults({});
                   setPreviewPage("home"); setPageOverrides({}); setCustomPages([]); setPageDownloadNames({});
                   setClearingDraft(false);
@@ -2119,7 +2404,7 @@ export default function CustomBuild({ userId, role } = {}) {
                     </button>
                   </div>
                   {uploadSource === "manifest" && (
-                    <div style={{ marginBottom: "16px", textAlign: "center" }}>
+                    <div style={{ marginBottom: "16px", textAlign: "center", display: "flex", flexDirection: "column", gap: "6px", alignItems: "center" }}>
                       <a
                         href="/downloads/Spec_Manifest_Copy_Template.docx"
                         download
@@ -2127,12 +2412,25 @@ export default function CustomBuild({ userId, role } = {}) {
                       >
                         ↓ Download the copy template for Manifest
                       </a>
+                      {isAdmin && (
+                        <button
+                          onClick={() => setShowFidelityCheck(true)}
+                          style={{ fontSize: "12px", color: "#6b7280", fontWeight: 600, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
+                        >
+                          Check a Manifest export's fidelity report
+                        </button>
+                      )}
                     </div>
                   )}
                   <div
                     onClick={() => fileRef.current?.click()}
                     onDragOver={e => e.preventDefault()}
-                    onDrop={e => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); }}
+                    onDrop={e => {
+                      e.preventDefault();
+                      var dropped = e.dataTransfer.files;
+                      if (uploadSource === "manifest" && dropped.length > 1) { handleBulkManifestFiles(dropped); return; }
+                      handleFile(dropped[0]);
+                    }}
                     style={{ border: "2px dashed #dde0e6", borderRadius: "6px", padding: "32px", textAlign: "center", cursor: "pointer" }}
                     onMouseOver={e => e.currentTarget.style.borderColor = "#000"}
                     onMouseOut={e => e.currentTarget.style.borderColor = "#dde0e6"}
@@ -2142,14 +2440,19 @@ export default function CustomBuild({ userId, role } = {}) {
                       {uploadSource === "manifest" ? "Upload Manifest Export" : "Upload Brand Brief"}
                     </div>
                     <div style={{ fontSize: "12px", color: "#6b7280" }}>
-                      {uploadSource === "manifest" ? "JSON only" : "PDF, DOCX, JSON, or TXT"}
+                      {uploadSource === "manifest" ? "JSON only — select or drop multiple files to import a whole site at once" : "PDF, DOCX, JSON, or TXT"}
                     </div>
                     <input
                       ref={fileRef}
                       type="file"
                       accept={uploadSource === "manifest" ? ".json" : ".json,.pdf,.txt,.docx"}
+                      multiple={uploadSource === "manifest"}
                       style={{ display: "none" }}
-                      onChange={e => handleFile(e.target.files[0])}
+                      onChange={e => {
+                        var picked = e.target.files;
+                        if (uploadSource === "manifest" && picked.length > 1) { handleBulkManifestFiles(picked); return; }
+                        handleFile(picked[0]);
+                      }}
                     />
                   </div>
                   <div style={{ textAlign: "center", margin: "12px 0", fontSize: "12px", color: "#9ca3af" }}>or</div>
@@ -2160,7 +2463,7 @@ export default function CustomBuild({ userId, role } = {}) {
                     Fill out intake form
                   </button>
                   </div>
-                  {parsing && <div style={{ marginTop: "12px", fontSize: "13px", color: "#09090b" }}>Reading brief — this takes a few seconds...</div>}
+                  {parsing && <div style={{ marginTop: "12px", fontSize: "13px", color: "#09090b" }}>{bulkImportProgress || "Reading brief — this takes a few seconds..."}</div>}
                   {briefError && <div style={{ fontSize: "12px", color: "#dc2626", marginTop: "8px", whiteSpace: "pre-wrap" }}>{briefError}</div>}
                   {placeholderButtons && (
                     <div style={{ marginTop: "8px", padding: "10px 12px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: "8px" }}>
@@ -2228,6 +2531,89 @@ export default function CustomBuild({ userId, role } = {}) {
                       <div style={{ fontWeight: 600, color: "#09090b", marginBottom: "4px", fontSize: "11px" }}>For WordPress / Yoast — copy over after import</div>
                       {brief._manifestTitleTag && <div style={{ marginBottom: "2px" }}><span style={{ fontWeight: 600 }}>Title:</span> {brief._manifestTitleTag}</div>}
                       {brief._manifestMetaDescription && <div><span style={{ fontWeight: 600 }}>Meta:</span> {brief._manifestMetaDescription}</div>}
+                    </div>
+                  )}
+                  {isAdmin && brief._manifestPageName && (
+                    <button
+                      onClick={() => setShowFidelityCheck(true)}
+                      style={{ fontSize: "11px", color: "#6b7280", fontWeight: 600, background: "none", border: "none", cursor: "pointer", textDecoration: "underline", marginBottom: "14px", padding: 0 }}
+                    >
+                      Check a Manifest export's fidelity report
+                    </button>
+                  )}
+                  {/* Per-page review: placeholder buttons / proposed blocks /
+                      unknown fields, read straight off the active page's own
+                      brief (briefsByPage[previewPage] in bulk mode, the one
+                      shared brief otherwise) -- switches automatically when
+                      clicking a different pill in the preview strip. Same
+                      data manifestToBrief always attached, same visual style
+                      as the pre-confirm version of this above the upload
+                      dropzone, just actually reachable now that brief is
+                      loaded instead of only visible in the narrow pre-
+                      confirm window (which the modal fully covers anyway). */}
+                  {((brief._placeholderButtons && brief._placeholderButtons.length > 0) ||
+                    (brief._proposedBlocks && brief._proposedBlocks.length > 0) ||
+                    (brief._unknownFields && brief._unknownFields.length > 0)) && (
+                    <div style={{ marginBottom: "20px" }}>
+                      {bulkImportMode && (
+                        <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "6px" }}>
+                          For this page — {activePreviewPage?.label || previewPage}
+                        </div>
+                      )}
+                      {brief._placeholderButtons && brief._placeholderButtons.length > 0 && (
+                        <div style={{ padding: "10px 12px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: "8px", marginBottom: "8px" }}>
+                          <div style={{ fontSize: "12px", fontWeight: 600, color: "#991b1b", marginBottom: "6px" }}>
+                            {brief._placeholderButtons.length} button{brief._placeholderButtons.length !== 1 ? "s need" : " needs"} a real destination before publishing
+                          </div>
+                          {brief._placeholderButtons.map((b, i) => (
+                            <div key={i} style={{ fontSize: "12px", color: "#7f1d1d", marginBottom: i < brief._placeholderButtons.length - 1 ? "3px" : 0 }}>
+                              • "{b.label}" ({b.section}) — currently links nowhere
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {brief._proposedBlocks && brief._proposedBlocks.map((block, i) => (
+                        <div key={i} style={{ padding: "10px 12px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "8px", marginBottom: "8px" }}>
+                          <div style={{ fontSize: "12px", fontWeight: 600, color: "#1e40af", marginBottom: "6px" }}>
+                            {block.type.indexOf("unknown:") === 0
+                              ? "Manifest sent a section type Spec doesn't fully support yet"
+                              : "Manifest suggested 1 more section (not included)"}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#1e3a8a", marginBottom: "8px" }}>
+                            <span style={{ fontWeight: 600 }}>
+                              {block.heading || (block.type === "form" ? "Lead-capture form" : block.type.replace("unknown:", ""))}
+                            </span>
+                            {block.rationale ? " — \"" + block.rationale + "\"" : ""}
+                          </div>
+                          <div style={{ display: "flex", gap: "8px" }}>
+                            <button
+                              onClick={() => handleAddProposedBlock(block)}
+                              style={{ padding: "5px 12px", fontSize: "12px", fontWeight: 600, background: "#1e40af", border: "none", borderRadius: "6px", color: "#fff", cursor: "pointer" }}>
+                              {block.type.indexOf("unknown:") === 0 ? "Add as plain text block" : "Add it"}
+                            </button>
+                            <button
+                              onClick={() => handleDismissProposedBlock(block)}
+                              style={{ padding: "5px 12px", fontSize: "12px", fontWeight: 600, background: "transparent", border: "1px solid #bfdbfe", borderRadius: "6px", color: "#1e40af", cursor: "pointer" }}>
+                              Dismiss
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                      {brief._unknownFields && brief._unknownFields.length > 0 && (
+                        <div style={{ padding: "10px 12px", background: "#f5f5f4", border: "1px solid #e7e5e4", borderRadius: "8px" }}>
+                          <div style={{ fontSize: "12px", fontWeight: 600, color: "#44403c", marginBottom: "6px" }}>
+                            Manifest sent {brief._unknownFields.reduce((n, f) => n + f.keys.length, 0)} field{brief._unknownFields.reduce((n, f) => n + f.keys.length, 0) !== 1 ? "s" : ""} Spec doesn't read yet
+                          </div>
+                          {brief._unknownFields.map((f, i) => (
+                            <div key={i} style={{ fontSize: "12px", color: "#57534e", marginBottom: i < brief._unknownFields.length - 1 ? "3px" : 0 }}>
+                              • {f.type}{f.heading ? " (\"" + f.heading + "\")" : ""}: {f.keys.join(", ")}
+                            </div>
+                          ))}
+                          <div style={{ fontSize: "11px", color: "#78716c", marginTop: "6px" }}>
+                            Not shown on the page. Flag for engineering if this should be added.
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                   <div style={{ marginBottom: "32px" }}>
@@ -2358,7 +2744,7 @@ export default function CustomBuild({ userId, role } = {}) {
                   <div style={{ fontSize: "11px", color: "#9ca3af", marginBottom: "12px" }}>
                     Files will download as: <span style={{ color: "#09090b", fontWeight: 600 }}>{slugify(clientName || brief?.brandName)}-home-elementor.json</span>
                   </div>
-                  <button style={T.btnGhost} onClick={() => { setBrief(null); setBriefName(""); setClientName(""); setPlaceholderButtons(null); setPageDownloadNames({}); }}>Replace brief</button>
+                  <button style={T.btnGhost} onClick={() => { resetBrief(); setBriefName(""); setClientName(""); setPlaceholderButtons(null); setPageDownloadNames({}); }}>Replace brief</button>
                 </div>
               )}
             </div>
@@ -2665,10 +3051,11 @@ export default function CustomBuild({ userId, role } = {}) {
               <div style={{ width: "1px", height: "20px", background: "#e5e7eb", margin: "0 6px" }} />
               <div style={{ position: "relative" }}>
                 <button
-                  onClick={() => setShowAddPagePreview(!showAddPagePreview)}
-                  title="Add page"
-                  style={{ width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", fontWeight: 500, cursor: "pointer", border: "1px solid #e5e7eb", borderRadius: "8px", background: "#fff", color: "#6b7280" }}>+</button>
-                {showAddPagePreview && (() => {
+                  onClick={() => { if (!bulkImportMode) setShowAddPagePreview(!showAddPagePreview); }}
+                  disabled={bulkImportMode}
+                  title={bulkImportMode ? "Not available for bulk-imported builds yet" : "Add page"}
+                  style={{ width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", fontWeight: 500, cursor: bulkImportMode ? "not-allowed" : "pointer", border: "1px solid #e5e7eb", borderRadius: "8px", background: "#fff", color: bulkImportMode ? "#c4c4c8" : "#6b7280", opacity: bulkImportMode ? 0.6 : 1 }}>+</button>
+                {showAddPagePreview && !bulkImportMode && (() => {
                   // Core page types (home/work/services/about/process/contact/landing/other)
                   // plus the additional types, so a build that doesn't already have every
                   // core page -- e.g. a Manifest import, which starts with only its one
