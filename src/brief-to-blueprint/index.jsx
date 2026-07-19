@@ -1357,6 +1357,19 @@ export default function CustomBuild({ userId, role } = {}) {
   }
 
   async function finishGenerate(workingBrief, inspoContext) {
+    // Syncs the live brief state with workingBrief -- fixes a real gap:
+    // when AI-drafted blank-fill fields were just approved
+    // (approveDraftedFields), workingBrief has them merged in but `brief`
+    // itself was never updated, so any edit afterward (color, section
+    // style, etc.) regenerated from the pre-draft brief and silently
+    // dropped the AI-filled fields. Safe to call unconditionally here: in
+    // the discard/no-draft-review paths workingBrief is already just a
+    // shallow copy of the current brief's own content, so this is a no-op
+    // in substance. Also safe with bulk import -- canGenerate hard-gates
+    // !bulkImportMode, so this whole function can never run while
+    // bulkImportMode is true, meaning setBrief always resolves to
+    // setBriefRaw here, never touching briefsByPage's per-page bulk data.
+    setBrief(workingBrief);
     setGenerating(true);
     setGeneratingStatus("Building pages...");
     try {
@@ -1398,14 +1411,11 @@ export default function CustomBuild({ userId, role } = {}) {
       setDraftsView(false);
 
       // Mirrored from workingBrief specifically, not the live `brief`
-      // state -- when AI-drafted blank-fill fields were just approved
-      // (approveDraftedFields), workingBrief already has them merged in
-      // but `brief` itself is never updated with that merge (separate,
-      // pre-existing gap, flagged on its own -- doesn't affect Manifest
-      // imports, which skip the AI draft-copy step entirely via
-      // copyBriefOnly). Using `brief` here would silently save a snapshot
-      // whose briefsByPage disagrees with the brief/pages it was saved
-      // alongside.
+      // state -- setBrief() above is async (React state update), so
+      // `brief` itself may not have re-rendered to workingBrief's value
+      // yet by the time this runs. Using workingBrief directly here keeps
+      // the saved snapshot correct regardless of that timing, matching
+      // what's actually being generated and previewed in this same call.
       var briefsByPageForSave = {};
       selectedPages.forEach(function(pid) { briefsByPageForSave[pid] = workingBrief; });
       saveDraftToList({ brief: workingBrief, briefsByPage: briefsByPageForSave, bulkImportMode, briefName, clientName, inspoUrls, selectedPages, customPages, copyBriefOnly, layoutVariants: variants, generated: { pages, inspoContext, aiRecs }, previewPage: selectedPages[0] || "home", crawlResults });
