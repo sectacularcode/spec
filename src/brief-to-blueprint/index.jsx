@@ -2019,7 +2019,7 @@ export default function CustomBuild({ userId, role } = {}) {
             // generatePages.js) -- checking the actual page id/label
             // pattern instead, matching how generatePages.js itself
             // decides which builder to route to.
-            const isLanding = /^(landing|other)(-\d+)?$/.test(activePreviewPage.id);
+            const isLanding = /^(landing|other)(-[a-z0-9-]+)?$/.test(activePreviewPage.id);
             const isHome = activePreviewPage.id === "home";
             const variants = isLanding ? (activePreviewPage.hasVariantF ? ["A","B","C","D","E","F"] : activePreviewPage.hasVariantE ? ["A","B","C","D","E"] : activePreviewPage.hasVariantD ? ["A","B","C","D"] : ["A","B","C"]) : (isHome && activePreviewPage.hasVariantC ? ["A","B","C"] : ["A","B"]);
             const labels = isLanding
@@ -2090,7 +2090,7 @@ export default function CustomBuild({ userId, role } = {}) {
               landing.js's variants. */}
           {generated && (() => {
             const eyebrowPage = activePreviewPage;
-            if (!eyebrowPage || !/^(landing|other)(-\d+)?$/.test(eyebrowPage.id)) return null;
+            if (!eyebrowPage || !/^(landing|other)(-[a-z0-9-]+)?$/.test(eyebrowPage.id)) return null;
             return (
               <div style={{ marginBottom: "32px" }}>
                 <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>
@@ -2126,7 +2126,7 @@ export default function CustomBuild({ userId, role } = {}) {
               not a new rendering path. */}
           {generated && (() => {
             const locPage = activePreviewPage;
-            if (!locPage || !/^(landing|other)(-\d+)?$/.test(locPage.id)) return null;
+            if (!locPage || !/^(landing|other)(-[a-z0-9-]+)?$/.test(locPage.id)) return null;
             return (
               <div style={{ marginBottom: "32px" }}>
                 <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>
@@ -2176,7 +2176,7 @@ export default function CustomBuild({ userId, role } = {}) {
               showing a confusing empty list. */}
           {generated && Array.isArray(brief.contentOrder) && brief.contentOrder.length > 0 && (() => {
             const ordPage = activePreviewPage;
-            if (!ordPage || !/^(landing|other)(-\d+)?$/.test(ordPage.id)) return null;
+            if (!ordPage || !/^(landing|other)(-[a-z0-9-]+)?$/.test(ordPage.id)) return null;
             const blockLabel = (block) => {
               if (block.type === "feature") {
                 const f = Array.isArray(brief.features) ? brief.features[block.index] : null;
@@ -2223,7 +2223,7 @@ export default function CustomBuild({ userId, role } = {}) {
               same mechanism. */}
           {generated && (() => {
             const secPage = activePreviewPage;
-            if (!secPage || !/^(landing|other)(-\d+)?$/.test(secPage.id)) return null;
+            if (!secPage || !/^(landing|other)(-[a-z0-9-]+)?$/.test(secPage.id)) return null;
             const featureCount = Array.isArray(brief.features) && brief.features.length > 0 ? brief.features.length : 3;
             const rows = getSectionRows(brief, featureCount);
             const featureLabel = (idx) => {
