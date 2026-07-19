@@ -177,10 +177,14 @@ export default function CustomBuild({ userId, role } = {}) {
   const [draftedFields, setDraftedFields] = useState(null); // pending AI drafts for approval
   const [zipping, setZipping]           = useState(false); // true while the all-pages .zip is being assembled
   const [layoutVariants, setLayoutVariants] = useState({}); // {pageId: "A"|"B"}
+  // swapDrawer / sectionLibrary / swapFilter power the "Swap sections" feature,
+  // whose entrance button was removed July 2026 (unused). State + drawer + the
+  // pageOverrides read-path are intentionally retained so it can be re-enabled;
+  // see the "DISABLED ENTRANCE" comment in the Export group for how to restore.
   const [swapDrawer, setSwapDrawer]         = useState(null); // pageId of page being swapped, or null
   const [sectionLibrary, setSectionLibrary] = useState([]); // saved sections from past builds
   const [swapFilter, setSwapFilter]         = useState(""); // filter by page type
-  const [pageOverrides, setPageOverrides]   = useState({}); // {pageId: {sectionIndex: sectionData}}
+  const [pageOverrides, setPageOverrides]   = useState({}); // {pageId: {sectionIndex: sectionData}} — written by Swap sections, read at download
   const [mobilePreview, setMobilePreview]   = useState(false); // desktop vs mobile preview toggle
   const [pdfDownloading, setPdfDownloading] = useState(false);
   const [panelCollapsed, setPanelCollapsed] = useState(false); // collapse left panel for full-width preview
@@ -2863,18 +2867,32 @@ export default function CustomBuild({ userId, role } = {}) {
           {generated && (
             <div>
               <div style={{ height: "1px", background: "#eae7e1", margin: "18px 0" }} />
-              {/* Swap sections — moved from preview header into panel */}
-              {sectionLibrary.length > 0 && (
-                <div style={{ marginBottom: "24px" }}>
-                  <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "12px" }}>Sections</div>
-                  <button
-                    onClick={() => { setSwapDrawer(swapDrawer === previewPage ? null : previewPage); setSwapFilter(""); }}
-                    style={{ ...T.btnGhost, width: "100%", justifyContent: "space-between", padding: "12px 16px", fontSize: "13px" }}>
-                    <span>Swap sections</span>
-                    <span style={{ color: "#b45309" }}>↗</span>
-                  </button>
-                </div>
-              )}
+              {/* ── Swap sections: DISABLED ENTRANCE (intentional, not dead code) ──
+                  The "Swap sections" feature lets you drop a section saved from a
+                  past build (sectionLibrary) into the current page, writing to
+                  pageOverrides — which IS still read at download time (see
+                  downloadPage's `pageOverrides[p.id]` lookup). The whole feature
+                  is intact: the swapDrawer/sectionLibrary/swapFilter state, the
+                  listSectionLibrary() loader, the drawer UI further down, and the
+                  pageOverrides read-path all remain.
+
+                  Only the ENTRANCE BUTTON was removed (July 2026) because it went
+                  unused in practice. Everything else is deliberately kept so the
+                  feature can be switched back on later with zero rebuild — just
+                  restore the button below and it works again:
+
+                  {sectionLibrary.length > 0 && (
+                    <div style={{ marginBottom: "24px" }}>
+                      <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "12px" }}>Sections</div>
+                      <button
+                        onClick={() => { setSwapDrawer(swapDrawer === previewPage ? null : previewPage); setSwapFilter(""); }}
+                        style={{ ...T.btnGhost, width: "100%", justifyContent: "space-between", padding: "12px 16px", fontSize: "13px" }}>
+                        <span>Swap sections</span>
+                        <span style={{ color: "#b45309" }}>↗</span>
+                      </button>
+                    </div>
+                  )}
+                  ─────────────────────────────────────────────────────────────── */}
               <button
                 onClick={() => toggleSection("download")}
                 style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", padding: 0, marginBottom: "12px", cursor: "pointer" }}>
@@ -3134,7 +3152,11 @@ export default function CustomBuild({ userId, role } = {}) {
               </div>
             </div>
 
-            {/* Swap drawer */}
+            {/* Swap drawer — the Swap sections UI. Currently unreachable because
+                its entrance button was removed July 2026 (swapDrawer never gets
+                set to non-null), but intentionally retained; restore the button
+                in the Export group to re-enable. See the "DISABLED ENTRANCE"
+                comment there and the note on the swapDrawer state declaration. */}
             {swapDrawer && (
               <div style={{ position: "absolute", top: "57px", right: 0, width: "360px", height: "calc(100% - 57px)", background: "#fff", borderLeft: "1px solid #dde0e6", zIndex: 10, display: "flex", flexDirection: "column", overflow: "hidden" }}>
                 <div style={{ padding: "16px", borderBottom: "1px solid #dde0e6", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
