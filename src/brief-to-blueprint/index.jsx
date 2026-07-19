@@ -43,6 +43,16 @@ import { bestTextColor } from "../utils/contrast.js";
 
 export default function CustomBuild({ userId, role } = {}) {
   const [brief, setBrief]               = useState(null);
+  // Per-page brief map -- Phase 1 of the bulk-import state-model change.
+  // For today's single-brief build, this is a passive mirror of `brief`
+  // under every currently selected page id, kept in sync by the effect
+  // below -- nothing yet reads from this instead of `brief`, so every
+  // existing edit path (all setBrief call sites, every brief.xyz read)
+  // is completely untouched. The point of this phase is to prove out the
+  // map itself and its draft persistence shape before Phase 3 (bulk
+  // Manifest import) needs distinct per-page briefs -- at that point this
+  // stops mirroring and starts actually diverging per page.
+  const [briefsByPage, setBriefsByPage] = useState({});
   const [styleConflict, setStyleConflict]     = useState(null); // { savedStyle, briefColors, brandName } when both exist and differ -- pauses generate() until resolved
   const [stylePanelStatus, setStylePanelStatus] = useState(""); // brief save/load feedback text
   const [showStylePicker, setShowStylePicker] = useState(false); // "Load a saved style guide" dropdown open/closed
@@ -139,6 +149,12 @@ export default function CustomBuild({ userId, role } = {}) {
       if (!draft) return;
       try {
         if (draft.brief)          setBrief(draft.brief);
+        // Only present in drafts saved after this field existed -- absent
+        // on any older draft, which is fine: the mirror effect above
+        // rebuilds it automatically from draft.brief + draft.selectedPages
+        // the moment those are restored below, so no explicit fallback is
+        // needed here the way a real migration would require.
+        if (draft.briefsByPage)   setBriefsByPage(draft.briefsByPage);
         if (draft.briefName)      setBriefName(draft.briefName);
         if (draft.clientName)     setClientName(draft.clientName);
         if (draft.inspoUrls)      setInspoUrls(draft.inspoUrls);
@@ -160,6 +176,7 @@ export default function CustomBuild({ userId, role } = {}) {
     const timer = setTimeout(() => {
       const draft = {
         brief,
+        briefsByPage,
         briefName,
         clientName,
         inspoUrls,
@@ -195,7 +212,19 @@ export default function CustomBuild({ userId, role } = {}) {
       saveSessionDraft(draft);
     }, 800);
     return () => clearTimeout(timer);
-  }, [brief, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants, previewPage, crawlResults, generated]);
+  }, [brief, briefsByPage, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants, previewPage, crawlResults, generated]);
+
+  // Keeps briefsByPage mirroring `brief` across every currently selected
+  // page. Full rebuild rather than a merge -- there's no bulk-imported
+  // divergent per-page data yet in this phase, so every selected page
+  // should point at the exact same brief object, and a page id that's no
+  // longer selected shouldn't linger with a stale entry either.
+  useEffect(() => {
+    if (!brief) { setBriefsByPage({}); return; }
+    var next = {};
+    selectedPages.forEach(function(pid) { next[pid] = brief; });
+    setBriefsByPage(next);
+  }, [brief, selectedPages]);
 
   // Load saved drafts list on mount
   useEffect(() => {
@@ -252,6 +281,7 @@ export default function CustomBuild({ userId, role } = {}) {
   async function resumeDraft(draft) {
     const s = draft.state;
     if (s.brief) setBrief(s.brief);
+    if (s.briefsByPage) setBriefsByPage(s.briefsByPage);
     if (s.briefName) setBriefName(s.briefName);
     if (s.clientName) setClientName(s.clientName);
     if (s.inspoUrls) setInspoUrls(s.inspoUrls);
@@ -1135,7 +1165,18 @@ export default function CustomBuild({ userId, role } = {}) {
       setPreviewPage(selectedPages[0] || "home");
       setDraftsView(false);
 
-      saveDraftToList({ brief: workingBrief, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants: variants, generated: { pages, inspoContext, aiRecs }, previewPage: selectedPages[0] || "home", crawlResults });
+      // Mirrored from workingBrief specifically, not the live `brief`
+      // state -- when AI-drafted blank-fill fields were just approved
+      // (approveDraftedFields), workingBrief already has them merged in
+      // but `brief` itself is never updated with that merge (separate,
+      // pre-existing gap, flagged on its own -- doesn't affect Manifest
+      // imports, which skip the AI draft-copy step entirely via
+      // copyBriefOnly). Using `brief` here would silently save a snapshot
+      // whose briefsByPage disagrees with the brief/pages it was saved
+      // alongside.
+      var briefsByPageForSave = {};
+      selectedPages.forEach(function(pid) { briefsByPageForSave[pid] = workingBrief; });
+      saveDraftToList({ brief: workingBrief, briefsByPage: briefsByPageForSave, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants: variants, generated: { pages, inspoContext, aiRecs }, previewPage: selectedPages[0] || "home", crawlResults });
 
     } catch(genErr) {
       console.error("Generate error:", genErr);
