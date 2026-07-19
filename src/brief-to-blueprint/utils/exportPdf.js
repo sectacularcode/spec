@@ -32,6 +32,7 @@
 
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { waitForDocumentFonts } from "../../utils/pdfFontReady.js";
 
 const EXPORT_CAPTURE_WIDTH_PX = 1280;
 
@@ -90,33 +91,15 @@ function renderOffscreen(html) {
           reject(new Error("PDF export: offscreen preview failed to load"));
           return;
         }
-        if (doc.fonts && doc.fonts.ready) await doc.fonts.ready;
-        // fonts.ready resolving isn't the same guarantee as "every weight
-        // this document actually uses has been measured and reflowed" --
-        // with font-display:swap (used here), text first paints in a
-        // fallback font and swaps to the real one once it's downloaded;
-        // fonts.ready can resolve at a point in that swap where html2canvas's
-        // internal text-layout pass measures using stale/fallback glyph
-        // widths, then paints with the real font -- a mismatch that can
-        // show up as words losing the space between them. Explicitly
-        // loading every weight this document's own font-family declaration
-        // requests closes that gap much more reliably than the generic
-        // ready check alone.
-        if (doc.fonts && doc.fonts.load) {
-          try {
-            await Promise.all([
-              doc.fonts.load("400 16px Inter"),
-              doc.fonts.load("500 16px Inter"),
-              doc.fonts.load("600 16px Inter"),
-              doc.fonts.load("700 16px Inter"),
-              doc.fonts.load("800 16px Inter"),
-            ]);
-          } catch (fontErr) {
-            // Non-fatal -- if a specific weight fails to load, capture
-            // proceeds with whatever's available rather than failing the
-            // whole export over a font glitch.
-          }
-        }
+        // Confirmed still reproducing July 19 2026 with the previous
+        // version of this fix (a hardcoded Inter-weights preload) -- see
+        // waitForDocumentFonts' own comment for why. This call only
+        // settles fonts on THIS offscreen iframe's document, which warms
+        // the browser's font-file cache for the per-section loads below
+        // but does not, on its own, close the race -- see the onclone
+        // hook on the html2canvas() call in elementsToPdf() for the part
+        // that actually does.
+        await waitForDocumentFonts(doc);
         // PDF pages don't scroll, so position:sticky/fixed (the real
         // nav, e.g.) serve no purpose in this capture and are a known
         // html2canvas rendering hazard -- html2canvas can misjudge a
@@ -224,6 +207,12 @@ async function elementsToPdf(elements) {
       useCORS: true,
       width: EXPORT_CAPTURE_WIDTH_PX,
       windowWidth: EXPORT_CAPTURE_WIDTH_PX,
+      // html2canvas's documented hook for acting on its OWN internal
+      // clone before it renders -- returning a promise blocks capture
+      // until it resolves. This is the actual document that gets
+      // measured and painted, and is what was still racing after the
+      // outer-iframe-only fix above (see waitForDocumentFonts' comment).
+      onclone: (clonedDoc) => waitForDocumentFonts(clonedDoc),
     });
     if (!canvas.width || !canvas.height) continue;
     // JPEG, not PNG -- confirmed real case, a single-page PDF export came
