@@ -94,6 +94,7 @@ export default function CustomBuild({ userId, role } = {}) {
     setBriefRaw(null);
     setBriefsByPage({});
   }
+  const [styleConflict, setStyleConflict]     = useState(null); // { savedStyle, briefColors, brandName } when both exist and differ -- pauses generate() until resolved
   const [stylePanelStatus, setStylePanelStatus] = useState(""); // brief save/load feedback text
   const [showStylePicker, setShowStylePicker] = useState(false); // "Load a saved style guide" dropdown open/closed
   const [savedStylesList, setSavedStylesList] = useState([]);    // all of this user's saved brand styles, for the picker
