@@ -2943,6 +2943,70 @@ export default function CustomBuild({ userId, role } = {}) {
             </div>
           )}
           </div>
+
+          {/* Generate — primary action. Was deleted alongside the old Copy
+              Settings block in the panel rework; restored here at the end of
+              the setup. Page generation is free; AI draft-copy only runs when
+              copyBriefOnly is off (set via the intake form). */}
+          <div style={{ display: "flex", justifyContent: "center", marginTop: "8px" }}>
+          <button
+            onClick={generate}
+            disabled={!canGenerate || generating || !!draftedFields}
+            style={{ ...T.btnPrimary, justifyContent: "center", padding: "14px 40px", fontSize: "14px", borderRadius: "8px", opacity: canGenerate ? 1 : 0.4, cursor: canGenerate ? "pointer" : "not-allowed" }}>
+            {generating ? (generatingStatus || "Generating…") : "Generate " + selectedPages.length + " Page" + (selectedPages.length !== 1 ? "s" : "")}
+          </button>
+          </div>
+          {!brief && <div style={{ fontSize: "12px", color: "#9ca3af", textAlign: "center", marginTop: "8px" }}>Upload a brand brief to enable generation</div>}
+          {brief && (() => {
+            // Page generation itself is free — this only reflects
+            // draft-copy.js, which only runs when "Use brief copy only" is
+            // off and something is still blank. See utils/estimateCost.js —
+            // same function a future breakdown panel would call too.
+            const est = estimateGenerationCost(brief, copyBriefOnly);
+            const label = !est.willDraft
+              ? "Estimated cost: $0.00 — using brief copy only"
+              : `Estimated cost: ~$${est.costDollars.toFixed(2)} — AI will draft ${est.blankFieldCount} blank field${est.blankFieldCount !== 1 ? "s" : ""}`;
+            return <div style={{ fontSize: "12px", color: "#9ca3af", textAlign: "center", marginTop: "8px" }}>{label}</div>;
+          })()}
+
+          {/* AI Drafted fields approval — gates page generation until reviewed */}
+          {draftedFields && Object.keys(draftedFields).length > 0 && (
+            <div style={{ marginTop: "24px", ...T.surface }}>
+              <div style={{ padding: "16px", background: "#ffffff", borderRadius: "8px" }}>
+                <div style={{ fontSize: "12px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>
+                  {Object.keys(draftedFields).length} field{Object.keys(draftedFields).length !== 1 ? "s" : ""} drafted in brand voice
+                </div>
+                <div style={{ fontSize: "11px", color: "#6b7280", marginBottom: "12px" }}>Review and edit before anything is built. These will fill blank fields in the brief.</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {Object.entries(draftedFields).map(([key, value]) => (
+                    <div key={key}>
+                      <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "4px" }}>
+                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                      </div>
+                      <textarea
+                        value={value}
+                        onChange={e => setDraftedFields(prev => ({ ...prev, [key]: e.target.value }))}
+                        rows={2}
+                        style={{ width: "100%", padding: "8px 10px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", resize: "vertical", fontFamily: "'Be Vietnam Pro', sans-serif", boxSizing: "border-box" }}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
+                  <button
+                    onClick={approveDraftedFields}
+                    style={{ ...T.btnPrimary, fontSize: "12px" }}>
+                    Approve &amp; continue
+                  </button>
+                  <button
+                    onClick={discardDraftedFields}
+                    style={{ ...T.btnGhost, fontSize: "12px" }}>
+                    Discard &amp; continue
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           </div>
         </div>
 
