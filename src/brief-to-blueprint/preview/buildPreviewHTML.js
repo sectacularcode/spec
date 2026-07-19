@@ -47,14 +47,23 @@ export { he };
 export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
   variant = variant || "A";
 
-  // Sanitize all string fields up-front so every downstream insertion is XSS-safe
-  var safe = {};
-  Object.keys(brief || {}).forEach(function(k) {
-    var v = (brief || {})[k];
-    safe[k] = typeof v === "string" ? he(v) : v;
-  });
-  brief = safe;
-
+  // Sanitization happens per-field, at the point each page builder inserts
+  // brief content into its HTML string (every builder does its own he()
+  // calls -- verified across all 22 files in preview/pages/, and the five
+  // that were missing it -- home/about/contact/process/services -- got it
+  // added directly). A blanket whole-object he() pass used to run here
+  // instead, which seemed like reasonable defense in depth but wasn't:
+  // it ran before ANY builder saw the brief, so a field already carrying
+  // deliberately pre-formed, safe HTML (brief.closingBody when
+  // closingBodyIsHtml is true -- richTextToSafeHtml() in manifestImport.js
+  // builds a real <a> tag into that string on purpose) got escaped into
+  // literal visible "<a href=...>" text instead of rendering as a link,
+  // and every other field got double-escaped on top of its own builder's
+  // correct single pass (e.g. a real apostrophe ending up as literal
+  // "&#39;" text on the page instead of an apostrophe). Per-field escaping
+  // at the point of use is the only place that can tell "plain text, needs
+  // escaping" apart from "pre-formed safe HTML, must not be touched again"
+  // -- a blanket pass upstream of every builder never could.
   var patterns = selectPatterns(brief, inspoContext || "");
 
   // The Home page's A/B/C layouts are fixed hero+services combinations
@@ -273,10 +282,10 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
     || sections.home;
   var body = resolvedSection();
 
-  var navItems = (brief.pages || ["Home","About","Services","Contact"]).map(function(p) { return typeof p === "string" ? p : (p.label || p.name || p); }).slice(0,6);
+  var navItems = (brief.pages || ["Home","About","Services","Contact"]).map(function(p) { return he(typeof p === "string" ? p : (p.label || p.name || p)); }).slice(0,6);
 
   return "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>" +
-    "<title>" + (brief.brandName || "Preview") + "</title>" +
+    "<title>" + he(brief.brandName || "Preview") + "</title>" +
     "<link href='" + fontUrl + "' rel='stylesheet'>" +
     "<style>" +
       "*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}" +
@@ -366,10 +375,10 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
     "</style>" +
     "</head><body>" +
     "<nav style='background:" + ink + ";padding:14px clamp(20px,5vw,60px);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;'>" +
-      "<div style='font-family:Inter,sans-serif;font-weight:800;font-size:18px;color:" + warmWhite + ";'>" + (brief.brandName || "Brand") + "</div>" +
+      "<div style='font-family:Inter,sans-serif;font-weight:800;font-size:18px;color:" + warmWhite + ";'>" + he(brief.brandName || "Brand") + "</div>" +
       "<div class='nav-links' style='display:flex;gap:24px;align-items:center;'>" +
         navItems.map(function(l) { return "<a style='color:" + warmWhite + ";text-decoration:none;font-size:14px;font-weight:500;'>" + l + "</a>"; }).join("") +
-        "<a style='padding:8px 20px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;text-decoration:none;border-radius:4px;margin-left:8px;'>" + (brief.headerCta || "Get in touch") + "</a>" +
+        "<a style='padding:8px 20px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;text-decoration:none;border-radius:4px;margin-left:8px;'>" + he(brief.headerCta || "Get in touch") + "</a>" +
       "</div>" +
       "<button class='hamburger' onclick='toggleMobileNav()' style='display:none;background:none;border:none;cursor:pointer;padding:4px;'>" +
         "<svg id='ham-icon' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='" + warmWhite + "' stroke-width='2' stroke-linecap='round'>" +
@@ -383,17 +392,17 @@ export function buildPreviewHTML(brief, activePage, variant, inspoContext) {
     "<div id='mobile-nav' style='background:" + ink + ";border-top:1px solid rgba(255,255,255,.1);'>" +
       "<div style='padding:8px 20px 20px;display:flex;flex-direction:column;gap:0;'>" +
         navItems.map(function(l) { return "<a style='color:" + warmWhite + ";text-decoration:none;font-size:16px;font-weight:500;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.07);display:block;'>" + l + "</a>"; }).join("") +
-        "<a style='margin-top:16px;padding:14px 20px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;text-decoration:none;border-radius:4px;text-align:center;display:block;'>" + (brief.headerCta || "Get in touch") + "</a>" +
+        "<a style='margin-top:16px;padding:14px 20px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:14px;text-decoration:none;border-radius:4px;text-align:center;display:block;'>" + he(brief.headerCta || "Get in touch") + "</a>" +
       "</div>" +
     "</div>" +
     body +
     "<footer style='background:" + ink + ";padding:48px clamp(20px,5vw,60px);'>" +
       "<div style='display:flex;flex-direction:column;align-items:flex-start;gap:24px;max-width:1100px;margin:0 auto;'>" +
-        "<div style='font-family:Inter,sans-serif;font-weight:800;font-size:18px;color:" + warmWhite + ";'>" + (brief.brandName || "Brand") + "</div>" +
-        (brief.tagline ? "<div style='font-size:13px;color:rgba(255,255,255,0.65);margin-top:-16px;'>" + brief.tagline + "</div>" : "") +
+        "<div style='font-family:Inter,sans-serif;font-weight:800;font-size:18px;color:" + warmWhite + ";'>" + he(brief.brandName || "Brand") + "</div>" +
+        (brief.tagline ? "<div style='font-size:13px;color:rgba(255,255,255,0.65);margin-top:-16px;'>" + he(brief.tagline) + "</div>" : "") +
         "<div class='footer-nav' style='display:flex;gap:24px;flex-wrap:wrap;'>" + navItems.map(function(l) { return "<a class='footer-link' style='color:rgba(255,255,255,0.8);text-decoration:none;font-size:13px;font-weight:500;'>" + l + "</a>"; }).join("") + "</div>" +
-        (brief.contactEmail ? "<div style='font-size:13px;color:rgba(255,255,255,0.6);'>" + (brief.contactEmail || "") + "</div>" : "") +
-        "<div style='font-size:12px;color:rgba(255,255,255,0.35);padding-top:8px;border-top:1px solid rgba(255,255,255,0.1);width:100%;'>" + (brief.brandName || "Brand") + " &copy; " + new Date().getFullYear() + " &nbsp;&middot;&nbsp; <a class='footer-link' href='#' style='color:rgba(255,255,255,0.45);text-decoration:none;font-size:12px;'>Privacy Policy</a> &nbsp;&middot;&nbsp; <a class='footer-link' href='#' style='color:rgba(255,255,255,0.45);text-decoration:none;font-size:12px;'>Cookie Policy</a></div>" +
+        (brief.contactEmail ? "<div style='font-size:13px;color:rgba(255,255,255,0.6);'>" + he(brief.contactEmail || "") + "</div>" : "") +
+        "<div style='font-size:12px;color:rgba(255,255,255,0.35);padding-top:8px;border-top:1px solid rgba(255,255,255,0.1);width:100%;'>" + he(brief.brandName || "Brand") + " &copy; " + new Date().getFullYear() + " &nbsp;&middot;&nbsp; <a class='footer-link' href='#' style='color:rgba(255,255,255,0.45);text-decoration:none;font-size:12px;'>Privacy Policy</a> &nbsp;&middot;&nbsp; <a class='footer-link' href='#' style='color:rgba(255,255,255,0.45);text-decoration:none;font-size:12px;'>Cookie Policy</a></div>" +
       "</div>" +
     "</footer>" +
     "<script>" +
