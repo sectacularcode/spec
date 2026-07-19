@@ -91,6 +91,32 @@ function renderOffscreen(html) {
           return;
         }
         if (doc.fonts && doc.fonts.ready) await doc.fonts.ready;
+        // fonts.ready resolving isn't the same guarantee as "every weight
+        // this document actually uses has been measured and reflowed" --
+        // with font-display:swap (used here), text first paints in a
+        // fallback font and swaps to the real one once it's downloaded;
+        // fonts.ready can resolve at a point in that swap where html2canvas's
+        // internal text-layout pass measures using stale/fallback glyph
+        // widths, then paints with the real font -- a mismatch that can
+        // show up as words losing the space between them. Explicitly
+        // loading every weight this document's own font-family declaration
+        // requests closes that gap much more reliably than the generic
+        // ready check alone.
+        if (doc.fonts && doc.fonts.load) {
+          try {
+            await Promise.all([
+              doc.fonts.load("400 16px Inter"),
+              doc.fonts.load("500 16px Inter"),
+              doc.fonts.load("600 16px Inter"),
+              doc.fonts.load("700 16px Inter"),
+              doc.fonts.load("800 16px Inter"),
+            ]);
+          } catch (fontErr) {
+            // Non-fatal -- if a specific weight fails to load, capture
+            // proceeds with whatever's available rather than failing the
+            // whole export over a font glitch.
+          }
+        }
         // PDF pages don't scroll, so position:sticky/fixed (the real
         // nav, e.g.) serve no purpose in this capture and are a known
         // html2canvas rendering hazard -- html2canvas can misjudge a
