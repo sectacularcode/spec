@@ -2836,15 +2836,15 @@ export default function CustomBuild({ userId, role } = {}) {
             {openSections.pagesToBuild && (
             <div style={{ marginTop: "12px" }}>
               <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>Only checked pages are included in the export.</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                 {ALL_PAGES.map(p => (
-                  <label key={p.id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px", border: selectedPages.includes(p.id) ? "1px solid #b45309" : "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: 500, color: selectedPages.includes(p.id) ? "#b45309" : "#09090b", background: selectedPages.includes(p.id) ? "rgba(180, 83, 9, 0.06)" : "#ffffff" }}>
+                  <label key={p.id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 10px", borderRadius: "5px", cursor: "pointer", fontSize: "13px", fontWeight: 500, color: selectedPages.includes(p.id) ? "#b45309" : "#09090b", background: selectedPages.includes(p.id) ? "rgba(180, 83, 9, 0.08)" : "#f5f4f2", border: selectedPages.includes(p.id) ? "1px solid #b45309" : "1px solid transparent", boxSizing: "border-box" }}>
                     <input type="checkbox" checked={selectedPages.includes(p.id)} onChange={() => togglePage(p.id)} style={{ accentColor: "#b45309", width: "15px", height: "15px" }} />
                     <span>{p.label}</span>
                   </label>
                 ))}
                 {customPages.map(p => (
-                  <label key={p.id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px", border: selectedPages.includes(p.id) ? "1px solid #b45309" : "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: 500, color: selectedPages.includes(p.id) ? "#b45309" : "#09090b", background: selectedPages.includes(p.id) ? "rgba(180, 83, 9, 0.06)" : "#ffffff" }}>
+                  <label key={p.id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 10px", borderRadius: "5px", cursor: "pointer", fontSize: "13px", fontWeight: 500, color: selectedPages.includes(p.id) ? "#b45309" : "#09090b", background: selectedPages.includes(p.id) ? "rgba(180, 83, 9, 0.08)" : "#f5f4f2", border: selectedPages.includes(p.id) ? "1px solid #b45309" : "1px solid transparent", boxSizing: "border-box" }}>
                     <input type="checkbox" checked={selectedPages.includes(p.id)} onChange={() => togglePage(p.id)} style={{ accentColor: "#b45309", width: "15px", height: "15px" }} />
                     <span style={{ flex: 1 }}>{p.label}</span>
                     <button
