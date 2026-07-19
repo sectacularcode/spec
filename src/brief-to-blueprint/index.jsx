@@ -7,7 +7,7 @@ import { ALL_PAGES, ADDITIONAL_PAGE_TYPES } from "../constants/pages.js";
 // Utils
 import { listSectionLibrary } from "../utils/sectionLibrary.js";
 import { getSessionDraft, saveSessionDraft, clearSessionDraft, listDraftSnapshots, saveDraftSnapshot, deleteDraftSnapshot } from "../utils/blueprintDrafts.js";
-import { getInspoPatterns, saveInspoPatterns } from "../utils/inspoPatterns.js";
+import { getInspoPatterns } from "../utils/inspoPatterns.js";
 import { buildInspoContext } from "./utils/inspo.js";
 import { saveToLibrary } from "./utils/library.js";
 import { he } from "./utils/htmlEscape.js";
@@ -171,8 +171,7 @@ export default function CustomBuild({ userId, role } = {}) {
   const [draftsView, setDraftsView]     = useState(false); // start in build mode, not drafts list
   const [drafts, setDrafts]             = useState([]); // saved blueprint drafts
   const [inspoUrls, setInspoUrls]       = useState([""]);
-  const [crawlResults, setCrawlResults] = useState({});  // keyed by URL
-  const [crawling, setCrawling]         = useState({});  // keyed by URL
+  const [crawlResults, setCrawlResults] = useState({});  // keyed by URL — populated by the (removed) inspo crawler; kept because the generation path still reads it (reads empty now, which is correct)
   const [storedPatterns, setStoredPatterns] = useState({}); // persisted across sessions
   const [selectedPages, setPages]       = useState(["home"]);
   const [customPages, setCustomPages]   = useState([]); // user-added pages beyond the defaults
@@ -777,59 +776,6 @@ export default function CustomBuild({ userId, role } = {}) {
     });
   }
 
-  async function crawlUrl(url) {
-    const trimmed = url.trim();
-    if (!trimmed || crawlResults[trimmed] || crawling[trimmed]) return;
-    // Only allow http/https — reject javascript:, file://, ftp://, etc.
-    if (!/^https?:\/\//i.test(trimmed)) return;
-    setCrawling(c => ({ ...c, [trimmed]: true }));
-    try {
-      const res = await fetch("/api/crawl-inspo", {
-        method: "POST",
-        headers: await authHeaders(),
-        body: JSON.stringify({ url: trimmed }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setCrawlResults(r => {
-          const updated = { ...r, [trimmed]: data };
-          // Persist the merged pattern pool to storage
-          if (data.patterns) {
-            const merged = buildInspoContext(updated, storedPatterns);
-            saveInspoPatterns(merged);
-            setStoredPatterns({ pool: merged });
-          }
-          return updated;
-        });
-        // Real brand colors pulled from the reference site's own Elementor
-        // Kit CSS (not guessed). Only fills currently-blank color fields —
-        // never overwrites a color the user already set or that came from
-        // an uploaded brief doc, same "fill blanks only" rule used
-        // everywhere else in this app.
-        if (data.colors) {
-          setBrief(b => {
-            if (!b) return b;
-            const existing = b.colors || {};
-            const merged = { ...existing };
-            let changed = false;
-            for (const key of Object.keys(data.colors)) {
-              if (!existing[key] && data.colors[key]) {
-                merged[key] = data.colors[key];
-                changed = true;
-              }
-            }
-            return changed ? { ...b, colors: merged } : b;
-          });
-        }
-      } else {
-        setCrawlResults(r => ({ ...r, [trimmed]: { error: data.error || "Could not crawl this URL" } }));
-      }
-    } catch (err) {
-      setCrawlResults(r => ({ ...r, [trimmed]: { error: err.message } }));
-    } finally {
-      setCrawling(c => { const n = {...c}; delete n[trimmed]; return n; });
-    }
-  }
   function togglePage(id) { setPages(prev => prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]); }
 
   // Holds the context needed to resume generation after the user reviews/
