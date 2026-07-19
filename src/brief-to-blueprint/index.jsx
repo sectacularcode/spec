@@ -764,14 +764,6 @@ export default function CustomBuild({ userId, role } = {}) {
     });
   }
 
-  function addUrl() { setInspoUrls(u => [...u, ""]); }
-  function updateUrl(i, v) { setInspoUrls(u => u.map((x, j) => j === i ? v : x)); }
-  function removeUrl(i) {
-    const url = inspoUrls[i];
-    setInspoUrls(u => u.filter((_, j) => j !== i));
-    setCrawlResults(r => { const n = {...r}; delete n[url]; return n; });
-  }
-
   async function crawlUrl(url) {
     const trimmed = url.trim();
     if (!trimmed || crawlResults[trimmed] || crawling[trimmed]) return;
@@ -2053,6 +2045,17 @@ export default function CustomBuild({ userId, role } = {}) {
           </div>
 
 
+          {/* ===== GROUP: THIS PAGE — everything scoped to the previewed page
+               (layout, hero eyebrow, location, section styles). One card, inner
+               sub-labels + dividers instead of nested cards. ===== */}
+          {generated && (
+            <div style={{ marginBottom: "28px", ...T.surface }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: "9px", marginBottom: "4px" }}>
+                <span style={{ fontSize: "18px", fontWeight: 700, color: "#09090b" }}>This page</span>
+                <span style={{ fontSize: "11px", color: "#9ca3af" }}>{activePreviewPage ? (activePreviewPage.label || previewPage).replace(/-\d+$/, "") : ""}</span>
+              </div>
+              <div style={{ height: "1px", background: "#eae7e1", margin: "14px 0 18px" }} />
+
           {/* Layout variant picker — shown when generated page has variants */}
           {generated && (() => {
             if (!activePreviewPage || !activePreviewPage.hasVariants) return null;
@@ -2087,8 +2090,8 @@ export default function CustomBuild({ userId, role } = {}) {
               : { A: "Primary layout for this page type.", B: "Alternate layout with a different section structure." };
             const current = layoutVariants[previewPage] || activePreviewPage.recommended || "A";
             return (
-              <div style={{ marginBottom: "32px" }}>
-                <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
+              <div>
+                <div style={{ fontSize: "11px", fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "8px" }}>
                   Layout — {(activePreviewPage.label || previewPage).replace(/-\d+$/, "")}
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -2134,11 +2137,12 @@ export default function CustomBuild({ userId, role } = {}) {
             const eyebrowPage = activePreviewPage;
             if (!eyebrowPage || !/^(landing|other)(-[a-z0-9-]+)?$/.test(eyebrowPage.id)) return null;
             return (
-              <div style={{ marginBottom: "32px" }}>
-                <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>
-                  Hero Eyebrow
+              <div>
+                <div style={{ height: "1px", background: "#f0eee9", margin: "16px 0" }} />
+                <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#9ca3af", marginBottom: "8px" }}>
+                  Hero eyebrow
                 </div>
-                <div style={T.surface}>
+                <div>
                   <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "10px", lineHeight: 1.5 }}>
                     Small label above the hero headline. Leave blank to show the brand name (today's default).
                   </div>
@@ -2170,11 +2174,12 @@ export default function CustomBuild({ userId, role } = {}) {
             const locPage = activePreviewPage;
             if (!locPage || !/^(landing|other)(-[a-z0-9-]+)?$/.test(locPage.id)) return null;
             return (
-              <div style={{ marginBottom: "32px" }}>
-                <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>
-                  Location Details
+              <div>
+                <div style={{ height: "1px", background: "#f0eee9", margin: "16px 0" }} />
+                <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#9ca3af", marginBottom: "8px" }}>
+                  Location details
                 </div>
-                <div style={T.surface}>
+                <div>
                   <div style={{ fontSize: "12px", color: "#b45309", marginBottom: "10px", lineHeight: 1.5 }}>
                     Only needed if Manifest didn't send an address for this page. Powers the map on Variant F (Location).
                   </div>
@@ -2207,58 +2212,6 @@ export default function CustomBuild({ userId, role } = {}) {
             );
           })()}
 
-          {/* Manifest section order readout -- read-only, shows exactly
-              what Manifest's export called for (hero always first,
-              followed by brief.contentOrder in the real sequence
-              manifestImport.js recorded) so there's a clear answer to
-              "what should the top-to-bottom layout be" before deciding
-              whether to keep it or rearrange it. Only meaningful for a
-              Manifest-imported brief -- brief.contentOrder doesn't exist
-              for legacy/manual briefs, so this stays hidden rather than
-              showing a confusing empty list. */}
-          {generated && Array.isArray(brief.contentOrder) && brief.contentOrder.length > 0 && (() => {
-            const ordPage = activePreviewPage;
-            if (!ordPage || !/^(landing|other)(-[a-z0-9-]+)?$/.test(ordPage.id)) return null;
-            const blockLabel = (block) => {
-              if (block.type === "feature") {
-                const f = Array.isArray(brief.features) ? brief.features[block.index] : null;
-                return f && f.heading ? f.heading : "(untitled feature)";
-              }
-              if (block.type === "faq") {
-                const count = Array.isArray(brief.faqItems) ? brief.faqItems.length : 0;
-                return "FAQ" + (count ? " (" + count + " question" + (count === 1 ? "" : "s") + ")" : "");
-              }
-              if (block.type === "form") return "Form" + (brief.formHeading ? " — " + brief.formHeading : "");
-              if (block.type === "map") return "Map / Location";
-              if (block.type === "cta") return brief.closingCtaButtonLabel ? "Closing CTA — \"" + brief.closingCtaButtonLabel + "\"" : "Closing CTA";
-              return block.type;
-            };
-            return (
-              <div style={{ marginBottom: "32px" }}>
-                <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>
-                  Manifest Section Order
-                </div>
-                <div style={T.surface}>
-                  <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px", lineHeight: 1.5 }}>
-                    The real top-to-bottom order Manifest sent for this page. This is what the build follows by default.
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 10px", background: "#f5f4f2", borderRadius: "5px" }}>
-                      <div style={{ fontSize: "11px", fontWeight: 700, color: "#b45309", minWidth: "18px" }}>1</div>
-                      <div style={{ fontSize: "13px", color: "#09090b" }}>Hero{brief.heroHeadline ? " — " + brief.heroHeadline : ""}</div>
-                    </div>
-                    {brief.contentOrder.map((block, i) => (
-                      <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 10px", background: "#f5f4f2", borderRadius: "5px" }}>
-                        <div style={{ fontSize: "11px", fontWeight: 700, color: "#b45309", minWidth: "18px" }}>{i + 2}</div>
-                        <div style={{ fontSize: "13px", color: "#09090b" }}>{blockLabel(block)}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
-
           {/* Section styles picker — landing/other pages only, matches
               where brief.featureLayout actually applies. Replaces the old
               AFS-only hardcoded layout with a real per-brief UI over the
@@ -2274,11 +2227,12 @@ export default function CustomBuild({ userId, role } = {}) {
               return brief[key] || "(untitled)";
             };
             return (
-              <div style={{ marginBottom: "32px" }}>
-                <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>
-                  Section Styles
+              <div>
+                <div style={{ height: "1px", background: "#f0eee9", margin: "16px 0" }} />
+                <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#9ca3af", marginBottom: "8px" }}>
+                  Sections <span style={{ fontWeight: 500, letterSpacing: "normal", textTransform: "none", color: "#c4c0b8" }}>— style, reorder, hide</span>
                 </div>
-                <div style={T.surface}>
+                <div>
                   <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "10px", lineHeight: 1.5 }}>
                     How each content section renders, regardless of which layout (A–E) is active. Untouched rows use the same automatic pattern as before.
                   </div>
@@ -2442,10 +2396,20 @@ export default function CustomBuild({ userId, role } = {}) {
             );
           })()}
 
+            </div>
+          )}
+
+          {/* ===== GROUP: BRAND — colors, fonts, style guide, buttons. Applies
+               to every page. This is the old Brand Brief section; the header now
+               reads "Brand" and sits inside the card. ===== */}
           {/* STEP 1 */}
-          <div style={{ marginBottom: "32px" }}>
-            <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>Brand Brief</div>
-            <div style={T.surface}>
+          <div style={{ marginBottom: "28px", ...T.surface }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "9px", marginBottom: "4px" }}>
+              <span style={{ fontSize: "18px", fontWeight: 700, color: "#09090b" }}>Brand</span>
+              {brief && <span style={{ fontSize: "11px", color: "#9ca3af" }}>applies to all pages</span>}
+            </div>
+            <div style={{ height: "1px", background: "#eae7e1", margin: "14px 0 18px" }} />
+            <div>
               {!brief ? (
                 <>
                   <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
@@ -2683,11 +2647,12 @@ export default function CustomBuild({ userId, role } = {}) {
                       )}
                     </div>
                   )}
-                  <div style={{ marginBottom: "32px" }}>
-                    <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>
-                      Colors
+                  <div style={{ height: "1px", background: "#f0eee9", margin: "16px 0" }} />
+                  <div>
+                    <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#9ca3af", marginBottom: "10px" }}>
+                      Colors &amp; fonts
                     </div>
-                    <div style={T.surface}>
+                    <div>
                       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                         {COLOR_FIELDS.map(f => (
                           <div key={f.key} style={{ display: "grid", gridTemplateColumns: "90px 34px 1fr", gap: "8px", alignItems: "center" }}>
@@ -2778,11 +2743,12 @@ export default function CustomBuild({ userId, role } = {}) {
                       </div>
                     )}
                   </div>
-                  <div style={{ marginBottom: "32px" }}>
-                    <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>
+                  <div style={{ height: "1px", background: "#f0eee9", margin: "16px 0" }} />
+                  <div>
+                    <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#9ca3af", marginBottom: "10px" }}>
                       Buttons
                     </div>
-                    <div style={T.surface}>
+                    <div>
                       <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                         <ButtonEditor
                           locked
@@ -2821,81 +2787,27 @@ export default function CustomBuild({ userId, role } = {}) {
             </div>
           </div>
 
-          {/* STEP 2 */}
-          <div style={{ marginBottom: "32px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-              <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b" }}>Inspo URLs</div>
-              <span style={{ fontSize: "12px", fontWeight: 600, color: "#b45309", marginLeft: "auto" }}>Optional</span>
-            </div>
-            {/* Stored patterns used silently — not shown to end users */}
-            <div style={T.surface}>
-              <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>
-                Paste a site URL and Spec will discover all pages in the nav, not just the home page. Each interior page informs the matching page type in your build.
-              </div>
-              {inspoUrls.map((url, i) => (
-                <div key={i} style={{ marginBottom: "12px" }}>
-                  <div style={{ display: "flex", gap: "8px", marginBottom: "6px" }}>
-                    <input
-                      style={{ ...T.input, flex: 1 }}
-                      value={url}
-                      onChange={e => updateUrl(i, e.target.value)}
-                      onBlur={e => crawlUrl(e.target.value)}
-                      onKeyDown={e => { if (e.key === "Enter") crawlUrl(url); }}
-                      placeholder="https://example.com"
-                    />
-                    {inspoUrls.length > 1 && <button onClick={() => removeUrl(i)} style={{ ...T.btnGhost, padding: "10px 12px" }}>×</button>}
-                  </div>
-                  {/* Crawl status */}
-                  {crawling[url.trim()] && (
-                    <div style={{ fontSize: "12px", color: "#6b7280", padding: "8px 12px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "6px" }}>
-                      Scanning site pages...
-                    </div>
-                  )}
-                  {crawlResults[url.trim()] && !crawlResults[url.trim()].error && (
-                    <div style={{ fontSize: "12px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "6px", padding: "10px 12px" }}>
-                      <div style={{ fontWeight: 600, color: "#09090b", marginBottom: "6px" }}>
-                        {crawlResults[url.trim()].pageCount} page{crawlResults[url.trim()].pageCount !== 1 ? "s" : ""} found
-                      </div>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-                        {(crawlResults[url.trim()].pages || []).map((p, pi) => (
-                          <span key={pi} style={{ fontSize: "9px", padding: "3px 8px", background: "rgba(180, 83, 9, 0.1)", color: "#b45309", borderRadius: "10px", whiteSpace: "nowrap", fontWeight: 500, letterSpacing: "0.02em" }}>
-                            {p.pageType !== "other" ? p.pageType : p.path}
-                          </span>
-                        ))}
-                      </div>
-                      {crawlResults[url.trim()].patterns?.siteNotes && (
-                        <div style={{ fontSize: "11px", color: "#6b7280", marginTop: "8px", lineHeight: 1.5 }}>
-                          {crawlResults[url.trim()].patterns.siteNotes}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  {crawlResults[url.trim()]?.error && (
-                    <div style={{ fontSize: "12px", color: "#dc2626", padding: "6px 10px", background: "#fef2f2", borderRadius: "4px" }}>
-                      {crawlResults[url.trim()].error}
-                    </div>
-                  )}
-                </div>
-              ))}
-              <button onClick={addUrl} style={{ ...T.btnGhost, marginTop: "4px", fontSize: "13px" }}>+ Add URL</button>
-            </div>
-          </div>
-
+          {/* ===== GROUP: EXPORT — page selection and file downloads. Pages to
+               Build shows pre-generation too; the download/preview block only
+               appears once a build exists. One card, collapsible sub-sections. ===== */}
+          <div style={{ marginBottom: "28px", ...T.surface }}>
+            <div style={{ fontSize: "18px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>Export</div>
+            <div style={{ height: "1px", background: "#eae7e1", margin: "14px 0 18px" }} />
           {/* STEP 3 */}
-          <div style={{ marginBottom: "32px" }}>
+          <div>
             <button
               onClick={() => toggleSection("pagesToBuild")}
               style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", padding: 0, marginBottom: "12px", cursor: "pointer" }}>
-              <span style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", fontWeight: 600, color: "#09090b" }}>
-                Pages to Build
-                <span style={{ fontSize: "12px", fontWeight: 500, color: "#6b7280" }}>{selectedPages.length} selected</span>
+              <span style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#6b7280" }}>
+                Pages to build
+                <span style={{ fontSize: "11px", fontWeight: 500, letterSpacing: "normal", textTransform: "none", color: "#9ca3af" }}>{selectedPages.length} selected</span>
               </span>
               <span style={{ display: "inline-flex", transform: openSections.pagesToBuild ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.15s ease", color: "#6b7280" }}>
                 <svg width="12" height="8" viewBox="0 0 10 6" fill="none"><path d="M0 0l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
               </span>
             </button>
             {openSections.pagesToBuild && (
-            <div style={T.surface}>
+            <div style={{ marginTop: "12px" }}>
               <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>Only checked pages are included in the export.</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                 {ALL_PAGES.map(p => (
@@ -2948,88 +2860,9 @@ export default function CustomBuild({ userId, role } = {}) {
             )}
           </div>
 
-          {/* STEP 4 */}
-          <div style={{ marginBottom: "32px" }}>
-            <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>Copy Settings</div>
-            <div style={T.surface}>
-              <div style={{ fontSize: "13px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>Use copy from brand brief only?</div>
-              <div style={{ display: "flex", gap: "10px" }}>
-                <label style={{ flex: 1, padding: "14px", border: copyBriefOnly ? "2px solid #b45309" : "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", textAlign: "center" }}>
-                  <input type="radio" name="copy" checked={copyBriefOnly} onChange={() => setCopy(true)} style={{ display: "none" }} />
-                  <div style={{ fontSize: "14px", fontWeight: 700, color: "#09090b" }}>Yes</div>
-                  <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>Brief copy used verbatim. Nothing is changed or generated by AI.</div>
-                </label>
-                <label style={{ flex: 1, padding: "14px", border: !copyBriefOnly ? "2px solid #b45309" : "1px solid #dde0e6", borderRadius: "6px", cursor: "pointer", textAlign: "center" }}>
-                  <input type="radio" name="copy" checked={!copyBriefOnly} onChange={() => setCopy(false)} style={{ display: "none" }} />
-                  <div style={{ fontSize: "14px", fontWeight: 700, color: "#09090b" }}>No</div>
-                  <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>AI will fill any empty fields using the brand voice from the brief. You can review and edit every drafted field before anything exports.</div>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ display: "flex", justifyContent: "center", marginTop: "8px" }}>
-          <button
-            onClick={generate}
-            disabled={!canGenerate || generating || !!draftedFields}
-            style={{ ...T.btnPrimary, justifyContent: "center", padding: "14px 40px", fontSize: "14px", borderRadius: "8px", opacity: canGenerate ? 1 : 0.4, cursor: canGenerate ? "pointer" : "not-allowed" }}>
-            {generating ? (generatingStatus || "Generating…") : "Generate " + selectedPages.length + " Page" + (selectedPages.length !== 1 ? "s" : "")}
-          </button>
-          </div>
-          {!brief && <div style={{ fontSize: "12px", color: "#9ca3af", textAlign: "center", marginTop: "8px" }}>Upload a brand brief to enable generation</div>}
-          {brief && (() => {
-            // Page generation itself is free — this only reflects
-            // draft-copy.js, which only runs when "Use brief copy only" is
-            // off and something is still blank. See utils/estimateCost.js —
-            // same function a future breakdown panel would call too.
-            const est = estimateGenerationCost(brief, copyBriefOnly);
-            const label = !est.willDraft
-              ? "Estimated cost: $0.00 — using brief copy only"
-              : `Estimated cost: ~$${est.costDollars.toFixed(2)} — AI will draft ${est.blankFieldCount} blank field${est.blankFieldCount !== 1 ? "s" : ""}`;
-            return <div style={{ fontSize: "12px", color: "#9ca3af", textAlign: "center", marginTop: "8px" }}>{label}</div>;
-          })()}
-
-          {/* AI Drafted fields approval — gates page generation until reviewed */}
-          {draftedFields && Object.keys(draftedFields).length > 0 && (
-            <div style={{ marginTop: "24px", ...T.surface }}>
-              <div style={{ padding: "16px", background: "#ffffff", borderRadius: "8px" }}>
-                <div style={{ fontSize: "12px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>
-                  {Object.keys(draftedFields).length} field{Object.keys(draftedFields).length !== 1 ? "s" : ""} drafted in brand voice
-                </div>
-                <div style={{ fontSize: "11px", color: "#6b7280", marginBottom: "12px" }}>Review and edit before anything is built. These will fill blank fields in the brief.</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                  {Object.entries(draftedFields).map(([key, value]) => (
-                    <div key={key}>
-                      <div style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "4px" }}>
-                        {key.replace(/([A-Z])/g, ' $1').trim()}
-                      </div>
-                      <textarea
-                        value={value}
-                        onChange={e => setDraftedFields(prev => ({ ...prev, [key]: e.target.value }))}
-                        rows={2}
-                        style={{ width: "100%", padding: "8px 10px", fontSize: "13px", border: "1px solid #dde0e6", borderRadius: "6px", resize: "vertical", fontFamily: "'Be Vietnam Pro', sans-serif", boxSizing: "border-box" }}
-                      />
-                    </div>
-                  ))}
-                </div>
-                <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
-                  <button
-                    onClick={approveDraftedFields}
-                    style={{ ...T.btnPrimary, fontSize: "12px" }}>
-                    Approve &amp; continue
-                  </button>
-                  <button
-                    onClick={discardDraftedFields}
-                    style={{ ...T.btnGhost, fontSize: "12px" }}>
-                    Discard &amp; continue
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
           {generated && (
-            <div style={{ marginTop: "24px", ...T.surface }}>
+            <div>
+              <div style={{ height: "1px", background: "#eae7e1", margin: "18px 0" }} />
               {/* Swap sections — moved from preview header into panel */}
               {sectionLibrary.length > 0 && (
                 <div style={{ marginBottom: "24px" }}>
@@ -3109,6 +2942,7 @@ export default function CustomBuild({ userId, role } = {}) {
               </>)}
             </div>
           )}
+          </div>
           </div>
         </div>
 
