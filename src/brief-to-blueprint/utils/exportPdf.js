@@ -226,14 +226,27 @@ async function elementsToPdf(elements) {
       windowWidth: EXPORT_CAPTURE_WIDTH_PX,
     });
     if (!canvas.width || !canvas.height) continue;
-    captures.push({ dataUrl: canvas.toDataURL("image/png"), heightPt: PAGE_WIDTH_PT * (canvas.height / canvas.width) });
+    // JPEG, not PNG -- confirmed real case, a single-page PDF export came
+    // out at 82MB with PNG. No transparency is in play (backgroundColor
+    // above is already opaque white), so JPEG loses nothing visually here,
+    // only file size. 0.85 quality: solid balance for this kind of
+    // flat-color/text/gradient design content, no visible artifacting at
+    // normal zoom, meaningfully smaller than PNG regardless of quality
+    // setting chosen (confirmed empirically, though the exact real-world
+    // ratio couldn't be measured end-to-end here -- this sandbox has no
+    // network route to the real webfont, so a real comparison against the
+    // actual 82MB file wasn't possible; PNG vs JPEG at any matched quality
+    // was consistently smaller even under that degraded fallback-font
+    // rendering, and real photographic/gradient content typically
+    // compresses better under JPEG than this test could show).
+    captures.push({ dataUrl: canvas.toDataURL("image/jpeg", 0.85), heightPt: PAGE_WIDTH_PT * (canvas.height / canvas.width) });
   }
   if (!captures.length) return null;
 
   const pdf = new jsPDF({ unit: "pt", format: [PAGE_WIDTH_PT, captures[0].heightPt], orientation: "landscape" });
   captures.forEach((c, i) => {
     if (i > 0) pdf.addPage([PAGE_WIDTH_PT, c.heightPt], "landscape");
-    pdf.addImage(c.dataUrl, "PNG", 0, 0, PAGE_WIDTH_PT, c.heightPt);
+    pdf.addImage(c.dataUrl, "JPEG", 0, 0, PAGE_WIDTH_PT, c.heightPt);
   });
   return pdf;
 }
