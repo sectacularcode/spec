@@ -3021,10 +3021,25 @@ export default function CustomBuild({ userId, role } = {}) {
           </>)}
           </div>
 
-          {/* Generate — primary action. Was deleted alongside the old Copy
-              Settings block in the panel rework; restored here at the end of
-              the setup. Page generation is free; AI draft-copy only runs when
-              copyBriefOnly is off (set via the intake form). */}
+          {/* Generate — primary action. Page generation is free; AI draft-copy
+              only runs when copyBriefOnly is off, which is opt-in via the
+              checkbox directly below (default off = verbatim brief copy, $0).
+              Even when on, drafts only fill BLANK fields and pause for review
+              in the approval panel before anything is applied. */}
+          {brief && (
+            <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", marginTop: "4px", marginBottom: "12px", cursor: "pointer" }}>
+              <input
+                type="checkbox"
+                checked={!copyBriefOnly}
+                onChange={e => setCopy(!e.target.checked)}
+                style={{ accentColor: "#b45309", width: "15px", height: "15px", marginTop: "1px", flexShrink: 0 }}
+              />
+              <span style={{ fontSize: "12px", color: "#3f3f46", lineHeight: 1.5 }}>
+                Let AI draft blank fields
+                <span style={{ display: "block", fontSize: "11px", color: "#9ca3af" }}>Only fills empty fields, in your brand voice — you review and approve every draft before it's used. Off means brief copy is used exactly as written.</span>
+              </span>
+            </label>
+          )}
           <div style={{ display: "flex", justifyContent: "center", marginTop: "8px" }}>
           <button
             onClick={generate}
