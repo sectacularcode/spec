@@ -81,16 +81,18 @@ export default async function handler(req, res) {
         // print, so headings render in real Inter and the map isn't blank.
         gotoOptions: { waitUntil: "networkidle2", timeout: 20000 },
         options: {
-          // Landscape Letter pages, matching the previous export's
-          // orientation. IMPORTANT: an explicit `width` here would OVERRIDE
-          // `landscape` in Puppeteer's page.pdf (landscape only swaps
-          // dimensions for format-based sizing, not for an explicit
-          // width/height) -- which is exactly what produced portrait output
-          // on the first ship. So we size by `format` + `landscape` and set
-          // no explicit width. printBackground so the section background
-          // colors (the gold hero/CTA bands) render instead of white.
-          format: "Letter",
-          landscape: true,
+          // Force landscape with an EXPLICIT width+height box (width > height)
+          // rather than format+landscape. Two earlier attempts got this wrong:
+          // (1) explicit `width` alone (no height) defaulted to a tall page =>
+          // portrait; (2) `format:"Letter"+landscape` relies on Browserless
+          // passing those through to page.pdf exactly, which wasn't reliable.
+          // Setting BOTH width and height makes the page box unambiguous and
+          // landscape by construction (1280x720, 16:9, matching the desktop
+          // preview's own proportions). printBackground so the section
+          // background colors (the gold hero/CTA bands) render instead of
+          // white.
+          width: "1280px",
+          height: "720px",
           printBackground: true,
           preferCSSPageSize: false,
           margin: { top: "0", bottom: "0", left: "0", right: "0" },
