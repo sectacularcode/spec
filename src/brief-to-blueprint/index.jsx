@@ -120,15 +120,6 @@ export default function CustomBuild({ userId, role } = {}) {
   function toggleSection(key) {
     setOpenSections(s => ({ ...s, [key]: !s[key] }));
   }
-  // Collapse state for the three top-level group cards (This page / Brand /
-  // Export). Inverse default of openSections above: a key absent here means
-  // OPEN, present+true means collapsed -- the groups hold the primary editing
-  // controls, so they start expanded and the person folds whichever they
-  // aren't using. Session-scoped.
-  const [collapsedGroups, setCollapsedGroups] = useState({}); // { thisPage?, brand?, export? } true = collapsed
-  function toggleGroup(key) {
-    setCollapsedGroups(g => ({ ...g, [key]: !g[key] }));
-  }
   // Sections Manifest itself marked proposed:true (a suggestion, not
   // confirmed content -- see manifestImport.js's _proposedBlocks for the
   // real bug this fixes) but excluded from the built page entirely.
@@ -2012,18 +2003,10 @@ export default function CustomBuild({ userId, role } = {}) {
                sub-labels + dividers instead of nested cards. ===== */}
           {generated && (
             <div style={{ marginBottom: "28px", ...T.surface }}>
-              <button
-                onClick={() => toggleGroup("thisPage")}
-                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", padding: 0, cursor: "pointer", textAlign: "left" }}>
-                <span style={{ display: "flex", alignItems: "baseline", gap: "9px" }}>
-                  <span style={{ fontSize: "18px", fontWeight: 700, color: "#09090b" }}>This page</span>
-                  <span style={{ fontSize: "11px", color: "#9ca3af" }}>{activePreviewPage ? (activePreviewPage.label || previewPage).replace(/-\d+$/, "") : ""}</span>
-                </span>
-                <span style={{ display: "inline-flex", transform: collapsedGroups.thisPage ? "rotate(0deg)" : "rotate(180deg)", transition: "transform 0.15s ease", color: "#6b7280" }}>
-                  <svg width="13" height="8" viewBox="0 0 10 6" fill="none"><path d="M0 0l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                </span>
-              </button>
-              {!collapsedGroups.thisPage && (<>
+              <div style={{ display: "flex", alignItems: "baseline", gap: "9px", marginBottom: "4px" }}>
+                <span style={{ fontSize: "18px", fontWeight: 700, color: "#09090b" }}>This page</span>
+                <span style={{ fontSize: "11px", color: "#9ca3af" }}>{activePreviewPage ? (activePreviewPage.label || previewPage).replace(/-\d+$/, "") : ""}</span>
+              </div>
               <div style={{ height: "1px", background: "#eae7e1", margin: "14px 0 18px" }} />
 
           {/* Layout variant picker — shown when generated page has variants */}
@@ -2366,7 +2349,6 @@ export default function CustomBuild({ userId, role } = {}) {
             );
           })()}
 
-              </>)}
             </div>
           )}
 
@@ -2375,18 +2357,10 @@ export default function CustomBuild({ userId, role } = {}) {
                reads "Brand" and sits inside the card. ===== */}
           {/* STEP 1 */}
           <div style={{ marginBottom: "28px", ...T.surface }}>
-            <button
-              onClick={() => toggleGroup("brand")}
-              style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", padding: 0, cursor: "pointer", textAlign: "left" }}>
-              <span style={{ display: "flex", alignItems: "baseline", gap: "9px" }}>
-                <span style={{ fontSize: "18px", fontWeight: 700, color: "#09090b" }}>Brand</span>
-                {brief && <span style={{ fontSize: "11px", color: "#9ca3af" }}>applies to all pages</span>}
-              </span>
-              <span style={{ display: "inline-flex", transform: collapsedGroups.brand ? "rotate(0deg)" : "rotate(180deg)", transition: "transform 0.15s ease", color: "#6b7280" }}>
-                <svg width="13" height="8" viewBox="0 0 10 6" fill="none"><path d="M0 0l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-              </span>
-            </button>
-            {!collapsedGroups.brand && (<>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "9px", marginBottom: "4px" }}>
+              <span style={{ fontSize: "18px", fontWeight: 700, color: "#09090b" }}>Brand</span>
+              {brief && <span style={{ fontSize: "11px", color: "#9ca3af" }}>applies to all pages</span>}
+            </div>
             <div style={{ height: "1px", background: "#eae7e1", margin: "14px 0 18px" }} />
             <div>
               {!brief ? (
@@ -2766,22 +2740,13 @@ export default function CustomBuild({ userId, role } = {}) {
                 </div>
               )}
             </div>
-            </>)}
           </div>
 
           {/* ===== GROUP: EXPORT — page selection and file downloads. Pages to
                Build shows pre-generation too; the download/preview block only
                appears once a build exists. One card, collapsible sub-sections. ===== */}
           <div style={{ marginBottom: "28px", ...T.surface }}>
-            <button
-              onClick={() => toggleGroup("export")}
-              style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", padding: 0, cursor: "pointer", textAlign: "left" }}>
-              <span style={{ fontSize: "18px", fontWeight: 700, color: "#09090b" }}>Export</span>
-              <span style={{ display: "inline-flex", transform: collapsedGroups.export ? "rotate(0deg)" : "rotate(180deg)", transition: "transform 0.15s ease", color: "#6b7280" }}>
-                <svg width="13" height="8" viewBox="0 0 10 6" fill="none"><path d="M0 0l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-              </span>
-            </button>
-            {!collapsedGroups.export && (<>
+            <div style={{ fontSize: "18px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>Export</div>
             <div style={{ height: "1px", background: "#eae7e1", margin: "14px 0 18px" }} />
           {/* File name — the download filename + internal Elementor template
               title. Fallback chain in downloadPage is customName (per-page
@@ -2967,7 +2932,6 @@ export default function CustomBuild({ userId, role } = {}) {
               </>)}
             </div>
           )}
-          </>)}
           </div>
 
           {/* Generate — primary action. Page generation is free; AI draft-copy
