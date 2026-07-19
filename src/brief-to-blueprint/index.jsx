@@ -226,7 +226,9 @@ export default function CustomBuild({ userId, role } = {}) {
         if (draft.inspoUrls)      setInspoUrls(draft.inspoUrls);
         if (draft.selectedPages)  setPages(draft.selectedPages);
         if (draft.customPages)    setCustomPages(draft.customPages);
-        if (draft.copyBriefOnly !== undefined) setCopy(draft.copyBriefOnly);
+        // Intentionally NOT restoring draft.copyBriefOnly: AI draft-copy is a
+        // deliberate per-session opt-in, never sticky. It always loads OFF so
+        // it can never run without the person turning it on again this session.
         if (draft.layoutVariants) setLayoutVariants(draft.layoutVariants);
         if (draft.generated)      setGenerated(draft.generated);
         if (draft.previewPage)    setPreviewPage(draft.previewPage);
@@ -362,7 +364,8 @@ export default function CustomBuild({ userId, role } = {}) {
     if (s.inspoUrls) setInspoUrls(s.inspoUrls);
     if (s.selectedPages) setPages(s.selectedPages);
     if (s.customPages) setCustomPages(s.customPages);
-    if (s.copyBriefOnly !== undefined) setCopy(s.copyBriefOnly);
+    // See note above: copyBriefOnly is deliberately not restored -- AI draft-
+    // copy always loads OFF and must be re-enabled per session.
     if (s.layoutVariants) setLayoutVariants(s.layoutVariants);
     if (s.generated) setGenerated(s.generated);
     if (s.previewPage) setPreviewPage(s.previewPage);
