@@ -651,8 +651,17 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
         var formRendered = false;
         var mapRendered = false;
         var ctaRendered = false;
+        // Mirror of landing.js's renderOrderedContent hidden-section guard --
+        // a section is user-hidden if its key is in brief.hiddenSections
+        // ("faq"|"form"|"map"|"cta"|"testimonials" or "feature-<index>").
+        // Must stay identical to the builder or preview/export drift is
+        // reintroduced. Hidden singletons are marked *rendered* so the
+        // re-add safety nets below can't undo the hide.
+        var hidden = Array.isArray(brief.hiddenSections) ? brief.hiddenSections : [];
+        function isHidden(key) { return hidden.indexOf(key) !== -1; }
         var body = brief.contentOrder.map(function (block) {
           if (block.type === "feature") {
+            if (isHidden("feature-" + block.index)) return "";
             var curated = Array.isArray(brief.featureLayout)
               ? brief.featureLayout.filter(function (e) { return e.indices && e.indices.length === 1 && e.indices[0] === block.index; })[0]
               : null;
@@ -660,26 +669,28 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
             var style = safeStyleFor(curated ? curated.style : defaultOrderedRowStyle(block.index, !!brief.videoUrl), f);
             return renderCuratedFeatureLayoutHTML([{ style: style, indices: [block.index] }]);
           } else if (block.type === "faq") {
+            if (isHidden("faq")) return "";
             return faqHTML;
           } else if (block.type === "form") {
             // Variant B always leads with its own two-column form+trust
             // section, and Variant F folds the form into its hero-area
             // layout separately -- opts.skipForm avoids a redundant
             // second form further down the page in ordered mode.
-            if (opts.skipForm) { formRendered = true; return ""; }
+            if (opts.skipForm || isHidden("form")) { formRendered = true; return ""; }
             formRendered = true;
             return genericFormHTML(opts.formAnchorId);
           } else if (block.type === "map") {
             // Variant F's hero already includes the map.
-            if (opts.skipMap) { mapRendered = true; return ""; }
+            if (opts.skipMap || isHidden("map")) { mapRendered = true; return ""; }
             mapRendered = true;
             return mapSectionHTML;
           } else if (block.type === "cta") {
+            if (isHidden("cta")) { ctaRendered = true; return ""; }
             ctaRendered = true;
             return closingCtaHTML(opts.closingBg);
           } else if (block.type === "testimonials") {
             testimonialsRendered = true;
-            if (opts.skipTestimonials) return "";
+            if (opts.skipTestimonials || isHidden("testimonials")) return "";
             return opts.testimonialsOverride !== undefined ? opts.testimonialsOverride : "";
           }
           return "";
@@ -690,15 +701,16 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
         // the "add it" flow on a proposed section, see manifestImport.js's
         // applyProposedBlock). Each fallback call is self-guarding
         // (returns "" with no real content), same as the normal path.
-        if (!formRendered && !opts.skipForm) body += genericFormHTML(opts.formAnchorId);
-        if (!mapRendered && !opts.skipMap) body += mapSectionHTML;
-        if (!ctaRendered) body += closingCtaHTML(opts.closingBg);
+        // isHidden() checked here too so a re-add can't undo a hide.
+        if (!formRendered && !opts.skipForm && !isHidden("form")) body += genericFormHTML(opts.formAnchorId);
+        if (!mapRendered && !opts.skipMap && !isHidden("map")) body += mapSectionHTML;
+        if (!ctaRendered && !isHidden("cta")) body += closingCtaHTML(opts.closingBg);
         return body + (
           // Safety net for already-saved builds whose stored contentOrder
           // predates testimonials being tracked -- mirrors landing.js's
           // renderOrderedContent() exactly, same reasoning documented
           // there. Appends at the end rather than guessing a position.
-          (!testimonialsRendered && !opts.skipTestimonials && opts.testimonialsOverride) ? opts.testimonialsOverride : ""
+          (!testimonialsRendered && !opts.skipTestimonials && !isHidden("testimonials") && opts.testimonialsOverride) ? opts.testimonialsOverride : ""
         );
       }
 

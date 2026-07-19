@@ -649,8 +649,17 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     var formRendered = false;
     var mapRendered = false;
     var ctaRendered = false;
+    // A section is user-hidden if its key is present in brief.hiddenSections.
+    // Keys: "faq" | "form" | "map" | "cta" | "testimonials" for the singleton
+    // sections, and "feature-<index>" for an individual feature row. Kept as
+    // a lookup helper rather than repeated indexOf so the guard reads cleanly
+    // in each branch below. A hidden singleton is marked *rendered* (so the
+    // safety nets below never re-add it) but nothing is pushed.
+    var hidden = Array.isArray(brief.hiddenSections) ? brief.hiddenSections : [];
+    function isHidden(key) { return hidden.indexOf(key) !== -1; }
     brief.contentOrder.forEach(function (block) {
       if (block.type === "feature") {
+        if (isHidden("feature-" + block.index)) return;
         var f = features[block.index];
         if (!f) return;
         var curated = Array.isArray(brief.featureLayout)
@@ -659,6 +668,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         var style = safeStyleFor(curated ? curated.style : defaultOrderedRowStyle(block.index, !!brief.videoUrl), f);
         rendered = rendered.concat(renderFeatureLayout([{ style: style, indices: [block.index] }], features));
       } else if (block.type === "faq") {
+        if (isHidden("faq")) return;
         var faqEl = makeFaqSection();
         if (faqEl) rendered.push(faqEl);
       } else if (block.type === "form") {
@@ -667,7 +677,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
         // placing form content wherever Manifest's export had it --
         // opts.skipForm avoids rendering a second, redundant form section
         // further down the page in ordered mode.
-        if (opts.skipForm) { formRendered = true; return; }
+        if (opts.skipForm || isHidden("form")) { formRendered = true; return; }
         // Variant F builds its own form section separately (real anchor
         // ID, #contact-form, for the hero's "Contact Us" to jump to) --
         // opts.formOverride substitutes that instead of a second, plain
@@ -678,17 +688,18 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
       } else if (block.type === "map") {
         // Variant F's hero already includes the map -- opts.skipMap
         // avoids rendering it a second time further down the page.
-        if (opts.skipMap) { mapRendered = true; return; }
+        if (opts.skipMap || isHidden("map")) { mapRendered = true; return; }
         var mapEl = makeMapSection();
         if (mapEl) rendered.push(mapEl);
         mapRendered = true;
       } else if (block.type === "cta") {
+        if (isHidden("cta")) { ctaRendered = true; return; }
         var ctaEl = makeClosingCta(opts.closingBg);
         if (ctaEl) rendered.push(ctaEl);
         ctaRendered = true;
       } else if (block.type === "testimonials") {
         testimonialsRendered = true;
-        if (opts.skipTestimonials) return;
+        if (opts.skipTestimonials || isHidden("testimonials")) return;
         var tEl = opts.testimonialsOverride !== undefined ? opts.testimonialsOverride : makeTestimonialSection();
         if (tEl) rendered.push(tEl);
       }
@@ -701,8 +712,9 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // silently drop the testimonial section entirely instead of just
     // misplacing it). Appends at the end rather than guessing a fixed
     // position, since "somewhere, once" beats a position that's provably
-    // wrong on 2 of 17 real pages on hand.
-    if (!testimonialsRendered && !opts.skipTestimonials) {
+    // wrong on 2 of 17 real pages on hand. isHidden() is checked here too
+    // so a user hiding a section can't be undone by the re-add net.
+    if (!testimonialsRendered && !opts.skipTestimonials && !isHidden("testimonials")) {
       var fallbackT = opts.testimonialsOverride !== undefined ? opts.testimonialsOverride : makeTestimonialSection();
       if (fallbackT) rendered.push(fallbackT);
     }
@@ -713,15 +725,15 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     // since the section was excluded from contentOrder entirely at
     // import time (it was a suggestion, not confirmed) and only gets its
     // real fields filled in later, after contentOrder was already built.
-    if (!formRendered && !opts.skipForm) {
+    if (!formRendered && !opts.skipForm && !isHidden("form")) {
       var fallbackForm = opts.formOverride !== undefined ? opts.formOverride : makeFormSection();
       if (fallbackForm) rendered.push(fallbackForm);
     }
-    if (!mapRendered && !opts.skipMap) {
+    if (!mapRendered && !opts.skipMap && !isHidden("map")) {
       var fallbackMap = makeMapSection();
       if (fallbackMap) rendered.push(fallbackMap);
     }
-    if (!ctaRendered) {
+    if (!ctaRendered && !isHidden("cta")) {
       var fallbackCta = makeClosingCta(opts.closingBg);
       if (fallbackCta) rendered.push(fallbackCta);
     }

@@ -1138,6 +1138,29 @@ export default function CustomBuild({ userId, role } = {}) {
     regenerateActivePage(updatedBrief);
   }
 
+  // Adds/removes a section key from brief.hiddenSections -- the unified
+  // hide mechanism read by landing.js/landingPreview.js's ordered-content
+  // walker (keys: "map" | "cta" | "form" | "testimonials" | "faq", or
+  // "feature-<index>" for one feature row). Distinct from the skip* flags
+  // above, which are older brand-level toggles for specific sections; this
+  // covers the sections that had no toggle before (map, closing CTA,
+  // individual feature rows) without adding a new flag per section. A
+  // section stays hidden in both the live preview and the downloadable
+  // JSON, and regenerates just the active page (no AI cost), same as every
+  // other Section Styles control.
+  function toggleHiddenSection(key, hidden) {
+    var current = Array.isArray(brief.hiddenSections) ? brief.hiddenSections : [];
+    var next = hidden
+      ? (current.indexOf(key) === -1 ? current.concat([key]) : current)
+      : current.filter(function (k) { return k !== key; });
+    var updatedBrief = { ...brief, hiddenSections: next };
+    setBrief(updatedBrief);
+    regenerateActivePage(updatedBrief);
+  }
+  function isSectionHidden(key) {
+    return Array.isArray(brief.hiddenSections) && brief.hiddenSections.indexOf(key) !== -1;
+  }
+
   // Manual override for Location (Variant F)'s map/address -- Manifest is
   // the only other source for these two fields (manifestImport.js's
   // map_location handling), and Manifest doesn't always send a
@@ -2266,6 +2289,14 @@ export default function CustomBuild({ userId, role } = {}) {
                     <input type="checkbox" checked={!!brief.skipTestimonials} onChange={e => toggleSkipTestimonials(e.target.checked)} style={{ cursor: "pointer", accentColor: "#b45309" }} />
                     Hide the testimonials section
                   </label>
+                  <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
+                    <input type="checkbox" checked={isSectionHidden("map")} onChange={e => toggleHiddenSection("map", e.target.checked)} style={{ cursor: "pointer", accentColor: "#b45309" }} />
+                    Hide the map section
+                  </label>
+                  <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#6b7280", cursor: "pointer", marginBottom: "10px" }}>
+                    <input type="checkbox" checked={isSectionHidden("cta")} onChange={e => toggleHiddenSection("cta", e.target.checked)} style={{ cursor: "pointer", accentColor: "#b45309" }} />
+                    Hide the closing call-to-action
+                  </label>
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                     {rows.map((row, rowIdx) => {
                       const isGrouped = row.indices.length > 1;
@@ -2287,13 +2318,27 @@ export default function CustomBuild({ userId, role } = {}) {
                         );
                       }
 
+                      const rowHidden = row.indices.every(i => isSectionHidden("feature-" + i));
                       return (
-                        <div key={rowIdx} style={{ padding: "16px 18px", borderRadius: "6px", border: "1px solid #dde0e6", background: "#ffffff", display: "flex", flexDirection: "column", gap: "10px" }}>
-                          <div style={{ fontSize: "14px", fontWeight: 700, color: "#09090b" }}>
-                            {isGrouped ? row.indices.map(featureLabel).join(" + ") : featureLabel(row.indices[0])}
+                        <div key={rowIdx} style={{ padding: "16px 18px", borderRadius: "6px", border: "1px solid " + (rowHidden ? "#f0d9bf" : "#dde0e6"), background: rowHidden ? "#fdf8f1" : "#ffffff", display: "flex", flexDirection: "column", gap: "10px" }}>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
+                            <div style={{ fontSize: "14px", fontWeight: 700, color: rowHidden ? "#b08b5b" : "#09090b", textDecoration: rowHidden ? "line-through" : "none" }}>
+                              {isGrouped ? row.indices.map(featureLabel).join(" + ") : featureLabel(row.indices[0])}
+                            </div>
+                            {/* Toggles every index in the row together, so a
+                                grouped row hides/shows as one unit. */}
+                            <button
+                              onClick={() => row.indices.forEach(i => toggleHiddenSection("feature-" + i, !rowHidden))}
+                              style={{ padding: "4px 10px", fontSize: "11px", fontWeight: 600, background: "#fff", color: rowHidden ? "#b45309" : "#6b7280", border: "1px solid " + (rowHidden ? "#f0d9bf" : "#dde0e6"), borderRadius: "5px", cursor: "pointer", whiteSpace: "nowrap" }}>
+                              {rowHidden ? "Show row" : "Hide row"}
+                            </button>
                           </div>
 
-                          {isGrouped ? (
+                          {rowHidden ? (
+                            <div style={{ fontSize: "11px", color: "#b08b5b", fontStyle: "italic" }}>
+                              Hidden — won't appear in preview or export
+                            </div>
+                          ) : isGrouped ? (
                             <input
                               value={row.header}
                               onChange={e => setSectionRowHeader(rows, rowIdx, e.target.value)}
@@ -2318,6 +2363,7 @@ export default function CustomBuild({ userId, role } = {}) {
                             </select>
                           )}
 
+                          {!rowHidden && (
                           <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
                             {(isGrouped || canGroupNext) && (
                               <label style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", color: "#6b7280", cursor: "pointer" }}>
@@ -2331,6 +2377,7 @@ export default function CustomBuild({ userId, role } = {}) {
                             </label>
                             <button onClick={() => insertMidCta(rows, rowIdx)} style={{ padding: "4px 10px", fontSize: "12px", background: "#fff", color: "#b45309", border: "1px solid #b45309", borderRadius: "5px", cursor: "pointer" }}>+ Insert CTA after this row</button>
                           </div>
+                          )}
 
                           {/* Manual button override -- attaches to the first
                               feature index in the row (the same index a
@@ -2339,7 +2386,7 @@ export default function CustomBuild({ userId, role } = {}) {
                               buttonUrl/buttonPlacement directly; landing.js
                               and landingPreview.js already render whatever's
                               there, Manifest-imported or typed in here. */}
-                          {(() => {
+                          {!rowHidden && (() => {
                             const btnIdx = row.indices[0];
                             const btnFeature = (Array.isArray(brief.features) && brief.features[btnIdx]) || {};
                             return (
