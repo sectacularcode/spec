@@ -111,6 +111,15 @@ export default function CustomBuild({ userId, role } = {}) {
   // wasn't catching anything new. This one stays because it's the only
   // thing that knows which buttons are actually broken in this build.
   const [placeholderButtons, setPlaceholderButtons] = useState(null); // [{ label, section }] | null
+  // Collapsed/expanded state for the content-heavy panel sections (Pages to
+  // Build and Download). Both default to collapsed so the panel opens as a
+  // clean overview -- especially important on bulk imports where Download is
+  // one name-input + download button PER PAGE (20+ rows). Session-scoped
+  // (resets on reload); a key absent from this object means collapsed.
+  const [openSections, setOpenSections] = useState({}); // { pagesToBuild?: true, download?: true }
+  function toggleSection(key) {
+    setOpenSections(s => ({ ...s, [key]: !s[key] }));
+  }
   // Sections Manifest itself marked proposed:true (a suggestion, not
   // confirmed content -- see manifestImport.js's _proposedBlocks for the
   // real bug this fixes) but excluded from the built page entirely.
@@ -2874,7 +2883,18 @@ export default function CustomBuild({ userId, role } = {}) {
 
           {/* STEP 3 */}
           <div style={{ marginBottom: "32px" }}>
-            <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>Pages to Build</div>
+            <button
+              onClick={() => toggleSection("pagesToBuild")}
+              style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", padding: 0, marginBottom: "12px", cursor: "pointer" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", fontWeight: 600, color: "#09090b" }}>
+                Pages to Build
+                <span style={{ fontSize: "12px", fontWeight: 500, color: "#6b7280" }}>{selectedPages.length} selected</span>
+              </span>
+              <span style={{ display: "inline-flex", transform: openSections.pagesToBuild ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.15s ease", color: "#6b7280" }}>
+                <svg width="12" height="8" viewBox="0 0 10 6" fill="none"><path d="M0 0l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              </span>
+            </button>
+            {openSections.pagesToBuild && (
             <div style={T.surface}>
               <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>Only checked pages are included in the export.</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
@@ -2925,6 +2945,7 @@ export default function CustomBuild({ userId, role } = {}) {
 
               <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "10px" }}>{selectedPages.length} page{selectedPages.length !== 1 ? "s" : ""} selected</div>
             </div>
+            )}
           </div>
 
           {/* STEP 4 */}
@@ -3021,7 +3042,18 @@ export default function CustomBuild({ userId, role } = {}) {
                   </button>
                 </div>
               )}
-              <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "12px" }}>Download</div>
+              <button
+                onClick={() => toggleSection("download")}
+                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", padding: 0, marginBottom: "12px", cursor: "pointer" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280" }}>
+                  Download
+                  <span style={{ fontSize: "11px", fontWeight: 500, letterSpacing: "normal", textTransform: "none", color: "#9ca3af" }}>{generated.pages.length} page{generated.pages.length !== 1 ? "s" : ""}</span>
+                </span>
+                <span style={{ display: "inline-flex", transform: openSections.download ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.15s ease", color: "#6b7280" }}>
+                  <svg width="12" height="8" viewBox="0 0 10 6" fill="none"><path d="M0 0l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                </span>
+              </button>
+              {openSections.download && (<>
               <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 {generated.pages.map(p => (
                   <div key={p.id} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -3049,8 +3081,23 @@ export default function CustomBuild({ userId, role } = {}) {
                   <span>Footer</span><span style={{ color: "#b45309" }}>↓ .json</span>
                 </button>
               </div>
+              <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "14px" }}>
+                Import via WordPress → Templates → Saved Templates → Import Templates.
+              </div>
+              </>)}
               <div style={{ height: "1px", background: "#dde0e6", margin: "18px 0" }} />
-              <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280", marginBottom: "12px" }}>Preview</div>
+              <button
+                onClick={() => toggleSection("htmlPreview")}
+                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", padding: 0, marginBottom: "12px", cursor: "pointer" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6b7280" }}>
+                  HTML preview
+                  <span style={{ fontSize: "11px", fontWeight: 500, letterSpacing: "normal", textTransform: "none", color: "#9ca3af" }}>{generated.pages.length} page{generated.pages.length !== 1 ? "s" : ""}</span>
+                </span>
+                <span style={{ display: "inline-flex", transform: openSections.htmlPreview ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.15s ease", color: "#6b7280" }}>
+                  <svg width="12" height="8" viewBox="0 0 10 6" fill="none"><path d="M0 0l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                </span>
+              </button>
+              {openSections.htmlPreview && (<>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 {generated.pages.map(p => (
                   <button key={p.id + "-preview"} onClick={() => downloadPreview(p.id, layoutVariants[p.id] || p.recommended || "A")} style={{ ...T.btnGhost, textAlign: "left", display: "flex", justifyContent: "space-between", padding: "12px 16px", fontSize: "13px" }}>
@@ -3059,9 +3106,7 @@ export default function CustomBuild({ userId, role } = {}) {
                 ))}
               </div>
               <div style={{ fontSize: "12px", color: "#9ca3af", marginTop: "10px", lineHeight: 1.5 }}>Open in browser to scroll and screenshot the full page.</div>
-              <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "14px" }}>
-                Import via WordPress → Templates → Saved Templates → Import Templates.
-              </div>
+              </>)}
             </div>
           )}
           </div>
