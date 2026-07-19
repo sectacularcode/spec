@@ -2668,6 +2668,59 @@ export default function CustomBuild({ userId, role } = {}) {
                         />
                       </div>
                     </div>
+                    {/* Style-guide Save/Load lives directly under Colors --
+                        it saves and applies the brand's colors/fonts/buttons
+                        as a named profile, so it belongs with the color/font
+                        controls it acts on, not after the Buttons section. */}
+                    {brief.brandName && (
+                      <div style={{ marginTop: "12px", position: "relative" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                          {((brief.colors && Object.keys(brief.colors).length > 0)
+                            || (Array.isArray(brief.fonts) && brief.fonts.some(f => f))
+                            || (Array.isArray(brief.buttons) && brief.buttons.length > 0)) && (
+                            <button
+                              onClick={saveBrandStyle}
+                              style={{ padding: "6px 12px", fontSize: "11px", fontWeight: 600, border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", cursor: "pointer" }}>
+                              Save as {brief.brandName}'s style guide
+                            </button>
+                          )}
+                          <button
+                            onClick={() => showStylePicker ? setShowStylePicker(false) : openStylePicker()}
+                            style={{ padding: "6px 12px", fontSize: "11px", fontWeight: 600, border: "1px solid #dde0e6", borderRadius: "6px", background: showStylePicker ? "#f3f4f6" : "#fff", color: "#09090b", cursor: "pointer" }}>
+                            Load a saved style guide
+                          </button>
+                          {stylePanelStatus && <span style={{ fontSize: "11px", color: "#6b7280" }}>{stylePanelStatus}</span>}
+                        </div>
+                        {showStylePicker && (
+                          <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, zIndex: 20, width: "280px", maxHeight: "320px", overflowY: "auto", background: "#fff", border: "1px solid #dde0e6", borderRadius: "8px", boxShadow: "0 8px 24px rgba(0,0,0,0.1)", padding: "8px" }}>
+                            {loadingStyles && <div style={{ fontSize: "12px", color: "#6b7280", padding: "8px" }}>Loading saved styles...</div>}
+                            {!loadingStyles && pickerError && (
+                              <div style={{ fontSize: "12px", color: "#dc2626", padding: "8px" }}>{pickerError}</div>
+                            )}
+                            {!loadingStyles && !pickerError && savedStylesList.length === 0 && (
+                              <div style={{ fontSize: "12px", color: "#6b7280", padding: "8px" }}>
+                                No saved style guides yet. Save one from the button above and it'll show up here.
+                              </div>
+                            )}
+                            {!loadingStyles && savedStylesList.map(style => (
+                              <div
+                                key={style.id}
+                                onClick={() => applySavedStyle(style)}
+                                style={{ padding: "8px", borderRadius: "6px", cursor: "pointer", display: "flex", flexDirection: "column", gap: "6px" }}
+                                onMouseEnter={e => e.currentTarget.style.background = "#f9fafb"}
+                                onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                                <span style={{ fontSize: "12px", fontWeight: 600, color: "#09090b" }}>{style.name}</span>
+                                <div style={{ display: "flex", gap: "4px" }}>
+                                  {Object.entries(style.colors || {}).slice(0, 8).map(([id, hex]) => (
+                                    <div key={id} title={id + ": " + hex} style={{ width: "16px", height: "16px", borderRadius: "3px", background: hex, border: "1px solid rgba(0,0,0,.1)" }} />
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div style={{ marginBottom: "32px" }}>
                     <div style={{ fontSize: "14px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>
@@ -2696,55 +2749,6 @@ export default function CustomBuild({ userId, role } = {}) {
                       </div>
                     </div>
                   </div>
-                  {brief.brandName && (
-                    <div style={{ marginBottom: "32px", position: "relative" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                        {((brief.colors && Object.keys(brief.colors).length > 0)
-                          || (Array.isArray(brief.fonts) && brief.fonts.some(f => f))
-                          || (Array.isArray(brief.buttons) && brief.buttons.length > 0)) && (
-                          <button
-                            onClick={saveBrandStyle}
-                            style={{ padding: "6px 12px", fontSize: "11px", fontWeight: 600, border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: "#09090b", cursor: "pointer" }}>
-                            Save as {brief.brandName}'s style guide
-                          </button>
-                        )}
-                        <button
-                          onClick={() => showStylePicker ? setShowStylePicker(false) : openStylePicker()}
-                          style={{ padding: "6px 12px", fontSize: "11px", fontWeight: 600, border: "1px solid #dde0e6", borderRadius: "6px", background: showStylePicker ? "#f3f4f6" : "#fff", color: "#09090b", cursor: "pointer" }}>
-                          Load a saved style guide
-                        </button>
-                        {stylePanelStatus && <span style={{ fontSize: "11px", color: "#6b7280" }}>{stylePanelStatus}</span>}
-                      </div>
-                      {showStylePicker && (
-                        <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, zIndex: 20, width: "280px", maxHeight: "320px", overflowY: "auto", background: "#fff", border: "1px solid #dde0e6", borderRadius: "8px", boxShadow: "0 8px 24px rgba(0,0,0,0.1)", padding: "8px" }}>
-                          {loadingStyles && <div style={{ fontSize: "12px", color: "#6b7280", padding: "8px" }}>Loading saved styles...</div>}
-                          {!loadingStyles && pickerError && (
-                            <div style={{ fontSize: "12px", color: "#dc2626", padding: "8px" }}>{pickerError}</div>
-                          )}
-                          {!loadingStyles && !pickerError && savedStylesList.length === 0 && (
-                            <div style={{ fontSize: "12px", color: "#6b7280", padding: "8px" }}>
-                              No saved style guides yet. Save one from the button above and it'll show up here.
-                            </div>
-                          )}
-                          {!loadingStyles && savedStylesList.map(style => (
-                            <div
-                              key={style.id}
-                              onClick={() => applySavedStyle(style)}
-                              style={{ padding: "8px", borderRadius: "6px", cursor: "pointer", display: "flex", flexDirection: "column", gap: "6px" }}
-                              onMouseEnter={e => e.currentTarget.style.background = "#f9fafb"}
-                              onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                              <span style={{ fontSize: "12px", fontWeight: 600, color: "#09090b" }}>{style.name}</span>
-                              <div style={{ display: "flex", gap: "4px" }}>
-                                {Object.entries(style.colors || {}).slice(0, 8).map(([id, hex]) => (
-                                  <div key={id} title={id + ": " + hex} style={{ width: "16px", height: "16px", borderRadius: "3px", background: hex, border: "1px solid rgba(0,0,0,.1)" }} />
-                                ))}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
                   <label style={{ ...T.label, marginBottom: "6px", display: "block" }}>Export name</label>
                   <input
                     style={{ ...T.input, marginBottom: "12px", width: "100%", maxWidth: "100%", boxSizing: "border-box" }}
