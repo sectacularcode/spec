@@ -119,6 +119,32 @@ function renderOffscreen(html) {
         // instead of showing "+" on everything but the first.
         doc.querySelectorAll(".faq-answer").forEach((el) => { el.style.display = "block"; });
         doc.querySelectorAll(".faq-toggle").forEach((el) => { el.checked = true; });
+        // Google Maps embeds are cross-origin iframes -- html2canvas
+        // cannot read into another origin's document at all (a browser
+        // security boundary, not a library limitation it can work
+        // around), so these were rasterizing as blank space in the PDF.
+        // Swaps each one for a styled address/directions card instead --
+        // not a real map image (that would need a Static Maps API key,
+        // a new credential/cost this doesn't have), but real, useful
+        // content instead of an empty hole. The address is pulled
+        // straight out of the iframe's own src (?q=<address>), which
+        // landingPreview.js already encodes there -- no new data plumbing
+        // needed, and this only touches the offscreen PDF-capture clone,
+        // never the live preview iframe.
+        doc.querySelectorAll('iframe[src*="maps.google.com"], iframe[src*="google.com/maps"]').forEach((el) => {
+          var address = "";
+          try {
+            var srcUrl = new URL(el.getAttribute("src"), "https://maps.google.com");
+            address = srcUrl.searchParams.get("q") || "";
+          } catch (e) { /* leave address blank, card still shows */ }
+          var card = doc.createElement("div");
+          card.setAttribute("style", "width:100%;height:100%;min-height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#eef0f3;border:1px solid #d7dbe1;box-sizing:border-box;padding:24px;text-align:center;font-family:inherit;");
+          card.innerHTML =
+            '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#5b6472" stroke-width="1.6"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
+            '<div style="font-size:14px;font-weight:700;color:#2b3038;">' + (address ? address.replace(/&/g, "&amp;").replace(/</g, "&lt;") : "View on Google Maps") + '</div>' +
+            '<div style="font-size:12px;color:#5b6472;">Map view not available in PDF export -- see the live preview or exported page for the interactive map.</div>';
+          el.replaceWith(card);
+        });
         resolve({ iframe, body: doc.body });
       } catch (err) {
         reject(err);
