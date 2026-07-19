@@ -2560,7 +2560,14 @@ export default function CustomBuild({ userId, role } = {}) {
                 </>
               ) : (
                 <div style={{ width: "100%", boxSizing: "border-box", overflow: "hidden" }}>
-                  <div style={{ fontSize: "13px", fontWeight: 600, color: "#09090b", marginBottom: "12px" }}>{brief.brandName || "Brand loaded"}</div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", marginBottom: "12px" }}>
+                    <div style={{ fontSize: "13px", fontWeight: 600, color: "#09090b" }}>{brief.brandName || "Brand loaded"}</div>
+                    <button
+                      onClick={() => { resetBrief(); setBriefName(""); setClientName(""); setPlaceholderButtons(null); setPageDownloadNames({}); }}
+                      style={{ fontSize: "11px", fontWeight: 600, color: "#6b7280", background: "#fff", border: "1px solid #dde0e6", borderRadius: "6px", padding: "5px 12px", cursor: "pointer", flexShrink: 0 }}>
+                      Replace brief
+                    </button>
+                  </div>
                   {(brief._manifestTitleTag || brief._manifestMetaDescription) && (
                     <div style={{ marginBottom: "14px", padding: "10px 12px", background: "#eeedf1", borderRadius: "6px", fontSize: "11px", color: "#6b7280" }}>
                       <div style={{ fontWeight: 600, color: "#09090b", marginBottom: "4px", fontSize: "11px" }}>For WordPress / Yoast — copy over after import</div>
@@ -2781,17 +2788,6 @@ export default function CustomBuild({ userId, role } = {}) {
                       </div>
                     </div>
                   </div>
-                  <label style={{ ...T.label, marginBottom: "6px", display: "block" }}>Export name</label>
-                  <input
-                    style={{ ...T.input, marginBottom: "12px", width: "100%", maxWidth: "100%", boxSizing: "border-box" }}
-                    value={clientName}
-                    onChange={e => setClientName(e.target.value)}
-                    placeholder="e.g. Specish Studio"
-                  />
-                  <div style={{ fontSize: "11px", color: "#9ca3af", marginBottom: "12px" }}>
-                    Files will download as: <span style={{ color: "#09090b", fontWeight: 600 }}>{slugify(clientName || brief?.brandName)}-home-elementor.json</span>
-                  </div>
-                  <button style={T.btnGhost} onClick={() => { resetBrief(); setBriefName(""); setClientName(""); setPlaceholderButtons(null); setPageDownloadNames({}); }}>Replace brief</button>
                 </div>
               )}
             </div>
@@ -2803,6 +2799,27 @@ export default function CustomBuild({ userId, role } = {}) {
           <div style={{ marginBottom: "28px", ...T.surface }}>
             <div style={{ fontSize: "18px", fontWeight: 700, color: "#09090b", marginBottom: "4px" }}>Export</div>
             <div style={{ height: "1px", background: "#eae7e1", margin: "14px 0 18px" }} />
+          {/* File name — the download filename + internal Elementor template
+              title. Fallback chain in downloadPage is customName (per-page
+              override in the Download list) || clientName (this field) ||
+              brandName, so this sets the default name for every page's file.
+              Lives here in Export next to the downloads it controls; only
+              shown once a brief is loaded (before that there's nothing to
+              name). Moved out of the Brand group July 2026. */}
+          {brief && (
+            <div style={{ marginBottom: "18px" }}>
+              <label style={{ ...T.label, marginBottom: "6px", display: "block" }}>File name</label>
+              <input
+                style={{ ...T.input, marginBottom: "8px", width: "100%", maxWidth: "100%", boxSizing: "border-box" }}
+                value={clientName}
+                onChange={e => setClientName(e.target.value)}
+                placeholder="e.g. Specish Studio"
+              />
+              <div style={{ fontSize: "11px", color: "#9ca3af" }}>
+                Files will download as: <span style={{ color: "#09090b", fontWeight: 600 }}>{slugify(clientName || brief?.brandName)}-home-elementor.json</span>
+              </div>
+            </div>
+          )}
           {/* STEP 3 */}
           <div>
             <button
