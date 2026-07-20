@@ -2388,7 +2388,7 @@ export default function CustomBuild({ userId, role } = {}) {
                     </button>
                   </div>
                   {uploadSource === "manifest" && (
-                    <div style={{ marginBottom: "16px", textAlign: "center", display: "flex", flexDirection: "column", gap: "6px", alignItems: "center" }}>
+                    <div style={{ marginBottom: "16px", textAlign: "center" }}>
                       <a
                         href="/downloads/Spec_Manifest_Copy_Template.docx"
                         download
@@ -2396,14 +2396,6 @@ export default function CustomBuild({ userId, role } = {}) {
                       >
                         ↓ Download the copy template for Manifest
                       </a>
-                      {isAdmin && (
-                        <button
-                          onClick={() => setShowFidelityCheck(true)}
-                          style={{ fontSize: "12px", color: "#6b7280", fontWeight: 600, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
-                        >
-                          Check a Manifest export's fidelity report
-                        </button>
-                      )}
                     </div>
                   )}
                   <div
@@ -2690,18 +2682,12 @@ export default function CustomBuild({ userId, role } = {}) {
           )}
           {/* STEP 3 */}
           <div>
-            <button
-              onClick={() => toggleSection("pagesToBuild")}
-              style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", padding: 0, marginBottom: "12px", cursor: "pointer" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginBottom: "12px" }}>
               <span style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#6b7280" }}>
                 Pages to build
                 <span style={{ fontSize: "11px", fontWeight: 500, letterSpacing: "normal", textTransform: "none", color: "#9ca3af" }}>{selectedPages.length} selected</span>
               </span>
-              <span style={{ display: "inline-flex", transform: openSections.pagesToBuild ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.15s ease", color: "#6b7280" }}>
-                <svg width="12" height="8" viewBox="0 0 10 6" fill="none"><path d="M0 0l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-              </span>
-            </button>
-            {openSections.pagesToBuild && (
+            </div>
             <div style={{ marginTop: "12px" }}>
               <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>Only checked pages are included in the export.</div>
               <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
@@ -2752,7 +2738,6 @@ export default function CustomBuild({ userId, role } = {}) {
 
               <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "10px" }}>{selectedPages.length} page{selectedPages.length !== 1 ? "s" : ""} selected</div>
             </div>
-            )}
           </div>
 
           {generated && (
