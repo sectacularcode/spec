@@ -9,6 +9,7 @@
 // the same cross-tenant collision guard as api/projects.js.
 //
 // GET  /api/blueprint-drafts?session=1  — fetch the current session row
+// GET  /api/blueprint-drafts?id=xxx     — fetch one saved snapshot by id (404 if missing or not yours)
 // GET  /api/blueprint-drafts            — list saved snapshots (session row excluded)
 // POST /api/blueprint-drafts            — { session: true, data } upserts the
 //                                          session row, OR { entry: {clientName, data} }
@@ -72,6 +73,21 @@ export default async function handler(req, res) {
           SELECT data FROM blueprint_drafts WHERE id = ${sessionDraftId(userId)} AND user_id = ${userId}
         `;
         return res.status(200).json({ data: rows[0]?.data ?? null });
+      }
+      // Single-draft fetch for deep-linking (?build=<id> in the browser URL).
+      // Scoped to user_id like every other query here -- a link containing
+      // someone else's draft id simply 404s for anyone not that user, it
+      // never leaks another tenant's data.
+      if (req.query.id) {
+        const id = req.query.id;
+        if (!validId(id)) return res.status(400).json({ error: "Invalid id" });
+        const { rows } = await sql`
+          SELECT id, client_name, data, updated_at FROM blueprint_drafts
+          WHERE id = ${id} AND user_id = ${userId} AND id <> ${sessionDraftId(userId)}
+        `;
+        if (rows.length === 0) return res.status(404).json({ error: "Not found" });
+        const r = rows[0];
+        return res.status(200).json({ id: r.id, clientName: r.client_name, ...r.data, updatedAt: r.updated_at });
       }
       const { rows } = await sql`
         SELECT id, client_name, data, updated_at FROM blueprint_drafts

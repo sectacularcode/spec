@@ -106,13 +106,42 @@ function ToolNav({ view, setView, tools, role, user }) {
 function AppShell() {
   const { user } = useUser();
 
+  // ?tool= in the URL takes priority over localStorage so a shared/bookmarked
+  // link opens the right tool. ?build= (used by Brief to Blueprint's own deep
+  // links) implies the tool too, as a fallback in case a link only has
+  // ?build= without an explicit ?tool= -- keeps older-style links working.
   const [view, setViewRaw] = useState(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const fromUrl = params.get("tool") || (params.get("build") ? "brief-to-blueprint" : null);
+      if (fromUrl) return fromUrl;
+    } catch {}
     try { return localStorage.getItem("spec_app_view") || "dashboard"; } catch { return "dashboard"; }
   });
 
   function setView(v) {
     setViewRaw(v);
     try { localStorage.setItem("spec_app_view", v); } catch {}
+    // Keep the URL's ?tool= in sync so switching tools stays shareable/
+    // bookmarkable too. Dashboard is the default landing view, so it's left
+    // out of the URL to keep the bare specish.com link clean; switching away
+    // from a sub-tool's build/page also clears those params since they no
+    // longer apply.
+    try {
+      const url = new URL(window.location.href);
+      if (v === "dashboard") {
+        url.searchParams.delete("tool");
+        url.searchParams.delete("build");
+        url.searchParams.delete("page");
+      } else {
+        url.searchParams.set("tool", v);
+        if (v !== "brief-to-blueprint") {
+          url.searchParams.delete("build");
+          url.searchParams.delete("page");
+        }
+      }
+      window.history.replaceState({}, "", url);
+    } catch {}
   }
   const [role, setRole]             = useState("staff");
   const [tools, setTools]           = useState(["template-studio", "brief-to-blueprint"]);

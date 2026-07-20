@@ -49,6 +49,20 @@ export async function listDraftSnapshots() {
   } catch { return []; }
 }
 
+// Single-draft fetch for deep-linking (a shared/bookmarked ?build=<id> URL).
+// Returns the same shape as one entry from listDraftSnapshots() so it can be
+// passed straight into resumeDraft(). Returns null on any failure --
+// including a 404, which happens both for a genuinely-missing draft and for
+// one that belongs to a different account (the API scopes by user_id and
+// can't tell those apart on purpose).
+export async function getDraftSnapshot(id) {
+  try {
+    const res = await fetch("/api/blueprint-drafts?id=" + encodeURIComponent(id), { headers: await authHeaders() });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch { return null; }
+}
+
 export async function saveDraftSnapshot(clientName, data) {
   try {
     const res = await fetch("/api/blueprint-drafts", {

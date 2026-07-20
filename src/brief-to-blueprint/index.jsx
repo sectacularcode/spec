@@ -6,7 +6,7 @@ import { ALL_PAGES, ADDITIONAL_PAGE_TYPES } from "../constants/pages.js";
 
 // Utils
 import { listSectionLibrary } from "../utils/sectionLibrary.js";
-import { getSessionDraft, saveSessionDraft, clearSessionDraft, listDraftSnapshots, saveDraftSnapshot, deleteDraftSnapshot } from "../utils/blueprintDrafts.js";
+import { getSessionDraft, saveSessionDraft, clearSessionDraft, listDraftSnapshots, saveDraftSnapshot, getDraftSnapshot, deleteDraftSnapshot } from "../utils/blueprintDrafts.js";
 import { getInspoPatterns } from "../utils/inspoPatterns.js";
 import { buildInspoContext } from "./utils/inspo.js";
 import { saveToLibrary } from "./utils/library.js";
@@ -49,6 +49,17 @@ export default function CustomBuild({ userId, role } = {}) {
   // way function declarations are; referencing it before this line would
   // throw a temporal-dead-zone ReferenceError).
   const [previewPage, setPreviewPage]   = useState("home");
+  // The server-assigned id of whichever saved snapshot is currently loaded
+  // (null for an in-progress, never-yet-saved build). Drives the ?build= /
+  // &page= URL params below so a build is bookmarkable/shareable -- see
+  // updateBuildUrl(). Set by resumeDraft() and after a successful
+  // saveDraftToList(); cleared by resetBrief().
+  const [currentBuildId, setCurrentBuildId] = useState(null);
+  // Set when a ?build=<id> URL didn't resolve on load (deleted, or belongs
+  // to a different Spec account -- the API can't tell those apart on
+  // purpose, see api/blueprint-drafts.js). Surfaced as a dismissible banner
+  // instead of silently landing on an empty session.
+  const [urlLoadError, setUrlLoadError] = useState("");
   const [briefRaw, setBriefRaw]         = useState(null);
   // Per-page brief map. In single-brief mode (bulkImportMode false, the
   // default) this mirrors briefRaw across every selected page -- see the
@@ -89,10 +100,25 @@ export default function CustomBuild({ userId, role } = {}) {
   // only null out the currently active page's entry in briefsByPage,
   // leaving bulkImportMode stuck on and every OTHER imported page's data
   // still sitting in state. This exits bulk mode and clears everything.
+  // Writes ?tool=brief-to-blueprint&build=<id>&page=<page> into the address
+  // bar via replaceState (no navigation, no extra back-button history entry
+  // per click). Pass buildId=null to clear build/page entirely, e.g. on
+  // Replace brief / Clear draft / Start a build.
+  function updateBuildUrl(buildId, page) {
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set("tool", "brief-to-blueprint");
+      if (buildId) url.searchParams.set("build", buildId); else url.searchParams.delete("build");
+      if (buildId && page) url.searchParams.set("page", page); else url.searchParams.delete("page");
+      window.history.replaceState({}, "", url);
+    } catch {}
+  }
   function resetBrief() {
     setBulkImportMode(false);
     setBriefRaw(null);
     setBriefsByPage({});
+    setCurrentBuildId(null);
+    updateBuildUrl(null, null);
   }
   const [styleConflict, setStyleConflict]     = useState(null); // { savedStyle, briefColors, brandName } when both exist and differ -- pauses generate() until resolved
   const [stylePanelStatus, setStylePanelStatus] = useState(""); // brief save/load feedback text
@@ -201,6 +227,25 @@ export default function CustomBuild({ userId, role } = {}) {
   // Load saved draft on mount
   useEffect(() => {
     async function loadDraft() {
+      // A ?build=<id> URL takes priority over the normal session-draft
+      // restore -- this is what makes a bookmarked/shared link open that
+      // specific build instead of whatever happens to be sitting in this
+      // browser's in-progress session. &page=<id> additionally picks which
+      // page is active within it.
+      let params = null;
+      try { params = new URLSearchParams(window.location.search); } catch {}
+      const buildId = params ? params.get("build") : null;
+      if (buildId) {
+        const snapshot = await getDraftSnapshot(buildId);
+        if (snapshot) {
+          await resumeDraft(snapshot);
+          const pageParam = params.get("page");
+          if (pageParam) setPreviewPage(pageParam);
+          return;
+        }
+        setUrlLoadError("That build link isn't available. It may have been removed, or it belongs to a different Spec account than the one you're signed in with.");
+      }
+
       const draft = await getSessionDraft();
       if (!draft) return;
       try {
@@ -228,6 +273,14 @@ export default function CustomBuild({ userId, role } = {}) {
     }
     loadDraft();
   }, []);
+
+  // Keeps ?build=/&page= in sync any time the active page changes within an
+  // already-loaded build (e.g. clicking a different page pill in the
+  // preview strip) -- the initial ?build= write itself happens inside
+  // resumeDraft()/saveDraftToList() the moment currentBuildId is set.
+  useEffect(() => {
+    if (currentBuildId) updateBuildUrl(currentBuildId, previewPage);
+  }, [currentBuildId, previewPage]);
 
   // Save draft whenever key state changes (debounced)
   useEffect(() => {
@@ -343,6 +396,7 @@ export default function CustomBuild({ userId, role } = {}) {
       // Reconcile the temporary id with the server-assigned one.
       setDrafts(existing => existing.map(d => d.id === tempId ? { ...d, id: result.id } : d));
     }
+    setCurrentBuildId(result.id);
   }
 
   async function resumeDraft(draft) {
@@ -361,6 +415,7 @@ export default function CustomBuild({ userId, role } = {}) {
     if (s.generated) setGenerated(s.generated);
     if (s.previewPage) setPreviewPage(s.previewPage);
     if (s.crawlResults) setCrawlResults(s.crawlResults);
+    setCurrentBuildId(draft.id);
     setDraftsView(false);
   }
 
@@ -1970,6 +2025,12 @@ export default function CustomBuild({ userId, role } = {}) {
 
         <div style={{ padding: "clamp(20px,3vw,40px) clamp(16px,3vw,40px)", borderRight: generated ? "1px solid #dde0e6" : "none", overflowY: panelCollapsed ? "hidden" : "auto", overflowX: "hidden", flexShrink: 0, background: "#eeedf1", height: "100%", boxSizing: "border-box" }}>
           <div style={{ maxWidth: generated ? "100%" : "1100px", margin: "0 auto" }}>
+          {urlLoadError && (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", marginBottom: "16px", padding: "12px 14px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: "8px", fontSize: "13px", color: "#7f1d1d" }}>
+              <span>{urlLoadError}</span>
+              <button onClick={() => setUrlLoadError("")} style={{ background: "none", border: "none", color: "#7f1d1d", cursor: "pointer", fontSize: "15px", flexShrink: 0, lineHeight: 1, padding: 0 }}>×</button>
+            </div>
+          )}
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
             <button onClick={() => setDraftsView(true)} style={{ padding: "5px 10px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "5px", fontWeight: 500, display: "inline-flex", alignItems: "center", lineHeight: 1, gap: "4px", fontSize: "12px", cursor: "pointer" }}>← Builds</button>
             <button onClick={() => setShowBulkLocation(true)} style={{ padding: "5px 10px", background: "#ffffff", color: "#3f3f46", border: "1px solid #dde0e6", borderRadius: "5px", fontWeight: 500, fontSize: "12px", cursor: "pointer", display: "inline-flex", alignItems: "center", lineHeight: 1 }}>Bulk Locations</button>
@@ -2682,12 +2743,27 @@ export default function CustomBuild({ userId, role } = {}) {
           )}
           {/* STEP 3 */}
           <div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginBottom: "12px" }}>
-              <span style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#6b7280" }}>
-                Pages to build
-                <span style={{ fontSize: "11px", fontWeight: 500, letterSpacing: "normal", textTransform: "none", color: "#9ca3af" }}>{selectedPages.length} selected</span>
-              </span>
-            </div>
+            {generated ? (
+              <button
+                onClick={() => toggleSection("pagesToBuild")}
+                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", padding: 0, marginBottom: "12px", cursor: "pointer" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#6b7280" }}>
+                  Pages to build
+                  <span style={{ fontSize: "11px", fontWeight: 500, letterSpacing: "normal", textTransform: "none", color: "#9ca3af" }}>{selectedPages.length} selected</span>
+                </span>
+                <span style={{ display: "inline-flex", transform: openSections.pagesToBuild ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.15s ease", color: "#6b7280" }}>
+                  <svg width="12" height="8" viewBox="0 0 10 6" fill="none"><path d="M0 0l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                </span>
+              </button>
+            ) : (
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginBottom: "12px" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#6b7280" }}>
+                  Pages to build
+                  <span style={{ fontSize: "11px", fontWeight: 500, letterSpacing: "normal", textTransform: "none", color: "#9ca3af" }}>{selectedPages.length} selected</span>
+                </span>
+              </div>
+            )}
+            {(!generated || openSections.pagesToBuild) && (
             <div style={{ marginTop: "12px" }}>
               <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "12px" }}>Only checked pages are included in the export.</div>
               <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
@@ -2738,6 +2814,7 @@ export default function CustomBuild({ userId, role } = {}) {
 
               <div style={{ fontSize: "12px", color: "#6b7280", marginTop: "10px" }}>{selectedPages.length} page{selectedPages.length !== 1 ? "s" : ""} selected</div>
             </div>
+            )}
           </div>
 
           {generated && (
