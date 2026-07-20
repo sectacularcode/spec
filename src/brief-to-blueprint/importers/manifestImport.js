@@ -255,11 +255,20 @@ const GLOBAL_IGNORED_KEYS = ["type", "intent", "proposed", "rationale"];
 const KNOWN_KEYS_BY_TYPE = {
   hero: ["heading", "subheading", "buttons"],
   text_section: ["heading", "items", "buttons"],
-  // feature_cards' own section.heading is a known, real schema field --
-  // confirmed not yet wired to any output (only item.title/item.body are
-  // read). Listed here as known-but-unconsumed, not unknown -- no real
-  // page on hand uses feature_cards to confirm real-world impact, but
-  // it's a documented gap, not a surprise the next audit should rediscover.
+  // feature_cards -- section.heading and item.button are now wired (see
+  // the handler below): heading renders as its own row ahead of the
+  // group's cards, item.button reuses the same buttonLabel/buttonUrl/
+  // buttonPlacement shape every other featurePairs entry already produces,
+  // so it renders through the exact same existing button-rendering path
+  // in landing.js -- no new landing.js/landingPreview.js code needed.
+  // item.image is a real, documented schema field on each item but is
+  // NOT wired here: no featurePairs consumer in landing.js renders a
+  // per-item image today, so wiring it would mean adding real new
+  // rendering (not just reading a field that already has somewhere to
+  // go) with zero real page to verify it against -- left as a known,
+  // explicit gap rather than guessed at. Still no real page on hand uses
+  // feature_cards at all (confirmed against all 17 Freeway page-
+  // documents, July 2026), so none of this has real-world exposure yet.
   feature_cards: ["heading", "items"],
   map_location: ["heading", "location", "phone", "hours", "email", "note", "button", "mode", "directions_url", "maps_url"],
   faq: ["heading", "items"],
@@ -780,9 +789,32 @@ function manifestPageDocumentToBrief(raw) {
     }
 
     if (section.type === "feature_cards") {
-      (section.items || []).forEach(function (item) {
-        featurePairs.push({ heading: item.title || "", body: flattenRichText(item.body) });
+      // Group heading: no existing contentOrder concept for "one heading
+      // over N feature rows" (faq/testimonials/form are each a single
+      // collective section instead), and inventing a new contentOrder
+      // type for a section type with zero real-world exposure risks
+      // guessing a shape that's wrong the first time a real page uses
+      // it. Reuses the exact same pattern text_section already produces
+      // instead -- a plain heading-only featurePairs row immediately
+      // ahead of the cards -- so it renders through code that's already
+      // proven correct rather than new code with nothing real to test
+      // it against.
+      if (headingText) {
+        featurePairs.push({ heading: headingText, body: "" });
         contentOrder.push({ type: "feature", index: featurePairs.length - 1 });
+      }
+      (section.items || []).forEach(function (item) {
+        var itemBtn = item.button;
+        var itemBtnUrl = pageDocumentButtonUrl(itemBtn);
+        featurePairs.push({
+          heading: item.title || "",
+          body: flattenRichText(item.body),
+          buttonLabel: itemBtn ? itemBtn.label || "" : "",
+          buttonUrl: itemBtnUrl,
+          buttonPlacement: itemBtn ? itemBtn.placement || "" : "",
+        });
+        contentOrder.push({ type: "feature", index: featurePairs.length - 1 });
+        trackPlaceholderButton(itemBtn && itemBtn.label, itemBtnUrl, "Feature card");
       });
       return;
     }
