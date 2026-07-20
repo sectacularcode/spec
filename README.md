@@ -1,7 +1,5 @@
 # spec.
 
-**Owner:** Kalei Lumayno owns this repository and everything in it, solely and exclusively. Spec is independent — it is not part of any shared GitHub organization, joint codebase, or co-owned repository. Integration with other tools (e.g. Manifest) happens only through a separate, shared contract repository; this repository itself is never shared or co-owned. See `LICENSE`.
-
 A browser-based planning tool for WordPress designers. Converts brand briefs into structured, importable page templates for Elementor (primary) and Divi (secondary).
 
 **Live:** [specish.com](https://specish.com)
@@ -160,3 +158,9 @@ All API routes (except `auth.js`, `me.js`, `signout.js`) verify the session cook
 | Logo / headings | Outfit 800 |
 | Top nav | system Inter |
 | Top nav height | 48px fixed |
+
+---
+
+## Owner
+
+Kalei Lumayno owns this repository and everything in it, solely and exclusively. Spec is independent — it is not part of any shared GitHub organization, joint codebase, or co-owned repository. Integration with other tools (e.g. Manifest) happens only through a separate, shared contract repository; this repository itself is never shared or co-owned. See `LICENSE`.
