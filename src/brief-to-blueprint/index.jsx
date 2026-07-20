@@ -2788,6 +2788,39 @@ export default function CustomBuild({ userId, role } = {}) {
               </div>
             </div>
           )}
+          {/* Download PDF -- moved into the panel from the preview strip
+              header (July 2026). Captures the exact same HTML already shown
+              in the preview iframe (same buildPreviewHTML call, same brief/
+              page/variant/inspoContext args), so the PDF always matches
+              what's on screen -- i.e. whichever page is currently active in
+              the Preview strip above, not necessarily every checked page.
+              Only shown once a build is generated, matching Download/HTML
+              preview below. Renders into a second, temporary off-screen
+              iframe first since the visible one is sandboxed without
+              allow-same-origin and html2canvas can't read into it directly
+              -- see exportPdf.js for the full reasoning. */}
+          {generated && (
+            <button
+              onClick={async () => {
+                if (pdfDownloading) return;
+                setPdfDownloading(true);
+                try {
+                  var pdfVariant = layoutVariants[previewPage] || activePreviewPage?.recommended || "A";
+                  var pdfHtml = buildPreviewHTML(brief, previewPage, pdfVariant, generated?.inspoContext || "");
+                  await downloadPreviewPdf(pdfHtml, [brief?.brandName, activePreviewPage?.label || previewPage, pdfVariant]);
+                } catch (err) {
+                  console.error("PDF export failed:", err);
+                } finally {
+                  setPdfDownloading(false);
+                }
+              }}
+              disabled={pdfDownloading}
+              title="Download the currently previewed page as a PDF"
+              style={{ width: "100%", marginBottom: "18px", padding: "10px 14px", fontSize: "13px", fontWeight: 600, cursor: pdfDownloading ? "default" : "pointer", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: pdfDownloading ? "#9ca3af" : "#09090b", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span>{pdfDownloading ? "Preparing…" : "Download PDF"}</span>
+              <span style={{ fontSize: "11px", fontWeight: 500, color: "#9ca3af" }}>{activePreviewPage ? (activePreviewPage.label || previewPage).replace(/-\d+$/, "") : ""}</span>
+            </button>
+          )}
           {/* STEP 3 */}
           <div>
             {generated ? (
@@ -3207,34 +3240,6 @@ export default function CustomBuild({ userId, role } = {}) {
                   );
                 })()}
               </div>
-
-              {/* Download PDF -- captures the exact same HTML already
-                  shown in the preview iframe below (same buildPreviewHTML
-                  call, same brief/page/variant/inspoContext args), so the
-                  PDF always matches what's on screen. Renders it into a
-                  second, temporary off-screen iframe first since the
-                  visible one is sandboxed without allow-same-origin and
-                  html2canvas can't read into it directly -- see
-                  exportPdf.js for the full reasoning. */}
-              <button
-                onClick={async () => {
-                  if (pdfDownloading) return;
-                  setPdfDownloading(true);
-                  try {
-                    var pdfVariant = layoutVariants[previewPage] || activePreviewPage?.recommended || "A";
-                    var pdfHtml = buildPreviewHTML(brief, previewPage, pdfVariant, generated?.inspoContext || "");
-                    await downloadPreviewPdf(pdfHtml, [brief?.brandName, activePreviewPage?.label || previewPage, pdfVariant]);
-                  } catch (err) {
-                    console.error("PDF export failed:", err);
-                  } finally {
-                    setPdfDownloading(false);
-                  }
-                }}
-                disabled={pdfDownloading}
-                title="Download this page as a PDF"
-                style={{ padding: "6px 14px", fontSize: "12px", fontWeight: 600, cursor: pdfDownloading ? "default" : "pointer", border: "1px solid #dde0e6", borderRadius: "6px", background: "#fff", color: pdfDownloading ? "#9ca3af" : "#09090b" }}>
-                {pdfDownloading ? "Preparing…" : "Download PDF"}
-              </button>
 
               {/* Desktop / Mobile toggle — pushed to far right */}
               <div style={{ marginLeft: "auto", display: "flex", border: "1px solid #dde0e6", borderRadius: "6px", overflow: "hidden" }}>
