@@ -59,6 +59,33 @@ import { scanForLegacyContent, regenerateHeadings, applyLegacyContentFixes } fro
 
 // Styles
 
+// Sidebar workflow-tab button. Was previously defined inside App's render
+// body (closing over `tab`/`setTab` directly), which meant React saw a
+// brand-new component type on every single App re-render and remounted it
+// from scratch each time instead of updating the existing instance --
+// flagged by react-hooks/static-components. Hoisted to module scope with
+// tab/setTab threaded through as explicit props instead of closure reads;
+// every call site below updated to pass them.
+function TabBtn({ id, label, tab, setTab }) {
+  return (
+    <button onClick={() => setTab(id)} style={{ width: "100%", textAlign: "left", padding: "9px 14px", background: tab === id ? "#fef3e2" : "transparent", color: tab === id ? "#b45309" : "#3f3f46", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: tab === id ? 600 : 400, cursor: "pointer", display: "block", whiteSpace: "nowrap" }}>{label}</button>
+  );
+}
+
+// Builder format toggle — applies to both Page and Footer downloads. Same
+// fix as TabBtn above: hoisted out of App's render body, exportFormat/
+// setExportFormat threaded through as explicit props instead of closure
+// reads.
+function FormatToggle({ exportFormat, setExportFormat }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "6px", padding: "3px", marginRight: "4px" }}>
+      <span style={{ fontSize: "10px", color: "#a3a39e", padding: "0 6px", letterSpacing: "0.05em", textTransform: "uppercase" }}>Export</span>
+      <button onClick={() => setExportFormat("elementor")} style={{ padding: "5px 10px", background: exportFormat === "elementor" ? "#b45309" : "transparent", color: exportFormat === "elementor" ? "#ffffff" : "#6b7280", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Elementor</button>
+      <button onClick={() => setExportFormat("divi")} style={{ padding: "5px 10px", background: exportFormat === "divi" ? "#b45309" : "transparent", color: exportFormat === "divi" ? "#ffffff" : "#6b7280", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Divi</button>
+    </div>
+  );
+}
+
 export default function App({ userId } = {}) {
   const [projects, setProjects] = useState([]);
   const [activeId, setActiveId] = useState(function(){try{return localStorage.getItem("spec_activeId")||"";}catch{return "";}});
@@ -1381,19 +1408,6 @@ Rules:
 
   // Styles (I) imported from ./styles.js
 
-  const TabBtn = ({ id, label }) => (
-    <button onClick={() => setTab(id)} style={{ width: "100%", textAlign: "left", padding: "9px 14px", background: tab === id ? "#fef3e2" : "transparent", color: tab === id ? "#b45309" : "#3f3f46", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: tab === id ? 600 : 400, cursor: "pointer", display: "block", whiteSpace: "nowrap" }}>{label}</button>
-  );
-
-  // Builder format toggle — applies to both Page and Footer downloads
-  const FormatToggle = () => (
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "#ffffff", border: "1px solid #dde0e6", borderRadius: "6px", padding: "3px", marginRight: "4px" }}>
-      <span style={{ fontSize: "10px", color: "#a3a39e", padding: "0 6px", letterSpacing: "0.05em", textTransform: "uppercase" }}>Export</span>
-      <button onClick={() => setExportFormat("elementor")} style={{ padding: "5px 10px", background: exportFormat === "elementor" ? "#b45309" : "transparent", color: exportFormat === "elementor" ? "#ffffff" : "#6b7280", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Elementor</button>
-      <button onClick={() => setExportFormat("divi")} style={{ padding: "5px 10px", background: exportFormat === "divi" ? "#b45309" : "transparent", color: exportFormat === "divi" ? "#ffffff" : "#6b7280", border: "none", borderRadius: "4px", fontSize: "12px", fontWeight: 500, cursor: "pointer" }}>Divi</button>
-    </div>
-  );
-
   // If there are no projects at all, force the Projects view (which has + New / Import tiles)
 
   const exportBrief = () => {
@@ -1695,7 +1709,7 @@ Rules:
           </div>
         </div>
         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-          <FormatToggle />
+          <FormatToggle exportFormat={exportFormat} setExportFormat={setExportFormat} />
           <button onClick={downloadPage} style={{ padding: "7px 14px", background: "#b45309", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap" }}>Download Template</button>
           <button onClick={() => setView("editor")} style={{ padding: "7px 14px", background: "transparent", color: "#ffffff", border: "1px solid rgba(255,255,255,0.25)", borderRadius: "6px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap" }}>← Back to Editor</button>
         </div>
@@ -2655,13 +2669,13 @@ Rules:
         {/* SIDEBAR — Workflow tabs */}
         <div className="sidebar-nav" style={{ background: "#ffffff", borderRight: "1px solid #dde0e6", overflowY: "auto", display: "flex", flexDirection: "column", padding: "20px 12px", width: "280px", boxShadow: "2px 0 8px rgba(0,0,0,0.04)" }}>
           <div style={{ fontSize: "11px", fontWeight: 600, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px", padding: "0 4px" }}>Workflow</div>
-          <TabBtn id="discovery" label="Discovery" />
-          <TabBtn id="positioning" label="Positioning" />
-          <TabBtn id="brand" label="Visual" />
-          <TabBtn id="content" label="Content" />
-          <TabBtn id="social" label="Social" />
-          <TabBtn id="footer" label="Header & Footer" />
-          <TabBtn id="export" label="Export & Import" />
+          <TabBtn id="discovery" label="Discovery" tab={tab} setTab={setTab} />
+          <TabBtn id="positioning" label="Positioning" tab={tab} setTab={setTab} />
+          <TabBtn id="brand" label="Visual" tab={tab} setTab={setTab} />
+          <TabBtn id="content" label="Content" tab={tab} setTab={setTab} />
+          <TabBtn id="social" label="Social" tab={tab} setTab={setTab} />
+          <TabBtn id="footer" label="Header & Footer" tab={tab} setTab={setTab} />
+          <TabBtn id="export" label="Export & Import" tab={tab} setTab={setTab} />
         </div>
 
         {/* RIGHT — Content area */}
