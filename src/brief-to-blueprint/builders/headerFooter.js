@@ -114,10 +114,29 @@ export function buildFooterJSON(C, brief, inspoContext) {
 
   var inspo = (inspoContext || "").toLowerCase();
   var isDark = inspo.indexOf("dark footer") !== -1 || inspo.indexOf("dark background footer") !== -1;
-  // Default footer to dark ink — common pattern for premium brands
-  var bgColor = isDark || true ? ink : bone;
+  // Confirmed real bug: this read `isDark || true`, which always evaluates
+  // true regardless of isDark's actual value -- every footer rendered dark
+  // ink no matter what the brief/inspo said, and the detection logic above
+  // was completely dead as a result. The header function just above this
+  // one (buildHeaderJSON) already has the correct, working version of this
+  // exact pattern -- `var bgColor = isDark ? ink : ...` -- so this restores
+  // real conditional behavior to match, with dark ink still the default
+  // only when genuinely requested (per the original "premium brands"
+  // comment), not unconditionally forced.
+  var bgColor = isDark ? ink : bone;
   var textColor = bgColor === ink ? warmWhite : text;
-  var mutedColor = bgColor === ink ? stone : stone;
+  // Was `bgColor === ink ? stone : stone` -- both branches already
+  // returned the same value, so this is a behavior-neutral simplification,
+  // not a functional change.
+  var mutedColor = stone;
+  // Was hardcoded to the white-tinted values below on both of this
+  // function's border_color sites -- correct only for a dark background;
+  // nearly invisible against the light bone background isDark:false now
+  // genuinely produces. Mirrors the header's own isDark ? white : darker
+  // border pattern (see buildHeaderJSON's borderColor above) instead of
+  // inventing a new one.
+  var borderColor = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)";
+  var borderColorSubtle = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
 
   var navLinks = brief.headerNav || ["Home", "Work", "Services", "About", "Process", "Contact"];
 
@@ -159,7 +178,7 @@ export function buildFooterJSON(C, brief, inspoContext) {
     minimalRow.settings.background_color = bgColor;
     minimalRow.settings.border_border = "solid";
     minimalRow.settings.border_width = { unit: "px", top: "1", right: "0", bottom: "0", left: "0", isLinked: false };
-    minimalRow.settings.border_color = "rgba(255,255,255,0.1)";
+    minimalRow.settings.border_color = borderColor;
 
     return {
       version: "0.4",
@@ -191,7 +210,7 @@ export function buildFooterJSON(C, brief, inspoContext) {
   copyrightBar.settings.background_color = bgColor;
   copyrightBar.settings.border_border = "solid";
   copyrightBar.settings.border_width = { unit: "px", top: "1", right: "0", bottom: "0", left: "0", isLinked: false };
-  copyrightBar.settings.border_color = "rgba(255,255,255,0.08)";
+  copyrightBar.settings.border_color = borderColorSubtle;
   copyrightBar.settings.justify_content = "space-between";
   copyrightBar.settings.flex_align_items = "center";
 
