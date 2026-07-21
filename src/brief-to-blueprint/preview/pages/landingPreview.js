@@ -239,7 +239,6 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           var f = items[0];
 
           if (entry.style === "grouped-header") {
-            var colWidth = Math.floor(100 / items.length);
             htmlParts.push(
               "<section style='background:#ffffff;padding:56px clamp(24px,6vw,64px);'>" +
                 "<div style='font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:" + brass + ";margin-bottom:20px;'>" + he(entry.header || "") + "</div>" +

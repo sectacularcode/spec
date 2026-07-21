@@ -58,7 +58,7 @@ export default function HeaderFooterTab({ ctx }) {
                     `<a href="#" style="font-family:'${bf}',sans-serif;font-size:13px;color:${tc};text-decoration:none;margin:0 12px;white-space:nowrap;">${he(l.trim())}</a>`).join("");
                   const btnTxt = `<a href="#" style="font-family:'${bf}',sans-serif;font-size:12px;font-weight:600;color:#fff;background:${ac};padding:8px 18px;text-decoration:none;border-radius:4px;white-space:nowrap;">${he(brand.cta1 || "Get in touch")}</a>`;
                   const hs = brand.headerStyle || "Editorial";
-                  let headerHTML = "";
+                  let headerHTML;
                   if (hs === "Editorial") headerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding:0 40px;height:60px;background:${pc};border-bottom:1px solid ${brand.borderColor||"rgba(128,128,128,0.15)"};">${logoEl}<div style="display:flex;">${navLinks}</div><div></div></div>`;
                   else if (hs === "Studio") headerHTML = `<div style="text-align:center;padding:16px 40px;background:${pc};border-bottom:1px solid ${brand.borderColor||"rgba(128,128,128,0.15)"};"><div style="margin-bottom:10px;">${logoEl}</div><div>${navLinks}</div></div>`;
                   else if (hs === "Agency") headerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding:0 40px;height:60px;background:${pc};border-bottom:1px solid ${brand.borderColor||"rgba(128,128,128,0.15)"};">${logoEl}<div style="display:flex;align-items:center;">${navLinks}</div></div>`;
@@ -109,7 +109,7 @@ export default function HeaderFooterTab({ ctx }) {
                   const email = brand.contactEmail ? `<p style="font-family:'${bf}',sans-serif;font-size:12px;color:${tc};margin:6px 0 0;">${he(brand.contactEmail)}</p>` : "";
                   const copy = `<p style="font-family:'${bf}',sans-serif;font-size:11px;color:${tc};margin:16px 0 0;opacity:0.7;">© ${new Date().getFullYear()} ${he(brand.name || "Brand")}. All rights reserved.</p>`;
                   const fs = brand.footerStyle || "Editorial";
-                  let footerHTML = "";
+                  let footerHTML;
                   if (fs === "Editorial") {
                     footerHTML = `<div style="text-align:center;padding:48px 40px 32px;background:${pc};border-top:1px solid ${brand.borderColor||"rgba(128,128,128,0.15)"};">${logoEl}${tagline}<div style="margin:16px 0;">${navLinks}</div>${copy}</div>`;
                   } else if (fs === "Studio") {

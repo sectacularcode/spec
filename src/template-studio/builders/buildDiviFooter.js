@@ -33,7 +33,7 @@ export function buildDiviFooter(brand) {
   const copyright = he(brand.name);
   const utilityLine = he(brand.utilityMenu || "");
 
-  let inner = "";
+  let inner;
   if (footerStyle === "Editorial") {
     inner = `[et_pb_row][et_pb_column type="4_4"]${logo(28, "center")}${txt(tagline, body, 13, "center")}[et_pb_divider color="transparent" height="24px"][/et_pb_divider]${social}[et_pb_divider color="transparent" height="24px"][/et_pb_divider]${txt(`© ${new Date().getFullYear()} ${copyright}. All rights reserved.`, body, 11, "center")}[/et_pb_column][/et_pb_row]`;
   } else if (footerStyle === "Studio") {

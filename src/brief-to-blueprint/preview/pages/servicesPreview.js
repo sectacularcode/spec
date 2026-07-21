@@ -15,7 +15,7 @@ export function buildServicesPreview(brief, variant, inspoContext, colors, patte
           "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>" + he(brief.servicesH1 || "What we offer") + "</h1>" +
           "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0;line-height:1.65;'>" + he(brief.servicesSubhead || "Our full range of services.") + "</p>" +
         "</div></section>";
-      var body = "";
+      var body;
       if (sp === "alternating-rows") {
         body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:1160px;margin:0 auto;'>" +
           svcCards.map(function(pair, idx) {

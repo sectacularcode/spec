@@ -11,7 +11,7 @@ export function buildWorkPreview(brief, variant, inspoContext, colors, patterns)
         "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>Selected projects</h1>" +
         "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0;line-height:1.65;'>A look at what we have built.</p>" +
       "</div></section>";
-      var body = "";
+      var body;
       if (wp === "case-study-cards") {
         body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:1160px;margin:0 auto;'>" +
           [1,2,3,4].map(function(n) {

@@ -12,7 +12,7 @@ export function buildAboutPreview(brief, variant, inspoContext, colors, patterns
         "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>About</div>" +
         "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>" + he(brief.aboutHeading || "Our story") + "</h1>" +
       "</div></section>";
-      var body = "";
+      var body;
       if (ap === "centered-narrative") {
         body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='max-width:720px;margin:0 auto;'>" +
           "<p style='font-size:18px;color:" + text + ";line-height:1.8;margin:0 0 32px;'>" + he(brief.aboutBody || "Your company story goes here.") + "</p>" +

@@ -14,7 +14,7 @@ export function buildProcessPreview(brief, variant, inspoContext, colors, patter
         "<h1 style='font-weight:800;font-size:clamp(36px,5vw,56px);color:" + ink + ";margin:0 0 16px;line-height:1.1;'>" + he(brief.processH1 || "How it works") + "</h1>" +
         "<p style='font-size:17px;color:" + text + ";max-width:560px;margin:0;line-height:1.65;'>Simple and calm, from first call to final files.</p>" +
       "</div></section>";
-      var body = "";
+      var body;
       if (pp === "icon-cards") {
         body = "<section style='background:" + bone + ";padding:40px 40px 96px;'><div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;max-width:1160px;margin:0 auto;'>" +
           steps.map(function(s, i) {
