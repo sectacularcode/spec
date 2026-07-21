@@ -697,10 +697,13 @@ function manifestPageDocumentToBrief(raw) {
   // map_location/cta overwrite bug, so guarded the same way now instead of
   // waiting for a real case to surface it.
   var testimonialsOrderRecorded = false;
-  // Guards the singleton closing-CTA slot the same way mapOrderRecorded
-  // guards the map slot below -- see the cta handler for the real bug
-  // this fixes (2+ cta sections on one page overwriting each other).
-  var closingCtaClaimed = false;
+  // The actual singleton-slot guard here is the `section ===
+  // winningCtaSection` check in the cta handler below -- winningCtaSection
+  // is resolved once up front, so only that exact section can ever match.
+  // (No closingCtaClaimed flag needed the way mapOrderRecorded/
+  // faqOrderRecorded guard their slots -- those guard "first occurrence
+  // wins" across a loop; this guards "the one Manifest already told us is
+  // primary", decided before the loop even starts.)
 
   sections.forEach(function (section, idx) {
     var isLast = idx === sections.length - 1;
@@ -851,7 +854,6 @@ function manifestPageDocumentToBrief(raw) {
       // page -- it becomes an ordered feature row at its own real
       // position instead of a second identical closing CTA.
       if (section === winningCtaSection) {
-        closingCtaClaimed = true;
         brief.closingCta = headingText;
         brief.closingBody = ctaBodyText;
         // Confirmed real bug, July 2026: this only ever read heading/body,
