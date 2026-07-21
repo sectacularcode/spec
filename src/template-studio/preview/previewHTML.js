@@ -70,7 +70,6 @@ export function previewHTML(page, brand) {
       const subhead = page.heroSubhead || (brand.keyMessages || "").split(".")[0];
       const v = layout.heroVariant || "left-standard";
       const eyebrow = eyebrowText(layout.eyebrowStyle, page.heroEyebrow || page.pageType || "Welcome");
-      const btnTxtColor = textOn(ac);
       // Hero CTA markup: single Primary link, or Primary + Secondary pair when
       // brand.cta2 has a value -- keeps the live preview matching what buildPageJSON.js
       // and buildDiviPage.js now actually export instead of only ever showing Primary.
