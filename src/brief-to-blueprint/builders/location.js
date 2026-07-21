@@ -98,7 +98,7 @@ function mkInfoBlock(loc, ink, stone, bone) {
 // ── Variant A: Content-heavy / SEO ────────────────────────────────────────────
 export function buildLocationPageA(colors, brief, loc) {
   var C = getColors(colors);
-  var loc = loc || brief.locationData || {};
+  loc = loc || brief.locationData || {};
   var definedBtn = (brief.buttons || []).find(function(b) { return (b.name || "").trim().toLowerCase() === "primary"; }) || (brief.buttons && brief.buttons[0]);
   var btnBg = (definedBtn && definedBtn.background) || C.brassDp;
   var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, C.text);
@@ -188,7 +188,7 @@ export function buildLocationPageA(colors, brief, loc) {
 // ── Variant B: Conversion-first ───────────────────────────────────────────────
 export function buildLocationPageB(colors, brief, loc) {
   var C = getColors(colors);
-  var loc = loc || brief.locationData || {};
+  loc = loc || brief.locationData || {};
   var definedBtn = (brief.buttons || []).find(function(b) { return (b.name || "").trim().toLowerCase() === "primary"; }) || (brief.buttons && brief.buttons[0]);
   var btnBg = (definedBtn && definedBtn.background) || C.brassDp;
   var btnText = (definedBtn && definedBtn.textColor) || bestTextColor(btnBg, C.text);

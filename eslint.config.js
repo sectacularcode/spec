@@ -7,7 +7,7 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 export default defineConfig([
   globalIgnores(['dist']),
   {
-    files: ['**/*.{js,jsx}'],
+    files: ['src/**/*.{js,jsx}'],
     extends: [
       js.configs.recommended,
       reactHooks.configs.flat.recommended,
@@ -27,6 +27,20 @@ export default defineConfig([
       // pattern). Without this, no-unused-vars flagged every one of those
       // as if it were dead code, when removing them would have broken the
       // shared signature instead.
+      "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+    },
+  },
+  {
+    // api/ is Vercel serverless (Node) code, not browser code -- it was
+    // sharing the browser-globals block above, which flagged every real
+    // Node global (process, Buffer) as undefined. No React/JSX here, so no
+    // need for the react-hooks/react-refresh extends this block doesn't use.
+    files: ['api/**/*.js'],
+    extends: [js.configs.recommended],
+    languageOptions: {
+      globals: globals.node,
+    },
+    rules: {
       "no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
     },
   },

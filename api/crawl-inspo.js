@@ -226,7 +226,7 @@ function extractNavLinks(html, origin) {
           links.push(resolved.replace(/\/$/, "") || resolved);
         }
       }
-    } catch {}
+    } catch { /* skip URLs that fail to resolve/parse */ }
   }
   return [...new Set(links)];
 }

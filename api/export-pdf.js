@@ -110,7 +110,7 @@ export default async function handler(req, res) {
     // a bare status would hide -- capture a short snippet, same as
     // computedFontStyle.js does.
     let detail = "";
-    try { detail = (await bl.text()).slice(0, 200); } catch {}
+    try { detail = (await bl.text()).slice(0, 200); } catch { /* keep detail empty, status code alone still returned */ }
     return res.status(502).json({ error: "PDF render failed", reason: `bad_status:${bl.status}${detail ? ":" + detail : ""}` });
   }
 

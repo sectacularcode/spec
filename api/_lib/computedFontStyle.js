@@ -198,7 +198,7 @@ export async function extractComputedStyles(safeUrl) {
     // Capture a short body snippet -- Browserless returns useful detail on
     // 4xx (bad token, bad code) that a bare status code alone would hide.
     let detail = "";
-    try { detail = (await response.text()).slice(0, 200); } catch {}
+    try { detail = (await response.text()).slice(0, 200); } catch { /* keep detail empty, status code alone still returned */ }
     return { ok: false, reason: `bad_status:${response.status}${detail ? ":" + detail : ""}` };
   }
 

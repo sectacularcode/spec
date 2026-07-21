@@ -2,7 +2,7 @@ import mammoth from "mammoth";
 import { requireAuth, getProfile } from "./_lib/auth.js";
 import { rateLimit, tooMany } from "./_lib/ratelimit.js";
 import { deepStripHTML } from "./_lib/sanitize.js";
-import { callAnthropic, extractJSON, extractJSONWithDiagnostics } from "./_lib/anthropic.js";
+import { callAnthropic, extractJSONWithDiagnostics } from "./_lib/anthropic.js";
 import { logUsage } from "./_lib/usage.js";
 
 const EXTRACTION_PROMPT = `Extract every field from this brand brief and return ONLY a single valid JSON object.

@@ -337,7 +337,7 @@ export function buildColorSet(css) {
   // the used-check has to happen per-iteration, not just before the loop,
   // or duplicates among the custom entries themselves slip through.
   let addedCustom = 0;
-  for (const [id, hex] of Object.entries(elementor.custom)) {
+  for (const [_id, hex] of Object.entries(elementor.custom)) {
     if (addedCustom >= 6) break;
     if (used.has(hex)) continue;
     result.push({ custom: true, hex, name: "", usage: "", confidence: "confirmed" });
