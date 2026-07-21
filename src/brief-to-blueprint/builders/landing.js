@@ -636,10 +636,6 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
     return style;
   }
 
-  function safeOrderedRowStyle(i, hasVideo, features) {
-    return safeStyleFor(defaultOrderedRowStyle(i, hasVideo), features[i]);
-  }
-
   function renderOrderedContent(opts) {
     opts = opts || {};
     if (!Array.isArray(brief.contentOrder) || !brief.contentOrder.length) return null;
@@ -784,7 +780,7 @@ export function buildLandingPage(colors, brief, inspoContext, variant) {
   // rowIdx isn't used for alternating background here (always warm white,
   // matching Variant E's original), but is accepted for signature
   // consistency with the other render* functions.
-  function renderMidCta(rowIdx) {
+  function renderMidCta(_rowIdx) {
     return mkContainer([
       mkHeading(phoneCta, accent, "h2", { weight: 800, px: 32, align: "center" }),
       mkSpacer(8),

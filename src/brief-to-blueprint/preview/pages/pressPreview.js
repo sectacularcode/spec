@@ -3,7 +3,7 @@
 // Output is byte-identical to the pre-split inline version -- verified
 // against the original before shipping. colors carries the 8 resolved
 // palette values buildPreviewHTML.js computes (defaults already applied).
-export function buildPressPreview(brief, variant, inspoContext, colors, patterns) {
+export function buildPressPreview(brief, variant, inspoContext, colors, _patterns) {
   var ink = colors.ink, brass = colors.brass, bone = colors.bone, warmWhite = colors.warmWhite, stone = colors.stone, brassDp = colors.brassDp, text = colors.text;
       var articles = [["How This Startup is Changing the Game","Forbes · January 2026"],["10 Companies to Watch in 2026","Inc. · March 2026"],["The Future of Digital Services","TechCrunch · May 2026"]];
       var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +

@@ -145,7 +145,7 @@ function renderOffscreen(html) {
           try {
             var srcUrl = new URL(el.getAttribute("src"), "https://maps.google.com");
             address = srcUrl.searchParams.get("q") || "";
-          } catch (e) { /* leave address blank, card still shows */ }
+          } catch { /* leave address blank, card still shows */ }
           var card = doc.createElement("div");
           card.setAttribute("style", "width:100%;height:100%;min-height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#eef0f3;border:1px solid #d7dbe1;box-sizing:border-box;padding:24px;text-align:center;font-family:inherit;");
           card.innerHTML =

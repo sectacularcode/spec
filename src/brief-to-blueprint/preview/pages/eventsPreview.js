@@ -6,7 +6,7 @@ import { he } from "../../utils/htmlEscape.js";
 // against the original before shipping. colors carries the 8 resolved
 // palette values buildPreviewHTML.js computes (defaults already applied).
 export function buildEventsPreview(brief, variant, inspoContext, colors, patterns) {
-  var ink = colors.ink, brass = colors.brass, bone = colors.bone, warmWhite = colors.warmWhite, stone = colors.stone, brassDp = colors.brassDp, text = colors.text;
+  var ink = colors.ink, brass = colors.brass, bone = colors.bone, warmWhite = colors.warmWhite, stone = colors.stone, brassDp = colors.brassDp;
       var ep = patterns.events || "date-list";
       var evts = [
         { date: "JAN 15", title: "Workshop: Brand Strategy Fundamentals", meta: "10:00 AM — 2:00 PM · Virtual" },

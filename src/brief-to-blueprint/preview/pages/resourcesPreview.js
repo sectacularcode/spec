@@ -3,7 +3,7 @@
 // Output is byte-identical to the pre-split inline version -- verified
 // against the original before shipping. colors carries the 8 resolved
 // palette values buildPreviewHTML.js computes (defaults already applied).
-export function buildResourcesPreview(brief, variant, inspoContext, colors, patterns) {
+export function buildResourcesPreview(brief, variant, inspoContext, colors, _patterns) {
   var ink = colors.ink, bone = colors.bone, stone = colors.stone, brassDp = colors.brassDp, text = colors.text;
       var items = [["Getting Started Guide","A step-by-step walkthrough for new clients.","PDF"],["Brand Toolkit","Templates, guidelines, and assets for your brand.","ZIP"],["Project Brief Template","Fill this out before our first meeting.","DOCX"],["Case Study Collection","Real results from real projects.","PDF"]];
       var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +

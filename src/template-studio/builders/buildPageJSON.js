@@ -1,4 +1,3 @@
-import { THEMES } from "../constants/themes.js";
 import { getLayout, eyebrowText } from "../constants/layouts.js";
 import { isLight, textOn, mutedTextOn, buttonOn, buttonVariations } from "../utils/colors.js";
 import { imgOrPlaceholder } from "../utils/images.js";
@@ -10,7 +9,6 @@ import { he } from "../utils/htmlEscape.js";
 
 export function buildPageJSON(page, brand) {
   const { primaryColor: pc, accentColor: ac, cardBgColor: card, headingFont: hf, bodyFont: bf } = brand;
-  const theme = THEMES.find(t => t.id === brand.themeId);
   // Computed fresh from the actual background color every time, not from a stored
   // theme.mode/themeMode label -- those can go stale the moment primaryColor is
   // changed without also updating them (e.g. the "Primary BG" color picker doesn't

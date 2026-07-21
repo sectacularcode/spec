@@ -3,7 +3,7 @@
 // byte-identical to the pre-split inline version -- verified against the
 // original before shipping. colors carries the 8 resolved palette values
 // buildPreviewHTML.js computes (defaults already applied).
-export function buildLocationPreview(brief, variant, inspoContext, colors, patterns) {
+export function buildLocationPreview(brief, variant, inspoContext, colors, _patterns) {
   var ink = colors.ink, bone = colors.bone, stone = colors.stone, brassDp = colors.brassDp, text = colors.text;
       if (variant === "B") {
         // Centered — address first, map below

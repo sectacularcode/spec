@@ -3,7 +3,7 @@
 // Output is byte-identical to the pre-split inline version -- verified
 // against the original before shipping. colors carries the 8 resolved
 // palette values buildPreviewHTML.js computes (defaults already applied).
-export function buildBlogPostPreview(brief, variant, inspoContext, colors, patterns) {
+export function buildBlogPostPreview(brief, variant, inspoContext, colors, _patterns) {
   var ink = colors.ink, brass = colors.brass, bone = colors.bone, stone = colors.stone, brassDp = colors.brassDp, text = colors.text;
       if (variant === "B") {
         // Wide editorial — no sidebar column, wider content, pull quote prominent

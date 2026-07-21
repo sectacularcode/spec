@@ -4,7 +4,7 @@
 // against the original before shipping. colors carries the 8 resolved
 // palette values buildPreviewHTML.js computes (defaults already applied).
 export function buildBlogPreview(brief, variant, inspoContext, colors, patterns) {
-  var ink = colors.ink, brass = colors.brass, bone = colors.bone, stone = colors.stone, brassDp = colors.brassDp, text = colors.text;
+  var ink = colors.ink, brass = colors.brass, bone = colors.bone, stone = colors.stone, brassDp = colors.brassDp;
       var bp = patterns.blog || "grid-3col";
       var header = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +
         "<div style='font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:" + brassDp + ";margin-bottom:16px;'>Journal</div>" +

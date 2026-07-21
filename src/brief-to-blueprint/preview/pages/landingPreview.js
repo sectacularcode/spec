@@ -627,10 +627,6 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
         if (style === "split-cta-left") return "split-left";
         return style;
       }
-      function safeOrderedRowStyle(i, hasVideo) {
-        var f = Array.isArray(brief.features) ? brief.features[i] : null;
-        return safeStyleFor(defaultOrderedRowStyle(i, hasVideo), f);
-      }
       // For the legacy curated-layout path (featureLayout set but no
       // contentOrder) -- same substitution, applied per entry, using the
       // first index's feature for a grouped row (matches how a grouped

@@ -3,7 +3,7 @@
 // Output is byte-identical to the pre-split inline version -- verified
 // against the original before shipping. colors carries the 8 resolved
 // palette values buildPreviewHTML.js computes (defaults already applied).
-export function buildDownloadsPreview(brief, variant, inspoContext, colors, patterns) {
+export function buildDownloadsPreview(brief, variant, inspoContext, colors, _patterns) {
   var ink = colors.ink, bone = colors.bone, stone = colors.stone, brassDp = colors.brassDp, text = colors.text;
       var ditems = [["Brand Guidelines Template","Start with a professional framework."],["Social Media Calendar","Plan your content month by month."],["Project Scope Template","Define deliverables before you start."],["Invoice Template","Clean, professional billing."]];
       var dheader = "<section style='background:" + bone + ";padding:88px 40px 40px;'><div style='max-width:1160px;margin:0 auto;'>" +

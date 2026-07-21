@@ -878,23 +878,6 @@ export const applyTheme = (theme, brand) => ({
   themeMode: theme.mode,
 });
 
-// ──────────────────────────────────────────────────────────────────────────────
-// COLOR CONTRAST HELPERS — ensures text is always readable on its background.
-// Uses perceptual luminance (WCAG-style) to pick black or white text dynamically.
-// ──────────────────────────────────────────────────────────────────────────────
-const luminance = (hex) => {
-  if (!hex || typeof hex !== "string") return 0.5;
-  const h = hex.replace("#", "");
-  if (h.length < 6) return 0.5;
-  const [r, g, b] = [0, 2, 4].map(i => {
-    const c = parseInt(h.substr(i, 2), 16) / 255;
-    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-  });
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-};
-const isLight = (hex) => luminance(hex) > 0.179;
-const textOn = (bg) => isLight(bg) ? "#0a0a0a" : "#ffffff";
-
 // Returns a sensible button color pair that works on any section background
 // Returns image URL if provided, otherwise a stable Picsum placeholder
 // ──────────────────────────────────────────────────────────────────────────────

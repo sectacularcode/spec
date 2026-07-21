@@ -1,14 +1,13 @@
 import { THEMES } from "../constants/themes.js";
 import { imgOrPlaceholder } from "../utils/images.js";
 import { he } from "../utils/htmlEscape.js";
-import { textOn, mutedTextOn, buttonOn, buttonVariations, isLight, headingColorOn } from "../utils/colors.js";
+import { textOn, mutedTextOn, buttonOn, buttonVariations, headingColorOn } from "../utils/colors.js";
 // Builds Divi shortcode format for a page (secondary export format)
 // Returns a plain string of Divi [et_pb_*] shortcodes.
 export function buildDiviPage(page, brand) {
   const { primaryColor: pc, accentColor: ac, cardBgColor: card, bodyTextColor: body, headingFont: hf, bodyFont: bf } = brand;
   const ts = body;
   const theme = THEMES.find(t => t.id === brand.themeId);
-  const isDark = !isLight(pc);
   const hc = headingColorOn(pc, theme && theme.headingColor);
 
   // Responsive padding string: desktop "T|R|B|L" plus tablet/phone scaled-down variants.

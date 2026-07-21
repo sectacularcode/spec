@@ -3,7 +3,7 @@
 // Output is byte-identical to the pre-split inline version -- verified
 // against the original before shipping. colors carries the 8 resolved
 // palette values buildPreviewHTML.js computes (defaults already applied).
-export function buildEventSinglePreview(brief, variant, inspoContext, colors, patterns) {
+export function buildEventSinglePreview(brief, variant, inspoContext, colors, _patterns) {
   var ink = colors.ink, brass = colors.brass, bone = colors.bone, warmWhite = colors.warmWhite, stone = colors.stone, brassDp = colors.brassDp, text = colors.text;
       if (variant === "B") {
         // Light centered layout

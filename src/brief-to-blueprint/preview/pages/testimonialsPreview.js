@@ -6,7 +6,7 @@ import { he } from "../../utils/htmlEscape.js";
 // against the original before shipping. colors carries the 8 resolved
 // palette values buildPreviewHTML.js computes (defaults already applied).
 export function buildTestimonialsPreview(brief, variant, inspoContext, colors, patterns) {
-  var ink = colors.ink, brass = colors.brass, bone = colors.bone, warmWhite = colors.warmWhite, stone = colors.stone, brassDp = colors.brassDp, text = colors.text;
+  var ink = colors.ink, brass = colors.brass, bone = colors.bone, warmWhite = colors.warmWhite, stone = colors.stone, brassDp = colors.brassDp;
       var tp = patterns.testimonials || "card-grid";
       var quotes = [
         { q: "This changed everything for our business.", name: "Client Name", role: "Role, Company" },

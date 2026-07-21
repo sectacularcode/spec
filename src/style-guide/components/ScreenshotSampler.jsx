@@ -191,7 +191,7 @@ export default function ScreenshotSampler({ onSample, colors = [], onRoleCorrect
       } else {
         setRoleCheckStatus(data.error || "Couldn't check roles — try again.");
       }
-    } catch (e) {
+    } catch {
       setRoleCheckStatus("Couldn't check roles — try again.");
     }
     setCheckingRoles(false);
