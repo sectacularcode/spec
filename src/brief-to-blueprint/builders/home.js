@@ -165,16 +165,59 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
     return mkContainer([row], bone, { padY: "96" });
   })();
 
-  var work = mkContainer([
-    mkHeading(brief.workH2 || "Recent work.", ink, "h2", { px: 44, weight: 800 }),
-    mkSpacer(48),
-    mkContainer(
-      (brief.workItems || ["Film 1","Film 2","Film 3"]).map(function(w) {
-        return mkContainer([mkImageBg(w, { minHeight: 220 }), mkSpacer(12), mkText("<strong>" + he(w) + "</strong>", stone)],
-          null, { padY: "0", grow: 1, isInner: true });
-      }), null, { direction: "row", gap: "24", padY: "0", isInner: true }
-    ),
-  ], bone, { padY: "96" }); // Recent work grid — preview uses 96, matching the other split sections above
+  // ── WORK (portfolio) — pattern-driven ───────────────────────────────────
+  // default (unset/unmatched id) is exactly the original always-on
+  // treatment -- untouched. case-study-cards and full-width-stacked are
+  // new; homePreview.js gets the matching HTML in the same pass.
+  var portfolioPattern = patterns && patterns.portfolio;
+  var work;
+  if (portfolioPattern === "case-study-cards") {
+    var csCards = (brief.workItems || ["Film 1","Film 2","Film 3"]).map(function(w) {
+      var card = mkContainer([
+        mkImageBg(w, { minHeight: 180 }),
+        mkSpacer(16),
+        mkHeading(w, ink, "h4", { weight: 700, px: 18 }),
+      ], "#ffffff", { padY: "24", isInner: true });
+      card.settings.border_border = "solid";
+      card.settings.border_width = { unit: "px", top: "0", right: "0", bottom: "0", left: "3", isLinked: false };
+      card.settings.border_color = brass;
+      card.settings.padding = { unit: "px", top: "24", right: "24", bottom: "24", left: "24", isLinked: false };
+      card.settings._flex_grow = 1;
+      return card;
+    });
+    var csRow = mkContainer(csCards, null, { direction: "row", gap: "24", padY: "0", isInner: true });
+    csRow.settings.flex_wrap = "wrap";
+    work = mkContainer([
+      mkHeading(brief.workH2 || "Recent work.", ink, "h2", { px: 44, weight: 800 }),
+      mkSpacer(48),
+      csRow,
+    ], bone, { padY: "96" });
+  } else if (portfolioPattern === "full-width-stacked") {
+    var fwsChildren = [];
+    (brief.workItems || ["Film 1","Film 2","Film 3"]).forEach(function(w, idx) {
+      if (idx > 0) fwsChildren.push(mkSpacer(48));
+      fwsChildren.push(mkContainer([
+        mkImageBg(w, { minHeight: 320 }),
+        mkSpacer(16),
+        mkHeading(w, ink, "h3", { weight: 700, px: 24 }),
+      ], null, { padY: "0", isInner: true }));
+    });
+    work = mkContainer(
+      [mkHeading(brief.workH2 || "Recent work.", ink, "h2", { px: 44, weight: 800 }), mkSpacer(48)].concat(fwsChildren),
+      bone, { padY: "96" }
+    );
+  } else { // default (unset/unmatched) -- unchanged from before
+    work = mkContainer([
+      mkHeading(brief.workH2 || "Recent work.", ink, "h2", { px: 44, weight: 800 }),
+      mkSpacer(48),
+      mkContainer(
+        (brief.workItems || ["Film 1","Film 2","Film 3"]).map(function(w) {
+          return mkContainer([mkImageBg(w, { minHeight: 220 }), mkSpacer(12), mkText("<strong>" + he(w) + "</strong>", stone)],
+            null, { padY: "0", grow: 1, isInner: true });
+        }), null, { direction: "row", gap: "24", padY: "0", isInner: true }
+      ),
+    ], bone, { padY: "96" }); // Recent work grid — preview uses 96, matching the other split sections above
+  }
 
   var pricingTeaser = mkContainer([
     mkHeading(brief.pricingH2 || "Clear prices. No discovery-call maze.", ink, "h2",
@@ -186,13 +229,35 @@ export function buildHomePage(C, brief, inspoHint, patterns) {
       null, { padY: "0", center: true, isInner: true }),
   ], bone, { padY: "112", center: true });
 
-  var closing = mkContainer([
-    mkHeading(brief.tagline || "The stories that move a company forward.", warmWhite, "h1",
-      { font: "Fraunces", weight: 300, px: 64, italic: true, align: "center" }),
-    mkSpacer(48),
-    mkContainer([mkButton(brief.closingCta || "Start a project", btnBg, btnText)],
-      null, { padY: "0", center: true, isInner: true }),
-  ], ink, { padY: "120", minH: 70, center: true });
+  // ── CLOSING CTA — pattern-driven ────────────────────────────────────────
+  // dark-full (default/unset) is exactly the original always-on treatment.
+  // split-cta and minimal-line are new; both mirror homePreview.js's own
+  // real HTML for these patterns so preview and export can't drift again.
+  var ctaPattern = patterns && patterns.cta;
+  var closing;
+  if (ctaPattern === "split-cta") {
+    var splitCtaRow = mkContainer([
+      mkHeading(brief.tagline || "The stories that move a company forward.", warmWhite, "h2", { weight: 800, px: 28 }),
+      mkButton(brief.closingCta || "Start a project", btnBg, btnText),
+    ], null, { direction: "row", gap: "24", padY: "0", isInner: true });
+    splitCtaRow.settings.flex_justify_content = "space-between";
+    splitCtaRow.settings.flex_wrap = "wrap";
+    closing = mkContainer([splitCtaRow], ink, { padY: "60" });
+  } else if (ctaPattern === "minimal-line") {
+    var minimalLineHtml = "<a href='#' style='color:" + brassDp + ";text-decoration:underline;font-weight:600;'>" + he(brief.closingCta || "Start a project") + " \u2192</a>";
+    closing = mkContainer([mkText(minimalLineHtml, brassDp, "center")], bone, { padY: "60", center: true });
+    closing.settings.border_border = "solid";
+    closing.settings.border_width = { unit: "px", top: "1", right: "0", bottom: "0", left: "0", isLinked: false };
+    closing.settings.border_color = "#E2DBCC";
+  } else { // dark-full (default)
+    closing = mkContainer([
+      mkHeading(brief.tagline || "The stories that move a company forward.", warmWhite, "h1",
+        { font: "Fraunces", weight: 300, px: 64, italic: true, align: "center" }),
+      mkSpacer(48),
+      mkContainer([mkButton(brief.closingCta || "Start a project", btnBg, btnText)],
+        null, { padY: "0", center: true, isInner: true }),
+    ], ink, { padY: "120", minH: 70, center: true });
+  }
 
   return { version: "0.4", title: he(brief.brandName || "Site") + " — Home", type: "page", page_settings: {},
     content: [hero, hook, cards, split, whoSection, work, pricingTeaser, closing] };

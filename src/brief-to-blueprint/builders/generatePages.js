@@ -47,21 +47,43 @@ export function generatePages(brief, selectedPages, inspoContext, aiRecs, custom
     var result = null;
 
     if (pid === "home") {
+      // A and B explicitly pin cta:"dark-full" and leave portfolio unset --
+      // this is deliberate, not incidental. selectPatterns() can compute
+      // ANY of the 3 cta / 4 portfolio ids for a given brief today, and
+      // home.js now genuinely varies its output by both. Without pinning
+      // here, A/B would inherit whatever got computed -- meaning some
+      // existing briefs would silently start rendering a different
+      // closing/work section the moment this shipped, even though A/B
+      // are the only variants that can be auto-recommended and shown by
+      // default (see homeRec below). Pinning keeps A/B's output exactly
+      // what it was before cta/portfolio patterns existed in home.js at
+      // all -- the new variety only ever shows up in C, which nobody
+      // sees unless they deliberately pick it.
       var homePatterns = Object.assign({}, patterns);
       homePatterns.hero = "centered-bold";
+      homePatterns.cta = "dark-full";
+      delete homePatterns.portfolio;
       var homeA = buildHomePage(colors, brief, inspoContext, homePatterns);
       var homePatternsB = Object.assign({}, patterns);
       homePatternsB.hero = "split-left";
+      homePatternsB.cta = "dark-full";
+      delete homePatternsB.portfolio;
       var homeB = buildHomePage(colors, brief, inspoContext, homePatternsB);
       // Layout C — a third, genuinely distinct combination: the "minimal"
       // hero (large centered text, no image, single CTA) paired with the
       // "numbered-features" cards treatment, instead of A/B's shared
       // bordered-card-grid look. Both patterns already existed in the
       // preview; the numbered-features cards treatment didn't exist in
-      // the real export until now (see home.js).
+      // the real export until now (see home.js). Also now pins a real
+      // cta/portfolio pattern (split-cta close, case-study-cards work) --
+      // this is where the new variety actually shows up, since C is
+      // never auto-recommended (see homeRec below) and only appears if
+      // someone deliberately switches to it.
       var homePatternsC = Object.assign({}, patterns);
       homePatternsC.hero = "minimal";
       homePatternsC.services = "numbered-features";
+      homePatternsC.cta = "split-cta";
+      homePatternsC.portfolio = "case-study-cards";
       var homeC = buildHomePage(colors, brief, inspoContext, homePatternsC);
       var homeRec = (patterns.hero === "split-left" || patterns.hero === "split-right") ? "B" : "A";
       var homeData = homeRec === "B" ? homeB : homeA;

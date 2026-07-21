@@ -134,40 +134,75 @@ export function buildHomePreview(brief, variant, inspoContext, colors, patterns)
         "<div><p style='font-size:16px;color:" + text + ";line-height:1.7;margin:0;'>" + he(brief.whoBody || "[Who this is for — pulled from brand brief. Describe the ideal client specifically.]") + "</p></div>" +
       "</div></section>";
 
-      // ── WORK (recent work grid) ──
-      // Matches home.js's `work` section exactly: heading + a row of
-      // image-placeholder + bold-caption items (workH2/workItems, same
-      // 3-item default). Previously missing from preview entirely.
+      // ── WORK (portfolio) — pattern-driven ──
+      // default matches home.js's unset-pattern treatment exactly: heading
+      // + a row of image-placeholder + caption items. Caption color fixed
+      // to stone (was ink here -- home.js's real caption uses mkText(...,
+      // stone), found while building the two new treatments below).
+      // case-study-cards and full-width-stacked are new, built in the
+      // same pass as their home.js Elementor equivalents.
+      var pp = patterns.portfolio;
       var workItemsList = (brief.workItems || ["Film 1","Film 2","Film 3"]);
-      var workHTML = "<section style='background:" + bone + ";padding:96px clamp(24px,8vw,80px);'><div style='max-width:1100px;margin:0 auto;'>" +
-        "<h2 style='font-weight:800;font-size:clamp(28px,4vw,44px);color:" + ink + ";margin:0 0 48px;'>" + he(brief.workH2 || "Recent work.") + "</h2>" +
-        "<div style='display:grid;grid-template-columns:repeat(" + workItemsList.length + ",1fr);gap:24px;'>" +
+      var workHTML;
+      if (pp === "case-study-cards") {
+        workHTML = "<section style='background:" + bone + ";padding:96px clamp(24px,8vw,80px);'><div style='max-width:1100px;margin:0 auto;'>" +
+          "<h2 style='font-weight:800;font-size:clamp(28px,4vw,44px);color:" + ink + ";margin:0 0 48px;'>" + he(brief.workH2 || "Recent work.") + "</h2>" +
+          "<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;'>" +
+            workItemsList.map(function(w) {
+              return "<div style='background:#ffffff;border-left:3px solid " + brass + ";padding:24px;'>" +
+                "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;margin-bottom:16px;'>" + he(w) + "</div>" +
+                "<h3 style='font-size:18px;font-weight:700;color:" + ink + ";margin:0;'>" + he(w) + "</h3>" +
+              "</div>";
+            }).join("") +
+          "</div>" +
+        "</div></section>";
+      } else if (pp === "full-width-stacked") {
+        workHTML = "<section style='background:" + bone + ";padding:96px clamp(24px,8vw,80px);'><div style='max-width:1100px;margin:0 auto;'>" +
+          "<h2 style='font-weight:800;font-size:clamp(28px,4vw,44px);color:" + ink + ";margin:0 0 48px;'>" + he(brief.workH2 || "Recent work.") + "</h2>" +
           workItemsList.map(function(w) {
-            return "<div>" +
-              "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;margin-bottom:12px;'>" + he(w) + "</div>" +
-              "<div style='font-size:15px;font-weight:700;color:" + ink + ";'>" + he(w) + "</div>" +
+            return "<div style='margin-bottom:48px;'>" +
+              "<div style='background:#e0ddd7;aspect-ratio:21/9;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;margin-bottom:16px;'>" + he(w) + "</div>" +
+              "<h3 style='font-size:24px;font-weight:700;color:" + ink + ";margin:0;'>" + he(w) + "</h3>" +
             "</div>";
           }).join("") +
-        "</div>" +
-      "</div></section>";
+        "</div></section>";
+      } else { // default (unset/unmatched)
+        workHTML = "<section style='background:" + bone + ";padding:96px clamp(24px,8vw,80px);'><div style='max-width:1100px;margin:0 auto;'>" +
+          "<h2 style='font-weight:800;font-size:clamp(28px,4vw,44px);color:" + ink + ";margin:0 0 48px;'>" + he(brief.workH2 || "Recent work.") + "</h2>" +
+          "<div style='display:grid;grid-template-columns:repeat(" + workItemsList.length + ",1fr);gap:24px;'>" +
+            workItemsList.map(function(w) {
+              return "<div>" +
+                "<div style='background:#e0ddd7;aspect-ratio:4/3;border-radius:4px;display:flex;align-items:center;justify-content:center;color:" + stone + ";font-size:13px;margin-bottom:12px;'>" + he(w) + "</div>" +
+                "<div style='font-size:15px;font-weight:700;color:" + stone + ";'>" + he(w) + "</div>" +
+              "</div>";
+            }).join("") +
+          "</div>" +
+        "</div></section>";
+      }
 
-      // ── CTA (closing) ──
-      // Matches home.js's real `closing` section exactly -- fallback text
-      // ("The stories that move a company forward."), the button reading
-      // brief.closingCta (was hardcoded literal text here before), and
-      // the actual italic/light-weight/Fraunces typographic treatment
-      // (was rendering as a bold sans heading before, plus a
-      // brief.signatureLine paragraph that doesn't exist anywhere in
-      // home.js). The split-cta/minimal-line variants this preview used
-      // to offer are intentionally not restored here -- home.js has no
-      // matching treatment for either today, so showing them in preview
-      // would just reopen the same preview/export mismatch this pass is
-      // fixing. They come back together with real home.js support in a
-      // separate pass.
-      var ctaHTML = "<section style='background:" + ink + ";padding:120px clamp(24px,8vw,80px);text-align:center;min-height:70vh;display:flex;align-items:center;justify-content:center;'><div>" +
-        "<h1 style='font-family:Fraunces,serif;font-weight:300;font-style:italic;font-size:clamp(32px,6vw,64px);color:" + warmWhite + ";margin:0 0 48px;line-height:1.15;'>" + he(brief.tagline || "The stories that move a company forward.") + "</h1>" +
-        "<a style='padding:14px 40px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + he(brief.closingCta || "Start a project") + "</a>" +
-      "</div></section>";
+      // ── CTA (closing) — pattern-driven ──
+      // All three now match home.js's real closing section exactly:
+      // dark-full is the original always-on treatment; split-cta and
+      // minimal-line are new, built in the same pass as their home.js
+      // Elementor equivalents. Both read the real fields (tagline,
+      // closingCta) instead of hardcoded literal text.
+      var cp = patterns.cta;
+      var ctaHTML;
+      if (cp === "split-cta") {
+        ctaHTML = "<section style='background:" + ink + ";padding:60px clamp(24px,8vw,80px);'><div style='display:flex;justify-content:space-between;align-items:center;max-width:1160px;margin:0 auto;flex-wrap:wrap;gap:24px;'>" +
+          "<h2 style='font-weight:800;font-size:clamp(20px,3vw,32px);color:" + warmWhite + ";margin:0;'>" + he(brief.tagline || "The stories that move a company forward.") + "</h2>" +
+          "<a style='padding:14px 40px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + he(brief.closingCta || "Start a project") + "</a>" +
+        "</div></section>";
+      } else if (cp === "minimal-line") {
+        ctaHTML = "<section style='background:" + bone + ";padding:60px clamp(24px,8vw,80px);text-align:center;border-top:1px solid #E2DBCC;'>" +
+          "<a style='font-size:16px;color:" + brassDp + ";text-decoration:underline;font-weight:600;'>" + he(brief.closingCta || "Start a project") + " →</a>" +
+        "</section>";
+      } else { // dark-full (default)
+        ctaHTML = "<section style='background:" + ink + ";padding:120px clamp(24px,8vw,80px);text-align:center;min-height:70vh;display:flex;align-items:center;justify-content:center;'><div>" +
+          "<h1 style='font-family:Fraunces,serif;font-weight:300;font-style:italic;font-size:clamp(32px,6vw,64px);color:" + warmWhite + ";margin:0 0 48px;line-height:1.15;'>" + he(brief.tagline || "The stories that move a company forward.") + "</h1>" +
+          "<a style='padding:14px 40px;background:" + brassDp + ";color:#ffffff;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;border-radius:4px;display:inline-block;'>" + he(brief.closingCta || "Start a project") + "</a>" +
+        "</div></section>";
+      }
 
       // ── HOOK ──
       // home.js's hook is a single centered H2 only -- weight 700, Inter,
