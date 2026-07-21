@@ -262,7 +262,7 @@ async function downloadPreviewPdfServer(html, fileNameParts) {
   });
   if (!res.ok) {
     let detail = "";
-    try { detail = (await res.json()).error || ""; } catch {}
+    try { detail = (await res.json()).error || ""; } catch { /* best-effort, safe to skip if unavailable */ }
     throw new Error(`export-pdf ${res.status}${detail ? ": " + detail : ""}`);
   }
   const blob = await res.blob();

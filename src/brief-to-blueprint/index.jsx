@@ -111,7 +111,7 @@ export default function CustomBuild({ userId, role } = {}) {
       if (buildId) url.searchParams.set("build", buildId); else url.searchParams.delete("build");
       if (buildId && page) url.searchParams.set("page", page); else url.searchParams.delete("page");
       window.history.replaceState({}, "", url);
-    } catch {}
+    } catch { /* best-effort, safe to skip if unavailable */ }
   }
   function resetBrief() {
     setBulkImportMode(false);
@@ -243,7 +243,7 @@ export default function CustomBuild({ userId, role } = {}) {
       // browser's in-progress session. &page=<id> additionally picks which
       // page is active within it.
       let params = null;
-      try { params = new URLSearchParams(window.location.search); } catch {}
+      try { params = new URLSearchParams(window.location.search); } catch { /* best-effort, safe to skip if unavailable */ }
       const buildId = params ? params.get("build") : null;
       if (buildId) {
         const snapshot = await getDraftSnapshot(buildId);
@@ -279,7 +279,7 @@ export default function CustomBuild({ userId, role } = {}) {
         if (draft.generated)      setGenerated(draft.generated);
         if (draft.previewPage)    setPreviewPage(draft.previewPage);
         if (draft.crawlResults)   setCrawlResults(draft.crawlResults);
-      } catch {}
+      } catch { /* best-effort, safe to skip if unavailable */ }
     }
     loadDraft();
   }, []);
@@ -335,7 +335,7 @@ export default function CustomBuild({ userId, role } = {}) {
       saveSessionDraft(draft);
     }, 800);
     return () => clearTimeout(timer);
-  }, [brief, briefsByPage, bulkImportMode, briefName, clientName, inspoUrls, selectedPages, copyBriefOnly, layoutVariants, previewPage, crawlResults, generated]);
+  }, [brief, briefsByPage, bulkImportMode, briefName, clientName, inspoUrls, selectedPages, customPages, copyBriefOnly, layoutVariants, previewPage, crawlResults, generated]);
 
   // Keeps briefsByPage mirroring briefRaw across every currently selected
   // page -- single-brief mode only. Full rebuild rather than a merge --
@@ -470,7 +470,7 @@ export default function CustomBuild({ userId, role } = {}) {
         const inspoCtx = generated.inspoContext || "";
         const newPages = generatePages(brief, [...selectedPages, ...newPageDefs.map(p => p.id)], inspoCtx, generated.aiRecs, [...customPages, ...newPageDefs]);
         setGenerated(prev => ({ ...prev, pages: newPages }));
-      } catch {}
+      } catch { /* best-effort, safe to skip if unavailable */ }
     }
   }
 

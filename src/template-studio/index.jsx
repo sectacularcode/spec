@@ -224,7 +224,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
                 }
               });
               setProjects(parsed);
-              var sid=null;try{sid=localStorage.getItem("spec_activeId");}catch{}
+              var sid=null;try{sid=localStorage.getItem("spec_activeId");}catch{ /* best-effort, safe to skip if unavailable */ }
               setActiveId(sid&&parsed.find(function(x){return x.id===sid;})?sid:parsed[0].id);
           }
         } else if (lsRaw) {
@@ -232,10 +232,10 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
             const lsParsed = JSON.parse(lsRaw);
             if (Array.isArray(lsParsed) && lsParsed.length > 0 && !cancelled) {
               setProjects(lsParsed);
-              var sid2=null;try{sid2=localStorage.getItem("spec_activeId");}catch{}
+              var sid2=null;try{sid2=localStorage.getItem("spec_activeId");}catch{ /* best-effort, safe to skip if unavailable */ }
               setActiveId(sid2&&lsParsed.find(function(x){return x.id===sid2;})?sid2:lsParsed[0].id);
             }
-          } catch {}
+          } catch { /* best-effort, safe to skip if unavailable */ }
         }
       } catch {
         // No saved data or parse error — start with empty projects list
@@ -244,9 +244,9 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [userId]);
 
-  useEffect(function(){if(!storageLoaded)return;try{if(activeId)localStorage.setItem("spec_activeId",activeId);localStorage.setItem("spec_view",view);localStorage.setItem("spec_tab",tab);localStorage.setItem("spec_pageIdx",String(pageIdx));}catch{}}, [activeId,view,tab,pageIdx,storageLoaded]);
+  useEffect(function(){if(!storageLoaded)return;try{if(activeId)localStorage.setItem("spec_activeId",activeId);localStorage.setItem("spec_view",view);localStorage.setItem("spec_tab",tab);localStorage.setItem("spec_pageIdx",String(pageIdx));}catch{ /* best-effort, safe to skip if unavailable */ }}, [activeId,view,tab,pageIdx,storageLoaded]);
 
   // Save projects to storage whenever they change (after initial load).
   // Diffs against lastSavedRef and only upserts/deletes the projects that
@@ -294,7 +294,7 @@ const [tab, setTab] = useState(function(){try{return localStorage.getItem("spec_
         } else {
           // Signed out — localStorage is the only persistence available,
           // matching the `else if (lsRaw)` fallback read above.
-          try { localStorage.setItem("projects", JSON.stringify(projects)); } catch {}
+          try { localStorage.setItem("projects", JSON.stringify(projects)); } catch { /* best-effort, safe to skip if unavailable */ }
         }
       } catch {
         // Storage write failed — fail silently, user can export to file as backup
@@ -757,7 +757,7 @@ Return ONLY a valid JSON object — no preamble, no markdown fences:
   "headingFont": "Manrope|Inter|Playfair Display|Cormorant Garamond|Yeseva One|Italiana|Oswald|Space Mono|Fraunces",
   "bodyFont": "Inter|DM Sans|Lato|Manrope|Space Mono",
   "fontReason": "1 short sentence",
-  "imageCategory": "ONLY used when isCustom is true (ignored otherwise) — one of: marketing|production|product|lifestyle|editorial|portrait|trades|automotive|food|default. Pick whichever real category is the closest visual match to the theme. \"editorial\" is beauty/skincare/fashion photography specifically — do NOT use it as a generic catch-all. \"food\" is candy/bakery/confectionery/dessert/cafe/restaurant photography — use it for any theme actually about food or sweets. If nothing genuinely fits (hobby, fandom, collector, pop-culture, or any theme with no real visual overlap to these categories), use \"default\" rather than forcing a mismatch.",
+  "imageCategory": "ONLY used when isCustom is true (ignored otherwise) — one of: marketing|production|product|lifestyle|editorial|portrait|trades|automotive|food|default. Pick whichever real category is the closest visual match to the theme. "editorial" is beauty/skincare/fashion photography specifically — do NOT use it as a generic catch-all. "food" is candy/bakery/confectionery/dessert/cafe/restaurant photography — use it for any theme actually about food or sweets. If nothing genuinely fits (hobby, fandom, collector, pop-culture, or any theme with no real visual overlap to these categories), use "default" rather than forcing a mismatch.",
   "goals": ["array of 1-3 goals from this list — Lead Generation, Direct Sales / E-commerce, Bookings & Reservations, Awareness & Brand Building, Community & Newsletter Growth, Applications & Sign-ups, Donations & Fundraising"],
   "outcome": "1 specific sentence",
   "primaryKeywords": "5 comma-separated keywords",
@@ -766,8 +766,8 @@ Return ONLY a valid JSON object — no preamble, no markdown fences:
   "heroHeading": "8-14 word hero headline in the theme's voice",
   "heroSubhead": "1-2 sentences. What this site is about, in the theme's authentic voice.",
   "aboutBody": "60-100 words of dummy body copy fully immersed in the theme's world.",
-  "aboutHeading": "5-9 words. A pointed statement fully in the theme's voice, not a generic label like \"About Us\" or \"Why clients keep coming back\" -- must sound like it belongs to THIS specific theme.",
-  "ctaHeading": "5-10 words. A closing call-to-action line fully in the theme's voice, not a generic phrase like \"Ready to get started?\".",
+  "aboutHeading": "5-9 words. A pointed statement fully in the theme's voice, not a generic label like "About Us" or "Why clients keep coming back" -- must sound like it belongs to THIS specific theme.",
+  "ctaHeading": "5-10 words. A closing call-to-action line fully in the theme's voice, not a generic phrase like "Ready to get started?".",
   "sections": ["Hero", "About", "CTA"],
   "projectName": "1-3 word project name"
 }
@@ -1149,7 +1149,7 @@ Rules:
     setPageIdx(0);
     setBriefRec(null);
     setBriefText("");
-    try { localStorage.removeItem("spec_tab"); } catch {}
+    try { localStorage.removeItem("spec_tab"); } catch { /* best-effort, safe to skip if unavailable */ }
     setTab("discovery");
     setView("editor");
   };
@@ -1236,7 +1236,7 @@ Rules:
     setActiveId(id);
     setView("editor");
     setPageIdx(0);
-    try { localStorage.removeItem("spec_tab"); } catch {}
+    try { localStorage.removeItem("spec_tab"); } catch { /* best-effort, safe to skip if unavailable */ }
     setTab("discovery"); // Land on Discovery so they start by filling in the business info
   };
 
@@ -1636,7 +1636,7 @@ Rules:
         }
         return raw; // old full format
       }
-    } catch {}
+    } catch { /* best-effort, safe to skip if unavailable */ }
     return null;
   })();
 

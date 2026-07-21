@@ -115,13 +115,13 @@ function AppShell() {
       const params = new URLSearchParams(window.location.search);
       const fromUrl = params.get("tool") || (params.get("build") ? "brief-to-blueprint" : null);
       if (fromUrl) return fromUrl;
-    } catch {}
+    } catch { /* best-effort, safe to skip if unavailable */ }
     try { return localStorage.getItem("spec_app_view") || "dashboard"; } catch { return "dashboard"; }
   });
 
   function setView(v) {
     setViewRaw(v);
-    try { localStorage.setItem("spec_app_view", v); } catch {}
+    try { localStorage.setItem("spec_app_view", v); } catch { /* best-effort, safe to skip if unavailable */ }
     // Keep the URL's ?tool= in sync so switching tools stays shareable/
     // bookmarkable too. Dashboard is the default landing view, so it's left
     // out of the URL to keep the bare specish.com link clean; switching away
@@ -141,7 +141,7 @@ function AppShell() {
         }
       }
       window.history.replaceState({}, "", url);
-    } catch {}
+    } catch { /* best-effort, safe to skip if unavailable */ }
   }
   const [role, setRole]             = useState("staff");
   const [tools, setTools]           = useState(["template-studio", "brief-to-blueprint"]);

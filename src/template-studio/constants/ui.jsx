@@ -29,16 +29,12 @@ export const UI_ICONS = {
   "file-text": (k) => [<path key={k+"a"} d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />, <polyline key={k+"b"} points="14 2 14 8 20 8" />, <line key={k+"c"} x1="16" y1="13" x2="8" y2="13" />, <line key={k+"d"} x1="16" y1="17" x2="8" y2="17" />, <polyline key={k+"e"} points="10 9 9 9 8 9" />],
 };
 
-export const Icon = ({ name, size = 16, color = "currentColor", strokeWidth = 1.75, style = {} }) => {
-  const renderPaths = UI_ICONS[name];
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24"
-         fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round"
-         style={{ flexShrink: 0, display: "inline-block", verticalAlign: "middle", ...style }}>
-      {renderPaths ? renderPaths(name) : null}
-    </svg>
-  );
-};
+// Icon component lives in ../components/Icon.jsx (imports UI_ICONS from here) --
+// was previously duplicated here too, an apparent leftover from that split.
+// Confirmed via full-codebase grep: every real import already pulls Icon from
+// Icon.jsx, nothing imports it from this file. Removing the duplicate also
+// resolves react-refresh/only-export-components for this file, since Icon was
+// the only component-type export mixed in among otherwise-plain constants.
 export const TONES = ["Editorial & Minimal", "Bold & Direct", "Friendly & Conversational", "Premium & Refined", "Professional", "Warm & Approachable", "Authoritative & Expert", "Playful & Creative", "Honest & Grounded", "Luxe & Aspirational", "Other"];
 export const FOOTER_STYLES = ["Editorial", "Studio", "Agency", "Premium", "Two Column", "Dark Bar"];
 export const HEADER_STYLES = ["Editorial", "Studio", "Agency", "Premium", "Social First", "Transparent"];

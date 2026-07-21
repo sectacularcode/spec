@@ -122,6 +122,7 @@ export function buildLandingPreview(brief, variant, inspoContext, colors) {
           "</svg>"
         ].join("");
         // btoa needs ASCII — strip non-ASCII chars
+        // eslint-disable-next-line no-control-regex -- \x00-\x7F is the real intended ASCII range boundary, not an accidental control character
         var safe = svgLines.replace(/[^\x00-\x7F]/g, "");
         return "data:image/svg+xml;base64," + btoa(safe);
       }
